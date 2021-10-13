@@ -1,9 +1,16 @@
 package `in`.processmaster.salestripclm.activity
 
+import DocManagerModel
 import `in`.processmaster.salestripclm.ConnectivityChangeReceiver
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.alertDialogNetwork
 import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.connectivityChangeReceiver
+import `in`.processmaster.salestripclm.models.LoginModel
+import `in`.processmaster.salestripclm.models.TeamsModel
+import `in`.processmaster.salestripclm.networkUtils.APIClient
+import `in`.processmaster.salestripclm.networkUtils.APIInterface
+import `in`.processmaster.salestripclm.utils.DatabaseHandler
+import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
@@ -26,20 +33,26 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
+import com.google.gson.Gson
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import kotlinx.android.synthetic.main.progress_view.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.lang.Exception
 import java.lang.ref.WeakReference
 
 
 open class BaseActivity : AppCompatActivity() {
 
-
-
     var alertDialog: AlertDialog? = null
+    var sharePreferanceBase: PreferenceClass?= null
+    var loginModelBase= LoginModel()
+    var dbBase= DatabaseHandler(this)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,6 +60,16 @@ open class BaseActivity : AppCompatActivity() {
         setContentView(R.layout.activity_base)
 
         connectivityChangeReceiver= ConnectivityChangeReceiver()
+
+        try{
+            sharePreferanceBase = PreferenceClass(this)
+            var profileData =sharePreferanceBase?.getPref("profileData")
+            loginModelBase = Gson().fromJson(profileData, LoginModel::class.java)
+        }
+        catch(e:Exception)
+        {
+
+        }
     }
 
     //network alert
@@ -406,6 +429,61 @@ open class BaseActivity : AppCompatActivity() {
         }
     }
 
+    //=========================================API Calling Section===========================================
 
+    fun getSecondaryApiInterface(): APIInterface {
+        return APIClient.getClient(2, sharePreferanceBase?.getPref("secondaryUrl")).create(
+            APIInterface::class.java)
+    }
+
+
+    //Get teams api
+    fun getTeamsApi( context:Context, progressmessage:String) : ArrayList<DocManagerModel>
+    {
+        progressMessage_tv?.setText(progressmessage)
+        enableProgress(progressView_parentRv!!)
+        var getResponseList=ArrayList<DocManagerModel>()
+
+        var call: Call<TeamsModel> = getSecondaryApiInterface().getTeamsMember(
+            "bearer " + loginModelBase?.accessToken,
+            loginModelBase.empId.toString()
+        ) as Call<TeamsModel>
+
+        call.enqueue(object : Callback<TeamsModel?> {
+            override fun onResponse(
+                call: Call<TeamsModel?>?,
+                response: Response<TeamsModel?>
+            ) {
+                if (response.code() == 200 && !response.body().toString().isEmpty())
+                {
+                    var getTeamslist=response.body()
+                    for(singleItem in getTeamslist?.data?.employeeList!!)
+                    {
+                        var selectorModel =DocManagerModel()
+                        selectorModel.setName(singleItem.firstName+" "+singleItem.lastName)
+                        selectorModel.setRoute(singleItem.headQuaterName)
+                        selectorModel.setSpeciality(singleItem.divisionName)
+                        selectorModel.setId(singleItem.empId)
+
+                        getResponseList.add(selectorModel)
+                    }
+                }
+                else
+                {
+                    Toast.makeText(this@BaseActivity, "Server error ", Toast.LENGTH_SHORT).show()
+                    return
+                }
+                disableProgress(progressView_parentRv!!)
+
+            }
+
+            override fun onFailure(call: Call<TeamsModel?>, t: Throwable?) {
+                call.cancel()
+                disableProgress(progressView_parentRv!!)
+
+            }
+        })
+        return getResponseList
+    }
 
 }

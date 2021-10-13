@@ -251,8 +251,6 @@ class DownloadedActivtiy : BaseActivity() {
     }
 
 
-
-
     fun progressDialog()
     {
         val dialogBuilder = AlertDialog.Builder(this)

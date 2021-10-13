@@ -24,35 +24,37 @@
             app:tint="@color/white" />
 
         <ImageView
-            android:visibility="gone"
+            android:layout_toLeftOf="@+id/sendImgGmail"
             android:layout_marginRight="10dp"
-            android:layout_alignParentRight="true"
             android:id="@+id/delete_imv"
             android:layout_centerVertical="true"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:src="@drawable/ic_bin"
             android:layout_marginLeft="10dp"
-            app:tint="@color/white" />
+            app:tint="@color/white"
+            />
 
         <ImageView
+            android:visibility="gone"
             android:id="@+id/sendImageWatsup"
-            android:layout_toLeftOf="@+id/sendImgGmail"
-            android:layout_centerVertical="true"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@drawable/whatsapp"
-            android:layout_marginRight="10dp"/>
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:layout_toLeftOf="@+id/sendImgGmail"
+            android:src="@drawable/whatsapp" />
 
 
         <ImageView
             android:id="@+id/sendImgGmail"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@drawable/gmail"
-            android:layout_marginRight="10dp"/>
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/ic_mail"
+            app:tint="@color/white" />
 
     </RelativeLayout>
 
@@ -63,11 +65,11 @@
         android:id="@+id/multipleImage_rv"/>
 
     <pl.droidsonroids.gif.GifImageView
-        android:id="@+id/nodata_gif"
         android:visibility="gone"
+        android:id="@+id/nodata_gif"
         android:layout_centerInParent="true"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
         android:src="@drawable/nodata_gif" />
 
 

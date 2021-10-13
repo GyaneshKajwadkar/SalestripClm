@@ -81,6 +81,10 @@ public class GenerateOTPModel {
             this.isOTPMatched = isOTPMatched;
         }
 
+        @SerializedName("imageName")
+        @Expose
+        private String imageName;
+
         @SerializedName("message")
         @Expose
         private String message;
@@ -94,6 +98,13 @@ public class GenerateOTPModel {
 
         public void setMessage(String message) {
             this.message = message;
+        }
+
+        public String getImageName() {
+            return imageName;
+        }
+        public void setImageName(String imageName) {
+            this.imageName = imageName;
         }
 
         public UserData getUserData() {

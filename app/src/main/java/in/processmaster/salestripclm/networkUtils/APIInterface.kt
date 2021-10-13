@@ -2,6 +2,7 @@ package `in`.processmaster.salestripclm.networkUtils
 
 import `in`.processmaster.salestripclm.models.*
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.http.*
@@ -61,10 +62,9 @@ interface APIInterface
         @Field("newPassword") newPassword: String?
     ): Call<GenerateOTPModel?>?
 
-
+    //edetailing api
     @GET("api/e-detailing/publish/{divisionId}")
-    fun  //edetailing api
-            detailingApi(
+    fun detailingApi(
         @Header("Authorization") authorization: String?,
         @Path("divisionId") divisionId: String?
     ): Call<DevisionModel?>?
@@ -111,5 +111,14 @@ interface APIInterface
 
     @Multipart
     @POST("api/users/documents")
-    fun changeProflePic(@Header("Authorization") authorization: String?,@Part filePart: MultipartBody.Part?,@Part("model") model: String?): Call<GenerateOTPModel?>?
-}
+    fun changeProflePic(@Header("Authorization") authorization: String?,
+                        @Part filePart: MultipartBody.Part?, @Part("model") model: RequestBody
+    ):
+            Call<GenerateOTPModel?>?
+
+    @Multipart
+    @POST("api/mailBox/mailWithAttachment")
+    fun sendEmail(@Header("Authorization") authorization: String?,
+                  @Part files: Array<MultipartBody.Part?>, @Part("model") model: RequestBody
+    ):
+            Call<GenerateOTPModel?>?}

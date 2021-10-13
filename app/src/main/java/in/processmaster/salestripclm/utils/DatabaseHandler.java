@@ -1,5 +1,6 @@
 package in.processmaster.salestripclm.utils;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -192,6 +193,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
     }
 
+    @SuppressLint("Range")
     public boolean getFavEdetailing(String idModel)
     {
         boolean isFavAdded=false;
@@ -309,8 +311,29 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return edetailList;
     }
 
+    public boolean getDownloadStatus(ArrayList<DevisionModel.Data.EDetailing.EretailDetail> eretailDetailList)
+    {
+        boolean returnValue=false;
+        for(int i=0;i<eretailDetailList.size();i++)
+        {
+            DownloadFileModel returnData= getSingleDownloadedData(eretailDetailList.get(i).getFileId());
+            if(returnData.getFileName()!=null)
+            {
+                returnValue=true;
+            }
+            else
+            {
+                returnValue=false;
+                break;
+            }
+        }
+
+       return returnValue;
+    }
+
 
     //getFav edetailing
+    @SuppressLint("Range")
     public  ArrayList<DevisionModel.Data.EDetailing> getAllFavBrands()
     {
        int id=1;
@@ -340,6 +363,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     //get single file path using id
+    @SuppressLint("Range")
     public  String getDownloadedSingleData(String id)
     {
         String data="";
@@ -418,6 +442,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     //get single file path using id
+    @SuppressLint("Range")
     public  DownloadFileModel getSingleDownloadedData(int id)
     {
         DownloadFileModel downloadFileModel=new DownloadFileModel();
@@ -448,6 +473,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     //get all file path using id
+    @SuppressLint("Range")
     public  ArrayList<DownloadFileModel> getAllDownloadedData(int id)
     {
         ArrayList<DownloadFileModel> downloadFileList=new ArrayList<>();
@@ -481,6 +507,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     //get all file path using id
+    @SuppressLint("Range")
     public  ArrayList<DownloadFileModel> getAllFavListChild(int id)
     {
         ArrayList<DownloadFileModel> downloadFileList=new ArrayList<>();
@@ -527,6 +554,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     }
 
+    @SuppressLint("Range")
     public ArrayList<DownloadFileModel> getAllDataUsingType(String type)
     {
         ArrayList<DownloadFileModel> downloadFileList=new ArrayList<>();
@@ -548,6 +576,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return downloadFileList;
     }
 
+    @SuppressLint("Range")
     public ArrayList<DownloadFileModel> getAllFavList()
     {
         ArrayList<DownloadFileModel> downloadFileList=new ArrayList<>();
@@ -595,8 +624,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     //=======================================VisualAds table==============================================
-    //gyanesh@processmaster.in
-    //Fac90020
     //insert or update visual ads table
     public void insertStartTimeSlide(String currentTime,int addDoctorId,int addBrandId)
     {
@@ -681,6 +708,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
+    @SuppressLint("Range")
     // check visual ads is already exist.
     public boolean CheckVisualAds(String startTime, int brandId) {
 
@@ -734,7 +762,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.update(TABLE_CHILD_VISUAL_ADS, initialValues, "setTime = ? AND file_id= ? ", new String[] {startTime, String.valueOf(setfileId)});  // number 1 is the _id here, update to variable for your code
         db.close();
-        Log.e("likelike","likeinserted");
     }
 
     //insert comment
@@ -761,6 +788,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     //getLike
+    @SuppressLint("Range")
     public boolean getLike(String setfileId, String startTime)
     {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -786,6 +814,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     //get comment
+    @SuppressLint("Range")
     public String getComment(String setfileId, String startTime)
     {
         String getDbComment=" ";
@@ -809,6 +838,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     //get time in second
+    @SuppressLint("Range")
     public int getTime(String setfileId, String startTime)
     {
         int getDbTimer= 0;
@@ -832,6 +862,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     // get all same id childs
+    @SuppressLint("Range")
     public ArrayList<VisualAdsModel_Send.childData> getAllChildBy_ID(String startTime)
     {
         ArrayList<VisualAdsModel_Send.childData> childListVisualAds=new ArrayList<>();
@@ -883,6 +914,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 
     //check is visualads exist using date and fileID
+    @SuppressLint("Range")
     public boolean ChecktimeandFileIdExist(String fileIdCheck,String dateTime) {
 
         SQLiteDatabase db = this.getReadableDatabase();

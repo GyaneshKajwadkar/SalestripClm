@@ -8,6 +8,7 @@ import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -76,6 +77,8 @@ class DownloadedFragment : Fragment() {
                 {
                     editTextFilter(EdetailingFragment.filter_et?.text.toString())
                 }
+
+                isFirstTimeOpen=false
             }, 100)
 
         return view
@@ -88,8 +91,9 @@ class DownloadedFragment : Fragment() {
         super.onResume()
         var   getAlleDetail= db.getSelectedeDetail(true)
 
-        if(getAlleDetail.size!=getAlleDetailListDb.size && !isFirstTimeOpen)
+        if(/*getAlleDetail.size!=getAlleDetailListDb.size &&*/ !isFirstTimeOpen)
         {
+
             getAlleDetailListDb.clear()
             getAlleDetailListDb.addAll(getAlleDetail)
             adapter =  Edetailing_Adapter(

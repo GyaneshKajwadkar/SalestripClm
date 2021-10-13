@@ -12,6 +12,7 @@ import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
@@ -25,31 +26,30 @@ import kotlinx.android.synthetic.main.activity_image_selecror.*
 import pl.droidsonroids.gif.GifImageView
 import java.io.File
 import java.io.FilenameFilter
+import java.io.Serializable
 
 
 class ImageSelectorActivity : BaseActivity() {
 
-
- //   var delete_imv:ImageView?=null
+    //   var delete_imv:ImageView?=null
 
     var adapter=ImageSelectorAdapter()
-    var db = DatabaseHandler(this)
     var nodata_gif: GifImageView?=null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_image_selecror)
 
-        nodata_gif=findViewById(R.id.nodata_gif);
+        nodata_gif=findViewById(R.id.nodata_gif)
 
         val folder = File(intent.getStringExtra("filePath"))
         val selection = intent.getStringExtra("selection")
 
         if(selection.equals("delete"))
         {
-            sendImageWatsup?.visibility=View.GONE
-            sendImgGmail?.visibility=View.GONE
-            delete_imv?.visibility=View.VISIBLE
+            //  sendImageWatsup?.visibility=View.GONE
+            //  sendImgGmail?.visibility=View.GONE
+            //  delete_imv?.visibility=View.VISIBLE
         }
 
         else
@@ -75,7 +75,7 @@ class ImageSelectorActivity : BaseActivity() {
         delete_imv.setOnClickListener({
             var getArray= adapter.getAllWorkRows()
             var filterList= getArray?.filter  { s -> s.isSend == true}
-            if(filterList?.size==0)
+            if(filterList?.size==0 || filterList==null)
             {
                 Toast.makeText(this, "No item selected", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -86,36 +86,59 @@ class ImageSelectorActivity : BaseActivity() {
 
 
         sendImgGmail?.setOnClickListener({
-          var getArray= adapter.getAllWorkRows()
+
+
+            var getArray= adapter.getAllWorkRows()
             var filterList= getArray?.filter  { s -> s.isSend == true}
-            if(filterList?.size==0)
+
+            if(filterList?.size==0 || filterList==null)
             {
-                Toast.makeText(this, "No item selected", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "No attachment selected", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            val otherStrings = arrayOf("kajwadkar13@gmail.com")
-
-
-            val intent = Intent()
-            intent.action = Intent.ACTION_SEND_MULTIPLE
-            intent.putExtra(Intent.EXTRA_EMAIL,  "kajwadkar13@gmail.com")
-            intent.putExtra(Intent.EXTRA_SUBJECT, "Screenshots salestrip CLM")
-            intent .setPackage("com.google.android.gm")
-
-            intent.type = "image/jpeg"
-
-            val files: ArrayList<Uri> = ArrayList<Uri>()
-
-            for (path in filterList!!)
-            {
-                val file = File(path.file?.absolutePath)
-                val uri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".provider", file);
-                files.add(uri)
-            }
-
-            intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files)
+            val intent: Intent = Intent(
+                this@ImageSelectorActivity,
+                MailActivity::class.java
+            )
+            val args = Bundle()
+            args.putSerializable(
+                "ARRAYLIST",
+                filterList as Serializable
+            )
+            intent.putExtra("attachment", args)
             startActivity(intent)
+
+
+
+            /*          var getArray= adapter.getAllWorkRows()
+                        var filterList= getArray?.filter  { s -> s.isSend == true}
+                        if(filterList?.size==0)
+                        {
+                            Toast.makeText(this, "No item selected", Toast.LENGTH_SHORT).show()
+                            return@setOnClickListener
+                        }
+
+
+                        val intent = Intent()
+                        intent.action = Intent.ACTION_SEND_MULTIPLE
+                        intent.putExtra(Intent.EXTRA_EMAIL,  "kajwadkar13@gmail.com")
+                        intent.putExtra(Intent.EXTRA_SUBJECT, "Screenshots salestrip CLM")
+                        intent .setPackage("com.google.android.gm")
+
+                        intent.type = "image/jpeg"
+
+                        val files: ArrayList<Uri> = ArrayList<Uri>()
+
+                        for (path in filterList!!)
+                        {
+                            val file = File(path.file?.absolutePath)
+                            val uri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".provider", file);
+                            files.add(uri)
+                        }
+
+                        intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files)
+                        startActivity(intent)*/
         })
 
         val installed: Boolean = isAppInstalled("com.whatsapp")
@@ -133,7 +156,7 @@ class ImageSelectorActivity : BaseActivity() {
         }
 
         sendImageWatsup?.setOnClickListener({
-           // val url = "https://api.whatsapp.com/send?phone= ${918109107014}"
+            // val url = "https://api.whatsapp.com/send?phone= ${918109107014}"
 
             if(!installed)
             {
@@ -210,7 +233,7 @@ class ImageSelectorActivity : BaseActivity() {
 
             if(index==allFiles.size-1)
             {
-                adapter=ImageSelectorAdapter(fileList, this)
+                adapter=ImageSelectorAdapter(fileList, this,true)
                 multipleImage_rv.layoutManager = GridLayoutManager(this, mNoOfColumns)
                 multipleImage_rv.itemAnimator = DefaultItemAnimator()
                 multipleImage_rv.adapter = adapter
@@ -219,7 +242,7 @@ class ImageSelectorActivity : BaseActivity() {
         if(fileList?.size==0)
         {
             nodata_gif?.visibility=View.VISIBLE
-            multipleImage_rv.visibility=View.GONE
+            //   multipleImage_rv.visibility=View.GONE
         }
         adapter.notifyDataSetChanged()
 
@@ -227,15 +250,15 @@ class ImageSelectorActivity : BaseActivity() {
 
 
 
-//Model class for sending image
-    class SendImage
+    //Model class for sending image
+    class SendImage :Serializable
     {
-         var file:File?=null
+        var file:File?=null
             get() = field
             set(value) { field = value }
 
-         var isSend: Boolean? = null
-             get() = field
+        var isSend: Boolean? = null
+            get() = field
             set(value) { field = value }
     }
 
@@ -267,7 +290,7 @@ class ImageSelectorActivity : BaseActivity() {
         val message_tv = dialogView.findViewById<View>(R.id.message_tv) as TextView
         val exit_btn = dialogView.findViewById<View>(R.id.exit_btn) as MaterialButton
         val cancel_btn =
-                dialogView.findViewById<View>(R.id.cancel_btn) as MaterialButton
+            dialogView.findViewById<View>(R.id.cancel_btn) as MaterialButton
 
         exit_btn.setText("Delete")
         message_tv.setText("Are you sure you want to delete selected files?")

@@ -16,16 +16,19 @@ import androidx.recyclerview.widget.RecyclerView
 import java.io.File
 
 
+
 class ImageSelectorAdapter constructor() :
-        RecyclerView.Adapter<ImageSelectorAdapter.MyViewHolder>()
+    RecyclerView.Adapter<ImageSelectorAdapter.MyViewHolder>()
 {
     var allFiles: ArrayList<ImageSelectorActivity.SendImage>? = null
     lateinit var  context: Context
+    var  isClickActivate= false
 
-    constructor(allFiles: ArrayList<ImageSelectorActivity.SendImage>?, context: Context) : this()
+    constructor(allFiles: ArrayList<ImageSelectorActivity.SendImage>?, context: Context, isActivate :Boolean) : this()
     {
         this.allFiles=allFiles;
         this.context=context;
+        this.isClickActivate=isActivate;
     }
 
     class MyViewHolder(view: View) : RecyclerView.ViewHolder(view)
@@ -38,7 +41,7 @@ class ImageSelectorAdapter constructor() :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder
     {
         val itemView = LayoutInflater.from(parent.context)
-                .inflate(R.layout.imageselector, parent, false)
+            .inflate(R.layout.imageselector, parent, false)
         return MyViewHolder(itemView)
     }
 
@@ -46,12 +49,19 @@ class ImageSelectorAdapter constructor() :
     {
         val imgFile = File(allFiles?.get(position)?.file?.absolutePath)
 
-        if (imgFile.exists()) {
+        if (imgFile.exists())
+        {
             val myBitmap = BitmapFactory.decodeFile(imgFile.absolutePath)
             holder.imageSelectionImg.setImageBitmap(myBitmap)
         }
 
         holder.imageSelectionImg.setOnClickListener({
+
+            if(!isClickActivate)
+            {
+                return@setOnClickListener
+            }
+
             val buttonColor = holder.parentImage_rl.getBackground() as ColorDrawable
             val colorId = buttonColor.color
 
@@ -81,7 +91,8 @@ class ImageSelectorAdapter constructor() :
         return allFiles?.size!!
     }
 
-    fun getAllWorkRows(): ArrayList<ImageSelectorActivity.SendImage>? {
+    fun getAllWorkRows(): ArrayList<ImageSelectorActivity.SendImage>?
+    {
         return allFiles
     }
 }

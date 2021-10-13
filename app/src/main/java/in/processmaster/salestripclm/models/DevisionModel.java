@@ -94,9 +94,6 @@ public class DevisionModel  {
             @SerializedName("isPublish")
             @Expose
             private Boolean isPublish;
-            @SerializedName("eretailDetailList")
-            @Expose
-            private Object eretailDetailList;
             @SerializedName("eretailReferenceList")
             @Expose
             private Object eretailReferenceList;
@@ -112,6 +109,10 @@ public class DevisionModel  {
             @SerializedName("isReviseData")
             @Expose
             private Boolean isReviseData;
+
+            @SerializedName("eretailDetailList")
+            @Expose
+            private ArrayList<EretailDetail> eretailDetailList = null;
 
             public Integer geteDetailId() {
                 return eDetailId;
@@ -161,13 +162,6 @@ public class DevisionModel  {
                 this.isPublish = isPublish;
             }
 
-            public Object getEretailDetailList() {
-                return eretailDetailList;
-            }
-
-            public void setEretailDetailList(Object eretailDetailList) {
-                this.eretailDetailList = eretailDetailList;
-            }
 
             public Object getEretailReferenceList() {
                 return eretailReferenceList;
@@ -207,6 +201,95 @@ public class DevisionModel  {
 
             public void setIsReviseData(Boolean isReviseData) {
                 this.isReviseData = isReviseData;
+            }
+
+            public ArrayList<EretailDetail> getEretailDetailList() {
+                return eretailDetailList;
+            }
+
+            public void setEretailDetailList(ArrayList<EretailDetail> eretailDetailList) {
+                this.eretailDetailList = eretailDetailList;
+            }
+            public class EretailDetail {
+
+                @SerializedName("eDetailId")
+                @Expose
+                private Integer eDetailId;
+                @SerializedName("fileId")
+                @Expose
+                private Integer fileId;
+                @SerializedName("fileSize")
+                @Expose
+                private Integer fileSize;
+                @SerializedName("fileName")
+                @Expose
+                private String fileName;
+                @SerializedName("filePath")
+                @Expose
+                private String filePath;
+                @SerializedName("fileOrder")
+                @Expose
+                private Integer fileOrder;
+                @SerializedName("fileType")
+                @Expose
+                private String fileType;
+
+                public Integer geteDetailId() {
+                    return eDetailId;
+                }
+
+                public void seteDetailId(Integer eDetailId) {
+                    this.eDetailId = eDetailId;
+                }
+
+                public Integer getFileId() {
+                    return fileId;
+                }
+
+                public void setFileId(Integer fileId) {
+                    this.fileId = fileId;
+                }
+
+                public Integer getFileSize() {
+                    return fileSize;
+                }
+
+                public void setFileSize(Integer fileSize) {
+                    this.fileSize = fileSize;
+                }
+
+                public String getFileName() {
+                    return fileName;
+                }
+
+                public void setFileName(String fileName) {
+                    this.fileName = fileName;
+                }
+
+                public String getFilePath() {
+                    return filePath;
+                }
+
+                public void setFilePath(String filePath) {
+                    this.filePath = filePath;
+                }
+
+                public Integer getFileOrder() {
+                    return fileOrder;
+                }
+
+                public void setFileOrder(Integer fileOrder) {
+                    this.fileOrder = fileOrder;
+                }
+
+                public String getFileType() {
+                    return fileType;
+                }
+
+                public void setFileType(String fileType) {
+                    this.fileType = fileType;
+                }
+
             }
 
         }

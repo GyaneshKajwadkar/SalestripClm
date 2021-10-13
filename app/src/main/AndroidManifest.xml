@@ -26,6 +26,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Salestrip"
         android:usesCleartextTraffic="true">
+
+        <activity
+            android:name=".activity.MailActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:screenOrientation="landscape"
+            android:windowSoftInputMode="stateHidden" />
+
         <activity
             android:name=".presentation_and_zoom.OnlinePresentationActivity"
             android:launchMode="singleTop"

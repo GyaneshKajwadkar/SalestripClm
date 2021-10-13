@@ -5,6 +5,7 @@ import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.models.GenerateOTPModel
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.models.ProfileModel
+import `in`.processmaster.salestripclm.models.SyncModel
 import `in`.processmaster.salestripclm.networkUtils.APIClient
 import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.utils.PreferenceClass
@@ -52,13 +53,9 @@ import retrofit2.Response
 import java.text.ParseException
 import java.util.regex.Matcher
 import java.util.regex.Pattern
-import android.R.attr.button
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-
-
-
 
 class ProfileeActivity : BaseActivity() {
 
@@ -100,9 +97,9 @@ class ProfileeActivity : BaseActivity() {
 
         territory_mb.setOnClickListener({
             setToDefaultAll()
-           territory_mb.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.appColor))
-           territory_mb.setTextColor(ContextCompat.getColorStateList(this, R.color.white))
-           territory_mb.iconTint=ContextCompat.getColorStateList(this, R.color.white)
+            territory_mb.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.appColor))
+            territory_mb.setTextColor(ContextCompat.getColorStateList(this, R.color.white))
+            territory_mb.iconTint=ContextCompat.getColorStateList(this, R.color.white)
             territory_ll.visibility= View.VISIBLE
         })
 
@@ -239,7 +236,7 @@ class ProfileeActivity : BaseActivity() {
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_TAKE_PHOTO) {
                 try {
-                 //   mPhotoFile = mCompressor.compressToFile(mPhotoFile)
+                    //   mPhotoFile = mCompressor.compressToFile(mPhotoFile)
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
@@ -251,7 +248,7 @@ class ProfileeActivity : BaseActivity() {
                             .placeholder(R.drawable.zm_menu_icon_profile)
                     )
                     .into(changeProfilePic_civ)
-                     updateProfilePic()
+                updateProfilePic()
             }
             else if (requestCode == REQUEST_GALLERY_PHOTO) {
                 val selectedImage = data?.data
@@ -303,7 +300,7 @@ class ProfileeActivity : BaseActivity() {
 
             alertDialog?.getWindow()
                 ?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            alertDialog.getWindow()?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+            alertDialog.getWindow()?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
 
             val changepassword_parentl=dialogView.findViewById<View>(R.id.changepassword_parentll)as LinearLayout
             val guidlines_parentll=dialogView.findViewById<View>(R.id.guidlines_parentll)as LinearLayout
@@ -369,54 +366,52 @@ class ProfileeActivity : BaseActivity() {
                         greaterGuidline_iv.setBackgroundResource(R.drawable.ic_cross)
                         endGuidline_iv.setBackgroundResource(R.drawable.ic_cross)
                     }
-
-
                 }
             })
 
 
+            okBtn_rl.setOnClickListener {
 
-             okBtn_rl.setOnClickListener {
-
-                 if(currentpassword_et.text.toString().isEmpty())
-                 {
-                     currentpassword_et.requestFocus()
-                     currentpassword_et.setError("Required")
-                     return@setOnClickListener
-                 }
-                 if(newpassword_et.text.toString().isEmpty())
-                 {
+                if(currentpassword_et.text.toString().isEmpty())
+                {
+                    currentpassword_et.requestFocus()
+                    currentpassword_et.setError("Required")
+                    return@setOnClickListener
+                }
+                if(newpassword_et.text.toString().isEmpty())
+                {
                     newpassword_et.requestFocus()
                     newpassword_et.setError("Required")
-                     return@setOnClickListener
-                 }
+                    return@setOnClickListener
+                }
 
-                 if(!checkStringLength(newpassword_et.text.toString()) || !checkMultipleGuidlines(newpassword_et.text.toString()) || checkEndGuidlines(newpassword_et.text.toString()) )
-                 {
-                     newpassword_et.requestFocus()
-                     newpassword_et.setError("Wrong format")
-                     return@setOnClickListener
-                 }
+                if(!checkStringLength(newpassword_et.text.toString()) || !checkMultipleGuidlines(newpassword_et.text.toString()) || checkEndGuidlines(newpassword_et.text.toString()) )
+                {
+                    newpassword_et.requestFocus()
+                    newpassword_et.setError("Wrong format")
+                    return@setOnClickListener
+                }
 
-                 if(confirmpassword_et.text.toString().isEmpty())
-                 {
-                     confirmpassword_et.requestFocus()
-                     confirmpassword_et.setError("Required")
-                     return@setOnClickListener
-                 }
+                if(confirmpassword_et.text.toString().isEmpty())
+                {
+                    confirmpassword_et.requestFocus()
+                    confirmpassword_et.setError("Required")
+                    return@setOnClickListener
+                }
 
-                 if(!confirmpassword_et.text.toString().equals(newpassword_et.text.toString()))
-                 {
-                     confirmpassword_et.requestFocus()
-                     confirmpassword_et.setError("Password mismatch")
-                     newpassword_et.setError("Password mismatch")
+                if(!confirmpassword_et.text.toString().equals(newpassword_et.text.toString()))
+                {
+                    confirmpassword_et.requestFocus()
+                    confirmpassword_et.setError("Password mismatch")
+                    newpassword_et.setError("Password mismatch")
 
-                     return@setOnClickListener
-                 }
-                 HideKeyboard(it)
-                 changeProfileApi(currentpassword_et,newpassword_et,alertDialog,progressViewDilog)
+                    return@setOnClickListener
+                }
+                HideKeyboard(it)
+                changePasswordApi(currentpassword_et,newpassword_et,alertDialog,progressViewDilog)
 
-             }
+            }
+
             cancelBtn_rl.setOnClickListener {
                 alertDialog?.dismiss()
             }
@@ -429,13 +424,13 @@ class ProfileeActivity : BaseActivity() {
     //check password string length
     fun checkStringLength(string: String):Boolean
     {
-            if(string.length>8)
-            {
+        if(string.length>8)
+        {
             return true
-            }
+        }
         else{
             return false
-            }
+        }
 
     }
 
@@ -472,17 +467,12 @@ class ProfileeActivity : BaseActivity() {
 
     fun getProfileDataApi()
     {
-
-        Log.e("callingApi","ProfileApi")
-        val sharePreferance = PreferenceClass(this)
-        var profileData =sharePreferance?.getPref("profileData")
-        val loginModel = Gson().fromJson(profileData, LoginModel::class.java)
-        var  apiInterface= APIClient.getClient(2, sharePreferance?.getPref("secondaryUrl")).create(
+        var  apiInterface= APIClient.getClient(2, sharePreferanceBase?.getPref("secondaryUrl")).create(
             APIInterface::class.java)
 
         var call: Call<ProfileModel> = apiInterface?.getProfileData(
-            "bearer " + loginModel?.accessToken,
-            loginModel.empId.toString()
+            "bearer " + loginModelBase?.accessToken,
+            loginModelBase.empId.toString()
         ) as Call<ProfileModel>
         call.enqueue(object : Callback<ProfileModel?> {
             @RequiresApi(Build.VERSION_CODES.O)
@@ -501,7 +491,7 @@ class ProfileeActivity : BaseActivity() {
                         .noFade()
                         .into(changeProfilePic_civ)
 
-                   // dateOfbirth_tv.setText(getObject?.dateOfBirth)
+                    // dateOfbirth_tv.setText(getObject?.dateOfBirth)
                     gender_tv.setText(if(getObject?.gender == 1) "Male" else "Female")
                     maritalStatus_tv.setText(if(getObject?.marriedStatus == 1) "Un-Married" else "Married")
                     email_tv.setText(getObject?.emailId)
@@ -518,16 +508,17 @@ class ProfileeActivity : BaseActivity() {
                     manager_tv.setText(getObject?.reportingManagerName)
 
                     val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
-                    try {
+                    try
+                    {
                         val d = sdf.parse(getObject?.joiningDate)
                         val d2 = sdf.parse(getObject?.dateOfBirth)
-                        sdf.applyPattern("dd MMM yyyy ")
+                        sdf.applyPattern("dd MMM yyyy")
 
                         joiningDate_tv.setText(sdf.format(d))
                         dateOfbirth_tv.setText(sdf.format(d2))
-
-
-                    } catch (ex: ParseException) {
+                    }
+                    catch (ex: ParseException)
+                    {
                         Log.v("Exception", ex.getLocalizedMessage())
                     }
 
@@ -535,8 +526,8 @@ class ProfileeActivity : BaseActivity() {
                     designation_tv.setText(getObject?.hierDesc)
 
                     // fieldWork_id.setText(getObject?.field)
-                   // degree_tv.setText(getObject?.)
-                   // anniversary_tv.setText(if(getObject?.marriedStatus == 1) "Un-Married" else "Married")
+                    // degree_tv.setText(getObject?.)
+                    // anniversary_tv.setText(if(getObject?.marriedStatus == 1) "Un-Married" else "Married")
                 }
                 else
                 {
@@ -552,7 +543,7 @@ class ProfileeActivity : BaseActivity() {
         })
     }
 
-    fun changeProfileApi(
+    fun changePasswordApi(
         oldPassword: EditText,
         newPassword: EditText,
         alertDialog: AlertDialog,
@@ -562,21 +553,14 @@ class ProfileeActivity : BaseActivity() {
         progressViewDilog?.visibility=View.VISIBLE
 
         Log.e("callingApi","ChangePasswordApi")
-        val sharePreferance = PreferenceClass(this)
-        var profileData =sharePreferance?.getPref("profileData")
-        val loginModel = Gson().fromJson(profileData, LoginModel::class.java)
 
-          val paramObject = JSONObject()
-          paramObject.put("empId",       loginModel.empId.toString())
-          paramObject.put("oldPassword", oldPassword.text.toString())
-          paramObject.put("newPassword", newPassword.text.toString())
+        val paramObject = JSONObject()
+        paramObject.put("empId",       loginModelBase.empId.toString())
+        paramObject.put("oldPassword", oldPassword.text.toString())
+        paramObject.put("newPassword", newPassword.text.toString())
 
-
-        var  apiInterface= APIClient.getClient(2, sharePreferance?.getPref("secondaryUrl")).create(
-            APIInterface::class.java)
-
-        var call: Call<GenerateOTPModel> = apiInterface?.changePassword(
-            "bearer " + loginModel?.accessToken,
+        var call: Call<GenerateOTPModel> = getSecondaryApiInterface().changePassword(
+            "bearer " + loginModelBase?.accessToken,
             paramObject
         ) as Call<GenerateOTPModel>
         call.enqueue(object : Callback<GenerateOTPModel?> {
@@ -600,15 +584,12 @@ class ProfileeActivity : BaseActivity() {
                         oldPassword.requestFocus()
                         oldPassword.setError(getObject?.errorObj?.errorMessage)
                     }
-
-
                 }
                 else
                 {
                     Toast.makeText(this@ProfileeActivity, "Server error ", Toast.LENGTH_SHORT).show()
                 }
                 progressViewDilog?.visibility=View.GONE
-
             }
 
             override fun onFailure(call: Call<GenerateOTPModel?>, t: Throwable?) {
@@ -628,23 +609,19 @@ class ProfileeActivity : BaseActivity() {
             mPhotoFile?.getName(),
             RequestBody.create(MediaType.parse("image/*"), mPhotoFile))
 
-        val sharePreferance = PreferenceClass(this)
-        var profileData =sharePreferance?.getPref("profileData")
-        val loginModel = Gson().fromJson(profileData, LoginModel::class.java)
 
         val paramObject = JSONObject()
-        paramObject.put("EmpId",     loginModel.empId.toString())
+        paramObject.put("EmpId",     loginModelBase.empId.toString())
         paramObject.put("ImageName", mPhotoFile?.getName() )
         paramObject.put("ImagePath", mPhotoFile?.absolutePath.toString())
         paramObject.put("ImageExt",  mPhotoFile?.absolutePath?.substring(mPhotoFile?.absolutePath?.lastIndexOf(".")?.plus(1)!!))
         paramObject.put("AbsolutePath", mPhotoFile?.absolutePath.toString())
 
-        var  apiInterface= APIClient.getClient(2, sharePreferance?.getPref("secondaryUrl")).create(
-            APIInterface::class.java)
+        var reqBody = RequestBody.create(MediaType.parse("text/plain"), paramObject.toString());
 
-        var call: Call<GenerateOTPModel> = apiInterface?.changeProflePic(
-            "bearer " + loginModel?.accessToken,
-            filePart,paramObject.toString()
+        var call: Call<GenerateOTPModel> = getSecondaryApiInterface().changeProflePic(
+            "bearer " + loginModelBase?.accessToken,
+            filePart,reqBody
         ) as Call<GenerateOTPModel>
         call.enqueue(object : Callback<GenerateOTPModel?> {
             @RequiresApi(Build.VERSION_CODES.O)
@@ -653,29 +630,36 @@ class ProfileeActivity : BaseActivity() {
                 response: Response<GenerateOTPModel?>
             )
             {
-                Log.e("resultCodeProfile",response.code().toString())
                 if (response.code() == 200 && !response.body().toString().isEmpty())
                 {
                     var getObject=response.body()
+                    loginModelBase.imageName=getObject?.data?.imageName.toString()
+
+                    val gson = Gson()
+                    sharePreferanceBase?.setPref("profileData", gson.toJson(loginModelBase))
+
+                    var profileData =sharePreferanceBase?.getPref("profileData")
+                    loginModelBase = Gson().fromJson(profileData, LoginModel::class.java)
                 }
                 else
                 {
                     Toast.makeText(this@ProfileeActivity, "Server error ", Toast.LENGTH_SHORT).show()
+
                 }
+
                 progressView_parentRv?.visibility=View.GONE
             }
 
             override fun onFailure(call: Call<GenerateOTPModel?>, t: Throwable?) {
                 call.cancel()
-                Log.e("errorhaiProfile",t?.message.toString())
-
                 progressView_parentRv?.visibility=View.GONE
+                Toast.makeText(this@ProfileeActivity, "Server error ", Toast.LENGTH_SHORT).show()
+
             }
             //TechnoSpark
 
         })
 
     }
-
 
 }

@@ -13,6 +13,7 @@ import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.ConnectivityManager
@@ -28,6 +29,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.NonNull
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import retrofit2.Call
@@ -57,7 +59,6 @@ class Edetailing_Adapter(
     var alertDialog: AlertDialog?=null
 
 
-
     inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var header_tv: TextView = view.findViewById(R.id.header_tv)
         var bottom_tv: TextView = view.findViewById(R.id.bottom_tv)
@@ -65,10 +66,11 @@ class Edetailing_Adapter(
         var reDownload_rl: RelativeLayout = view.findViewById(R.id.reDownload_rl)
         var parent_ll: LinearLayout = view.findViewById(R.id.parent_ll)
         var valueProgressBar: ProgressBar = view.findViewById(R.id.valueProgressBar)
+        var headerTv: TextView = view.findViewById(R.id.headerTv)
+        var isPending_iv: ImageView = view.findViewById(R.id.isPending_iv)
     }
     @NonNull
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-
         val itemView = LayoutInflater.from(parent.context)
                 .inflate(R.layout.edetailing_view, parent, false)
         return MyViewHolder(itemView)
@@ -77,14 +79,20 @@ class Edetailing_Adapter(
     {
         val modeldata = filteredData?.get(position)
 
-
-
         if(modeldata?.isSaved==1)
         {
             holder.download_rl?.visibility = View.GONE
             holder.reDownload_rl?.visibility = View.VISIBLE
-        }
 
+            val checkDownloadStatus= db.getDownloadStatus(modeldata?.eretailDetailList)
+
+            if(!checkDownloadStatus)
+            {
+                   holder.reDownload_rl.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.orange)));
+                    holder.headerTv.setText("Pending Download")
+                    holder.isPending_iv.setImageResource(R.drawable.ic_download)
+            }
+        }
 
       holder.header_tv.text = modeldata?.brandName
       holder.bottom_tv.text = "Division: "+modeldata?.divisionName
@@ -114,70 +122,6 @@ class Edetailing_Adapter(
 
                 }
             )
-
-       /*      //open files in downloaded activity
-        holder.parent_ll.setOnClickListener {
-
-
-
-        *//* if(holder.reDownload_rl.visibility==View.VISIBLE)
-          {
-
-              //get downloaded file paths from db
-              var extractMainModel= db.getDownloadedSingleData(modeldata?.geteDetailId().toString())
-
-              //convert string to array list
-              val type: Type = object : TypeToken<List<DownloadFileModel?>?>() {}.type
-              val subArray: List<DownloadFileModel> = Gson().fromJson(extractMainModel, type)
-
-              if(subArray.size>0)
-              {
-                  //get main path
-                  val zipName: String = subArray.first().filePath.substring(
-                          subArray.first().filePath.lastIndexOf(
-                                  "/"
-                          )
-                  )
-                  val filterPath = subArray.first().filePath
-                  //break and get file name
-                  val index = subArray.first().filePath.lastIndexOf('/')
-                  val subPath=filterPath.substring(0, index)
-
-                  val intent = Intent(context, WebViewActivity::class.java)
-                  intent.putExtra("webUrlPath", subArray.first().zipExtractFilePath)
-                  intent.putExtra("brandId", subArray.first().brandId)
-                  context.startActivity(intent)
-
-
-                  //unzip file
-                //  unpackZipActivity(subPath, zipName, downloadedModel, isLast)
-              }
-
-
-
-          }*//*
-        }*/
-
-
-         /*     holder.download_rl.setOnClickListener {
-            downloadList= ArrayList()
-            if(isInternetAvailable(context)==true)
-            {
-                progressDialog()
-                progressBarAlert?.setIndeterminate(true)
-              //  disableScreen()
-                //Download file
-                downloadDivision_api(modeldata?.geteDetailId().toString(), position, holder, modeldata)
-            }
-            else{
-                Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT).show();
-            }
-
-        }
-
-      */
-
-    //    holder.year.text = movie.getYear()
     }
     override fun getItemCount(): Int {
         return filteredData?.size!!
@@ -193,16 +137,15 @@ class Edetailing_Adapter(
 
             override fun performFiltering(constraint: CharSequence): FilterResults? {
 
-
                 var constraint = constraint
                 val results = FilterResults()
                 val FilteredArrayNames: ArrayList<DevisionModel.Data.EDetailing> = ArrayList()
 
                 // perform your search here using the searchConstraint String.
-                constraint = constraint.toString().toLowerCase()
+                constraint = constraint.toString().lowercase()
                 for (i in 0 until edetailidList?.size!!) {
                     val dataNames: DevisionModel.Data.EDetailing = edetailidList?.get(i)!!
-                    if (dataNames.brandName.toLowerCase().startsWith(constraint.toString())) {
+                    if (dataNames.brandName.lowercase().startsWith(constraint.toString())) {
                         FilteredArrayNames.add(dataNames)
                     }
                 }
