@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:padding="5dp"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.cardview.widget.CardView
+        android:layout_margin="3dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="5dp">
+        <LinearLayout
+            android:padding="4dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="1.3">
+
+            <ImageView
+                android:layout_gravity="center"
+                android:tint="@color/purple_700"
+                android:layout_weight="0.3"
+                android:src="@drawable/ic_calendar"
+                android:layout_width="0dp"
+                android:layout_height="50dp"/>
+
+            <LinearLayout
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:textColor="@color/appColor"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:text="Doctor Name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/subject_tv"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    android:text="Subject"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:textSize="15sp"
+                    android:text="Meeting type: Physical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/appointmentDate_tv"
+                    android:layout_weight="1"
+                    android:textSize="15sp"
+                    android:text="Appointment time: 2:00 PM"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+
+                <Button
+                    android:visibility="gone"
+                    android:layout_gravity="right"
+                    android:backgroundTint="@color/appColor"
+                    android:id="@+id/startmeeting_btn"
+                    android:textColor="@color/white"
+                    android:layout_margin="5dp"
+                    android:text="Start meeting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+
+
+</RelativeLayout>

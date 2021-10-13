@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="5dp">
+
+    <LinearLayout
+        android:weightSum="2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Doctor name-"
+            android:layout_weight="0.6"/>
+
+        <TextView
+            android:textColor="@color/black"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="XYZ"
+            android:layout_weight="1.4"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginTop="3dp"
+        android:weightSum="2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="time-"
+            android:layout_weight="0.6"/>
+
+        <TextView
+            android:textColor="@color/black"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="5:00  AM"
+            android:layout_weight="1.4"/>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_marginTop="3dp"
+        android:weightSum="2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_weight="0.6"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Task- "
+           />
+
+        <TextView
+            android:layout_weight="1.4"
+            android:textColor="@color/black"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="XYZ"
+           />
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_marginTop="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:textSize="12sp"
+            android:textAlignment="center"
+            android:gravity="center"
+            android:textColor="@color/black"
+            android:backgroundTint="@color/yellow"
+            android:layout_marginRight="5dp"
+            android:layout_toLeftOf="@+id/modify_btn"
+            android:id="@+id/cancel_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text=" Cancel "/>
+
+        <Button
+            android:textSize="12sp"
+            android:layout_marginRight="5dp"
+            android:layout_toLeftOf="@+id/complete_btn"
+            android:textAlignment="center"
+            android:gravity="center"
+            android:id="@+id/modify_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text=" Modify "/>
+
+        <Button
+            android:textSize="12sp"
+            android:backgroundTint="@color/zm_green"
+            android:textAlignment="center"
+            android:gravity="center"
+            android:id="@+id/complete_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:text="Complete"/>
+
+
+    </RelativeLayout>
+<View
+    android:id="@+id/viewLine"
+    android:layout_marginTop="2dp"
+    android:layout_width="match_parent"
+    android:layout_height="2dp"
+    android:background="@color/gray"/>
+
+
+</LinearLayout>

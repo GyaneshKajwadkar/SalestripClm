@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="2dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal">
+
+    <androidx.cardview.widget.CardView
+        android:layout_centerInParent="true"
+        app:cardBackgroundColor="@color/zm_green"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="10dp">
+
+        <androidx.cardview.widget.CardView
+            android:layout_margin="1dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="10dp">
+
+        <LinearLayout
+            android:weightSum="1"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:padding="4dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:textColor="@color/black"
+                android:layout_weight="0.8"
+                android:textSize="10sp"
+                android:layout_toLeftOf="@+id/cross_iv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="dummy text"
+                android:id="@+id/name_tv"/>
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="20dp"
+                android:layout_weight="0.2">
+
+                <ImageView
+                    android:layout_centerVertical="true"
+                    android:id="@+id/cross_iv"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_alignParentRight="true"
+                    android:src="@drawable/ic_cross" />
+            </RelativeLayout>
+
+
+        </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+
+    </androidx.cardview.widget.CardView>
+
+</RelativeLayout>

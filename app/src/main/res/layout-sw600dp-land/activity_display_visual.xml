@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:padding="4dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/appColor">
+
+
+            <LinearLayout
+                android:layout_below="@+id/toolbar_rl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:weightSum="1"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatSpinner
+                    android:padding="5dp"
+                    android:overlapAnchor="false"
+                    android:id="@+id/division_spinner"
+                    style="@style/spinner_style"
+                    android:layout_margin="5dp"
+                    android:layout_weight="0.3"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"/>
+
+                <RelativeLayout
+                    android:orientation="horizontal"
+                    android:layout_weight="0.7"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content">
+
+
+                    <EditText
+                        android:id="@+id/doctor_et"
+                        android:layout_width="match_parent"
+                        android:layout_height="35dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="8dp"
+                        android:layout_toLeftOf="@+id/parentSelection"
+                        android:background="@drawable/edittext_capsul"
+                        android:drawableLeft="@android:drawable/ic_menu_search"
+                        android:drawableTint="@color/appColor"
+                        android:ellipsize="end"
+                        android:focusable="false"
+                        android:focusableInTouchMode="true"
+                        android:hint="Select Doctor"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:paddingLeft="5dp"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+
+                    <LinearLayout
+                        android:layout_marginLeft="8dp"
+                        android:id="@+id/parentSelection"
+                        android:layout_alignParentRight="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+
+                        <LinearLayout
+                            android:layout_centerVertical="true"
+                            android:id="@+id/allbrandparent_ll"
+                            android:layout_marginRight="10dp"
+                            android:padding="2dp"
+                            android:gravity="center"
+                            android:layout_gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:id="@+id/allBrand_iv"
+                                app:tint="@color/white"
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"
+                                android:src="@drawable/all"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="All Brands"
+                                android:textColor="@color/white"
+                                android:textSize="7sp"/>
+
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_centerVertical="true"
+                            android:id="@+id/favParent_ll"
+                            android:layout_marginRight="10dp"                                    android:padding="2dp"
+                            android:gravity="center"
+                            android:layout_gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:id="@+id/favBrand_iv"
+                                app:tint="@color/gray"
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"
+                                android:src="@drawable/favourite"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Favourite Brands"
+                                android:textColor="@color/white"
+                                android:textSize="7sp"/>
+
+
+                        </LinearLayout>
+
+
+                    </LinearLayout>
+
+
+
+                </RelativeLayout>
+
+
+
+            </LinearLayout>
+
+
+        </RelativeLayout>
+
+
+
+        <LinearLayout
+            android:id="@+id/allBrandParent_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+
+
+            <RelativeLayout
+                android:orientation="vertical"
+                android:layout_weight="2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/selectorButton_rv"/>
+
+                <LinearLayout
+                    android:id="@+id/splitViewparent_ll"
+                    android:layout_above="@+id/bottomButton_Parent"
+                    android:layout_below="@+id/selectorButton_rv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="1.001">
+
+
+                    <RelativeLayout
+                        android:id="@+id/sideparent_rl"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.3">
+
+
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/brand_rv"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:padding="5dp" />
+
+                        <LinearLayout
+                            android:visibility="gone"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <RelativeLayout
+                                android:layout_margin="2dp"
+                                android:id="@+id/allFav_selectionParent"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+
+                                <RelativeLayout
+                                    android:layout_margin="2dp"
+                                    android:id="@+id/favBrand_rl"
+                                    android:background="#E8D2A2"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content">
+                                    <TextView
+                                        android:layout_centerInParent="true"
+                                        android:padding="10dp"
+                                        android:text="Favourite brand"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/black"
+                                        android:textAlignment="center"
+                                        android:textSize="16sp"
+                                        android:id="@+id/favBrand_tv"/>
+
+
+                                </RelativeLayout>
+                            </RelativeLayout>
+
+                            <RelativeLayout
+                                android:layout_margin="2dp"
+                                android:id="@+id/allbrand_selectionParent"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+                                <RelativeLayout
+                                    android:layout_margin="1dp"
+                                    android:id="@+id/parentAllBrand_rl"
+                                    android:background="#E8D2A2"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content">
+                                    <TextView
+                                        android:layout_centerInParent="true"
+                                        android:padding="10dp"
+                                        android:text="All brand"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/black"
+                                        android:textAlignment="center"
+                                        android:textSize="16sp"
+                                        android:id="@+id/allBrand_tv"/>
+
+                                    <ImageView
+                                        android:id="@+id/brand_upDown_iv"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:src="@drawable/zm_btn_dropdown"
+                                        android:layout_centerVertical="true"
+                                        android:layout_alignParentRight="true"
+                                        app:tint="@color/black"
+                                        android:layout_marginRight="5dp"/>
+
+
+                                </RelativeLayout>
+
+                            </RelativeLayout>
+
+
+
+
+
+
+
+
+                        </LinearLayout>
+
+
+
+                        <Button
+                            android:layout_margin="5dp"
+                            android:layout_alignParentBottom="true"
+                            android:visibility="invisible"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/submitBtn"
+                            android:text="Submit"
+                            android:enabled="false"/>
+
+                    </RelativeLayout>
+
+
+                    <View
+                        android:layout_weight="0.001"
+                        android:background="@color/black"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"/>
+
+                    <FrameLayout
+                        android:padding="5dp"
+                        android:layout_marginLeft="2dp"
+                        android:layout_weight="0.7"
+                        android:id="@+id/child_fragment_container"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"/>
+
+
+
+                </LinearLayout>
+
+                <TextView
+
+                    android:textAlignment="center"
+                    android:visibility="gone"
+                    android:id="@+id/noData_tv"
+                    android:layout_margin="20dp"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    android:text="No data found"
+                    android:layout_above="@+id/bottomButton_Parent"
+                    android:layout_below="@+id/selectorButton_rv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                </TextView>
+
+
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:id="@+id/progressBar"
+                    android:visibility="gone"/>
+
+            </RelativeLayout>
+
+
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:padding="10dp"
+            android:layout_width= "match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            android:id="@+id/favBrand_frame"/>
+
+
+    </LinearLayout>
+
+
+    <include layout="@layout/bottom_sheet_visualads" />
+
+    <include layout="@layout/progress_view" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

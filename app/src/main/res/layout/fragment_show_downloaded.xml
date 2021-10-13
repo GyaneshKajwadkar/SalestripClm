@@ -1,0 +1,250 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <pl.droidsonroids.gif.GifImageView
+        android:id="@+id/nodata_gif"
+        android:visibility="gone"
+        android:layout_centerInParent="true"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:src="@drawable/nodata_gif" />
+
+    <TextView
+        android:layout_below="@+id/nodata_gif"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Select"
+        android:id="@+id/selection_tv"
+        android:textSize="20sp"
+        android:textColor="@color/zm_red"
+        android:visibility="gone"/>
+
+    <androidx.cardview.widget.CardView
+        android:visibility="gone"
+        android:id="@+id/topSearchParent"
+        android:layout_margin="2dp"
+        android:layout_alignParentRight="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/folderColor"
+        app:cardCornerRadius="25dp">
+
+        <EditText
+            android:layout_margin="3dp"
+            android:hint="Search brand"
+            android:textColor="@color/black"
+            android:inputType="text"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textSize="16sp"
+            android:id="@+id/filterFavList_et"
+            android:drawableTint="@color/appDarkColor"
+            android:drawableLeft="@android:drawable/ic_menu_search"
+            android:paddingLeft="5dp"
+            android:background="@drawable/edittext_capsul"
+            android:minWidth="300dp"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"/>
+
+    </androidx.cardview.widget.CardView>
+
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_below="@+id/topSearchParent"
+        android:id="@+id/nestedScroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/videoView_parent"
+                android:layout_marginTop="2dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:textStyle="bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:textSize="20sp"
+                        android:textColor="@color/purple_200"
+                        android:text="Videos"/>
+
+                    <LinearLayout
+                        android:visibility="gone"
+                        android:orientation="horizontal"
+                        android:layout_alignParentRight="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:src="@drawable/ic_slideshow"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"/>
+
+                        <TextView
+                            android:gravity="center"
+                            android:layout_gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="5dp"
+                            android:textSize="16sp"
+                            android:textColor="@color/black"
+                            android:text="Slide show"/>
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/gray"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:padding="5dp"
+                    android:id="@+id/video_rv"
+                    android:nestedScrollingEnabled="false"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/images_parent"
+                android:layout_marginTop="2dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:textStyle="bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:textSize="20sp"
+                        android:textColor="@color/purple_200"
+                        android:text="Images"/>
+
+                    <LinearLayout
+                        android:visibility="gone"
+                        android:orientation="horizontal"
+                        android:layout_alignParentRight="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:src="@drawable/ic_slideshow"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"/>
+
+                        <TextView
+                            android:gravity="center"
+                            android:layout_gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="5dp"
+                            android:textSize="16sp"
+                            android:textColor="@color/black"
+                            android:text="Slide show"/>
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/gray"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:padding="5dp"
+                    android:id="@+id/images_rv"
+                    android:nestedScrollingEnabled="false"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/html_parent"
+                android:layout_marginTop="2dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:textStyle="bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:textSize="20sp"
+                        android:textColor="@color/purple_200"
+                        android:text="Web views"/>
+
+                <!--    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_alignParentRight="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:src="@drawable/ic_slideshow"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"/>
+
+                        <TextView
+                            android:gravity="center"
+                            android:layout_gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="5dp"
+                            android:textSize="16sp"
+                            android:textColor="@color/black"
+                            android:text="Slide show"/>
+
+                    </LinearLayout>-->
+
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/gray"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:padding="5dp"
+                    android:id="@+id/html_rv"
+                    android:nestedScrollingEnabled="false"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</RelativeLayout>

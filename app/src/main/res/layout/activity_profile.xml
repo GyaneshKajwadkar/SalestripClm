@@ -1,0 +1,1262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <RelativeLayout
+            android:background="@color/appColor"
+            android:padding="15dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/backProfile"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentLeft="true"
+                android:src="@drawable/ic_back"
+                app:tint="@color/white" />
+
+            <ImageView
+                android:id="@+id/menuProfile"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentRight="true"
+                android:src="@drawable/ic_menu_dot"
+                app:tint="@color/white" />
+
+
+        </RelativeLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:weightSum="2"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_marginTop="20dp"
+                android:padding="10dp"
+                android:orientation="vertical"
+                android:layout_weight="0.5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/changeProfilePic_civ"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_gravity="center"
+                    android:src="@mipmap/ic_launcher"
+                    app:civ_border_color="@color/black"
+                    app:civ_border_width="1dp" />
+
+
+                <TextView
+                    android:id="@+id/name_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/appColor"
+                    android:text="Jack Coannar (EMP0007)"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/designation_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/appColor"
+                    android:text="SR(Sales Representative)"
+                    android:textAlignment="center"
+                    android:textSize="14sp"
+                    />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="5dp"
+                    android:background="@color/purple_200"/>
+
+
+                <com.google.android.material.button.MaterialButton
+                    android:gravity="center"
+                    android:id="@+id/changeProfile_mb"
+                    android:textColor="@color/white"
+                    app:iconGravity="textStart"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginLeft="5dp"
+                    android:padding="5dp"
+                    android:layout_width="match_parent"
+                    android:backgroundTint="@color/appColor"
+                    android:layout_height="match_parent"
+                    app:icon="@drawable/ic_menu_camera"
+                    app:iconTint="@color/white"
+                    android:text="Change profile"/>
+
+            </LinearLayout>
+
+            <ScrollView
+                android:paddingTop="5dp"
+                android:paddingRight="5dp"
+                android:paddingLeft="5dp"
+                android:paddingBottom="10dp"
+                android:layout_weight="1.5"
+                android:layout_width="0dp"
+                android:fillViewport="true"
+                android:layout_height="match_parent">
+                <LinearLayout
+                    android:layout_marginBottom="20dp"
+                    android:orientation="vertical"
+                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_marginTop="10dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:weightSum="3"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/personal_mb"
+                            android:gravity="center"
+                            android:textColor="@color/black"
+                            app:iconGravity="textStart"
+                            android:layout_marginRight="5dp"
+                            android:layout_marginLeft="5dp"
+                            android:padding="5dp"
+                            android:layout_weight="1"
+                            android:layout_width="0dp"
+                            android:backgroundTint="@color/gray"
+                            android:layout_height="match_parent"
+                            app:icon="@drawable/ic_login_edit"
+                            app:iconTint="@color/black"
+                            android:text="Personal"/>
+
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/contact_mb"
+                            android:gravity="center"
+                            android:textColor="@color/black"
+                            app:iconGravity="textStart"
+                            android:layout_marginRight="5dp"
+                            android:layout_marginLeft="5dp"
+                            android:padding="5dp"
+                            android:layout_weight="1"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:backgroundTint="@color/gray"
+                            app:icon="@drawable/ic_call"
+                            app:iconTint="@color/black"
+                            android:text="Contact"/>
+
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/territory_mb"
+                            android:gravity="center"
+                            android:textColor="@color/black"
+                            app:iconGravity="textStart"
+                            android:layout_marginRight="5dp"
+                            android:layout_marginLeft="5dp"
+                            android:padding="5dp"
+                            android:layout_weight="1"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:backgroundTint="@color/gray"
+                            app:icon="@drawable/ic_palace"
+                            app:iconTint="@color/black"
+                            android:text="Territory"/>
+
+
+
+                    </LinearLayout>
+
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <LinearLayout
+                            android:visibility="gone"
+                            android:id="@+id/personalParent_ll"
+                            android:orientation="vertical"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="5dp">
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    >
+
+                                    <ImageView
+                                        app:tint="@color/lightred"
+                                        android:layout_width="50dp"
+                                        android:layout_height="50dp"
+                                        android:src="@drawable/ic_circle" />
+
+
+                                    <ImageView
+                                        android:layout_width="30dp"
+                                        android:layout_height="30dp"
+                                        android:layout_centerInParent="true"
+                                        android:src="@drawable/ic_birthday"
+                                        app:tint="@color/lightred" />
+
+                                </RelativeLayout>
+
+                                <LinearLayout
+                                    android:layout_gravity="center"
+                                    android:layout_marginLeft="10dp"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="12sp"
+                                        android:text="Date of Birth"/>
+
+                                    <TextView
+                                        android:textColor="@color/black"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="16sp"
+                                        android:id="@+id/dateOfbirth_tv"
+                                        android:text="Date of Birth"/>
+
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/gray"/>
+
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="5dp">
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content">
+
+
+                                    <ImageView
+                                        android:layout_width="50dp"
+                                        android:layout_height="50dp"
+                                        android:layout_centerInParent="true"
+                                        android:src="@drawable/ic_circle"
+                                        app:tint="@color/lightbluegreen" />
+                                    <ImageView
+                                        android:layout_width="30dp"
+                                        android:layout_height="30dp"
+                                        android:layout_centerInParent="true"
+                                        android:src="@drawable/ic_gender"
+                                        app:tint="@color/lightbluegreen" />
+
+                                </RelativeLayout>
+
+                                <LinearLayout
+                                    android:layout_gravity="center"
+                                    android:layout_marginLeft="10dp"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="12sp"
+                                        android:text="Gender"/>
+
+                                    <TextView
+                                        android:id="@+id/gender_tv"
+                                        android:textColor="@color/black"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="16sp"
+                                        android:text="Gender"/>
+
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/gray"/>
+
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="5dp">
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    >
+
+                                    <ImageView
+                                        android:layout_width="50dp"
+                                        android:layout_height="50dp"
+                                        android:src="@drawable/ic_circle"
+                                        app:tint="@color/lightpurple" />
+
+
+                                    <ImageView
+                                        android:layout_width="30dp"
+                                        android:layout_height="30dp"
+                                        android:layout_centerInParent="true"
+                                        android:src="@drawable/ic_couple"
+                                        app:tint="@color/lightpurple" />
+
+                                </RelativeLayout>
+
+                                <LinearLayout
+                                    android:layout_gravity="center"
+                                    android:layout_marginLeft="10dp"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="12sp"
+                                        android:text="Marital Status"/>
+
+                                    <TextView
+                                        android:id="@+id/maritalStatus_tv"
+                                        android:textColor="@color/black"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="16sp"
+                                        android:text="Un-Married"/>
+
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/gray"/>
+
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="5dp">
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    >
+
+                                    <ImageView
+                                        android:layout_width="50dp"
+                                        android:layout_height="50dp"
+                                        android:layout_centerInParent="true"
+                                        android:src="@drawable/ic_circle"
+                                        app:tint="@color/lightskin" />
+
+
+                                    <ImageView
+                                        android:layout_width="30dp"
+                                        android:layout_height="30dp"
+                                        android:layout_centerInParent="true"
+                                        android:src="@drawable/ic_anniversary"
+                                        app:tint="@color/lightskin" />
+
+                                </RelativeLayout>
+
+                                <LinearLayout
+                                    android:layout_gravity="center"
+                                    android:layout_marginLeft="10dp"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="12sp"
+                                        android:text="Anniversary"/>
+
+                                    <TextView
+                                        android:id="@+id/anniversary_tv"
+                                        android:textColor="@color/black"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="16sp"
+                                        android:text="nil"/>
+
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/gray"/>
+
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="5dp">
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    >
+
+                                    <ImageView
+                                        android:layout_width="50dp"
+                                        android:layout_height="50dp"
+                                        android:src="@drawable/ic_circle"
+                                        app:tint="@color/lightred" />
+
+
+                                    <ImageView
+                                        android:layout_width="30dp"
+                                        android:layout_height="30dp"
+                                        android:layout_centerInParent="true"
+                                        android:src="@drawable/ic_email"
+                                        app:tint="@color/lightred" />
+
+                                </RelativeLayout>
+
+                                <LinearLayout
+                                    android:layout_gravity="center"
+                                    android:layout_marginLeft="10dp"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="12sp"
+                                        android:text="Email"/>
+
+                                    <TextView
+                                        android:id="@+id/email_tv"
+                                        android:textColor="@color/black"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="16sp"
+                                        android:text="xyz@pms.in"/>
+
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/gray"/>
+
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="5dp">
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    >
+
+                                    <ImageView
+                                        android:layout_width="50dp"
+                                        android:layout_height="50dp"
+                                        android:src="@drawable/ic_circle"
+                                        app:tint="@color/lightbluegreen" />
+
+
+                                    <ImageView
+                                        android:layout_width="30dp"
+                                        android:layout_height="30dp"
+                                        android:layout_centerInParent="true"
+                                        android:src="@drawable/ic_education"
+                                        app:tint="@color/lightbluegreen" />
+
+                                </RelativeLayout>
+
+                                <LinearLayout
+                                    android:layout_gravity="center"
+                                    android:layout_marginLeft="10dp"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="12sp"
+                                        android:text="Degree"/>
+
+                                    <TextView
+                                        android:id="@+id/degree_tv"
+                                        android:textColor="@color/black"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="16sp"
+                                        android:text="BE"/>
+
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/gray"/>
+
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="5dp">
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    >
+
+                                    <ImageView
+                                        android:layout_width="50dp"
+                                        android:layout_height="50dp"
+                                        android:layout_centerInParent="true"
+                                        android:src="@drawable/ic_circle"
+                                        app:tint="@color/lightpurple" />
+
+
+                                    <ImageView
+                                        android:layout_width="30dp"
+                                        android:layout_height="30dp"
+                                        android:layout_centerInParent="true"
+                                        android:src="@drawable/ic_joining"
+                                        app:tint="@color/lightpurple" />
+
+                                </RelativeLayout>
+
+                                <LinearLayout
+                                    android:layout_gravity="center"
+                                    android:layout_marginLeft="10dp"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="12sp"
+                                        android:text="Joining date"/>
+
+                                    <TextView
+                                        android:id="@+id/joiningDate_tv"
+                                        android:textColor="@color/black"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="16sp"
+                                        android:text="date"/>
+
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/gray"/>
+
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="5dp">
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    >
+
+                                    <ImageView
+                                        android:layout_width="50dp"
+                                        android:layout_height="50dp"
+                                        android:layout_centerInParent="true"
+                                        android:src="@drawable/ic_circle"
+                                        app:tint="@color/lightskin" />
+
+
+                                    <ImageView
+                                        android:layout_width="30dp"
+                                        android:layout_height="30dp"
+                                        android:layout_centerInParent="true"
+                                        android:src="@drawable/ic_suitcase"
+                                        app:tint="@color/lightskin" />
+
+                                </RelativeLayout>
+
+                                <LinearLayout
+                                    android:layout_gravity="center"
+                                    android:layout_marginLeft="10dp"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="12sp"
+                                        android:text=" Field work"/>
+
+                                    <TextView
+                                        android:id="@+id/fieldWork_id"
+                                        android:textColor="@color/black"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="16sp"
+                                        android:text="work"/>
+
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/gray"/>
+
+                        </LinearLayout>
+
+
+                        <LinearLayout
+                            android:visibility="gone"
+                            android:id="@+id/contact_ll"
+                            android:orientation="vertical"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="5dp">
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    >
+
+                                    <ImageView
+                                        app:tint="@color/lightred"
+                                        android:layout_width="50dp"
+                                        android:layout_height="50dp"
+                                        android:src="@drawable/ic_circle" />
+
+
+                                    <ImageView
+                                        android:layout_width="30dp"
+                                        android:layout_height="30dp"
+                                        android:layout_centerInParent="true"
+                                        android:src="@drawable/ic_home"
+                                        app:tint="@color/lightred" />
+
+                                </RelativeLayout>
+
+                                <LinearLayout
+                                    android:layout_marginLeft="10dp"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="12sp"
+                                        android:text="Address"/>
+
+                                    <TextView
+                                        android:id="@+id/address_tv"
+                                        android:textColor="@color/black"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="16sp"
+                                        android:text="address"/>
+
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/gray"/>
+
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="5dp">
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content">
+
+
+                                    <ImageView
+                                        android:layout_width="50dp"
+                                        android:layout_height="50dp"
+                                        android:layout_centerInParent="true"
+                                        android:src="@drawable/ic_circle"
+                                        app:tint="@color/lightbluegreen" />
+
+                                    <ImageView
+                                        android:layout_width="30dp"
+                                        android:layout_height="30dp"
+                                        android:layout_centerInParent="true"
+                                        android:src="@drawable/ic_city"
+                                        app:tint="@color/lightbluegreen" />
+
+                                </RelativeLayout>
+
+                                <LinearLayout
+                                    android:layout_marginLeft="10dp"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="12sp"
+                                        android:text="City"/>
+
+                                    <TextView
+                                        android:id="@+id/city_tv"
+                                        android:textColor="@color/black"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="16sp"
+                                        android:text="indore"/>
+
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/gray"/>
+
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="5dp">
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    >
+
+                                    <ImageView
+                                        app:tint="@color/lightpurple"
+                                        android:layout_width="50dp"
+                                        android:layout_height="50dp"
+                                        android:src="@drawable/ic_circle" />
+
+
+                                    <ImageView
+                                        android:layout_width="30dp"
+                                        android:layout_height="30dp"
+                                        android:layout_centerInParent="true"
+                                        android:src="@drawable/ic_state"
+                                        app:tint="@color/lightpurple" />
+
+                                </RelativeLayout>
+
+                                <LinearLayout
+                                    android:layout_marginLeft="10dp"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="12sp"
+                                        android:text="State"/>
+
+                                    <TextView
+                                        android:id="@+id/state_tv"
+                                        android:textColor="@color/black"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="16sp"
+                                        android:text="MP"/>
+
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/gray"/>
+
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="5dp">
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    >
+
+                                    <ImageView
+                                        android:layout_width="50dp"
+                                        android:layout_height="50dp"
+                                        android:layout_centerInParent="true"
+                                        android:src="@drawable/ic_circle"
+                                        app:tint="@color/lightskin" />
+
+
+                                    <ImageView
+                                        android:layout_width="30dp"
+                                        android:layout_height="30dp"
+                                        android:layout_centerInParent="true"
+                                        android:src="@drawable/ic_country"
+                                        app:tint="@color/lightskin" />
+
+                                </RelativeLayout>
+
+                                <LinearLayout
+                                    android:layout_marginLeft="10dp"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="12sp"
+                                        android:text="Country"/>
+
+                                    <TextView
+                                        android:id="@+id/country_tv"
+                                        android:textColor="@color/black"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="16sp"
+                                        android:text="India"/>
+
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/gray"/>
+
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="5dp">
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    >
+
+                                    <ImageView
+                                        app:tint="@color/lightred"
+                                        android:layout_width="50dp"
+                                        android:layout_height="50dp"
+                                        android:src="@drawable/ic_circle" />
+
+
+                                    <ImageView
+                                        android:layout_width="30dp"
+                                        android:layout_height="30dp"
+                                        android:layout_centerInParent="true"
+                                        android:src="@drawable/ic_landline"
+                                        app:tint="@color/lightred" />
+
+                                </RelativeLayout>
+
+                                <LinearLayout
+                                    android:layout_marginLeft="10dp"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="12sp"
+                                        android:text="Phone number"/>
+
+                                    <TextView
+                                        android:id="@+id/phoneNumber_tv"
+                                        android:textColor="@color/black"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="16sp"
+                                        android:text="0731"/>
+
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/gray"/>
+
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="5dp">
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    >
+
+                                    <ImageView
+                                        app:tint="@color/lightbluegreen"
+                                        android:layout_width="50dp"
+                                        android:layout_height="50dp"
+                                        android:src="@drawable/ic_circle" />
+
+
+                                    <ImageView
+                                        android:layout_width="30dp"
+                                        android:layout_height="30dp"
+                                        android:layout_centerInParent="true"
+                                        android:src="@drawable/ic_mobilenumber"
+                                        app:tint="@color/lightbluegreen" />
+
+                                </RelativeLayout>
+
+                                <LinearLayout
+                                    android:layout_marginLeft="10dp"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="12sp"
+                                        android:text="Mobile number"/>
+
+                                    <TextView
+                                        android:id="@+id/mobile_tv"
+                                        android:textColor="@color/black"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="16sp"
+                                        android:text="810"/>
+
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/gray"/>
+
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="5dp">
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    >
+
+                                    <ImageView
+                                        android:layout_width="50dp"
+                                        android:layout_height="50dp"
+                                        android:layout_centerInParent="true"
+                                        android:src="@drawable/ic_circle"
+                                        app:tint="@color/lightpurple" />
+
+
+                                    <ImageView
+                                        android:layout_width="30dp"
+                                        android:layout_height="30dp"
+                                        android:layout_centerInParent="true"
+                                        android:src="@drawable/ic_pincode"
+                                        app:tint="@color/lightpurple" />
+
+                                </RelativeLayout>
+
+                                <LinearLayout
+                                    android:layout_marginLeft="10dp"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="12sp"
+                                        android:text="Pincode"/>
+
+                                    <TextView
+                                        android:id="@+id/pincode_tv"
+                                        android:textColor="@color/black"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="16sp"
+                                        android:text="42001"/>
+
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/gray"/>
+
+
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:visibility="gone"
+                            android:id="@+id/territory_ll"
+                            android:orientation="vertical"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="5dp">
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    >
+
+                                    <ImageView
+                                        app:tint="@color/lightred"
+                                        android:layout_width="50dp"
+                                        android:layout_height="50dp"
+                                        android:src="@drawable/ic_circle" />
+
+
+                                    <ImageView
+                                        android:layout_width="30dp"
+                                        android:layout_height="30dp"
+                                        android:layout_centerInParent="true"
+                                        android:src="@drawable/ic_division"
+                                        app:tint="@color/lightred" />
+
+                                </RelativeLayout>
+
+                                <LinearLayout
+                                    android:layout_marginLeft="10dp"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="12sp"
+                                        android:text="Divison"/>
+
+                                    <TextView
+                                        android:id="@+id/divison_tv"
+                                        android:textColor="@color/black"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="16sp"
+                                        android:text="xyz"/>
+
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/gray"/>
+
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="5dp">
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content">
+
+
+                                    <ImageView
+                                        android:layout_width="50dp"
+                                        android:layout_height="50dp"
+                                        android:layout_centerInParent="true"
+                                        android:src="@drawable/ic_circle"
+                                        app:tint="@color/lightbluegreen" />
+                                    <ImageView
+                                        android:layout_width="30dp"
+                                        android:layout_height="30dp"
+                                        android:layout_centerInParent="true"
+                                        android:src="@drawable/ic_capitol"
+                                        app:tint="@color/lightbluegreen" />
+
+                                </RelativeLayout>
+
+                                <LinearLayout
+                                    android:layout_marginLeft="10dp"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="12sp"
+                                        android:text="Headquarter"/>
+
+                                    <TextView
+                                        android:id="@+id/headquarter_tv"
+                                        android:textColor="@color/black"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="16sp"
+                                        android:text="xyz"/>
+
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/gray"/>
+
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="5dp">
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    >
+
+                                    <ImageView
+                                        app:tint="@color/lightpurple"
+                                        android:layout_width="50dp"
+                                        android:layout_height="50dp"
+                                        android:src="@drawable/ic_circle" />
+
+
+                                    <ImageView
+                                        android:layout_width="30dp"
+                                        android:layout_height="30dp"
+                                        android:layout_centerInParent="true"
+                                        android:src="@drawable/ic_manager"
+                                        app:tint="@color/lightpurple" />
+
+                                </RelativeLayout>
+
+                                <LinearLayout
+                                    android:layout_marginLeft="10dp"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="12sp"
+                                        android:text="Reporting manager"/>
+
+                                    <TextView
+                                        android:id="@+id/manager_tv"
+                                        android:textColor="@color/black"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="16sp"
+                                        android:text="manager"/>
+
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/gray"/>
+
+
+
+                        </LinearLayout>
+
+                    </RelativeLayout>
+
+
+
+
+                </LinearLayout>
+
+            </ScrollView>
+
+            <RelativeLayout
+                android:layout_weight="0.3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+
+    <include layout="@layout/progress_view" />
+
+
+</RelativeLayout>

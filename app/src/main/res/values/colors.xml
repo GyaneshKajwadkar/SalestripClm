@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+
+
+<resources>
+    <color name="purple_200">#7B68EE</color>
+    <color name="purple_500">#6A5ACD</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#055E99</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="appColor">#9370DB</color>
+    <color name="appDarkColor">#055E99</color>
+    <color name="gray">#c5c5c5</color>
+    <color name="offwhite">#FAF0E6</color>
+    <color name="tranparentBlack">#26293542</color>
+    <color name="lightGray">#F5F5F5</color>
+    <color name="yellow">#FAD02C</color>
+    <color name="darkYellow">#FFFF00</color>
+    <color name="folderColor">#E8D2A2</color>
+
+    <color name="disabledDialogButtonColor">#1F000000</color>
+
+    <color name="itemHighlightColor">#1F000000</color>
+    <color name="itemFocusedColor">#1A000000</color>
+
+    <color name="darkBlue">#2962FF</color>
+
+    <color name="lightred">#FF7F7F </color>
+    <color name="lightbluegreen">#48D1CC </color>
+    <color name="lightpurple">#DDA0DD </color>
+    <color name="lightskin">#eecbad </color>
+
+
+
+
+
+</resources>

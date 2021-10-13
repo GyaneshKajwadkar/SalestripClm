@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/zm_top_toolbar_bg">
+
+    <LinearLayout
+        android:id="@+id/btnBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:padding="12dp"
+        android:gravity="center">
+
+        <ImageView
+            android:src="@drawable/icon_shrink"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+          />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/btnSwitchCamera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/btnBack"
+        android:layout_marginLeft="6dp"
+        android:gravity="center">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:duplicateParentState="true"
+            android:focusable="false"
+          />
+    </LinearLayout>
+
+
+    <Button
+        android:padding="10dp"
+        android:id="@+id/btnLeaveZoomMeeting"
+        android:backgroundTint="@android:color/holo_red_dark"
+        android:background="@android:color/holo_red_dark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:ellipsize="middle"
+        android:singleLine="true"
+        android:layout_marginRight="10dp"
+        android:text="Leave" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_centerVertical="true"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/meetingNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/zm_white"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/txtPassword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/zm_white"
+            android:textSize="15sp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+
+</RelativeLayout>

@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+
+        <RelativeLayout
+            android:padding="3dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/appColor">
+
+
+            <!--       <RelativeLayout
+                       android:id="@+id/toolbar_rl"
+                       android:layout_width="match_parent"
+                       android:layout_height="wrap_content">
+
+                       <ImageView
+                           android:visibility="gone"
+                           android:id="@+id/back_imv"
+                           android:layout_centerVertical="true"
+                           android:tint="@color/white"
+                           android:backgroundTint="@color/white"
+                           android:layout_width="25dp"
+                           android:layout_height="25dp"
+                           android:src="@drawable/ic_back"/>
+                       <TextView
+                           android:textStyle="bold"
+                           android:id="@+id/toolbarText_tv"
+                           android:textSize="20sp"
+                           android:text="E-Content"
+                           android:textColor="@color/white"
+                           android:layout_centerInParent="true"
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"/>
+
+
+                   </RelativeLayout>-->
+
+            <LinearLayout
+                android:layout_below="@+id/toolbar_rl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:weightSum="3"
+                android:orientation="horizontal">
+
+                <RelativeLayout
+                    android:layout_weight="0.5"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"/>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_weight="2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content">
+
+
+                    <EditText
+                        android:gravity="center"
+                        android:layout_gravity="center"
+                        android:hint="Search products"
+                        android:inputType="text"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:id="@+id/filter_et"
+                        android:drawableTint="@color/appColor"
+                        android:drawableLeft="@android:drawable/ic_menu_search"
+                        android:paddingLeft="5dp"
+                        android:background="@drawable/edittext_capsul"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"/>
+
+
+                </LinearLayout>
+
+
+                <RelativeLayout
+                    android:layout_weight="0.5"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_marginRight="20dp"
+                        android:layout_alignParentRight="true"
+                        android:id="@+id/syncData_ll"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <ImageView
+                            android:layout_gravity="center"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:src="@drawable/ic_refresh"
+                            app:tint="@color/white" />
+                        <TextView
+                            android:textStyle="bold"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"
+                            android:layout_gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Sync"/>
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+
+
+            </LinearLayout>
+
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="3"
+            android:orientation="horizontal">
+
+            <RelativeLayout
+                android:layout_weight="0.5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"/>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:orientation="vertical">
+                <com.google.android.material.appbar.AppBarLayout
+                    android:id="@+id/appbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+                    <com.google.android.material.tabs.TabLayout
+                        app:tabMaxWidth="0dp"
+                        android:id="@+id/result_tabs"
+                        android:background="@color/white"
+                        app:tabTextColor="@color/black"
+                        app:tabSelectedTextColor="@color/appColor"
+                        app:tabIndicatorColor="@color/appColor"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:tabGravity="fill"
+                        app:tabMode="fixed"/>
+                </com.google.android.material.appbar.AppBarLayout>
+
+                <view class="in.processmaster.salestripclm.fragments.EdetailingFragment$CustomViewPager"
+                    android:id="@+id/viewpager"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+
+
+            </LinearLayout>
+
+
+
+
+
+            <LinearLayout
+                android:visibility="gone"
+                android:orientation="vertical"
+                android:layout_weight="2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerView"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+
+            <RelativeLayout
+                android:layout_weight="0.5"
+                android:layout_width="0dp"
+                android:layout_height="match_parent">
+
+
+
+
+            </RelativeLayout>
+
+
+
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+
+    <include layout="@layout/progress_view" />
+
+</RelativeLayout>
