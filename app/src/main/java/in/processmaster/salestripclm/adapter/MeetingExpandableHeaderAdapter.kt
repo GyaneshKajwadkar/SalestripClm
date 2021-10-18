@@ -1,6 +1,7 @@
 package `in`.processmaster.salestripclm.adapter
 
 import `in`.processmaster.salestripclm.R
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -30,7 +31,7 @@ class MeetingExpandableHeaderAdapter(var context: Context, var arrayListString: 
         return ViewHolders(v)
     }
 
-    override fun onBindViewHolder(holder: ViewHolders, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolders, @SuppressLint("RecyclerView") position: Int) {
 
         holder.headingTxt.setText(arrayListString.get(position))
 

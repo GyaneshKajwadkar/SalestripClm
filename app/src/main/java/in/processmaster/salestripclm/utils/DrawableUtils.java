@@ -13,10 +13,6 @@ import com.applandeo.materialcalendarview.utils.DayColorsUtils;
 
 import in.processmaster.salestripclm.R;
 
-/**
- * Created by Mateusz Kornakiewicz on 02.08.2018.
- */
-
 public final class DrawableUtils {
 
     public static Drawable getCircleDrawableWithText(Context context, String string) {

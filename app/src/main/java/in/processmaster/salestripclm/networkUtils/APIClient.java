@@ -2,6 +2,7 @@ package in.processmaster.salestripclm.networkUtils;
 
 import android.util.Log;
 
+
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -14,8 +15,6 @@ public class APIClient {
 
 
     public static Retrofit getClient(int parent, String childUrl) {
-
-
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
@@ -42,4 +41,6 @@ public class APIClient {
                 .build();
         return retrofit;
     }
+
+
 }

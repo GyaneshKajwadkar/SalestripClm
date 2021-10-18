@@ -4,13 +4,37 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout-sw600dp-land/activity_image_selecror.xml" value="0.10546875" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout-sw600dp-land/activity_set_schedule_.xml" value="0.25" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout-sw600dp-land/edetailing_view.xml" value="0.107095046854083" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout-xlarge-land/activity_image_selecror.xml" value="0.140625" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout-xlarge-land/activity_set_schedule_.xml" value="0.10317460317460317" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout-xlarge-land/edetailing_view.xml" value="0.15961199294532627" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/activity_image_selecror.xml" value="0.12228260869565218" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/activity_mail.xml" value="0.1403985507246377" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/activity_profile.xml" value="0.12228260869565218" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/activity_set_schedule_.xml" value="0.121875" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/childexpandableheader.xml" value="0.14945652173913043" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/commentdialog.xml" value="0.13949275362318841" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/dateshedule_alert.xml" value="0.13949275362318841" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/downloadallprogress_alert.xml" value="0.13949275362318841" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/downloadhtml_view.xml" value="0.14945652173913043" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/downloadimage_view.xml" value="0.14945652173913043" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/downloadvideo_view.xml" value="0.115625" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/downloaedimage_view.xml" value="0.13949275362318841" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/downloaedvideo_view.xml" value="0.1105072463768116" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/edetailing_selector.xml" value="0.14945652173913043" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/edetailing_view.xml" value="0.2718720602069614" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/fav_dialog.xml" value="0.13949275362318841" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/feed_heading.xml" value="0.14945652173913043" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/imageselector.xml" value="0.14945652173913043" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/itemexp.xml" value="0.14945652173913043" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/otherbrandlayout.xml" value="0.14945652173913043" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/selectedview.xml" value="0.11458333333333333" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/selectionalert.xml" value="0.1105072463768116" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/selectorlayout.xml" value="0.13949275362318841" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/shedulemeeting_view.xml" value="0.14945652173913043" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/taskview.xml" value="0.14945652173913043" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/update_app_dialog.xml" value="0.13949275362318841" />
       </map>
     </option>
   </component>

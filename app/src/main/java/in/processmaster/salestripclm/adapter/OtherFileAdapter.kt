@@ -22,7 +22,6 @@ class OtherFileAdapter(
         var mCallback: ItemClickDisplayVisual?,
         var parentmodel: Int) :
         RecyclerView.Adapter<OtherFileAdapter.MyViewHolder>() {
-    var selectedPosition = -1
 
 
     inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {

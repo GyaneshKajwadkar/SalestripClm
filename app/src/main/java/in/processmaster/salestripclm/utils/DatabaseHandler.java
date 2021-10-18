@@ -930,7 +930,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 {
                     return true;
                 }
-
             }
             while (cursor.moveToNext());
         }

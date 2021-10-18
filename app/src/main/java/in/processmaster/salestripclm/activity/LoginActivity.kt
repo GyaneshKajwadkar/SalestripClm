@@ -199,7 +199,7 @@ class LoginActivity : BaseActivity() {
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
 
                     var loginModel = response.body()
-                    saveLoginData(loginModel)
+                   // saveLoginData(loginModel)
 
                     sharePreferance?.setPref("userName_login", userName_et?.getText().toString())
                     sharePreferance?.setPrefBool("isLogin", true)
@@ -208,15 +208,14 @@ class LoginActivity : BaseActivity() {
                             sharePreferance?.getPref("companyCode")
                     )
                     sharePreferance?.setPref("password", password_et?.getText().toString())
-
-                    //   disableProgress(progressBar!!)
-
-                } else {
-                    commonAlert(this@LoginActivity, "", "Incorrect username or password")
-                    disableProgress(progressView_parentRv!!)
+                    val gson = Gson()
+                    sharePreferance?.setPref("profileData", gson.toJson(loginModel))
+                    callHomePage()
                 }
-
-
+                else {
+                    commonAlert(this@LoginActivity, "", "Incorrect username or password")
+                }
+                disableProgress(progressView_parentRv!!)
             }
 
             override fun onFailure(call: Call<LoginModel?>, t: Throwable?) {

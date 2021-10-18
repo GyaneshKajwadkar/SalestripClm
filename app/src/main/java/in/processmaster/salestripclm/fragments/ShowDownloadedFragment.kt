@@ -45,9 +45,6 @@ class ShowDownloadedFragment : Fragment() {
     var adapterImage : DownloadedFolderAdapter?=null
     var adapterWeb : DownloadedFolderAdapter?=null
     var filterFavList_et : EditText?=null
-
-
-
     private var db: DatabaseHandler? = null
 
 
@@ -73,9 +70,6 @@ class ShowDownloadedFragment : Fragment() {
         videoView_parent=view.findViewById(R.id.videoView_parent)
         images_parent=view.findViewById(R.id.images_parent)
         html_parent=view.findViewById(R.id.html_parent)
-
-
-
 
         var arraylistVideo:ArrayList<DownloadFileModel> = ArrayList()
         var arraylistImages:ArrayList<DownloadFileModel> = ArrayList()

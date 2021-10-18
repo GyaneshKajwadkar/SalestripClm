@@ -1,6 +1,7 @@
 package `in`.processmaster.salestripclm.networkUtils
 
 import `in`.processmaster.salestripclm.models.*
+import io.reactivex.Observable
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import org.json.JSONObject
@@ -8,6 +9,8 @@ import retrofit2.Call
 import retrofit2.http.*
 import kotlin.collections.ArrayList
 import retrofit2.http.POST
+import retrofit2.Response
+
 
 interface APIInterface
 {
@@ -120,5 +123,15 @@ interface APIInterface
     @POST("api/mailBox/mailWithAttachment")
     fun sendEmail(@Header("Authorization") authorization: String?,
                   @Part files: Array<MultipartBody.Part?>, @Part("model") model: RequestBody
-    ):
-            Call<GenerateOTPModel?>?}
+    ): Call<GenerateOTPModel?>?
+
+
+    @POST("api/zoomMeeting/schedule")
+    fun setScheduleMeetingApi(@Header("Authorization") authorization: String?, @Body params: RequestBody ):Call<GenerateOTPModel?>?
+
+    @GET("api/zoomMeeting/employeewise/{empId}")
+    fun getScheduledMeeting(
+        @Header("Authorization") authorization: String?
+    ): Call<GetScheduleModel?>?
+
+}

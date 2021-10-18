@@ -51,7 +51,6 @@ class DisplayVisualFragment : BaseFragment(), DisplayVisualInterface, SortingDis
     var brand_rv: RecyclerView? = null
     var submitBtn: Button? = null
     var progressBar: ProgressBar? = null
-  //  var back_imv: ImageView? = null
     var splitViewparent_ll:LinearLayout?=null
     var noData_tv:TextView?=null
     var division_spinner: Spinner?=null
@@ -130,7 +129,6 @@ class DisplayVisualFragment : BaseFragment(), DisplayVisualInterface, SortingDis
 
         submitBtn = view.findViewById(R.id.submitBtn) as Button
         close_imv = view.findViewById(R.id.close_imv) as ImageView
-     //   back_imv = view.findViewById(R.id.back_imv) as ImageView
         progressBar = view.findViewById(R.id.progressBar) as ProgressBar
         selectorButton_rv = view.findViewById(R.id.selectorButton_rv) as RecyclerView
 
@@ -147,10 +145,6 @@ class DisplayVisualFragment : BaseFragment(), DisplayVisualInterface, SortingDis
 
         sharePreferance = PreferenceClass(activity)
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
-
-  /*      back_imv!!.setOnClickListener {
-            activity?.onBackPressed()
-        }*/
 
 
         doctor_et?.setOnClickListener({
@@ -228,8 +222,6 @@ class DisplayVisualFragment : BaseFragment(), DisplayVisualInterface, SortingDis
             allBrandParent_ll?.visibility=View.VISIBLE
             division_spinner?.visibility=View.VISIBLE
             favBrand_frame?.visibility=View.GONE
-            //   brand_rv?.isClickable=true
-
         })
 
         favParent_ll?.setOnClickListener({
@@ -237,7 +229,6 @@ class DisplayVisualFragment : BaseFragment(), DisplayVisualInterface, SortingDis
             allBrand_iv?.setColorFilter(ContextCompat.getColor(requireActivity(), R.color.gray));
             favBrand_iv?.setColorFilter(ContextCompat.getColor(requireActivity(), R.color.white));
             division_spinner?.isEnabled=false
-          //  brand_rv?.isClickable=false
             onClickFavButton()
             setDownloadListAdapter(downloadFilePathList)
 
@@ -249,8 +240,6 @@ class DisplayVisualFragment : BaseFragment(), DisplayVisualInterface, SortingDis
             favBrand_frame?.visibility=View.VISIBLE
 
             })
-
-      //  edetailingFavList = db.getAllFavBrands()
     }
 
     fun setDoctorList()
@@ -298,7 +287,6 @@ class DisplayVisualFragment : BaseFragment(), DisplayVisualInterface, SortingDis
                     downloadFilePathList.clear()
                     downloadFilePathList.addAll(storedDownloadedList)
                     setDownloadListAdapter(downloadFilePathList)
-                   // adapterVisualFile?.notifyDataSetChanged()
 
                 }
                 else
@@ -307,7 +295,6 @@ class DisplayVisualFragment : BaseFragment(), DisplayVisualInterface, SortingDis
                     downloadFilePathList.addAll(storedDownloadedList)
 
                     var filterList: ArrayList<DownloadFileModel> = ArrayList()
-                    var filterListFav: ArrayList<DownloadFileModel> = ArrayList()
 
                     for ((index, valueDownload) in downloadFilePathList?.withIndex()!!) {
 
@@ -321,7 +308,6 @@ class DisplayVisualFragment : BaseFragment(), DisplayVisualInterface, SortingDis
 
                     setDownloadListAdapter(downloadFilePathList)
 
-                   // adapterVisualFile?.notifyDataSetChanged()
 
                 }
                 callDownloadFragment()
@@ -399,15 +385,7 @@ class DisplayVisualFragment : BaseFragment(), DisplayVisualInterface, SortingDis
                     db.deleteAllChildVisual()
                     submitBtn?.visibility=View.GONE
                     Toast.makeText(activity, "Data save successfully", Toast.LENGTH_LONG).show()
-                    /*   db.deleteVisualAds(visualSendModel.get(0).id.toString())    // delete executed entry from db
-                       if (db.getAllSubmitVisual().size > 0)                       // check database if another entries present
-                       {
-                           sendVisual_api()
-                       }
-                       else
-                       {
-                           submitBtn?.setEnabled(false)                           //if visual submit entries is over then button disable again
-                       }*/
+
                 } else {
                 }
                 disableProgress(progressBar!!, requireActivity())
@@ -443,17 +421,6 @@ class DisplayVisualFragment : BaseFragment(), DisplayVisualInterface, SortingDis
                 downloadFilePathList.add(downloadFilePathLocal)
                 storedDownloadedList.add(downloadFilePathLocal)
 
-            /*    for ((index, valueDownload) in downloadFilePathLocal?.withIndex()!!)
-                {
-                    valueDownload.setDownloadType(value.divisionName) //set division name
-                    valueDownload.setBrandId(value.brandId) //set brand id in model then add to array list
-
-
-                    if(index==downloadFilePathLocal.size-1)
-                    {
-                        downloadFilePathList.add(valueDownload)
-                    }
-                }*/
             }
 
             if (index == edetailingList?.size!! - 1) {
@@ -598,12 +565,6 @@ class DisplayVisualFragment : BaseFragment(), DisplayVisualInterface, SortingDis
         {
             networkAlert(requireActivity())
         }
-    }
-
-
-     fun getClickedData(message: String)
-    {
-        Log.e("getClickedData", "message")
     }
 
 

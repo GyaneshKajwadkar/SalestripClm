@@ -102,25 +102,20 @@ class DownloadedActivtiy : BaseActivity() {
         }
 
         downloadAll_ll?.setOnClickListener({
-
             if(arrayList.size!=0)
             {
                 progressDialog()
                 progressBarAlert?.setIndeterminate(true)
                 downloadAll(0, arrayList)
             }
-
-
         })
 
-
         brandName = intent.getStringExtra("brandName").toString()
-         brandId = intent.getIntExtra("brandId", 0)
+        brandId = intent.getIntExtra("brandId", 0)
         eDetailingId = intent.getStringExtra("eDetailingId").toString()
 
         val args = intent.getBundleExtra("BUNDLE");
          arrayList = args?.getSerializable("ARRAYLIST") as (ArrayList<DownloadEdetail_model.Data.EDetailingImages>)
-
 
         var arraylistVideo:ArrayList<DownloadEdetail_model.Data.EDetailingImages> = ArrayList()
         var arraylistImages:ArrayList<DownloadEdetail_model.Data.EDetailingImages> = ArrayList()
@@ -157,10 +152,7 @@ class DownloadedActivtiy : BaseActivity() {
             progressDialog()
             progressBarAlert?.setIndeterminate(true)
             downloadSingleFolders(0,arraylistZip)
-
         })
-
-
 
         toolbarText_tv?.setText(brandName)
 

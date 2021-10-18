@@ -464,6 +464,8 @@ open class BaseActivity : AppCompatActivity() {
                         selectorModel.setRoute(singleItem.headQuaterName)
                         selectorModel.setSpeciality(singleItem.divisionName)
                         selectorModel.setId(singleItem.empId)
+                        selectorModel.setMailId(singleItem.emailId)
+
 
                         getResponseList.add(selectorModel)
                     }

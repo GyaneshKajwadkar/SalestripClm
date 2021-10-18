@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class DevisionModel  {
+public class DevisionModel implements Serializable  {
     @SerializedName("responseCode")
     @Expose
     private Integer responseCode;
@@ -210,7 +210,7 @@ public class DevisionModel  {
             public void setEretailDetailList(ArrayList<EretailDetail> eretailDetailList) {
                 this.eretailDetailList = eretailDetailList;
             }
-            public class EretailDetail {
+            public class EretailDetail implements Serializable{
 
                 @SerializedName("eDetailId")
                 @Expose

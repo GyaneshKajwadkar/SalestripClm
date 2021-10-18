@@ -8,6 +8,7 @@ import `in`.processmaster.salestripclm.networkUtils.APIClient
 import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
@@ -42,7 +43,6 @@ class EdetailingFragment : BaseFragment() {
     var sharePreferance: PreferenceClass?= null
     var loginModel : LoginModel?=null
     var adapter : Edetailing_Adapter?=null
-//    var back_imv:ImageView?=null
     var position:Int=0
     var getAlleDetail: ArrayList<DevisionModel.Data.EDetailing>?= ArrayList()
     var progressView_parentRv: RelativeLayout?=null
@@ -79,54 +79,19 @@ class EdetailingFragment : BaseFragment() {
         db = DatabaseHandler(activity)
         // Setting ViewPager for each Tabs
         viewPager = view.findViewById<View>(R.id.viewpager) as ViewPager
-       // setupViewPager(viewPager!!)
         // Set Tabs inside Toolbar
         tabs = view.findViewById<View>(R.id.result_tabs) as TabLayout
-      //  tabs!!.setupWithViewPager(viewPager)
-
-         //      back_imv=view.findViewById(R.id.back_imv) as ImageView
-
-        /*  back_imv!!.setOnClickListener {
-            activity?.onBackPressed()
-        }*/
-
-       progressMessage_tv?.setText("Loading e-Detailing")
-       activity?.let { enableProgress(progressView_parentRv!!, it) }
+        progressMessage_tv?.setText("Loading e-Detailing")
+        activity?.let { enableProgress(progressView_parentRv!!, it) }
 
         var profileData =sharePreferance?.getPref("profileData")
         loginModel= Gson().fromJson(profileData, LoginModel::class.java)
 
-       /* if(activity?.let { isInternetAvailable(it) } ==true)
-        {
-            division_api()
-        }*/
-
         calladapter()
-
-/*         if(db.alleDetail.size!=0)
-        {
-
-          //  activity?.let { disableProgress(progressView_parentRv!!, it) }
-
-        }
-        else
-        {
-            activity?.let { commonAlert(
-                it,
-                "No Internet",
-                "Make sure that Wi-Fi or modile data is turned on, then try again."
-            ) }
-
-            activity?.let { disableProgress(progressView_parentRv!!, it) }
-
-        }*/
 
         filter_et!!.addTextChangedListener(filterTextWatcher)
 
         changeStatusBar()
-
-        val fragmentDownload: DownloadedFragment? =
-            childFragmentManager.findFragmentById(R.id.container) as DownloadedFragment?
 
         Handler(Looper.getMainLooper())
             .postDelayed({
@@ -188,7 +153,6 @@ class EdetailingFragment : BaseFragment() {
                 Log.e("division_api", response.code().toString() + "")
                 if (response.code() == 200 && !response.body().toString().isEmpty())
                 {
-                    val dataList = response.body()?.data?.geteDetailingList()
 
                     for ((index, value) in db.alleDetail
                         ?.withIndex()!!) {
@@ -274,14 +238,12 @@ class EdetailingFragment : BaseFragment() {
         viewPager: ViewPager //,
     )
     {
-
         if (!isAdded()) return;
-        val newdownloadsFragment = NewDownloadsFragment()
-        val downloadedFragment = DownloadedFragment()
         var adapter = ViewPagerAdapter(getChildFragmentManager())
         viewPager.adapter = adapter
     }
 
+    @SuppressLint("WrongConstant")
     internal class Adapter(manager: FragmentManager?) : FragmentPagerAdapter(
         manager!!,
         FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT

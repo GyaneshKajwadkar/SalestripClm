@@ -1,29 +1,24 @@
 package `in`.processmaster.salestripclm.fragments
-
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.adapter.Edetailing_Adapter
 import `in`.processmaster.salestripclm.models.DevisionModel
-import `in`.processmaster.salestripclm.models.DownloadFileModel
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 class NewDownloadsFragment : Fragment() {
 
     var recyclerView: RecyclerView?=null
-   // var adapter : Edetailing_Adapter?=null
     var sharePreferance: PreferenceClass?= null
     var db = DatabaseHandler(activity)
     var progressView_parentRv: RelativeLayout?= null
@@ -95,31 +90,6 @@ class NewDownloadsFragment : Fragment() {
             adapter?.notifyDataSetChanged()
 
         }
-
-        /*
-
-        Handler(Looper.getMainLooper())
-            .postDelayed({
-
-            adapter =  Edetailing_Adapter(
-                getAlleDetailListDb, sharePreferance, requireActivity(), db,
-                progressView_parentRv
-            )
-
-            val layoutManager = LinearLayoutManager(activity)
-            recyclerView?.layoutManager = layoutManager
-               // recyclerView?.itemAnimator = DefaultItemAnimator()
-            recyclerView?.adapter = adapter
-
-           // adapter?.notifyDataSetChanged()
-
-            if(EdetailingFragment.filter_et?.text?.equals("") == false)
-            {
-                editTextFilter(EdetailingFragment.filter_et?.text.toString())
-            }
-            }, 200)
-*/
-
     }
 
 

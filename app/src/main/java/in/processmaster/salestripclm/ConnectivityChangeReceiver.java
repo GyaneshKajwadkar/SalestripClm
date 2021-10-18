@@ -19,7 +19,6 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-
         Activity activity= (Activity) context;
         BaseActivity baseActivity = new BaseActivity();
 

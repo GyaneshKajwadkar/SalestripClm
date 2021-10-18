@@ -1,5 +1,4 @@
 package `in`.processmaster.salestripclm.activity
-
 import DocManagerModel
 import DoctorManagerSelector_Adapter
 import IntegerInterface
@@ -16,7 +15,6 @@ import `in`.processmaster.salestripclm.networkUtils.APIClient
 import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.sdksampleapp.startjoinmeeting.UserLoginCallback
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
-import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
@@ -42,7 +40,6 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_set_schedule_.*
 import kotlinx.android.synthetic.main.progress_view.*
@@ -53,11 +50,22 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import androidx.recyclerview.widget.GridLayoutManager
+import okhttp3.MediaType
+import org.json.JSONArray
+import org.json.JSONObject
+
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.DateFormat
+import okhttp3.RequestBody
+
+
+
+
 
 class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface, PreMeetingServiceListener,/*TabLayout.OnTabSelectedListener,*/ UserLoginCallback.ZoomDemoAuthenticationListener
+
 {
     val myCalendar = Calendar.getInstance()
     var dialogCalendar: DatePickerDialog?=null
@@ -67,16 +75,16 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
     var connectivityChangeReceiver= ConnectivityChangeReceiver()
     var arrayListSelectorDoctor: ArrayList<DocManagerModel> = ArrayList()
     var arrayListSelectorTeams: ArrayList<DocManagerModel> = ArrayList()
-    var sharePreferance: PreferenceClass?= null
     var selectedAdapeter :SelectedDocManList_adapter? = null
     var selectedAdapeterTeams :SelectedDocManList_adapter? = null
+    var constructorList: ArrayList<DocManagerModel> = ArrayList()
+    var constructorListTeam: ArrayList<DocManagerModel> = ArrayList()
 
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_set_schedule_)
 
-        sharePreferance = PreferenceClass(this)
         getTeamsApi()
 
         Handler(Looper.getMainLooper()).postDelayed({
@@ -85,7 +93,6 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
 
     //    UserLoginCallback.getInstance().addListener(this)
     //    loginFirst()
-
 
     }
 
@@ -111,10 +118,6 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
                 finish()
             }
         }
-
-
-
-        val mNoOfColumns = Utility.calculateNoOfColumns(this,400f)
 
         selectedoctor_rv.setLayoutManager(GridLayoutManager(this, 5))
         recyclerView_teams.setLayoutManager(GridLayoutManager(this, 5))
@@ -195,6 +198,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
         var date: DatePickerDialog.OnDateSetListener = object : DatePickerDialog.OnDateSetListener {
 
 
+            @RequiresApi(Build.VERSION_CODES.N)
             override fun onDateSet(view: DatePicker?, year: Int, monthOfYear: Int,
                                    dayOfMonth: Int) {
                 myCalendar[Calendar.YEAR] = year
@@ -323,7 +327,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
             HideKeyboard(currentFocus ?: View(this@SetSchedule_Activity))
 
             /*   when (checkedId) {
-            
+
                    R.id.radio0 -> {
                    }
                    R.id.radio1 -> {
@@ -345,19 +349,28 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
             selectorModel.setRoute(item.routeName)
             selectorModel.setSpeciality(item.specialityName)
             selectorModel.setId(item.doctorId)
+            selectorModel.setMailId(item.emailId)
             arrayListSelectorDoctor.add(selectorModel)
         }
 
         selectManagers_cv.setOnClickListener({
+            selectManagers_cv.setCardBackgroundColor(ContextCompat.getColor(this, R.color.appColor))
             selectDoctorManager_alert(2)
         })
 
         selectDoctors_cv.setOnClickListener({
+            selectDoctors_cv.setCardBackgroundColor(ContextCompat.getColor(this, R.color.appColor))
             selectDoctorManager_alert(1)
         })
 
         submit_newSchedule.setOnClickListener({
             HideKeyboard(currentFocus ?: View(this@SetSchedule_Activity))
+
+            if(constructorList.size==0)
+            {
+                selectDoctors_cv.setCardBackgroundColor(ContextCompat.getColor(this, R.color.zm_red))
+                return@setOnClickListener
+            }
 
             if(subject_et.text.toString().isEmpty())
             {
@@ -396,13 +409,22 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
                 return@setOnClickListener
             }
 
-
-            if (mPreMeetingService == null)
+            if(remark_et.text.toString().isEmpty())
             {
+                remark_et.requestFocus()
+                remark_et.setError("Required")
                 return@setOnClickListener
             }
 
-            val meetingItem = mPreMeetingService!!.createScheduleMeetingItem()
+            setSheduleApi()
+         /*   if (mPreMeetingService == null)
+            {
+                return@setOnClickListener
+            }*/
+
+
+
+       /*     val meetingItem = mPreMeetingService!!.createScheduleMeetingItem()
 
             meetingItem.meetingTopic = subject_et.text.toString()
             meetingItem.startTime =getTimeDate().time
@@ -436,7 +458,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
             } else {
                 Toast.makeText(this, "User not login.", Toast.LENGTH_LONG).show()
                // finish()
-            }
+            }*/
 
         })
 
@@ -459,39 +481,16 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
         })
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     fun updateCalendar()
     {
-        val myFormat = "dd/MM/yy" //In which you need put here
+        val myFormat = "dd/MM/YYYY" //In which you need put here
         val sdf = SimpleDateFormat(myFormat, Locale.US)
         selectDate_tv.setText(sdf.format(myCalendar.getTime()))
     }
 
 
-
-    private fun getDateString(time: Long?): String {
-        if (time != null) {
-            val cal = Calendar.getInstance()
-            cal.timeInMillis = time
-            val month = when (cal[Calendar.MONTH]) {
-                Calendar.JANUARY -> "January"
-                Calendar.FEBRUARY -> "February"
-                Calendar.MARCH -> "March"
-                Calendar.APRIL -> "April"
-                Calendar.MAY -> "May"
-                Calendar.JUNE -> "June"
-                Calendar.JULY -> "July"
-                Calendar.AUGUST -> "August"
-                Calendar.SEPTEMBER -> "September"
-                Calendar.OCTOBER -> "October"
-                Calendar.NOVEMBER -> "November"
-                Calendar.DECEMBER -> "December"
-                else -> ""
-            }
-            return "$month ${cal[Calendar.DAY_OF_MONTH]}, ${cal[Calendar.YEAR]}"
-        } else return ""
-    }
-
-  /*  override fun onTabReselected(tab: TabLayout.Tab?) {
+    /*  override fun onTabReselected(tab: TabLayout.Tab?) {
         TODO("Not yet implemented")
     }
 
@@ -715,7 +714,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
         dialogBuilder.setView(dialogView)
 
         val alertDialog: AlertDialog = dialogBuilder.create()
-        alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+        alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         val list_rv= dialogView.findViewById<View>(R.id.list_rv) as RecyclerView
         val search_et= dialogView.findViewById<View>(R.id.search_et) as EditText
@@ -753,21 +752,6 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
             }
         })
 
-
-        /* list_rv.setOnClickListener{
-             //if verify edit text is empty
-             if(verify_et.getText().isEmpty())
-             {
-                 verify_et.setError("Required")
-                 verify_btn.requestFocus()
-                 return@setOnClickListener
-             }
-         }*/
-
-      /*  cancel_btn.setOnClickListener{
-            alertDialog.dismiss()
-        }*/
-
         ok_btn.setOnClickListener({
             alertDialog.dismiss()
         })
@@ -790,22 +774,11 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
 
     }
 
-    object Utility {
-        fun calculateNoOfColumns(
-            context: Context,
-            columnWidthDp: Float
-        ): Int { // For example columnWidthdp=180
-            val displayMetrics: DisplayMetrics = context.getResources().getDisplayMetrics()
-            val screenWidthDp: Float = displayMetrics.widthPixels / displayMetrics.density
-            return (screenWidthDp / columnWidthDp + 0.5).toInt() // +0.5 for correct rounding to int.
-        }
-    }
-
     fun callSelectedAdapter(selectionType: Int)
     {
         if(selectionType==1)
         {
-            var constructorList: ArrayList<DocManagerModel> = ArrayList()
+            constructorList= ArrayList()
             for (item in arrayListSelectorDoctor) {
                 if(item.getChecked()!!)
                 {
@@ -816,18 +789,19 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
             selectedAdapeter=SelectedDocManList_adapter(constructorList,this,selectionType)
             selectedoctor_rv.adapter=selectedAdapeter
             selectedAdapeter?.notifyDataSetChanged()
+
         }
         else
         {
-            var constructorList: ArrayList<DocManagerModel> = ArrayList()
+            constructorListTeam= ArrayList()
             for (item in arrayListSelectorTeams) {
                 if(item.getChecked()!!)
                 {
-                    constructorList.add(item)
+                    constructorListTeam.add(item)
                 }
             }
 
-            selectedAdapeterTeams=SelectedDocManList_adapter(constructorList,this,selectionType)
+            selectedAdapeterTeams=SelectedDocManList_adapter(constructorListTeam,this,selectionType)
             recyclerView_teams.adapter=selectedAdapeterTeams
             selectedAdapeterTeams?.notifyDataSetChanged()
         }
@@ -863,8 +837,6 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
             }
         }
 
-
-
         callSelectedAdapter(selectionType)
     }
 
@@ -873,16 +845,9 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
     {
         progressView_parentRv?.visibility=View.VISIBLE
 
-        var profileData =sharePreferance?.getPref("profileData")
-        var loginModel = Gson().fromJson(profileData, LoginModel::class.java)
-
-        var  apiInterface= APIClient.getClient(2, sharePreferance?.getPref("secondaryUrl")).create(
-            APIInterface::class.java
-        )
-
-        var call: Call<TeamsModel> = apiInterface?.getTeamsMember(
-            "bearer " + loginModel?.accessToken,
-            loginModel.empId.toString()
+        var call: Call<TeamsModel> = getSecondaryApiInterface().getTeamsMember(
+            "bearer " + loginModelBase?.accessToken,
+            loginModelBase.empId.toString()
         ) as Call<TeamsModel>
         call.enqueue(object : Callback<TeamsModel?> {
             override fun onResponse(
@@ -900,7 +865,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
                         selectorModel.setRoute(singleItem.headQuaterName)
                         selectorModel.setSpeciality(singleItem.divisionName)
                         selectorModel.setId(singleItem.empId)
-
+                        selectorModel.setMailId(singleItem.emailId)
                         arrayListSelectorTeams.add(selectorModel)
                     }
                 }
@@ -917,4 +882,122 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
             }
         })
     }
+
+    private fun setSheduleApi()
+    {
+        progressMessage_tv?.setText("Scheduling Meeting")
+        enableProgress(progressView_parentRv!!)
+
+        val originalFormat: DateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
+        val targetFormat: DateFormat = SimpleDateFormat("MM/dd/yyyy")
+        val date: Date = originalFormat.parse(selectDate_tv.text.toString())
+        val formattedDate: String = targetFormat.format(date) // 20120821
+
+        var spf = SimpleDateFormat("hh:mm aaa")
+        val startTimeStr = spf.parse(startTime.text.toString())
+        val endTimeStr = spf.parse(stopTime.text.toString())
+        spf= SimpleDateFormat("hh:mm:ss aaa")
+
+
+        val paramObject = JSONObject()
+        paramObject.put("MeetingId", "0")
+        paramObject.put("MeetingDate",formattedDate )
+        paramObject.put("topic",subject_et.text.toString())
+        paramObject.put("StartTime",formattedDate+" "+spf.format(startTimeStr))
+        paramObject.put("EndTime", formattedDate+" "+spf.format(endTimeStr))
+        paramObject.put("MeetingType", if(radio_meeting.getCheckedRadioButtonId()==0) "O" else "P")
+        paramObject.put("EmpId", loginModelBase.empId)
+        paramObject.put("Mode", "1")
+        paramObject.put("Description", remark_et.text.toString())
+
+        val doctorList = JSONArray()
+        for( item in arrayListSelectorDoctor)
+        {
+            if(item.getChecked()!!)
+            {
+                val arrayObject = JSONObject()
+                arrayObject.put("MeetingId","1")
+                arrayObject.put("MemberId",item.getId())
+                arrayObject.put("MemberType","doc")
+                arrayObject.put("EmailId",item.getMailId())
+                arrayObject.put("name",item.getName())
+                doctorList.put(arrayObject)
+            }
+
+        }
+        paramObject.put("DoctorList", doctorList)
+        val teamList = JSONArray()
+        for( item in arrayListSelectorTeams)
+        {
+            if(item.getChecked()!!)
+            {
+                val arrayObject = JSONObject()
+                arrayObject.put("MeetingId","1")
+                arrayObject.put("MemberId",item.getId())
+                arrayObject.put("MemberType","doc")
+                arrayObject.put("EmailId",item.getMailId())
+                arrayObject.put("name",item.getName())
+                teamList.put(arrayObject)
+            } }
+        paramObject.put("EmployeeList", teamList)
+
+        val bodyRequest: RequestBody =
+            RequestBody.create(MediaType.parse("application/json"), paramObject.toString())
+
+        var call: Call<GenerateOTPModel> = getSecondaryApiInterface().setScheduleMeetingApi(
+            "bearer " + loginModelBase?.accessToken,
+            bodyRequest
+        ) as Call<GenerateOTPModel>
+        call.enqueue(object : Callback<GenerateOTPModel?> {
+            override fun onResponse(
+                call: Call<GenerateOTPModel?>?,
+                response: Response<GenerateOTPModel?>
+            ) {
+                if (response.code() == 200 && !response.body().toString().isEmpty())
+                {
+                    var getResponse=response.body()
+                    if(!getResponse?.errorObj?.errorMessage.equals(""))
+                    {
+                        Toast.makeText(this@SetSchedule_Activity, "Server error ", Toast.LENGTH_SHORT).show()
+
+                    }
+                    else{
+                        disableProgress(progressView_parentRv!!)
+                        commonAlert(this@SetSchedule_Activity,getResponse?.data?.message.toString(),"")
+
+                        subject_et.setText("")
+                        remark_et.setText("")
+                        selectDate_tv.setText("Select Date")
+                        startTime.setText("Start time")
+                        stopTime.setText("End time")
+                        first.isChecked=true
+                        constructorList= ArrayList()
+                        constructorListTeam= ArrayList()
+
+
+                    /*    selectedAdapeter=SelectedDocManList_adapter(constructorList,this@SetSchedule_Activity,1)
+                        selectedoctor_rv.adapter=selectedAdapeter
+                        selectedAdapeter?.notifyDataSetChanged()
+                        selectedAdapeterTeams=SelectedDocManList_adapter(constructorListTeam,this@SetSchedule_Activity,1)
+                        recyclerView_teams.adapter=selectedAdapeterTeams
+                        selectedAdapeterTeams?.notifyDataSetChanged()*/
+
+                    }
+                }
+                else
+                {
+                    Toast.makeText(this@SetSchedule_Activity, "Server error ", Toast.LENGTH_SHORT).show()
+                }
+                disableProgress(progressView_parentRv!!)
+
+            }
+
+            override fun onFailure(call: Call<GenerateOTPModel?>, t: Throwable?) {
+                call.cancel()
+                disableProgress(progressView_parentRv!!)
+
+            }
+        })
+    }
+
 }

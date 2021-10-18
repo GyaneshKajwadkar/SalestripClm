@@ -109,8 +109,6 @@ class HomeFragment : Fragment(), OnChartGestureListener {
     var parent_ll: LinearLayout?=null
     var progressHomeFrag: ProgressBar?=null
 
-    var titleList: List<String>? = null
-
     @SuppressLint("RestrictedApi", "UseRequireInsteadOfGet")
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -120,8 +118,7 @@ class HomeFragment : Fragment(), OnChartGestureListener {
 
 
         val root = inflater.inflate(R.layout.fragment_home, container, false)
-        var  first_cv=root.findViewById<CardView>(R.id.first_cv) as CardView
-        var  second_cv=root.findViewById<CardView>(R.id.second_cv) as CardView
+
         viewPager = root.findViewById<View>(R.id.viewpager) as ViewPager
         tabs = root.findViewById<View>(R.id.result_tabs) as TabLayout
         createTask_fab   = root.findViewById<View>(R.id.createTask_fab) as FloatingActionButton
@@ -174,15 +171,6 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         })
 
 
-
-        val data = listOf(
-                Category("Today's meeting", listOf(CategoryList("My Spy"), CategoryList("BloodShot"), CategoryList("Midway"))),
-                Category("Tomorrow meeting", listOf(CategoryList("The Godfather"), CategoryList("The Dark Knight"))),
-                Category("This week", listOf(CategoryList("Apocalypse Now"), CategoryList("Saving Private Ryan"))),
-                Category("Next week", listOf(CategoryList("Apocalypse Now"), CategoryList("Saving Private Ryan"), CategoryList("Midway"))),
-        )
-
-
         expandable_Rv?.layoutManager = LinearLayoutManager(requireActivity())
 
 
@@ -201,41 +189,6 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         return root
     }
 
-
-
-    object ExpandableListData {
-        val data: HashMap<String, List<String>>
-            get() {
-                val expandableListDetail =
-                        HashMap<String, List<String>>()
-                val myFavCricketPlayers: MutableList<String> =
-                        ArrayList()
-                myFavCricketPlayers.add("MS.Dhoni")
-                myFavCricketPlayers.add("Sehwag")
-                myFavCricketPlayers.add("Shane Watson")
-                myFavCricketPlayers.add("Ricky Ponting")
-                myFavCricketPlayers.add("Shahid Afridi")
-                val myFavFootballPlayers: MutableList<String> = ArrayList()
-                myFavFootballPlayers.add("Cristiano Ronaldo")
-                myFavFootballPlayers.add("Lionel Messi")
-                myFavFootballPlayers.add("Gareth Bale")
-                myFavFootballPlayers.add("Neymar JR")
-                myFavFootballPlayers.add("David de Gea")
-                val myFavTennisPlayers: MutableList<String> = ArrayList()
-                myFavTennisPlayers.add("Roger Federer")
-                myFavTennisPlayers.add("Rafael Nadal")
-                myFavTennisPlayers.add("Andy Murray")
-                myFavTennisPlayers.add("Novak Jokovic")
-                myFavTennisPlayers.add("Sania Mirza")
-                expandableListDetail["CRICKET PLAYERS"] = myFavCricketPlayers
-                expandableListDetail["FOOTBALL PLAYERS"] = myFavFootballPlayers
-                expandableListDetail["TENNIS PLAYERS"] = myFavTennisPlayers
-                expandableListDetail["kikml"] = myFavTennisPlayers
-                expandableListDetail["ioiojbkmljh"] = myFavTennisPlayers
-
-                return expandableListDetail
-            }
-    }
 
     //=========================================Viewpagers=================================================
 
@@ -256,6 +209,7 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         viewPager.adapter = adapter
     }
 
+    @SuppressLint("WrongConstant")
     class ViewPagerAdapter(fm: FragmentManager?) :
             FragmentPagerAdapter(
                     fm!!,
@@ -718,7 +672,6 @@ class HomeFragment : Fragment(), OnChartGestureListener {
 
         var adapterRecycler= ScheduleMeetingAdapter(1)
         scheduledMeeting_rv.layoutManager = LinearLayoutManager(requireActivity())
-      //  recyclerNewSchedule?.itemAnimator = DefaultItemAnimator()
         scheduledMeeting_rv.adapter = adapterRecycler
 
         try {
@@ -891,8 +844,6 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         l.textSize=15f
 
         // entry label styling
-
-        // entry label styling
         charthalf!!.setEntryLabelColor(Color.BLACK)
         charthalf!!.setEntryLabelTextSize(12f)
         charthalf!!.setDrawEntryLabels(false)
@@ -914,7 +865,6 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         dataSet.sliceSpace = 3f
         dataSet.selectionShift = 5f
         dataSet.setColors(*ColorTemplate.MATERIAL_COLORS)
-        //dataSet.setSelectionShift(0f);
         val data = PieData(dataSet)
         data.setValueFormatter(PercentFormatter())
         data.setValueTextSize(14f)

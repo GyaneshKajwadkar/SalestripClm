@@ -54,8 +54,6 @@ class Edetailing_Adapter(
 
     var filteredData: ArrayList<DevisionModel.Data.EDetailing>? = edetailidList
     var downloadList: ArrayList<DownloadFileModel>? = ArrayList()
-    var progressBarAlert:ProgressBar?=null
-    var textViewAlert:TextView?=null
     var alertDialog: AlertDialog?=null
 
 
@@ -88,7 +86,7 @@ class Edetailing_Adapter(
 
             if(!checkDownloadStatus)
             {
-                   holder.reDownload_rl.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.orange)));
+                    holder.reDownload_rl.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.orange)));
                     holder.headerTv.setText("Pending Download")
                     holder.isPending_iv.setImageResource(R.drawable.ic_download)
             }
@@ -98,28 +96,31 @@ class Edetailing_Adapter(
       holder.bottom_tv.text = "Division: "+modeldata?.divisionName
 
         holder.download_rl.setOnClickListener({
-            progressView_parentRv?.visibility=View.VISIBLE
-            downloadDivision_apiNewCalling(modeldata?.geteDetailId().toString(), position, holder, modeldata)
+          //  progressView_parentRv?.visibility=View.VISIBLE
+          //  downloadDivision_apiNewCalling(modeldata?.geteDetailId().toString(), modeldata)
+            intentCalling(modeldata?.geteDetailId().toString(), modeldata)
         })
 
         holder.reDownload_rl.setOnClickListener {
-            progressView_parentRv?.visibility=View.VISIBLE
-            downloadDivision_apiNewCalling(modeldata?.geteDetailId().toString(), position, holder, modeldata)
+          //  progressView_parentRv?.visibility=View.VISIBLE
+            intentCalling(modeldata?.geteDetailId().toString(), modeldata)
+           // downloadDivision_apiNewCalling(modeldata?.geteDetailId().toString(), modeldata)
         }
 
             holder.parent_ll.setOnClickListener(
                 {
                     if(modeldata?.isSaved==1)
                     {
-                        progressView_parentRv?.visibility=View.VISIBLE
-                        downloadDivision_apiNewCalling(modeldata?.geteDetailId().toString(), position, holder, modeldata)
+                     //   progressView_parentRv?.visibility=View.VISIBLE
+                        intentCalling(modeldata?.geteDetailId().toString(), modeldata)
+                      //  downloadDivision_apiNewCalling(modeldata?.geteDetailId().toString(), modeldata)
                     }
                     else
                     {
-                        progressView_parentRv?.visibility=View.VISIBLE
-                        downloadDivision_apiNewCalling(modeldata?.geteDetailId().toString(), position, holder, modeldata)
+                     //   progressView_parentRv?.visibility=View.VISIBLE
+                        intentCalling(modeldata?.geteDetailId().toString(), modeldata)
+                      //  downloadDivision_apiNewCalling(modeldata?.geteDetailId().toString(), modeldata)
                     }
-
                 }
             )
     }
@@ -164,16 +165,48 @@ class Edetailing_Adapter(
         return position
     }
 
+    private fun intentCalling(
+        eDetailId: String,
+        modeldata: DevisionModel.Data.EDetailing?
+    )
+    {
+        var arrayList:ArrayList<DownloadEdetail_model.Data.EDetailingImages> = ArrayList()
+
+
+        for(iteams in modeldata?.eretailDetailList!!)
+        {
+            var modelClass=DownloadEdetail_model.Data.EDetailingImages()
+            modelClass.fileId=iteams.fileId
+            modelClass.fileName=iteams.fileName
+            modelClass.fileOrder=iteams.fileOrder
+            modelClass.filePath=iteams.filePath
+            modelClass.fileSize=iteams.fileSize
+            modelClass.fileType=iteams.fileType
+            modelClass.seteDetailId(iteams.geteDetailId())
+            arrayList.add(modelClass)
+        }
+
+        //get eDetailing Image list
+        val intent = Intent(context, DownloadedActivtiy::class.java)
+        intent.putExtra("brandName", modeldata?.brandName)
+        intent.putExtra("brandId", modeldata?.brandId)
+        intent.putExtra("eDetailingId", eDetailId)
+
+        val args = Bundle()
+        args.putSerializable("ARRAYLIST", arrayList as Serializable?)
+        intent.putExtra("BUNDLE",args);
+
+        context.startActivity(intent)
+    }
+
+
 
     //call_divisioinApi (Download file)
     private fun downloadDivision_apiNewCalling(
             eDetailId: String,
-            position: Int,
-            holder: MyViewHolder,
             modeldata: DevisionModel.Data.EDetailing?
     )
     {
-
 
         //get profile data from sharePreferance
         var profileData =sharePreferance?.getPref("profileData")
@@ -205,7 +238,7 @@ class Edetailing_Adapter(
 
                     val args = Bundle()
                     args.putSerializable("ARRAYLIST", arrayList as Serializable?)
-                    intent.putExtra("BUNDLE",args);
+                    intent.putExtra("BUNDLE",args)
 
                     context.startActivity(intent)
 
@@ -221,188 +254,6 @@ class Edetailing_Adapter(
                 call.cancel()
                 progressView_parentRv?.visibility=View.GONE
             }
-        })
-    }
-
-
-    //call_divisioinApi (Download file)
-    private fun downloadDivision_api(
-            eDetailId: String,
-            position: Int,
-            holder: MyViewHolder,
-            modeldata: DevisionModel.Data.EDetailing?
-    )
-    {
-
-
-        //get profile data from sharePreferance
-        var profileData =sharePreferance?.getPref("profileData")
-        var loginModel = Gson().fromJson(profileData, LoginModel::class.java)
-
-     //   enableProgress(progressBar)
-        var  apiInterface= APIClient.getClient(2, sharePreferance?.getPref("secondaryUrl")).create(
-                APIInterface::class.java
-        )
-
-        var call: Call<DownloadEdetail_model> = apiInterface?.downloadUrl(
-                "bearer " + loginModel?.accessToken,
-                eDetailId
-        ) as Call<DownloadEdetail_model>
-        call.enqueue(object : Callback<DownloadEdetail_model?> {
-            override fun onResponse(
-                    call: Call<DownloadEdetail_model?>?,
-                    response: Response<DownloadEdetail_model?>
-            ) {
-                if (response.code() == 200 && !response.body().toString().isEmpty()) {
-
-                    //get eDetailing Image list
-                    var isZipPresent = false
-                    for ((index, value) in response.body()?.getData()?.geteDetailingImagesList()
-                            ?.withIndex()!!) {
-                        val checkUrl = value.filePath
-                        val extension: String = checkUrl?.substring(checkUrl.lastIndexOf("."))!!
-                        //Check if file contain zip folder
-                        if (extension.equals(".zip")) {
-                            var isLast = false
-                            isZipPresent = true
-                            if (index == response.body()!!.getData()!!
-                                            .geteDetailingImagesList()!!.size - 1
-                            ) {
-                                isLast = true
-                            }
-                            //if file contain zip folder then download
-                            downloadUrl(
-                                    value.filePath.toString(),
-                                    value.fileName.toString(),
-                                    isLast,
-                                    eDetailId,
-                                    position,
-                                    holder, modeldata
-                            )
-                        }
-
-                        if (index == response.body()!!.getData()!!
-                                        .geteDetailingImagesList()!!.size - 1 && !isZipPresent
-                        ) {
-                            alertDialog?.dismiss()
-                            Toast.makeText(context, "No Data available", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                } else {
-                    alertDialog?.dismiss()
-                    Toast.makeText(context, "Unable to download", Toast.LENGTH_SHORT).show()
-
-                }
-
-            }
-
-            override fun onFailure(call: Call<DownloadEdetail_model?>, t: Throwable?) {
-                call.cancel()
-            }
-        })
-    }
-
-    //download files
-    fun downloadUrl(
-            urlMain: String,
-            fileName: String,
-            isLast: Boolean,
-            eDetailId: String,
-            position: Int,
-            holder: MyViewHolder,
-            modeldata: DevisionModel.Data.EDetailing?
-    )
-    {
-
-        val extension: String = urlMain.substring(urlMain.lastIndexOf("/"))
-        val executor: ExecutorService = Executors.newSingleThreadExecutor()
-        val handler = Handler(Looper.getMainLooper())
-
-        executor.execute(Runnable {
-            var count: Int
-            try {
-                val url = URL(urlMain)
-                //establish connection
-                val conection = url.openConnection()
-                conection.connect()
-                val lenghtOfFile = conection.contentLength
-                val input: InputStream = BufferedInputStream(url.openStream(), 8192)
-                val output: OutputStream
-
-                //create file path
-                var folder = File(context.getExternalFilesDir(null)?.absolutePath + "/zipFiles")
-
-                try {
-                    if (folder.mkdir()) {
-                        println("Directorycreated")
-                    } else {
-                        println("Directoryisnotcreated")
-                    }
-                } catch (e: java.lang.Exception) {
-                    e.printStackTrace()
-                }
-
-                var success = true
-                if (!folder.exists()) {
-                    success = folder.mkdirs()
-                }
-                if (success) {
-
-
-                    // Output stream to write file
-                    output = FileOutputStream(folder.getAbsolutePath() + extension)
-                    val data = ByteArray(1024)
-                    var total: Long = 0
-                    while (input.read(data).also { count = it } != -1) {
-
-                        total += count.toLong()
-
-                        context.runOnUiThread(Runnable {
-                            progressBarAlert?.setIndeterminate(false)
-                            progressBarAlert?.setProgress(((total * 100 / lenghtOfFile).toInt()))
-                            textViewAlert?.setText(((total * 100 / lenghtOfFile).toInt()).toString())
-                        })
-
-                        output.write(data, 0, count)
-                    }
-                    output.flush()
-                    output.close()
-
-                    var downloadedModel = DownloadFileModel()
-                    downloadedModel.setFileName(modeldata?.brandName)
-                    downloadedModel.setFileUrl(urlMain)
-                    downloadedModel.setFilePath(folder.getAbsolutePath() + extension)
-
-                    //get main path
-                    val zipName: String = downloadedModel.filePath.substring(
-                            downloadedModel.filePath.lastIndexOf(
-                                    "/"
-                            )
-                    )
-                    val filterPath = downloadedModel.filePath
-                    //break and get file name
-                    val index = downloadedModel.filePath.lastIndexOf('/')
-                    val subPath = filterPath.substring(0, index)
-
-                    context.runOnUiThread(Runnable {
-                        progressBarAlert?.setIndeterminate(true)
-                    })
-
-                    //unzip file
-
-                    unpackZipActivity(subPath, zipName, downloadedModel, isLast, eDetailId, position, modeldata, holder)
-
-
-                } else {
-                    alertDialog?.dismiss()
-                }
-                input.close()
-            } catch (e: Exception) {
-                Log.e("Error: ", e.message!!)
-                alertDialog?.dismiss()
-            }
-
-
         })
     }
 
@@ -422,7 +273,8 @@ class Edetailing_Adapter(
                 actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
                 else -> false
             }
-        } else {
+        }
+        else {
             connectivityManager.run {
                 connectivityManager.activeNetworkInfo?.run {
                     result = when (type) {
@@ -437,107 +289,6 @@ class Edetailing_Adapter(
         }
 
         return result
-    }
-
-
-    //unzip file path
-    fun unpackZipActivity(path: String, zipname: String, downloadedModel: DownloadFileModel, isLast: Boolean,
-                          eDetailId: String,
-                          position: Int,
-                          modeldata: DevisionModel.Data.EDetailing?, holder: MyViewHolder) {
-        var htmlPath =""
-        var isInput: InputStream? = null
-        val zis: ZipInputStream
-        try {
-            var filename: String
-            try {
-                isInput = FileInputStream(path + zipname)
-            } catch (e: Exception) {
-                Log.e("fileSaving", e.message!!)
-            }
-            zis = ZipInputStream(BufferedInputStream(isInput))
-            var ze: ZipEntry? = null
-            val buffer = ByteArray(1024)
-            var count: Int
-            while (zis.nextEntry.also { ze = it } != null) {
-                filename = ze!!.name
-
-                //  create directories if not exists
-                if (ze!!.isDirectory) {
-                    val fmd = File("$path/$filename")
-                    fmd.mkdirs()
-                    continue
-                }
-                val extractFileName = "$path/$filename"
-                val lowercaseName = extractFileName.toLowerCase()
-
-                //retrive html path
-                if (lowercaseName.endsWith(".html"))
-                {
-                    htmlPath=lowercaseName
-
-                }
-                val fout = FileOutputStream("$path/$filename")
-                while (zis.read(buffer).also { count = it } != -1) {
-                    fout.write(buffer, 0, count)
-                }
-                fout.close()
-                zis.closeEntry()
-            }
-            zis.close()
-        }
-        catch (e: IOException) {
-            Log.e("zipException", e.message!!)
-            alertDialog?.dismiss()
-        }
-        finally {
-            //if html path not empty then send data to webview activity
-
-            if(!htmlPath.isEmpty())
-            {
-                modeldata?.setIsSaved(1)
-
-                downloadedModel.setZipExtractFilePath(htmlPath)
-                downloadedModel.setBrandId(modeldata?.brandId!!)
-                downloadList?.add(downloadedModel)
-
-                //insert file path in database
-               val gson = Gson()
-               db.insertFilePath(1, gson.toJson(downloadList), eDetailId)
-
-
-                context.runOnUiThread(Runnable {
-                    notifyItemChanged(position, modeldata)
-                    alertDialog?.dismiss()
-                })
-            }
-        }
-
-    }
-
-    fun progressDialog()
-    {
-        val dialogBuilder = AlertDialog.Builder(context)
-        val inflater = context.layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.percentprogress_alert, null)
-        dialogBuilder.setCancelable(false);
-
-
-
-        dialogBuilder.setView(dialogView)
-
-        alertDialog= dialogBuilder.create()
-        alertDialog!!.setCanceledOnTouchOutside(false)
-        alertDialog!!.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
-
-        progressBarAlert =
-                dialogView.findViewById<View>(R.id.valueProgressBar) as ProgressBar
-
-        textViewAlert =
-                dialogView.findViewById<View>(R.id.progressNumber_tv) as TextView
-
-        alertDialog!!.show()
-
     }
 
 

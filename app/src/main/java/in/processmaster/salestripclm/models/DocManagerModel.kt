@@ -4,6 +4,7 @@ class DocManagerModel
     private var name: String? = null
     private var routeName: String? = null
     private var specialityName: String? = null
+    private var mailId: String? = null
     private var id: Int? = null
     private var checked: Boolean? = false
 
@@ -13,6 +14,14 @@ class DocManagerModel
 
     fun setChecked(checked: Boolean?) {
         this.checked = checked
+    }
+
+    fun getMailId(): String? {
+        return mailId
+    }
+
+    fun setMailId(name: String?) {
+        this.mailId = name
     }
 
     fun getName(): String? {

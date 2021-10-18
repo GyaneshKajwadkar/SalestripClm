@@ -67,7 +67,7 @@ class SplashActivity : BaseActivity()
 
         if(sharePreferance!!.getPrefBool("isLogin"))
         {
-            //if no internet connection and database have sync data then open directly home page
+           /* //if no internet connection and database have sync data then open directly home page
             if(isInternetAvailable(this)==false && db.datasCount > 0)
             {
                 Handler(Looper.getMainLooper()).postDelayed({
@@ -81,7 +81,9 @@ class SplashActivity : BaseActivity()
                 //call sync api for token check
                 sync_api()
             }
-            //login_api()
+            //login_api()*/
+
+            sync_api()
         }
                 //call login screen
         else

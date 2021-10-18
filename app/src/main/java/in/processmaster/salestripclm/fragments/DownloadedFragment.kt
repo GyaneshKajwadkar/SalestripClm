@@ -22,7 +22,6 @@ import pl.droidsonroids.gif.GifImageView
 class DownloadedFragment : Fragment() {
 
     var recyclerView: RecyclerView?=null
-  //  var adapter : Edetailing_Adapter?=null
     var sharePreferance: PreferenceClass?= null
     var nodata_gif: GifImageView?= null
     var progressView_parentRv: RelativeLayout?= null
@@ -70,7 +69,6 @@ class DownloadedFragment : Fragment() {
                 )
                 val layoutManager = LinearLayoutManager(activity)
                 recyclerView?.layoutManager = layoutManager
-                // recyclerView?.itemAnimator = DefaultItemAnimator()
                 recyclerView?.adapter = adapter
 
                 if(EdetailingFragment.filter_et?.text?.equals("") == false)
@@ -91,9 +89,10 @@ class DownloadedFragment : Fragment() {
         super.onResume()
         var   getAlleDetail= db.getSelectedeDetail(true)
 
+
+
         if(/*getAlleDetail.size!=getAlleDetailListDb.size &&*/ !isFirstTimeOpen)
         {
-
             getAlleDetailListDb.clear()
             getAlleDetailListDb.addAll(getAlleDetail)
             adapter =  Edetailing_Adapter(
@@ -101,45 +100,19 @@ class DownloadedFragment : Fragment() {
                 progressView_parentRv
             )
             recyclerView?.adapter = adapter
-           adapter?.notifyDataSetChanged()
+            adapter?.notifyDataSetChanged()
 
+            if(getAlleDetail.size!=0)
+            {
+                nodata_gif?.visibility=View.GONE
+                recyclerView?.visibility=View.VISIBLE
+            }
         }
-
-
-     /*   Handler(Looper.getMainLooper())
-            .postDelayed({
-                if(getAlleDetailListDb!!.size==0)
-                {
-                    nodata_gif?.visibility=View.VISIBLE
-                    recyclerView?.visibility=View.GONE
-                }
-                else
-                {
-                    nodata_gif?.visibility=View.GONE
-                    recyclerView?.visibility=View.VISIBLE
-                }
-
-                adapter =  Edetailing_Adapter(
-                    getAlleDetailListDb, sharePreferance, requireActivity(), db,
-                    progressView_parentRv
-                )
-                val layoutManager = LinearLayoutManager(activity)
-                recyclerView?.layoutManager = layoutManager
-                // recyclerView?.itemAnimator = DefaultItemAnimator()
-                recyclerView?.adapter = adapter
-
-                if(EdetailingFragment.filter_et?.text?.equals("") == false)
-                {
-                    editTextFilter(EdetailingFragment.filter_et?.text.toString())
-                }
-            }, 200)*/
-
     }
 
     fun editTextFilter(string: String)
     {
         adapter?.getFilter()?.filter(string);
     }
-
 
 }
