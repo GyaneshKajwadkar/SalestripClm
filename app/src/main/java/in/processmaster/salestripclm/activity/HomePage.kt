@@ -7,7 +7,6 @@ import `in`.processmaster.salestripclm.fragments.HomeFragment
 import `in`.processmaster.salestripclm.models.DevisionModel
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.models.SyncModel
-import `in`.processmaster.salestripclm.presentation_and_zoom.JoinMeetingActivity
 import `in`.processmaster.salestripclm.sdksampleapp.initsdk.InitAuthSDKCallback
 import `in`.processmaster.salestripclm.sdksampleapp.initsdk.InitAuthSDKHelper
 import `in`.processmaster.salestripclm.sdksampleapp.startjoinmeeting.UserLoginCallback
@@ -126,6 +125,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener,
         if(isInternetAvailable(this)==true)
         {
             sync_api()
+            getsheduledMeeting_api()
         }
 
         //Logout
@@ -649,5 +649,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener,
         super.onPause()
         stopConnectivity(this)
     }
+
+
 
 }

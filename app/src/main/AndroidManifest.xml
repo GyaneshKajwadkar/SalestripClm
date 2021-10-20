@@ -128,7 +128,7 @@
             android:screenOrientation="landscape"
             android:windowSoftInputMode="stateHidden" />
         <activity
-            android:name=".presentation_and_zoom.JoinMeetingActivity"
+            android:name=".activity.JoinMeetingActivity"
             android:exported="true"
             android:hardwareAccelerated="true"
             android:launchMode="singleTop"

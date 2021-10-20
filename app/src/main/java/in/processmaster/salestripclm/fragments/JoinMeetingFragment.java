@@ -1,4 +1,4 @@
-package in.processmaster.salestripclm.presentation_and_zoom;
+package in.processmaster.salestripclm.fragments;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -41,6 +41,8 @@ import android.widget.Toast;
 import java.util.List;
 
 import in.processmaster.salestripclm.R;
+import in.processmaster.salestripclm.activity.JoinMeetingActivity;
+import in.processmaster.salestripclm.presentation_and_zoom.OnlinePresentationActivity;
 import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.SimpleInMeetingBOControllerListener;
 import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.audio.MeetingAudioCallback;
 import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.audio.MeetingAudioHelper;

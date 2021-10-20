@@ -1,12 +1,13 @@
 package `in`.processmaster.salestripclm.adapter
 
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.models.GetScheduleModel
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
-class ScheduledDashboardAdapter : RecyclerView.Adapter<ScheduledDashboardAdapter.ScheduleViewHolder>() {
+class ScheduledDashboardAdapter(val meetingArrayList: ArrayList<GetScheduleModel.Data.Meeting>) : RecyclerView.Adapter<ScheduledDashboardAdapter.ScheduleViewHolder>() {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleViewHolder {
@@ -16,7 +17,7 @@ class ScheduledDashboardAdapter : RecyclerView.Adapter<ScheduledDashboardAdapter
 
 
     override fun getItemCount(): Int {
-        return 3
+        return meetingArrayList.size
     }
 
     class ScheduleViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView!!)

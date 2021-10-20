@@ -59,7 +59,7 @@ import in.processmaster.salestripclm.sdksampleapp.ui.APIUserStartJoinMeetingActi
 import in.processmaster.salestripclm.sdksampleapp.ui.BreakoutRoomsAdminActivity;
 import in.processmaster.salestripclm.sdksampleapp.ui.InitAuthSDKActivity;
 import in.processmaster.salestripclm.sdksampleapp.ui.UIUtil;
-import in.processmaster.salestripclm.presentation_and_zoom.JoinMeetingActivity;
+import in.processmaster.salestripclm.activity.JoinMeetingActivity;
 import us.zoom.sdk.BOControllerError;
 import us.zoom.sdk.IBOAdmin;
 import us.zoom.sdk.IBOAssistant;

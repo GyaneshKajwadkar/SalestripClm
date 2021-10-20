@@ -1,6 +1,7 @@
 package `in`.processmaster.salestripclm.fragments
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.adapter.*
+import `in`.processmaster.salestripclm.models.GetScheduleModel
 import `in`.processmaster.salestripclm.models.SyncModel
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.DrawableUtils.getDayCircle
@@ -25,7 +26,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
-import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
@@ -173,6 +173,13 @@ class HomeFragment : Fragment(), OnChartGestureListener {
 
         expandable_Rv?.layoutManager = LinearLayoutManager(requireActivity())
 
+        val responseData=db.getApiDetail(1)
+        var getScheduleModel=GetScheduleModel()
+        if(!responseData.equals(""))
+        {
+            getScheduleModel= Gson().fromJson(responseData, GetScheduleModel::class.java)
+        }
+
 
         var arrayListString : ArrayList<String> = ArrayList()
 
@@ -180,7 +187,7 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         arrayListString.add("Tommorow meetings")
         arrayListString.add("This week meetings")
         arrayListString.add("Next week meetings")
-         val adapter = MeetingExpandableHeaderAdapter(requireActivity(),arrayListString)
+        val adapter = MeetingExpandableHeaderAdapter(requireActivity(),arrayListString,getScheduleModel)
 
 
         expandable_Rv?.adapter = adapter
@@ -496,8 +503,6 @@ class HomeFragment : Fragment(), OnChartGestureListener {
 
 
         val data = BarData(dataSets)
-
-
         chart?.setTouchEnabled(true);
         chart?.setData(data)
         chart?.getAxisLeft()?.setAxisMinimum(0f)
@@ -598,7 +603,6 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         return incomeEntries.subList(0, size)
     }
 
-
     private fun getIncomeEntries2(size: Int): List<BarEntry>? {
         var incomeEntries = java.util.ArrayList<BarEntry>()
         incomeEntries.add(BarEntry(1f, 19f))
@@ -606,7 +610,6 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         incomeEntries.add(BarEntry(3f, 2f))
         return incomeEntries.subList(0, size)
     }
-
 
     private fun getIncomeEntries3(size: Int): List<BarEntry>? {
         var incomeEntries = java.util.ArrayList<BarEntry>()
@@ -652,7 +655,6 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         }
     }
 
-
     fun callMeetingAlert(selectedDateCal: String)
     {
 
@@ -670,9 +672,16 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         var selectedDate = dialogView.findViewById(R.id.selectedDate) as TextView
         var scheduledMeeting_rv = dialogView.findViewById(R.id.scheduledMeeting_rv) as RecyclerView
 
-        var adapterRecycler= ScheduleMeetingAdapter(1)
-        scheduledMeeting_rv.layoutManager = LinearLayoutManager(requireActivity())
-        scheduledMeeting_rv.adapter = adapterRecycler
+        val responseData=db.getApiDetail(1)
+        if(!responseData.equals(""))
+        {
+            var getScheduleModel= Gson().fromJson(responseData, GetScheduleModel::class.java)
+            var adapterRecycler= ScheduleMeetingAdapter(requireActivity(),1, getScheduleModel.getData()?.meetingList)
+            scheduledMeeting_rv.layoutManager = LinearLayoutManager(requireActivity())
+            scheduledMeeting_rv.adapter = adapterRecycler
+        }
+
+
 
         try {
             val date = format.parse(selectedDateCal)

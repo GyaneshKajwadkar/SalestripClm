@@ -1,4 +1,4 @@
-package in.processmaster.salestripclm.presentation_and_zoom;
+package in.processmaster.salestripclm.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -34,6 +34,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -46,6 +47,9 @@ import java.util.Map;
 
 import in.processmaster.salestripclm.ConnectivityChangeReceiver;
 import in.processmaster.salestripclm.R;
+import in.processmaster.salestripclm.adapter.ScheduleMeetingAdapter;
+import in.processmaster.salestripclm.fragments.JoinMeetingFragment;
+import in.processmaster.salestripclm.models.GetScheduleModel;
 import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.RawDataMeetingActivity;
 import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.SimpleZoomUIDelegate;
 import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.MeetingOptionBar;
@@ -54,6 +58,7 @@ import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.zoommeetingu
 import in.processmaster.salestripclm.sdksampleapp.startjoinmeeting.UserLoginCallback;
 import in.processmaster.salestripclm.sdksampleapp.startjoinmeeting.emailloginuser.EmailUserLoginHelper;
 import in.processmaster.salestripclm.sdksampleapp.ui.InitAuthSDKActivity;
+import in.processmaster.salestripclm.utils.DatabaseHandler;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import retrofit2.Call;
@@ -71,7 +76,6 @@ import us.zoom.sdk.IBOAttendee;
 import us.zoom.sdk.InMeetingBOController;
 import us.zoom.sdk.InMeetingNotificationHandle;
 import us.zoom.sdk.InMeetingService;
-import us.zoom.sdk.MeetingActivity;
 import us.zoom.sdk.MeetingError;
 import us.zoom.sdk.MeetingItem;
 import us.zoom.sdk.MeetingService;
@@ -99,7 +103,6 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
     ArrayList<MeetingItem> meetingListMain= new ArrayList<>();
     ConnectivityChangeReceiver  connectivityChangeReceiver= new ConnectivityChangeReceiver();
 
-
     private boolean mbPendingStartMeeting = false;
 
     private ZoomSDK zoomSDK;
@@ -118,7 +121,6 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
     ImageView zoomImageView;
     LinearLayout parentToolbar;
     TextView noData_tv;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -199,30 +201,47 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
             }
         });
 
-
-
         if(zoomSDK.isInitialized()) {
             PreMeetingService preMeetingService = zoomSDK.getPreMeetingService();
             if(preMeetingService != null)
             {
-             //   Toast.makeText(this, "preMeetingService", Toast.LENGTH_LONG).show();
-
                 preMeetingService.listMeeting();
                 preMeetingService.addListener(this);
             }
             else
-                {
-
+            {
                 Toast.makeText(this, "User not login.", Toast.LENGTH_LONG).show();
-
             }
         }
         mMeetingService = ZoomSDK.getInstance().getMeetingService();
         ZoomSDK.getInstance().getMeetingSettingsHelper().setCustomizedMeetingUIEnabled(true);
 
+        setScheduleAdapter();
     }
 
+    private void setScheduleAdapter()
+    {
 
+        String responseData= new DatabaseHandler(this).getApiDetail(1);
+
+        if(!responseData.equals(""))
+        {
+            GetScheduleModel getScheduleModel= new Gson().fromJson(responseData, GetScheduleModel.class);
+            ArrayList<GetScheduleModel.Data.Meeting>meetinglist=new ArrayList<>();
+            for(int i=0;i<getScheduleModel.getData().getMeetingList().size();i++)
+            {
+                if(getScheduleModel.getData().getMeetingList().get(i).getMeetingType().equals("O"))
+                {
+                    meetinglist.add(getScheduleModel.getData().getMeetingList().get(i));
+                }
+            }
+            ScheduleMeetingAdapter adapterRecycler= new ScheduleMeetingAdapter(this,1,meetinglist);
+            sheduled_rv.setLayoutManager(new LinearLayoutManager(this));
+            sheduled_rv.setAdapter(adapterRecycler);
+            adapterRecycler.notifyDataSetChanged();
+            scheduledProgess.setVisibility(View.GONE);
+        }
+    }
 
 
     @Override
@@ -236,47 +255,7 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
         super.onBackPressed();
     }
 
-    private void callApis()
-    {
-        getJWT();
 
-        GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(GetDataService.class);
-        Call<TokenClass> call = service.getTokenUserId("kajwadkar13@gmail.com","zak","Bearer" );
-        call.enqueue(new Callback<TokenClass>() {
-            @Override
-            public void onResponse(Call<TokenClass> call, Response<TokenClass> response) {
-
-                TokenClass model=response.body();
-
-                Log.e("andTheresponseIs",model.getToken());
-
-            }
-
-            @Override
-            public void onFailure(Call<TokenClass> call, Throwable t)
-            {
-                Log.e("fdsfsdf",t.getMessage());
-            }
-        });
-
-        Call<TokenClass> callUserId = service.getUserId("kajwadkar13@gmail.com","Bearer" );
-        callUserId.enqueue(new Callback<TokenClass>() {
-            @Override
-            public void onResponse(Call<TokenClass> call, Response<TokenClass> response) {
-
-                TokenClass model=response.body();
-
-                Log.e("andTheresponseIs",model.getId());
-
-            }
-
-            @Override
-            public void onFailure(Call<TokenClass> call, Throwable t)
-            {
-                Log.e("fdsfsdf",t.getMessage());
-            }
-        });
-    }
 
 
  /*   private void registerListener() {
@@ -471,11 +450,8 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
         }
 
         int ret = -1;
-
             ret = ApiUserStartMeetingHelper.getInstance().startMeetingWithNumber(this, meetingNo,userId,zak);
-
-
-        Log.i(TAG, "onClickBtnStartMeeting, ret=" + ret);*/
+            Log.i(TAG, "onClickBtnStartMeeting, ret=" + ret);*/
     }
 
 
@@ -680,7 +656,7 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
 
     @Override
     public void onListMeeting(int result, List<Long> meetingList) {
-        Log.i(TAG, "onListMeeting, result =" + result);
+        Log.i(TAG, "onListMeeting, result =" + meetingList.size());
         meetingListMain.clear();
 
         ZoomSDK zoomSDK = ZoomSDK.getInstance();
@@ -688,6 +664,7 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
         if(preMeetingService != null) {
             if (meetingList != null) {
                 for (long meetingUniqueId : meetingList) {
+                    Log.e("theUniqueId",meetingUniqueId+"");
                     MeetingItem item = preMeetingService.getMeetingItemByUniqueId(meetingUniqueId);
                     if(item != null) {
                         meetingListMain.add(item);
@@ -703,12 +680,12 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
         }
         if(meetingListMain.size()==0)
         {
-            noData_tv.setVisibility(View.VISIBLE);
+           // noData_tv.setVisibility(View.VISIBLE);
         }
 
-        ScheduledMeetingAdapter adapterRecycler= new ScheduledMeetingAdapter(1,meetingListMain,this);
+      /*  ScheduledMeetingAdapter adapterRecycler= new ScheduledMeetingAdapter(1,meetingListMain,this);
         sheduled_rv.setLayoutManager(new LinearLayoutManager(this));
-        sheduled_rv.setAdapter(adapterRecycler);
+        sheduled_rv.setAdapter(adapterRecycler);*/
         scheduledProgess.setVisibility(View.GONE);
 
     }

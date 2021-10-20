@@ -7,18 +7,13 @@ import SelectorInterface
 import `in`.processmaster.salestripclm.ConnectivityChangeReceiver
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.adapter.ScheduleMeetingAdapter
-import `in`.processmaster.salestripclm.fragments.ScheduleNewMetting_frag
-import `in`.processmaster.salestripclm.fragments.ScheduledMetting_frag
 import `in`.processmaster.salestripclm.inbuild_mail.GmailSender
 import `in`.processmaster.salestripclm.models.*
-import `in`.processmaster.salestripclm.networkUtils.APIClient
-import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.sdksampleapp.startjoinmeeting.UserLoginCallback
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
@@ -27,7 +22,6 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.DisplayMetrics
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
@@ -44,7 +38,6 @@ import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_set_schedule_.*
 import kotlinx.android.synthetic.main.progress_view.*
 import us.zoom.sdk.*
-import us.zoom.sdk.PreMeetingService.ScheduleOrEditMeetingError
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -59,16 +52,13 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.text.DateFormat
 import okhttp3.RequestBody
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 
-
-
-
-class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface, PreMeetingServiceListener,/*TabLayout.OnTabSelectedListener,*/ UserLoginCallback.ZoomDemoAuthenticationListener
-
+class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface, PreMeetingServiceListener, UserLoginCallback.ZoomDemoAuthenticationListener
 {
     val myCalendar = Calendar.getInstance()
-    var dialogCalendar: DatePickerDialog?=null
     private var mPreMeetingService: PreMeetingService? = null
     private var mAccoutnService: AccountService? = null
     var mCountry: MobileRTCDialinCountry? = null
@@ -91,9 +81,22 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
             init()
         }, 10)
 
-    //    UserLoginCallback.getInstance().addListener(this)
-    //    loginFirst()
+        setScheduleAdapter()
 
+    }
+
+    fun setScheduleAdapter()
+    {
+        val responseData=dbBase.getApiDetail(1)
+
+        if(!responseData.equals(""))
+        {
+            var getScheduleModel= Gson().fromJson(responseData, GetScheduleModel::class.java)
+            var adapterRecycler= ScheduleMeetingAdapter(this,0,getScheduleModel.getData()?.meetingList)
+            recyclerNewSchedule!!.layoutManager = LinearLayoutManager(this)
+            recyclerNewSchedule?.adapter = adapterRecycler
+            adapterRecycler.notifyDataSetChanged()
+        }
     }
 
     override fun onResume() {
@@ -106,10 +109,9 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
         stopConnectivity(this)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun init()
     {
-     //   selected.text = getDateString(eventsCalendar.getCurrentSelectedDate()?.timeInMillis)
-
         if (ZoomSDK.getInstance().isInitialized && ZoomSDK.getInstance().isLoggedIn) {
             mAccoutnService = ZoomSDK.getInstance().getAccountService()
             mPreMeetingService = ZoomSDK.getInstance().preMeetingService
@@ -121,78 +123,9 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
 
         selectedoctor_rv.setLayoutManager(GridLayoutManager(this, 5))
         recyclerView_teams.setLayoutManager(GridLayoutManager(this, 5))
-
-      //  selectedoctor_rv.setNestedScrollingEnabled(false);
-
-     //   val selectedAdapeter=SelectedDocManList_adapter(arrayListSelector,this)
-     //   selectedoctor_rv.adapter=selectedAdapeter
-
-
-
-
-        //   val today = Calendar.getInstance()
-     //   val end = Calendar.getInstance()
-     //   end.add(Calendar.YEAR, 2)
-
-     /*   var typeface: Typeface? = ResourcesCompat.getFont(this, R.font.opensans_regular)
-        var typeface2: Typeface? = ResourcesCompat.getFont(this, R.font.opensans_semibold)
-
-        eventsCalendar.setSelectionMode(eventsCalendar.MULTIPLE_SELECTION)
-                .setToday(today)
-                .setMonthRange(today, end)
-                .setWeekStartDay(Calendar.SUNDAY, false)
-                .setIsBoldTextOnSelectionEnabled(true)
-                .setDatesTypeface(typeface!!)
-                .setMonthTitleTypeface(typeface2!!)
-                .setWeekHeaderTypeface(typeface2!!)
-                .setCallback(this)
-
-                .build()
-
-        val c = Calendar.getInstance()
-        c.add(Calendar.DAY_OF_MONTH, 2)
-        eventsCalendar.addEvent(c)
-        c.add(Calendar.DAY_OF_MONTH, 3)
-        eventsCalendar.addEvent(c)
-        c.add(Calendar.DAY_OF_MONTH, 4)
-        eventsCalendar.addEvent(c)
-        c.add(Calendar.DAY_OF_MONTH, 7)
-        eventsCalendar.addEvent(c)
-        c.add(Calendar.MONTH, 1)
-        c[Calendar.DAY_OF_MONTH] = 1
-        eventsCalendar.addEvent(c)
-
-        selected.setOnClickListener {
-            val dates = eventsCalendar.getDatesFromSelectedRange()
-            Log.e("SELECTED SIZE", dates.size.toString())
-        }
-*/
-        //  selected.typeface = FontsManager.getTypeface(FontsManager.OPENSANS_SEMIBOLD, this)
-
-     //   val dc = Calendar.getInstance()
-     //   dc.add(Calendar.DAY_OF_MONTH, 2)
-
-
-        val newMetting= ScheduleNewMetting_frag()
-        val scheduledMeeting = ScheduledMetting_frag()
-
-        val adapter = Adapter(supportFragmentManager)
-        adapter.addFragment(newMetting, "Schedule Meeting")
-        adapter.addFragment(scheduledMeeting, "Scheduled Meetings")
-
-        viewpager_schedule.setAdapter(adapter)
-        result_tabs_schedule!!.setupWithViewPager(viewpager_schedule)
-
         scheduleBack_iv.setOnClickListener({
             onBackPressed()
         })
-
-
-        var adapterRecycler= ScheduleMeetingAdapter(0)
-        recyclerNewSchedule!!.layoutManager = LinearLayoutManager(this)
-      //  recyclerNewSchedule?.itemAnimator = DefaultItemAnimator()
-        recyclerNewSchedule?.adapter = adapterRecycler
-
 
 
         var date: DatePickerDialog.OnDateSetListener = object : DatePickerDialog.OnDateSetListener {
@@ -337,10 +270,6 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
                }*/
         })
 
-       // val db=DatabaseHandler(this)
-
-
-       // var model = Gson().fromJson(db.getAllData(), SyncModel::class.java)
 
         for(item in model.data.doctorList)
         {
@@ -388,7 +317,6 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
             if(startTime.text.equals("Start time"))
             {
                 startTimeheader_id.setTextColor(ContextCompat.getColorStateList(this, R.color.zm_red))
-
                 showSnackbar(parentSetSchedule,"Please select start time")
                 return@setOnClickListener
             }
@@ -396,10 +324,23 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
             if(stopTime.text.equals("End time"))
             {
                 stopTimeHeader_tv.setTextColor(ContextCompat.getColorStateList(this, R.color.zm_red))
-
                 showSnackbar(parentSetSchedule,"Please select end time")
 
                 return@setOnClickListener
+            }
+
+            val date = SimpleDateFormat("dd/MM/yyyy").format(Calendar.getInstance().time)
+            if(date.equals(selectDate_tv.text.toString()))
+            {
+                val currentTime=SimpleDateFormat("h:mm a").format(Calendar.getInstance().time).replace("am", "AM").replace("pm","PM")
+                val timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("h:mm a", Locale.ENGLISH)
+                val time1: LocalTime = LocalTime.parse(startTime.text.toString(), timeFormatter)
+                val time2: LocalTime = LocalTime.parse(currentTime, timeFormatter)
+                if (time1.isBefore(time2)) {
+                    startTimeheader_id.setTextColor(ContextCompat.getColorStateList(this, R.color.zm_red))
+                    showSnackbar(parentSetSchedule,"Time has already passed")
+                    return@setOnClickListener
+                }
             }
 
             if( !compareTimes() )
@@ -481,6 +422,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
         })
     }
 
+    @SuppressLint("NewApi")
     @RequiresApi(Build.VERSION_CODES.N)
     fun updateCalendar()
     {
@@ -488,20 +430,6 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
         val sdf = SimpleDateFormat(myFormat, Locale.US)
         selectDate_tv.setText(sdf.format(myCalendar.getTime()))
     }
-
-
-    /*  override fun onTabReselected(tab: TabLayout.Tab?) {
-        TODO("Not yet implemented")
-    }
-
-    override fun onTabUnselected(tab: TabLayout.Tab?) {
-        TODO("Not yet implemented")
-    }
-
-    override fun onTabSelected(tab: TabLayout.Tab?) {
-
-    //    viewPager.setCurrentItem(tab.getPosition());
-    }*/
 
     @SuppressLint("WrongConstant")
     internal class Adapter(manager: FragmentManager?) : FragmentPagerAdapter(
@@ -531,27 +459,6 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
             return mFragmentTitleList[position]
         }
     }
-
-    private fun getDurationInMinutes(): Int {
-        val calTo = Calendar.getInstance()
-        val calFrom = Calendar.getInstance()
-        val sdf = SimpleDateFormat("HH:mm", Locale.ENGLISH)
-        calTo.setTime(sdf.parse(startTime.text.toString()));// all done
-        calFrom.setTime(sdf.parse(stopTime.text.toString()));// all done
-
-
-        return (((calTo.getTimeInMillis() - calFrom.getTimeInMillis()) / 60000).toInt())
-    }
-
-
-    private fun getTimeDate(): Date {
-
-        val cal = Calendar.getInstance()
-        val sdf = SimpleDateFormat("dd/MM/yy HH:mm", Locale.ENGLISH)
-        cal.time = sdf.parse(selectDate_tv.text.toString()+" "+startTime.text.toString()) // all done
-        return cal.getTime()
-    }
-
 
     override fun onZoomSDKLoginResult(result: Long) {
         if (result == ZoomAuthenticationError.ZOOM_AUTH_ERROR_SUCCESS.toLong()) {
@@ -614,6 +521,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
             }
         }
     }
+
     private fun sendMessage(invitationEmailContentWithTime: String) {
 
         runOnUiThread {
@@ -663,7 +571,6 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
         })
         sender.start()
     }
-
 
     override fun onListMeeting(result: Int, meetingList: List<Long>?) {
 
@@ -720,7 +627,6 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
         val search_et= dialogView.findViewById<View>(R.id.search_et) as EditText
         val ok_btn= dialogView.findViewById<View>(R.id.ok_btn) as Button
 
-
         val layoutManager = LinearLayoutManager(this)
         list_rv.layoutManager=layoutManager
         var adapterView : DoctorManagerSelector_Adapter? = null
@@ -740,15 +646,16 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
             override fun beforeTextChanged(
                 s: CharSequence, start: Int,
                 count: Int, after: Int
-            ) {
+            )
+            {
             }
 
             override fun onTextChanged(
                 s: CharSequence, start: Int,
                 before: Int, count: Int
-            ) {
+            )
+            {
                 adapterView?.getFilter()?.filter(s.toString());
-
             }
         })
 
@@ -840,7 +747,6 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
         callSelectedAdapter(selectionType)
     }
 
-
     private fun getTeamsApi()
     {
         progressView_parentRv?.visibility=View.VISIBLE
@@ -883,6 +789,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
         })
     }
 
+    @SuppressLint("ResourceType")
     private fun setSheduleApi()
     {
         progressMessage_tv?.setText("Scheduling Meeting")
@@ -905,7 +812,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
         paramObject.put("topic",subject_et.text.toString())
         paramObject.put("StartTime",formattedDate+" "+spf.format(startTimeStr))
         paramObject.put("EndTime", formattedDate+" "+spf.format(endTimeStr))
-        paramObject.put("MeetingType", if(radio_meeting.getCheckedRadioButtonId()==0) "O" else "P")
+        paramObject.put("MeetingType", if(radio_meeting.getCheckedRadioButtonId()==1) "P" else "O")
         paramObject.put("EmpId", loginModelBase.empId)
         paramObject.put("Mode", "1")
         paramObject.put("Description", remark_et.text.toString())
@@ -938,7 +845,8 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
                 arrayObject.put("EmailId",item.getMailId())
                 arrayObject.put("name",item.getName())
                 teamList.put(arrayObject)
-            } }
+            }
+        }
         paramObject.put("EmployeeList", teamList)
 
         val bodyRequest: RequestBody =
@@ -973,9 +881,10 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
                         first.isChecked=true
                         constructorList= ArrayList()
                         constructorListTeam= ArrayList()
+                        getsheduled_Meeting_api()
 
 
-                    /*    selectedAdapeter=SelectedDocManList_adapter(constructorList,this@SetSchedule_Activity,1)
+                    /*  selectedAdapeter=SelectedDocManList_adapter(constructorList,this@SetSchedule_Activity,1)
                         selectedoctor_rv.adapter=selectedAdapeter
                         selectedAdapeter?.notifyDataSetChanged()
                         selectedAdapeterTeams=SelectedDocManList_adapter(constructorListTeam,this@SetSchedule_Activity,1)
@@ -998,6 +907,28 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
 
             }
         })
+    }
+
+    fun getsheduled_Meeting_api(){
+        var call: Call<GetScheduleModel> = getSecondaryApiInterface().getScheduledMeeting("bearer " + loginModelBase?.accessToken,loginModelBase.empId.toString()) as Call<GetScheduleModel>
+        call.enqueue(object : Callback<GetScheduleModel?> {
+            override fun onResponse(call: Call<GetScheduleModel?>?, response: Response<GetScheduleModel?>) {
+                Log.e("getscheduled_api", response.code().toString() + "")
+                if (response.code() == 200 && !response.body().toString().isEmpty()) {
+                    val gson = Gson()
+                    var model = response.body()
+                    dbBase?.insertOrUpdateAPI("1",gson.toJson(model))
+                    setScheduleAdapter()
+                }
+                else { }
+            }
+
+            override fun onFailure(call: Call<GetScheduleModel?>, t: Throwable?) {
+                call.cancel()
+            }
+        })
+
+
     }
 
 }

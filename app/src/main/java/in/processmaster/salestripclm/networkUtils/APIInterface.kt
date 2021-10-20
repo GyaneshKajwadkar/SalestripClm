@@ -131,7 +131,8 @@ interface APIInterface
 
     @GET("api/zoomMeeting/employeewise/{empId}")
     fun getScheduledMeeting(
-        @Header("Authorization") authorization: String?
+        @Header("Authorization") authorization: String?,
+        @Path("empId") empId: String?
     ): Call<GetScheduleModel?>?
 
 }

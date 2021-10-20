@@ -5,6 +5,7 @@ import `in`.processmaster.salestripclm.ConnectivityChangeReceiver
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.alertDialogNetwork
 import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.connectivityChangeReceiver
+import `in`.processmaster.salestripclm.models.GetScheduleModel
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.models.TeamsModel
 import `in`.processmaster.salestripclm.networkUtils.APIClient
@@ -24,6 +25,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -486,6 +488,38 @@ open class BaseActivity : AppCompatActivity() {
             }
         })
         return getResponseList
+    }
+
+    public fun getsheduledMeeting_api(): String? {
+
+        progressMessage_tv?.setText("Please wait")
+        enableProgress(progressView_parentRv!!)
+
+
+        var call: Call<GetScheduleModel> = getSecondaryApiInterface().getScheduledMeeting("bearer " + loginModelBase?.accessToken,loginModelBase.empId.toString()) as Call<GetScheduleModel>
+        call.enqueue(object : Callback<GetScheduleModel?> {
+            override fun onResponse(call: Call<GetScheduleModel?>?, response: Response<GetScheduleModel?>) {
+                Log.e("getscheduled_api", response.code().toString() + "")
+                if (response.code() == 200 && !response.body().toString().isEmpty()) {
+                    val gson = Gson()
+                    var model = response.body()
+                    dbBase?.insertOrUpdateAPI("1",gson.toJson(model))
+                }
+                else
+                {
+                    Log.e("elseGetScheduled", response.code().toString())
+                }
+                disableProgress(progressView_parentRv!!)
+            }
+
+            override fun onFailure(call: Call<GetScheduleModel?>, t: Throwable?) {
+                call.cancel()
+                disableProgress(progressView_parentRv!!)
+
+            }
+        })
+
+        return dbBase.getApiDetail(1)
     }
 
 }

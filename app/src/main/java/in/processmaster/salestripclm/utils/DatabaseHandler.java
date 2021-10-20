@@ -20,14 +20,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     Context context;
 
-   //=========================================hold SyncData==========================================
+   //=========================================hold SyncData===============================================
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "SalesTrip_CLM_db";
     private static final String TABLE_DATA = "SyncData";
     private static final String KEY_ID = "id";
     private static final String KEY_DATA = "data";
 
-    //=========================================hold eDetailingDataParent=====================================
+    //=========================================hold eDetailingDataParent===================================
     private static final String TABLE_EDETAILING = "edetaling";
     private static final String EDETAILING_DATA = "e_data";
     private static final String IS_DOWNLOADED = "isDownloaded";
@@ -58,6 +58,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String COMMENT = "_comment";
     private static final String SINGLE_SLIDE_TIMER = "singleSlide_timer";
     private static final String FILE_ID = "file_id";
+
+    //=========================================hold StoreApi===============================================
+    private static final String TABLE_API_DATA = "APIData";
+    private static final String APIKEY_ID = "id";
+    private static final String APIKEY_DATA = "data";
 
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -98,6 +103,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 +  SINGLE_SLIDE_TIMER + " INTEGER," +  FILE_ID + " INTEGER"+ ")";
         db.execSQL(CREATE_VISUALADS_CHILD_TABLE);
 
+        //api store database
+        String CREATE_API_TABLE = "CREATE TABLE " + TABLE_API_DATA + "("
+                + APIKEY_ID + " INTEGER,"
+                +  APIKEY_DATA + " TEXT"
+              + ")";
+        db.execSQL(CREATE_API_TABLE);
+
     }
 
     // Upgrading database
@@ -109,6 +121,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_SENDVISUALADS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_EDETAILINGDOWNLOAD);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHILD_VISUAL_ADS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_API_DATA);
         onCreate(db);
     }
 
@@ -912,7 +925,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL("delete from "+ TABLE_CHILD_VISUAL_ADS);
     }
 
-
     //check is visualads exist using date and fileID
     @SuppressLint("Range")
     public boolean ChecktimeandFileIdExist(String fileIdCheck,String dateTime) {
@@ -934,7 +946,56 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             while (cursor.moveToNext());
         }
         return false;
+    }
 
+    // =======================================api storage table================================================
+
+    public void insertOrUpdateAPI(String id,String data) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues initialValues = new ContentValues();
+        initialValues.put(APIKEY_ID, id);
+        initialValues.put(APIKEY_DATA, data);
+
+        if(CheckDataAPIStorage(String.valueOf(id)))
+        {
+            db.update(TABLE_API_DATA, initialValues, "id=?", new String[] {String.valueOf(id)});
+            db.close();
+        }
+        else
+        {
+            db.insert(TABLE_API_DATA, null, initialValues);
+            db.close();
+        }
+
+    }
+
+    public boolean CheckDataAPIStorage(String apiId) {
+        SQLiteDatabase sqldb = this.getReadableDatabase();
+        String Query = "Select * from " + TABLE_API_DATA + " where " + APIKEY_ID + " = " + apiId;
+        Cursor cursor = sqldb.rawQuery(Query, null);
+        if(cursor.getCount() <= 0){
+            cursor.close();
+            return false;
+        }
+        cursor.close();
+        return true;
+    }
+
+    public String getApiDetail(int id)
+    {
+        String strData = "";
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        Cursor cursor = db.query(TABLE_API_DATA, new String[] { APIKEY_ID,
+                        APIKEY_DATA }, APIKEY_ID + "=?",
+                new String[] { String.valueOf(id) }, null, null, null, null);
+        if (cursor.moveToFirst()) {
+            do {
+                strData=cursor.getString(1);
+            } while (cursor.moveToNext());
+        }
+
+        return strData;
     }
 
 }

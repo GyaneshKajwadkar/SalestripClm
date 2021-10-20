@@ -1,8 +1,10 @@
 package `in`.processmaster.salestripclm.adapter
 
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.models.GetScheduleModel
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,13 +18,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.iamkamrul.expandablerecyclerviewlist.model.ParentListItem
 import com.iamkamrul.expandablerecyclerviewlist.viewholder.ChildViewHolder
 import com.iamkamrul.expandablerecyclerviewlist.viewholder.ParentViewHolder
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.collections.ArrayList
 
-
-//feed_heading
-//childexpandableheader
-
-class MeetingExpandableHeaderAdapter(var context: Context, var arrayListString: ArrayList<String>) : RecyclerView.Adapter<MeetingExpandableHeaderAdapter.ViewHolders>() {
+class MeetingExpandableHeaderAdapter(
+    var context: Context,
+    var arrayListString: ArrayList<String>,
+    var getScheduleModel: GetScheduleModel
+) : RecyclerView.Adapter<MeetingExpandableHeaderAdapter.ViewHolders>() {
 
     private var currentPosition = 0
 
@@ -62,13 +66,90 @@ class MeetingExpandableHeaderAdapter(var context: Context, var arrayListString: 
                 currentPosition = position
             }
 
-
             //reloding the list
             notifyDataSetChanged()
         }
-        holder.showmeeting_rv.layoutManager = LinearLayoutManager(context)
-        val adapter = ScheduledDashboardAdapter()
-        holder.showmeeting_rv.adapter = adapter
+
+        var meetingArrayList=ArrayList<GetScheduleModel.Data.Meeting>()
+
+        if(getScheduleModel!=null)
+        {
+            for(meeting in getScheduleModel?.getData()?.meetingList!!)
+            {
+                var apiFormat = SimpleDateFormat("MMMM dd, yyyy")
+                val newDate = apiFormat.parse(meeting.strStartTime)
+                var spf = SimpleDateFormat("dd/MM/yyyy")
+                var fetchDate = spf.format(newDate)
+
+                when(position)
+                {
+                    0 ->
+                    {
+                        var currentdate = SimpleDateFormat("dd/MM/yyyy").format(Calendar.getInstance().time)
+                        if(currentdate.equals(fetchDate))
+                        {
+                            meetingArrayList.add(meeting)
+                        }
+
+                    }
+                    1 ->
+                    {
+                        val calendar = Calendar.getInstance()
+                        calendar.add(Calendar.DAY_OF_YEAR, 1)
+                        val tomorrow = calendar.time
+                        val tomorrowAsString = spf.format(tomorrow)
+                        Log.e("tomorrowAsString",tomorrowAsString)
+                        if(tomorrowAsString.equals(fetchDate))
+                        {
+                            meetingArrayList.add(meeting)
+                        }
+                    }
+
+                    else ->
+                    {
+                        val c = Calendar.getInstance()
+                        c.firstDayOfWeek = Calendar.MONDAY
+                        c[Calendar.DAY_OF_WEEK] = Calendar.MONDAY
+                        c[Calendar.HOUR_OF_DAY] = 0
+                        c[Calendar.MINUTE] = 0
+                        c[Calendar.SECOND] = 0
+                        c[Calendar.MILLISECOND] = 0
+                        val monday = c.time
+                        val nextMonday = Date(monday.time + 7 * 24 * 60 * 60 * 1000)
+
+                        var dateFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy")
+                        val startDate = dateFormat.parse(monday.toString())
+                        val lastDate =  dateFormat.parse(nextMonday.toString())
+                        val startingDate = spf.format(startDate)
+                        val endDate =  spf.format(lastDate)
+                        val finalStartingDate=spf.parse(startingDate)
+                        val finalEndDate=spf.parse(endDate)
+                        val apiDate= spf.parse(fetchDate)
+
+                        val isThisWeek = apiDate.after(finalStartingDate) && apiDate.before(finalEndDate)
+                        if(isThisWeek && position==2)
+                        {
+                            meetingArrayList.add(meeting)
+                        }
+                        else if(!isThisWeek && position==3)
+                        {
+                            meetingArrayList.add(meeting)
+                        }
+                    }
+                }
+            }
+        }
+
+        if(meetingArrayList.size==0)
+        {
+            holder.noDataFound_tv.visibility=View.VISIBLE
+        }
+        else
+        {
+            holder.showmeeting_rv.layoutManager = LinearLayoutManager(context)
+            val adapter = ScheduleMeetingAdapter(context,3,meetingArrayList)
+            holder.showmeeting_rv.adapter = adapter
+        }
     }
 
     override fun getItemCount(): Int {
@@ -80,72 +161,15 @@ class MeetingExpandableHeaderAdapter(var context: Context, var arrayListString: 
         var showmeeting_rv: RecyclerView
         var arrowImage: ImageView
         var headingTxt: TextView
+        var noDataFound_tv: TextView
 
         init {
             toggleView = itemView.findViewById(R.id.toggleView)
             showmeeting_rv = itemView.findViewById(R.id.showmeeting_rv)
             arrowImage = itemView.findViewById(R.id.toggleIcon)
             headingTxt = itemView.findViewById(R.id.headingTxt)
+            noDataFound_tv = itemView.findViewById(R.id.noDataFound_tv)
         }
     }
 
-}
-
-
-class CategoryListViewHolder(view: View) : ChildViewHolder(view){
-    fun bind(categoryList: CategoryList){
-      //  itemView.findViewById<TextView>(R.id.subject_tv).text = categoryList.name
-     //   itemView.findViewById<TextView>(R.id.headingTxt).text = categoryList.name
-    }
-}
-
-class CategoryViewHolder(itemView: View) : ParentViewHolder(itemView) {
-    private lateinit var animation: RotateAnimation
-
-    fun bind(category: Category){
-        itemView.findViewById<TextView>(R.id.headingTxt).text = category.name
-    }
-
-    override fun onExpansionToggled(expanded: Boolean) {
-        super.onExpansionToggled(expanded)
-        animation = if (expanded)
-            RotateAnimation(
-                    180f,
-                    0f,
-                    RotateAnimation.RELATIVE_TO_SELF,
-                    0.5f,
-                    RotateAnimation.RELATIVE_TO_SELF,
-                    0.5f
-            )
-        else
-            RotateAnimation(
-                    -1 * 180f,
-                    0f,
-                    RotateAnimation.RELATIVE_TO_SELF,
-                    0.5f,
-                    RotateAnimation.RELATIVE_TO_SELF,
-                    0.5f
-            )
-
-        animation.duration = 200
-        animation.fillAfter = true
-        itemView.findViewById<ImageView>(R.id.toggleIcon).startAnimation(animation)
-
-    }
-
-    override fun setExpanded(expanded: Boolean) {
-        super.setExpanded(expanded)
-        if (expanded)itemView.findViewById<ImageView>(R.id.toggleIcon).rotation = 180f
-        else itemView.findViewById<ImageView>(R.id.toggleIcon).rotation = 0f
-    }
-
-}
-
-
-
-data class CategoryList(val name: String)
-
-data class Category(val name: String, val movieList: List<CategoryList>) : ParentListItem {
-    override fun getChildItemList(): List<*> = movieList
-    override fun isInitiallyExpanded(): Boolean = false
 }
