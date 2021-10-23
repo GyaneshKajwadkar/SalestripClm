@@ -10,9 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class APIClient {
 
-
     private static Retrofit retrofit = null;
-
 
     public static Retrofit getClient(int parent, String childUrl) {
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
@@ -31,7 +29,6 @@ public class APIClient {
           {
               //childUrl
           commonUrl=childUrl;
-              Log.e("theChildUrlids",commonUrl);
           }
 
         retrofit = new Retrofit.Builder()

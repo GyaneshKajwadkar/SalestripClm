@@ -8,6 +8,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -50,6 +52,10 @@ import in.processmaster.salestripclm.R;
 import in.processmaster.salestripclm.adapter.ScheduleMeetingAdapter;
 import in.processmaster.salestripclm.fragments.JoinMeetingFragment;
 import in.processmaster.salestripclm.models.GetScheduleModel;
+import in.processmaster.salestripclm.models.LoginModel;
+import in.processmaster.salestripclm.models.ZoomCredientialModel;
+import in.processmaster.salestripclm.networkUtils.APIClient;
+import in.processmaster.salestripclm.networkUtils.APIInterface;
 import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.RawDataMeetingActivity;
 import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.SimpleZoomUIDelegate;
 import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.MeetingOptionBar;
@@ -59,6 +65,8 @@ import in.processmaster.salestripclm.sdksampleapp.startjoinmeeting.UserLoginCall
 import in.processmaster.salestripclm.sdksampleapp.startjoinmeeting.emailloginuser.EmailUserLoginHelper;
 import in.processmaster.salestripclm.sdksampleapp.ui.InitAuthSDKActivity;
 import in.processmaster.salestripclm.utils.DatabaseHandler;
+import in.processmaster.salestripclm.utils.PreferenceClass;
+import in.processmaster.salestripclm.utils.ZoomInitilizeClass;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import retrofit2.Call;
@@ -121,6 +129,8 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
     ImageView zoomImageView;
     LinearLayout parentToolbar;
     TextView noData_tv;
+    ProgressDialog dialog ;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,9 +153,6 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
 
         meetingsDrawer.openDrawer(Gravity.RIGHT);
 
-        zoomSDK = ZoomSDK.getInstance();
-
-
         menu_img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -158,6 +165,17 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
                 }
             }
         });
+
+        zoomSDK = ZoomSDK.getInstance();
+        if(!zoomSDK.isLoggedIn())
+        {
+           getCredientail_api();
+        }
+        else{
+            initilizeZoom();
+        }
+
+
 
        // UserLoginCallback.getInstance().addListener(this);fo
 
@@ -176,17 +194,11 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
       //  getSupportFragmentManager().beginTransaction().replace(R.id.frameZoom, fragmentS1).commit();
 
 
-        if (zoomSDK.isInitialized())
-        {
-            ZoomSDK.getInstance().getMeetingService().addListener(this);
-            ZoomSDK.getInstance().getMeetingSettingsHelper().enable720p(true);
-        }
 
-        mInMeetingService = ZoomSDK.getInstance().getInMeetingService();
 
      //   meetingShareHelper = new MeetingShareHelper(this, shareCallBack);
 
-         registerListener();
+
 
 
         scheduledProgess.setVisibility(View.VISIBLE);
@@ -201,23 +213,39 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
             }
         });
 
-        if(zoomSDK.isInitialized()) {
-            PreMeetingService preMeetingService = zoomSDK.getPreMeetingService();
-            if(preMeetingService != null)
-            {
-                preMeetingService.listMeeting();
-                preMeetingService.addListener(this);
-            }
-            else
-            {
-                Toast.makeText(this, "User not login.", Toast.LENGTH_LONG).show();
-            }
-        }
-        mMeetingService = ZoomSDK.getInstance().getMeetingService();
-        ZoomSDK.getInstance().getMeetingSettingsHelper().setCustomizedMeetingUIEnabled(true);
-
         setScheduleAdapter();
     }
+
+    public void initilizeZoom()
+   {
+       registerListener();
+       if (zoomSDK.isInitialized())
+            {
+                zoomSDK.getMeetingService().addListener(this);
+                zoomSDK.getMeetingSettingsHelper().enable720p(true);
+            }
+
+            mInMeetingService =zoomSDK.getInMeetingService();
+
+            if(zoomSDK.isInitialized()) {
+                PreMeetingService preMeetingService = zoomSDK.getPreMeetingService();
+                if(preMeetingService != null)
+                {
+                    preMeetingService.listMeeting();
+                    preMeetingService.addListener(this);
+                }
+                else
+                {
+                    Toast.makeText(this, "User not login.", Toast.LENGTH_LONG).show();
+                }
+            }
+
+        mMeetingService = zoomSDK.getMeetingService();
+       zoomSDK.getMeetingSettingsHelper().setCustomizedMeetingUIEnabled(true);
+
+
+    }
+
 
     private void setScheduleAdapter()
     {
@@ -235,7 +263,7 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
                     meetinglist.add(getScheduleModel.getData().getMeetingList().get(i));
                 }
             }
-            ScheduleMeetingAdapter adapterRecycler= new ScheduleMeetingAdapter(this,1,meetinglist);
+            ScheduleMeetingAdapter adapterRecycler= new ScheduleMeetingAdapter(this,1,meetinglist,zoomSDK);
             sheduled_rv.setLayoutManager(new LinearLayoutManager(this));
             sheduled_rv.setAdapter(adapterRecycler);
             adapterRecycler.notifyDataSetChanged();
@@ -247,11 +275,15 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
     @Override
     public void onBackPressed() {
 
-        if (mMeetingService.getMeetingStatus() == MeetingStatus.MEETING_STATUS_INMEETING)
+        if(mMeetingService!=null)
         {
-            showLeaveMeetingDialog();
-            return;
+            if (mMeetingService.getMeetingStatus() == MeetingStatus.MEETING_STATUS_INMEETING)
+            {
+                showLeaveMeetingDialog();
+                return;
+            }
         }
+
         super.onBackPressed();
     }
 
@@ -267,8 +299,7 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
 
 
     private void registerListener() {
-        ZoomSDK zoomSDK = ZoomSDK.getInstance();
-      //  zoomSDK.addAuthenticationListener(this);
+        //  zoomSDK.addAuthenticationListener(this);
         MeetingService meetingService = zoomSDK.getMeetingService();
         if (meetingService != null) {
             meetingService.addListener(this);
@@ -290,13 +321,11 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
     protected void onResume() {
         super.onResume();
         isResumed = true;
-        MeetingWindowHelper.getInstance().hiddenMeetingWindow(true);
-        ZoomSDK.getInstance().getMeetingSettingsHelper().setCustomizedMeetingUIEnabled(true);
+       // MeetingWindowHelper.getInstance().hiddenMeetingWindow(true);
+       // ZoomSDK.getInstance().getMeetingSettingsHelper().setCustomizedMeetingUIEnabled(true);
 
         IntentFilter intentFilter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
         this.registerReceiver(connectivityChangeReceiver, intentFilter);
-        //  refreshUI();
-
     }
 
     @Override
@@ -549,7 +578,7 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
                 Bundle bundle = new Bundle();
                 bundle.putInt("from", JoinMeetingFragment.JOIN_FROM_LOGIN);
 
-                Fragment fragment= new JoinMeetingFragment();
+                Fragment fragment= new JoinMeetingFragment(zoomSDK);
                 fragment.setArguments(bundle);
 
 
@@ -710,83 +739,7 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
 
     }
 
-    public static class RetrofitClientInstance {
 
-        private static Retrofit retrofit;
-        private static final String BASE_URL = "https://api.zoom.us/v2/users/";
-
-        public static Retrofit getRetrofitInstance() {
-            if (retrofit == null) {
-                retrofit = new Retrofit.Builder()
-                        .baseUrl(BASE_URL)
-                        .addConverterFactory(GsonConverterFactory.create())
-                        .build();
-            }
-            return retrofit;
-        }
-    }
-
-
-    public interface GetDataService {
-
-        @GET("{user_id}/token")
-        Call<TokenClass> getTokenUserId(@Path("user_id") String user_id,@Query("type") String userId, @Header("Authorization") String authHeader);
-
-        @GET("{user_id}")
-        Call<TokenClass> getUserId(@Path("user_id") String user_id, @Header("Authorization") String authHeader);
-
-    }
-
-
-
-
-    public class TokenClass
-    {
-        @SerializedName("token")
-        @Expose
-        String token;
-
-        @SerializedName("id")
-        @Expose
-        String id;
-
-        public String getId() {
-            return id;
-        }
-
-        public void setId(String id) {
-            this.id = id;
-        }
-
-        public String getToken() {
-            return token;
-        }
-
-        public void setToken(String token) {
-            this.token = token;
-        }
-    }
-
-    public  String getJWT()
-    {
-        Long tsLong = System.currentTimeMillis()/1000;
-        String str= String.valueOf(tsLong+1000);
-
-        Map map = new HashMap<String,Object>();
-        map.put("alg","HS256");
-        map.put("typ","JWT");
-
-        String jwt = Jwts.builder()
-                .setHeader(map)
-
-                .claim("iss","ZNEv370eQNW7OQoPcfPBqg")
-                .claim("exp",str)
-                .signWith(SignatureAlgorithm.HS256, "NgXBS7lpq6bAkv67bXwBOmZgpqbAbvxu4gsx".getBytes())
-                .compact();
-        Log.v("JWT : - ",jwt);
-       // jwtString=jwt;
-        return jwt;
-    }
 
     private void showLeaveMeetingDialogAdapter(MeetingItem item) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -982,9 +935,6 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
 
         }
 
-
-
-
         @Override
         public int getItemCount() {
            return meetingList.size();
@@ -1032,5 +982,44 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
     }
 
 
+    private void getCredientail_api() {
 
-}
+        dialog = ProgressDialog.show(this, "",
+                "Loading. Please wait...", true);
+        PreferenceClass sharedPreferences= new PreferenceClass(this);
+        String profileData =sharedPreferences.getPref("profileData");
+        LoginModel loginModelBase = new Gson().fromJson(profileData,LoginModel.class);
+
+        APIInterface  apiInterface = APIClient.getClient(2,sharedPreferences.getPref("secondaryUrl")).create(APIInterface.class);
+        Call<ZoomCredientialModel> call = apiInterface.getZoomCredientail("bearer " + loginModelBase.getAccessToken(),loginModelBase.getEmpId().toString());
+        call.enqueue(new Callback<ZoomCredientialModel>() {
+            @Override
+            public void onResponse(Call<ZoomCredientialModel> call, Response<ZoomCredientialModel> response) {
+
+
+                if (response.code() == 200 && !response.body().toString().isEmpty())
+                {
+                    ZoomCredientialModel model  = response.body();
+                    new ZoomInitilizeClass().initilizeZoom(JoinMeetingActivity.this,model);
+
+                }
+                else
+                {
+                    Log.e("elseGetCrediential", response.code()+"");
+                }
+                dialog.dismiss();
+
+            }
+
+            @Override
+            public void onFailure(Call<ZoomCredientialModel> call, Throwable t) {
+                Log.e("failGetCrediential",t.getMessage().toString());
+                dialog.dismiss();
+
+            }
+
+        });
+    }
+
+    }
+

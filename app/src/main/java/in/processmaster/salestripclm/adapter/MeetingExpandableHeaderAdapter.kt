@@ -4,20 +4,18 @@ import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.models.GetScheduleModel
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
-import android.view.animation.RotateAnimation
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.iamkamrul.expandablerecyclerviewlist.model.ParentListItem
 import com.iamkamrul.expandablerecyclerviewlist.viewholder.ChildViewHolder
 import com.iamkamrul.expandablerecyclerviewlist.viewholder.ParentViewHolder
+import us.zoom.sdk.ZoomSDK
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -98,7 +96,6 @@ class MeetingExpandableHeaderAdapter(
                         calendar.add(Calendar.DAY_OF_YEAR, 1)
                         val tomorrow = calendar.time
                         val tomorrowAsString = spf.format(tomorrow)
-                        Log.e("tomorrowAsString",tomorrowAsString)
                         if(tomorrowAsString.equals(fetchDate))
                         {
                             meetingArrayList.add(meeting)
@@ -147,7 +144,9 @@ class MeetingExpandableHeaderAdapter(
         else
         {
             holder.showmeeting_rv.layoutManager = LinearLayoutManager(context)
-            val adapter = ScheduleMeetingAdapter(context,3,meetingArrayList)
+            val zoomSdk= ZoomSDK.getInstance()
+
+            val adapter = ScheduleMeetingAdapter(context,3,meetingArrayList,zoomSdk)
             holder.showmeeting_rv.adapter = adapter
         }
     }

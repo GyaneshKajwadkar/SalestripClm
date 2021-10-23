@@ -183,6 +183,13 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
     public static  final int JOIN_FROM_APIUSER=2;
 
     public static  final int JOIN_FROM_LOGIN=3;
+
+    private ZoomSDK zoomSDK;
+
+    public JoinMeetingFragment(ZoomSDK zoomSDK) {
+        this.zoomSDK=zoomSDK;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -192,8 +199,8 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);*/
         getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        mMeetingService = ZoomSDK.getInstance().getMeetingService();
-        mInMeetingService = ZoomSDK.getInstance().getInMeetingService();
+        mMeetingService = zoomSDK.getMeetingService();
+        mInMeetingService = zoomSDK.getInMeetingService();
 
         from = getArguments().getInt("from");
     /*    if (null != getIntent().getExtras()) {
@@ -261,7 +268,7 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
         });
 
 
-        ZoomSDK.getInstance().getMeetingSettingsHelper().hideStopShareInScreenShareToolbar(true);
+        zoomSDK.getMeetingSettingsHelper().hideStopShareInScreenShareToolbar(true);
 
 
         if (Build.VERSION.SDK_INT >= 23 && checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
@@ -1335,25 +1342,25 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
             if(null!=smsService){
                 smsService.removeListener(this);
             }
-            ZoomSDK.getInstance().getInMeetingService().getInMeetingBOController().removeListener(mBOControllerListener);
+            zoomSDK.getInMeetingService().getInMeetingBOController().removeListener(mBOControllerListener);
         }catch (Exception e){
         }
     }
 
 
     private void registerListener() {
-        smsService=ZoomSDK.getInstance().getSmsService();
+        smsService=zoomSDK.getSmsService();
         if(null!=smsService){
             smsService.addListener(this);
         }
-        ZoomSDK.getInstance().getInMeetingService().getInMeetingBOController().addListener(mBOControllerListener);
+        zoomSDK.getInMeetingService().getInMeetingBOController().addListener(mBOControllerListener);
         MeetingAudioCallback.getInstance().addListener(this);
         MeetingVideoCallback.getInstance().addListener(this);
         MeetingShareCallback.getInstance().addListener(this);
         MeetingUserCallback.getInstance().addListener(this);
         MeetingCommonCallback.getInstance().addListener(this);
 
-        InMeetingInterpretationController meetingInterpretationController= ZoomSDK.getInstance().getInMeetingService().getInMeetingInterpretationController();
+        InMeetingInterpretationController meetingInterpretationController= zoomSDK.getInMeetingService().getInMeetingInterpretationController();
         meetingInterpretationController.setEvent(event);
     }
 
@@ -1501,7 +1508,7 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
         @Override
         public void onInterpreterRoleChanged(int userID, boolean isInterpreter) {
             Log.d(TAG, "onInterpreterRoleChanged:" + userID + ":" + isInterpreter);
-            boolean isMyself = ZoomSDK.getInstance().getInMeetingService().isMyself(userID);
+            boolean isMyself = zoomSDK.getInMeetingService().isMyself(userID);
             if (isMyself) {
                 if(isInterpreter){
                     Toast.makeText(getActivity(),R.string.zm_msg_interpreter_88102,Toast.LENGTH_SHORT).show();
@@ -1511,7 +1518,7 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
         }
 
         private void updateLanguage() {
-            final InMeetingInterpretationController controller = ZoomSDK.getInstance().getInMeetingService().getInMeetingInterpretationController();
+            final InMeetingInterpretationController controller = zoomSDK.getInMeetingService().getInMeetingInterpretationController();
             if(controller.isInterpretationEnabled()&&controller.isInterpretationStarted()&&controller.isInterpreter()){
                 layout_lans.setVisibility(View.VISIBLE);
             }else {

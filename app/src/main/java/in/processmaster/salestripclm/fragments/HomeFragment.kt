@@ -56,6 +56,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.gson.Gson
+import us.zoom.sdk.ZoomSDK
 import java.text.DecimalFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -676,7 +677,9 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         if(!responseData.equals(""))
         {
             var getScheduleModel= Gson().fromJson(responseData, GetScheduleModel::class.java)
-            var adapterRecycler= ScheduleMeetingAdapter(requireActivity(),1, getScheduleModel.getData()?.meetingList)
+            val zoomSdk=ZoomSDK.getInstance()
+            var adapterRecycler= ScheduleMeetingAdapter(requireActivity(),1,
+                getScheduleModel.getData()?.meetingList as MutableList<GetScheduleModel.Data.Meeting>,zoomSdk)
             scheduledMeeting_rv.layoutManager = LinearLayoutManager(requireActivity())
             scheduledMeeting_rv.adapter = adapterRecycler
         }

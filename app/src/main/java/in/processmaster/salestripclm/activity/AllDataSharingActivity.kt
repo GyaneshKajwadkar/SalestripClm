@@ -23,16 +23,13 @@ import java.io.File
 
 class AllDataSharingActivity : BaseActivity()
 {
-
     var db : DatabaseHandler? = null
     var stringArrayList: ArrayList<String> = ArrayList()
-
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_all_data_sharing)
-
         initView()
     }
     fun initView()
@@ -55,8 +52,8 @@ class AllDataSharingActivity : BaseActivity()
         share_ll.setOnClickListener({
             var intent = Intent()
             intent.putExtra("editTextValue", "value_here")
-            setResult(RESULT_OK, intent);
-            finish();
+            setResult(RESULT_OK, intent)
+            finish()
         })
 
     }

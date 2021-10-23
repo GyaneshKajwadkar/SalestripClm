@@ -48,10 +48,10 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
-class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener, UserLoginCallback.ZoomDemoAuthenticationListener , MeetingServiceListener, InitAuthSDKCallback
+class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/*, UserLoginCallback.ZoomDemoAuthenticationListener , MeetingServiceListener, InitAuthSDKCallback*/
 {
     var drawer_layout : DrawerLayout?=null
-    private var mZoomSDK: ZoomSDK? = null
+  //  private var mZoomSDK: ZoomSDK? = null
     var drawerProfileIv: ImageView?=null
     var bottomNavigation: BottomNavigationView? = null
     var openFragmentStr=""
@@ -60,7 +60,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener,
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_page)
 
-        mZoomSDK = ZoomSDK.getInstance()
+      //  mZoomSDK = ZoomSDK.getInstance()
         initView()
     }
 
@@ -126,6 +126,11 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener,
         {
             sync_api()
             getsheduledMeeting_api()
+            var zoomSDKBase = ZoomSDK.getInstance()
+            if(!zoomSDKBase.isLoggedIn)
+            {
+                getCredientail_api(this)
+            }
         }
 
         //Logout
@@ -151,13 +156,9 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener,
 
                 override fun onMenuModeChange(menu: MenuBuilder) {}
             })
-
-
             // Display the menu
             optionsMenu.show()
-
         })
-
         menu_img?.setOnClickListener({
             drawer_layout!!.openDrawer(Gravity.LEFT)
         })
@@ -180,10 +181,10 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener,
             .noFade()
             .into(drawerProfileIv)
 
-        nav_view?.setNavigationItemSelectedListener(this);
-        nav_view?.getMenu()?.getItem(0)?.setChecked(true);
+        nav_view?.setNavigationItemSelectedListener(this)
+        nav_view?.getMenu()?.getItem(0)?.setChecked(true)
 
-        InitAuthSDKHelper.getInstance().initSDK(this, this)
+     //   InitAuthSDKHelper.getInstance().initSDK(this, this)
     }
 
     //sync api
@@ -289,16 +290,16 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener,
                         }
                     }
 
-                    Log.e("isZoomLogin",mZoomSDK!!.isLoggedIn!!.toString()+" 456")
+                //    Log.e("isZoomLogin",mZoomSDK!!.isLoggedIn!!.toString()+" 456")
 
                 }
-
-                if (mZoomSDK?.isLoggedIn!!) {
+                disableProgress(progressView_parentRv!!)
+            /*    if (mZoomSDK?.isLoggedIn!!) {
                     disableProgress(progressView_parentRv!!)
 
                 } else {
 
-                }
+                }*/
             }
 
             override fun onFailure(call: Call<DevisionModel?>, t: Throwable?) {
@@ -323,11 +324,13 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener,
         when (item.itemId) {
             R.id.landingPage -> {
 
+                toolbarTv?.setText("Salestrip CLM")
+                val fragment = HomeFragment()
+                openFragment(fragment)
+                openFragmentStr = "HomeFragment"
+
                 Handler(Looper.getMainLooper()).postDelayed({
-                    toolbarTv?.setText("Salestrip CLM")
-                    val fragment = HomeFragment()
-                    openFragment(fragment)
-                    openFragmentStr = "HomeFragment"
+
                 }, 300)
 
                 return@OnNavigationItemSelectedListener true
@@ -443,7 +446,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener,
                 var intent = Intent(this, SetSchedule_Activity::class.java)
                 startActivity(intent)
                 overridePendingTransition(0, 0)
-
             }
 
             R.id.nav_screenshot -> {
@@ -452,7 +454,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener,
                 intent.putExtra("selection", "delete")
                 startActivity(intent)
                 overridePendingTransition(0, 0)
-
             }
 
             R.id.sync_menu -> {
@@ -465,7 +466,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener,
             R.id.nav_scheduled -> {
                 var intent = Intent(this, JoinMeetingActivity::class.java)
                 startActivity(intent)
-                overridePendingTransition(0, 0);
+                overridePendingTransition(0, 0)
             }
 
             R.id.nav_logout ->
@@ -527,7 +528,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener,
             .into(drawerProfileIv)
     }
 
-    override fun onZoomSDKLoginResult(result: Long)
+  /*  override fun onZoomSDKLoginResult(result: Long)
     {
         if (result == ZoomAuthenticationError.ZOOM_AUTH_ERROR_SUCCESS.toLong())
         {
@@ -540,9 +541,9 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener,
         }
 
         disableProgress(progressView_parentRv!!)
-    }
+    }*/
 
-    override fun onZoomIdentityExpired()
+  /*  override fun onZoomIdentityExpired()
     {
 
     }
@@ -612,6 +613,9 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener,
 
     override fun onZoomSDKInitializeResult(errorCode: Int, internalErrorCode: Int) {
         if (errorCode != ZoomError.ZOOM_ERROR_SUCCESS) {
+
+            Log.e("zoomErrorLog","error- $errorCode internalErrorcode- $internalErrorCode")
+
             Toast.makeText(
                 this,
                 "Failed to initialize Zoom SDK. Error: $errorCode, internalErrorCode=$internalErrorCode",
@@ -643,7 +647,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener,
             }}}
 
     override fun onMeetingStatusChanged(p0: MeetingStatus?, p1: Int, p2: Int) {
-    }
+    }*/
 
     override fun onPause() {
         super.onPause()

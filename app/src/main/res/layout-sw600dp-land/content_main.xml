@@ -7,7 +7,6 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/app_bar_main">
 
-
     <RelativeLayout
         android:animateLayoutChanges="true"
         android:id="@+id/profileHolder"
@@ -112,18 +111,16 @@
 
     </RelativeLayout>
 
-
-
     <RelativeLayout
         android:layout_below="@+id/profileHolder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <FrameLayout
-            android:layout_above="@+id/navigationView"
             android:id="@+id/container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_above="@+id/navigationView"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
         <com.google.android.material.bottomnavigation.BottomNavigationView

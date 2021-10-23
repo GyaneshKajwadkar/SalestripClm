@@ -8,10 +8,12 @@ import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.connect
 import `in`.processmaster.salestripclm.models.GetScheduleModel
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.models.TeamsModel
+import `in`.processmaster.salestripclm.models.ZoomCredientialModel
 import `in`.processmaster.salestripclm.networkUtils.APIClient
 import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
+import `in`.processmaster.salestripclm.utils.ZoomInitilizeClass
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
@@ -45,16 +47,18 @@ import kotlinx.android.synthetic.main.progress_view.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import us.zoom.sdk.*
 import java.lang.Exception
 import java.lang.ref.WeakReference
 
-
-open class BaseActivity : AppCompatActivity() {
+open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthenticationListener ,
+    MeetingServiceListener, InitAuthSDKCallback*/ {
 
     var alertDialog: AlertDialog? = null
     var sharePreferanceBase: PreferenceClass?= null
     var loginModelBase= LoginModel()
     var dbBase= DatabaseHandler(this)
+     var zoomSDKBase: ZoomSDK? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,6 +76,7 @@ open class BaseActivity : AppCompatActivity() {
         {
 
         }
+        zoomSDKBase = ZoomSDK.getInstance()
     }
 
     //network alert
@@ -88,9 +93,13 @@ open class BaseActivity : AppCompatActivity() {
             dialogView.findViewById<View>(R.id.okBtn_rl) as RelativeLayout
 
         okBtn_rl.setOnClickListener {
+
+            if(context?.javaClass?.simpleName.toString().equals("SplashActivity"))
+            {
+                context.finish()
+            }
             alertDialog.dismiss()
         }
-
         alertDialog.show()
     }
 
@@ -490,7 +499,7 @@ open class BaseActivity : AppCompatActivity() {
         return getResponseList
     }
 
-    public fun getsheduledMeeting_api(): String? {
+     fun getsheduledMeeting_api(): String? {
 
         progressMessage_tv?.setText("Please wait")
         enableProgress(progressView_parentRv!!)
@@ -515,11 +524,121 @@ open class BaseActivity : AppCompatActivity() {
             override fun onFailure(call: Call<GetScheduleModel?>, t: Throwable?) {
                 call.cancel()
                 disableProgress(progressView_parentRv!!)
-
             }
         })
 
         return dbBase.getApiDetail(1)
     }
 
+     fun getCredientail_api(context: Context) {
+
+         var call: Call<ZoomCredientialModel> = getSecondaryApiInterface().getZoomCredientail("bearer " + loginModelBase?.accessToken,loginModelBase.empId.toString()) as Call<ZoomCredientialModel>
+        call.enqueue(object : Callback<ZoomCredientialModel?> {
+            override fun onResponse(call: Call<ZoomCredientialModel?>?, response: Response<ZoomCredientialModel?>) {
+                Log.e("getcrediential_api", response.code().toString() + "")
+                if (response.code() == 200 && !response.body().toString().isEmpty())
+                {
+                    var model = response.body()
+                    ZoomInitilizeClass().initilizeZoom(context as Activity,model)
+                }
+                else
+                {
+                    Log.e("elseGetCrediential", response.code().toString())
+                }
+            }
+
+            override fun onFailure(call: Call<ZoomCredientialModel?>, t: Throwable?) {
+                Log.e("failGetCrediential",t?.message.toString())
+                call.cancel()
+            }
+        })
+
+    }
+
+
+  /*  override fun onZoomSDKLoginResult(result: Long) {
+        if (result == ZoomAuthenticationError.ZOOM_AUTH_ERROR_SUCCESS.toLong())
+        {
+            Log.e("logResult", "loginSuccessoverride")
+            UserLoginCallback.getInstance().removeListener(this)
+        }
+        else
+        {
+            Log.e("logResult", "loginErroroverride")
+        }
+    }
+
+    override fun onZoomSDKLogoutResult(result: Long) {
+        if (result == ZoomAuthenticationError.ZOOM_AUTH_ERROR_SUCCESS.toLong()) {
+
+            Toast.makeText(
+                this,
+                "Logout successfully",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
+        else {
+            Toast.makeText(
+                this,
+                "Logout failed result code = $result",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    override fun onZoomIdentityExpired() {
+    }
+
+    override fun onZoomAuthIdentityExpired() {
+    }
+
+    override fun onZoomSDKInitializeResult(errorCode: Int, internalErrorCode: Int) {
+        if (errorCode != ZoomError.ZOOM_ERROR_SUCCESS) {
+            Log.e("zoomErrorLog","error- $errorCode internalErrorcode- $internalErrorCode")
+        }
+        else {
+            if (zoomSDKBase?.tryAutoLoginZoom() == ZoomApiError.ZOOM_API_ERROR_SUCCESS) {
+                UserLoginCallback.getInstance().addListener(this)
+
+            }
+            else if(!zoomSDKBase?.isLoggedIn!!)
+            {
+                loginFirstbase()
+                UserLoginCallback.getInstance().addListener(this)
+            }}
+    }
+
+
+
+    override fun onMeetingStatusChanged(p0: MeetingStatus?, p1: Int, p2: Int) {
+        TODO("Not yet implemented")
+    }
+
+   private fun loginFirstbase(): Unit {
+
+        //  val meetingService: MeetingService? = ZoomSDK.getInstance().getMeetingService()
+
+        val ret: Int = EmailUserLoginHelper.getInstance().login(
+            "kajwadkar13@gmail.com",
+            "13Zoom@003"
+        )
+        if (ret != ZoomApiError.ZOOM_API_ERROR_SUCCESS) {
+            if (ret == ZoomApiError.ZOOM_API_ERROR_EMAIL_LOGIN_IS_DISABLED)
+            {
+                Log.e("logResult", "loginErrorFirst")
+            }
+
+            else if(ret == ZoomApiError.ZOOM_API_ERROR_SUCCESS)
+            {
+                Log.e("logResult", "loginSuccessFirst")
+            }
+
+            else
+            {
+                Log.e("logResult", "login and initilized")
+            }
+        } else {
+        }
+    }*/
 }

@@ -71,11 +71,21 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
     var constructorListTeam: ArrayList<DocManagerModel> = ArrayList()
 
     @RequiresApi(Build.VERSION_CODES.P)
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?)
+    {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_set_schedule_)
 
         getTeamsApi()
+        var zoomSDKBase = ZoomSDK.getInstance()
+
+        Log.e("checkTheZoomLogin", zoomSDKBase.isLoggedIn().toString() + "")
+
+        if(!zoomSDKBase.isLoggedIn)
+        {
+            getCredientail_api(this)
+        }
+
 
         Handler(Looper.getMainLooper()).postDelayed({
             init()
@@ -92,10 +102,32 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
         if(!responseData.equals(""))
         {
             var getScheduleModel= Gson().fromJson(responseData, GetScheduleModel::class.java)
-            var adapterRecycler= ScheduleMeetingAdapter(this,0,getScheduleModel.getData()?.meetingList)
+            val zoomSdk=ZoomSDK.getInstance()
+            var adapterRecycler= ScheduleMeetingAdapter(this,0,
+                getScheduleModel.getData()?.meetingList as MutableList<GetScheduleModel.Data.Meeting>,zoomSdk)
             recyclerNewSchedule!!.layoutManager = LinearLayoutManager(this)
             recyclerNewSchedule?.adapter = adapterRecycler
             adapterRecycler.notifyDataSetChanged()
+
+            selectDate_tv.addTextChangedListener(object : TextWatcher {
+                override fun afterTextChanged(s: Editable) {}
+                override fun beforeTextChanged(
+                    s: CharSequence, start: Int,
+                    count: Int, after: Int
+                ) {
+                }
+
+                override fun onTextChanged(
+                    s: CharSequence, start: Int,
+                    before: Int, count: Int
+                ) {
+                    if (s.length != 0)
+                    {
+                        adapterRecycler?.getFilter()?.filter(s.toString())
+                    }
+                }
+            })
+
         }
     }
 
@@ -142,15 +174,16 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
         }
 
 
+        var datePicker= DatePickerDialog(this, date, myCalendar[Calendar.YEAR], myCalendar[Calendar.MONTH],
+            myCalendar[Calendar.DAY_OF_MONTH])
+
+        datePicker.getDatePicker().setMinDate(myCalendar.getTimeInMillis())
+        myCalendar.add(Calendar.MONTH, +1)
+        datePicker.getDatePicker().setMaxDate(myCalendar.getTimeInMillis())
+
         selectDate_tv.setOnClickListener({
             selectDateHeader_tv.setTextColor(ContextCompat.getColorStateList(this, R.color.appColor))
-
             HideKeyboard(currentFocus ?: View(this))
-
-
-          var datePicker= DatePickerDialog(this, date, myCalendar[Calendar.YEAR], myCalendar[Calendar.MONTH],
-                    myCalendar[Calendar.DAY_OF_MONTH])
-            datePicker.getDatePicker().setMinDate(myCalendar.getTimeInMillis());
             datePicker.show()
         })
 
@@ -420,6 +453,8 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         })
+
+
     }
 
     @SuppressLint("NewApi")

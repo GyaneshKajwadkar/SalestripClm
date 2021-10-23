@@ -135,4 +135,10 @@ interface APIInterface
         @Path("empId") empId: String?
     ): Call<GetScheduleModel?>?
 
+    @GET("api/zoomMeeting/credentials/{empId}")
+    fun getZoomCredientail(
+        @Header("Authorization") authorization: String?,
+        @Path("empId") empId: String?
+    ): Call<ZoomCredientialModel?>?
+
 }

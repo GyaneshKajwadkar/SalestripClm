@@ -25,6 +25,7 @@ import com.google.gson.Gson
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import us.zoom.sdk.ZoomSDK
 
 
 class SplashActivity : BaseActivity()
@@ -84,6 +85,7 @@ class SplashActivity : BaseActivity()
             //login_api()*/
 
             sync_api()
+
         }
                 //call login screen
         else
@@ -94,8 +96,6 @@ class SplashActivity : BaseActivity()
                 finish()
             }, 2000)
         }
-
-
 
 
 
@@ -116,12 +116,13 @@ class SplashActivity : BaseActivity()
             override fun onResponse(call: Call<SyncModel?>?, response: Response<SyncModel?>) {
                 Log.e("sync_api", response.code().toString() + "")
 
-                if (response.code() == 200 && !response.body().toString().isEmpty()) {
-
+                if (response.code() == 200 && !response.body().toString().isEmpty())
+                {
                     val intent = Intent(this@SplashActivity, HomePage::class.java)
                     startActivity(intent)
                     finish()
-                } else if (response.code() == 401) {
+                }
+                else if (response.code() == 401) {
                     sharePreferance?.setPrefBool("isLogin", false)
                     val intent = Intent(this@SplashActivity, LoginActivity::class.java)
                     startActivity(intent)
@@ -180,7 +181,6 @@ class SplashActivity : BaseActivity()
                         //   version="2.1.50"
                         var updateLower: Boolean = checkForUpdateLower(version, namesList.get(0))
                         var updateHigher: Boolean = checkForUpdateHigher(version, namesList.get(1))
-
 
                         if (!updateHigher) {
                             try {

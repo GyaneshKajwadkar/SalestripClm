@@ -522,6 +522,8 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
 
         exit_btn.setOnClickListener{
             meetingShareHelper!!.stopShare()
+            MeetingWindowHelper.getInstance().hideOrshow(false)
+            alertDialog.dismiss()
             super.onBackPressed()
         }
 

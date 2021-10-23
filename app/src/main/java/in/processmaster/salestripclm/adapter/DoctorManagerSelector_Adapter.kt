@@ -109,7 +109,7 @@ class DoctorManagerSelector_Adapter(
                 val FilteredArrayNames: ArrayList<DocManagerModel> = ArrayList()
 
                 // perform your search here using the searchConstraint String.
-                constraint = constraint.toString().toLowerCase()
+                constraint = constraint.toString().lowercase()
                 for (i in 0 until arrayListSelector?.size!!) {
                     val dataNames: DocManagerModel = arrayListSelector?.get(i)!!
                     if (dataNames.getName()?.toLowerCase()?.startsWith(constraint.toString()) == true) {
