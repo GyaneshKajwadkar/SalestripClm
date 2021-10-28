@@ -139,7 +139,8 @@ public class InitAuthSDKActivity extends Activity implements InitAuthSDKCallback
 
         if (errorCode != ZoomError.ZOOM_ERROR_SUCCESS) {
             Toast.makeText(this, "Failed to initialize Zoom SDK. Error: " + errorCode + ", internalErrorCode=" + internalErrorCode, Toast.LENGTH_LONG).show();
-        } else {
+        } else
+        {
             ZoomSDK.getInstance().getZoomUIService().enableMinimizeMeeting(true);
             ZoomSDK.getInstance().getZoomUIService().setMiniMeetingViewSize(new CustomizedMiniMeetingViewSize(0, 0, 360, 540));
             setMiniWindows();
@@ -148,10 +149,13 @@ public class InitAuthSDKActivity extends Activity implements InitAuthSDKCallback
             ZoomSDK.getInstance().getMeetingService().addListener(this);
             ZoomSDK.getInstance().getMeetingSettingsHelper().setCustomizedNotificationData(null, handle);
             Toast.makeText(this, "Initialize Zoom SDK successfully.", Toast.LENGTH_LONG).show();
-            if (mZoomSDK.tryAutoLoginZoom() == ZoomApiError.ZOOM_API_ERROR_SUCCESS) {
+            if (mZoomSDK.tryAutoLoginZoom() == ZoomApiError.ZOOM_API_ERROR_SUCCESS)
+            {
                 UserLoginCallback.getInstance().addListener(this);
                 showProgressPanel(true);
-            } else {
+            }
+            else
+            {
                 showProgressPanel(false);
             }
         }

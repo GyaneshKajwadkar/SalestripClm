@@ -112,9 +112,6 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
         currentProduct_btn = findViewById<Button> (R.id.currentProduct_btn)
         otherProduct_btn = findViewById<Button> (R.id.otherProduct_btn)
 
-        // uris.add(URL(hlsUrl))
-      // uris.add(URL("https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4"))
-      // uris.add(URL("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"))
 
         floating_action_backBtn.setOnClickListener({
             onBackPressed()
@@ -377,6 +374,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
         return hlsMediaSource
     }
 
+/*
     private fun buildMediaSource(uris: ArrayList<URL>): ConcatenatingMediaSource {
         val userAgent = Util.getUserAgent(this, "MusicPlayer")
         val defaultMediaSource = DefaultDataSourceFactory(this, userAgent)
@@ -392,6 +390,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
 
         return concatenatingMediaSource
     }
+*/
 
     private fun buildMediaSourceVideoArray(uris: ArrayList<Uri>): ConcatenatingMediaSource {
         val userAgent = Util.getUserAgent(this, "MusicPlayer")

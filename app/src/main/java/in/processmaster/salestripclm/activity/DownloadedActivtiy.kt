@@ -43,7 +43,6 @@ class DownloadedActivtiy : BaseActivity() {
     var adapter : DownloadAdapter?=null
     //Database
     var db = DatabaseHandler(this)
-    var subArray: ArrayList<DownloadFileModel>? = ArrayList()
 
     var video_rv:RecyclerView?=null
     var images_rv:RecyclerView?=null

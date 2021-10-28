@@ -130,19 +130,52 @@
 
             </LinearLayout>
 
-
-
-
-            <Button
+            <LinearLayout
                 android:visibility="gone"
-                android:layout_gravity="right"
-                android:backgroundTint="@color/appColor"
-                android:id="@+id/startmeeting_btn"
-                android:textColor="@color/white"
-                android:layout_margin="5dp"
-                android:text="Start meeting"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:id="@+id/buttonParent_ll"
+                android:weightSum="3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:textAllCaps="false"
+                    android:layout_gravity="right"
+                    android:backgroundTint="@color/appColor"
+                    android:textColor="@color/white"
+                    android:layout_margin="2dp"
+                    android:text="Cancel meeting"
+                    android:textSize="12sp"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"/>
+                <Button
+                    android:textAllCaps="false"
+                    android:layout_weight="1"
+                    android:layout_gravity="right"
+                    android:backgroundTint="@color/appColor"
+                    android:textColor="@color/white"
+                    android:layout_margin="2dp"
+                    android:text="Update meeting"
+                    android:textSize="12sp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"/>
+
+                <Button
+                    android:textAllCaps="false"
+                    android:layout_weight="1"
+                    android:layout_gravity="right"
+                    android:backgroundTint="@color/appColor"
+                    android:id="@+id/startmeeting_btn"
+                    android:textColor="@color/white"
+                    android:layout_margin="2dp"
+                    android:text="Start \n meeting"
+                    android:textSize="12sp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
 
         </LinearLayout>
 

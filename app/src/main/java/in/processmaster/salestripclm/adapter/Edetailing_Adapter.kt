@@ -96,30 +96,22 @@ class Edetailing_Adapter(
       holder.bottom_tv.text = "Division: "+modeldata?.divisionName
 
         holder.download_rl.setOnClickListener({
-          //  progressView_parentRv?.visibility=View.VISIBLE
-          //  downloadDivision_apiNewCalling(modeldata?.geteDetailId().toString(), modeldata)
             intentCalling(modeldata?.geteDetailId().toString(), modeldata)
         })
 
         holder.reDownload_rl.setOnClickListener {
-          //  progressView_parentRv?.visibility=View.VISIBLE
             intentCalling(modeldata?.geteDetailId().toString(), modeldata)
-           // downloadDivision_apiNewCalling(modeldata?.geteDetailId().toString(), modeldata)
         }
 
             holder.parent_ll.setOnClickListener(
                 {
                     if(modeldata?.isSaved==1)
                     {
-                     //   progressView_parentRv?.visibility=View.VISIBLE
                         intentCalling(modeldata?.geteDetailId().toString(), modeldata)
-                      //  downloadDivision_apiNewCalling(modeldata?.geteDetailId().toString(), modeldata)
                     }
                     else
                     {
-                     //   progressView_parentRv?.visibility=View.VISIBLE
                         intentCalling(modeldata?.geteDetailId().toString(), modeldata)
-                      //  downloadDivision_apiNewCalling(modeldata?.geteDetailId().toString(), modeldata)
                     }
                 }
             )
@@ -201,7 +193,7 @@ class Edetailing_Adapter(
 
 
 
-    //call_divisioinApi (Download file)
+ /*   //call_divisioinApi (Download file)
     private fun downloadDivision_apiNewCalling(
             eDetailId: String,
             modeldata: DevisionModel.Data.EDetailing?
@@ -255,7 +247,7 @@ class Edetailing_Adapter(
                 progressView_parentRv?.visibility=View.GONE
             }
         })
-    }
+    }*/
 
     //check internet connection
     fun isInternetAvailable(context: Context): Boolean

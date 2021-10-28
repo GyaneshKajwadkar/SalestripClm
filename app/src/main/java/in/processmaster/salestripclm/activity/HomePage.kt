@@ -39,6 +39,9 @@ import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_home_page.*
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.progress_view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
@@ -96,11 +99,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         //change status bar colour
         changeStatusBar()
 
-        Picasso
-            .get()
-            .load(loginModelBase?.imageName)
-            .noFade()
-            .into(profile_image)
 
         /* try {
              val jsonObject = JSONObject(loginModelBase?.getEmployeeObj().toString())
@@ -126,11 +124,21 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         {
             sync_api()
             getsheduledMeeting_api()
-            var zoomSDKBase = ZoomSDK.getInstance()
-            if(!zoomSDKBase.isLoggedIn)
+
+            GlobalScope.launch(Dispatchers.IO)
             {
-                getCredientail_api(this)
+                var zoomSDKBase = ZoomSDK.getInstance()
+                if(!zoomSDKBase.isLoggedIn)
+                {
+                    getCredientail_api(this@HomePage)
+                }
             }
+
+            Picasso
+                .get()
+                .load(loginModelBase?.imageName)
+                .noFade()
+                .into(profile_image)
         }
 
         //Logout
@@ -185,6 +193,20 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         nav_view?.getMenu()?.getItem(0)?.setChecked(true)
 
      //   InitAuthSDKHelper.getInstance().initSDK(this, this)
+
+
+        //This is timer for zoom api
+       /* var count=0
+        val T = Timer()
+        T.scheduleAtFixedRate(object : TimerTask() {
+            override fun run() {
+                runOnUiThread {
+                   Log.e("hfioshfisgfuio",count.toString())
+                    count++
+                }
+            }
+        }, 1000, 1000)*/
+
     }
 
     //sync api
@@ -294,12 +316,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
                 }
                 disableProgress(progressView_parentRv!!)
-            /*    if (mZoomSDK?.isLoggedIn!!) {
-                    disableProgress(progressView_parentRv!!)
 
-                } else {
-
-                }*/
             }
 
             override fun onFailure(call: Call<DevisionModel?>, t: Throwable?) {
@@ -329,9 +346,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                 openFragment(fragment)
                 openFragmentStr = "HomeFragment"
 
-                Handler(Looper.getMainLooper()).postDelayed({
-
-                }, 300)
 
                 return@OnNavigationItemSelectedListener true
             }
@@ -494,7 +508,8 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         val df = SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault())
         val formattedDate: String = df.format(c)
 
-        if(sharePreferanceBase?.getPref("SyncDate")==null)
+
+        if(sharePreferanceBase?.getPref("SyncDate")==null || sharePreferanceBase?.getPref("SyncDate")!!.isEmpty())
         {
             sharePreferanceBase?.setPref("SyncDate", formattedDate)
         }
@@ -506,6 +521,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             }
             else
             {
+                Log.e("bdfusgduifdsfs","sdfuiogsduifdgsbf")
                 sync_api()
                 sharePreferanceBase?.setPref("SyncDate", formattedDate)
             }

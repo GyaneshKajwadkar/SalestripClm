@@ -1,20 +1,21 @@
 package `in`.processmaster.salestripclm.adapter
 
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.activity.BaseActivity
 import `in`.processmaster.salestripclm.models.GetScheduleModel
 import `in`.processmaster.salestripclm.sdksampleapp.inmeetingfunction.zoommeetingui.ZoomMeetingUISettingHelper
+import android.app.Activity
 import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.Filter
-import android.widget.Filterable
-import android.widget.TextView
+import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import us.zoom.sdk.*
 import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 class ScheduleMeetingAdapter(
     var context: Context,
@@ -27,13 +28,13 @@ class ScheduleMeetingAdapter(
 
     var filteredData =meetingList
 
-
     class MyViewHolder(view: View): RecyclerView.ViewHolder(view)  {
         var startmeeting_btn=view.findViewById<Button>(R.id.startmeeting_btn)
         var subject_tv=view.findViewById<TextView>(R.id.subject_tv)
         var meetingType_tv=view.findViewById<TextView>(R.id.meetingType_tv)
         var appointmentDate_tv=view.findViewById<TextView>(R.id.appointmentDate_tv)
         var doctorsName_tv=view.findViewById<TextView>(R.id.doctorsName_tv)
+        var buttonParent_ll=view.findViewById<LinearLayout>(R.id.buttonParent_ll)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleMeetingAdapter.MyViewHolder {
@@ -61,13 +62,48 @@ class ScheduleMeetingAdapter(
 
         if(viewTypeConst==1)
         {
-            holder.startmeeting_btn.visibility=View.VISIBLE
+            holder.buttonParent_ll.visibility=View.VISIBLE
             holder.startmeeting_btn.setOnClickListener({
                 val zoomSDK = ZoomSDK.getInstance()
                // val preMeetingService: PreMeetingService = zoomSDK.getPreMeetingService()
-                Log.e("sidfgud",filteredData?.get(position)?.zoomMeetingId?.toString()!!)
                 //val item = preMeetingService.getMeetingItemByUniqueId(meetingList?.get(position)?.zoomMeetingId?.toLong()!!)
-                onClickBtnStart(filteredData?.get(position)?.zoomMeetingId)
+                val c: Date = Calendar.getInstance().getTime()
+                val df = SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault())
+                var apiFormat = SimpleDateFormat("MMMM dd, yyyy")
+                var apiFormatTime = SimpleDateFormat("MMMM dd, yyyy hh:mm a")
+                val newDate = apiFormat.parse(filteredData?.get(position)?.strStartTime)
+                val apiTime = apiFormatTime.parse(filteredData?.get(position)?.strStartTime)
+                var fetchDate = df.format(newDate)
+                val formattedDate = df.format(c)
+                if(fetchDate.equals(formattedDate))
+                {
+                    val cal = Calendar.getInstance()
+                    cal.add(Calendar.HOUR, 1)
+                    val oneHourBack = cal.time
+
+                    val currentTime = SimpleDateFormat("HH:mm", Locale.getDefault()).format(oneHourBack)
+                    val apiTime = SimpleDateFormat("HH:mm", Locale.getDefault()).format(apiTime)
+                    Log.e("sdnuiofsdguf",currentTime.toString())
+                    Log.e("sdnuiapiTime",apiTime.toString())
+                    val currentTimeInt : Int =currentTime.replace(":","").toInt()
+                    val apiTimeInt : Int =apiTime.replace(":","").toInt()
+
+                    onClickBtnStart(filteredData?.get(position)?.zoomMeetingId)
+                    return@setOnClickListener
+                    if(apiTimeInt<=currentTimeInt)
+                    {
+                        onClickBtnStart(filteredData?.get(position)?.zoomMeetingId)
+                    }
+                    else
+                    {
+                        BaseActivity().commonAlert(context as Activity,"Meeting Alert","Meeting not start before the scheduled time")
+                    }
+
+                }
+                else{
+                    BaseActivity().commonAlert(context as Activity,"Meeting Alert","Meeting not start before the scheduled time")
+                }
+
             })
         }
 

@@ -15,8 +15,6 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import java.io.File
 
-
-
 class ImageSelectorAdapter constructor() :
     RecyclerView.Adapter<ImageSelectorAdapter.MyViewHolder>()
 {

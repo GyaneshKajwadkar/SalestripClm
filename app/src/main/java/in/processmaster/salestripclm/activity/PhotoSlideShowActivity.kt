@@ -59,7 +59,6 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
     var gestureDetector: GestureDetector? = null
     var gestureListener: OnTouchListener? = null
     var imageFrame: ViewFlipper? = null
-   // var slideShowBtn: TextView? = null
     var handler: Handler? = null
     var runnable: Runnable? = null
     var position=0
@@ -366,15 +365,8 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
                     handler!!.postDelayed(runnable!!, 500)
                 })*/
             setHorizontalAdapter(arrayImage, position,model)
-
-
         }
-
-
     }
-
-
-
 
     @RequiresApi(Build.VERSION_CODES.N)
     fun getAllEdetailingProduct() : java.util.ArrayList<DevisionModel.Data.EDetailing>

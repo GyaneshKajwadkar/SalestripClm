@@ -44,7 +44,6 @@ class EdetailingFragment : BaseFragment() {
     var loginModel : LoginModel?=null
     var adapter : Edetailing_Adapter?=null
     var position:Int=0
-    var getAlleDetail: ArrayList<DevisionModel.Data.EDetailing>?= ArrayList()
     var progressView_parentRv: RelativeLayout?=null
     var progressMessage_tv: TextView? =null
     var viewPager: ViewPager?=null
@@ -276,6 +275,7 @@ class EdetailingFragment : BaseFragment() {
     }
 
 
+    @SuppressLint("WrongConstant")
     class ViewPagerAdapter(fm: FragmentManager?) :
         FragmentPagerAdapter(     fm!!,
             FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {

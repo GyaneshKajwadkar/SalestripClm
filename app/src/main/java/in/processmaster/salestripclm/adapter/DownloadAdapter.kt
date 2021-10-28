@@ -828,11 +828,8 @@ class DownloadAdapter constructor() :
             override fun onClick(view: View?) {
                 view?.let { context?.hideKeyboard(it) }
                 alertDialog.dismiss()
-
             }
-
         })
-
         alertDialog.show()
     }
 
@@ -1037,8 +1034,6 @@ class DownloadAdapter constructor() :
          }
      }
     }
-
-
 
     fun Context.hideKeyboard(view: View) {
         val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager

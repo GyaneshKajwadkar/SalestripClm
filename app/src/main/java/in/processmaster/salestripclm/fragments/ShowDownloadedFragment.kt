@@ -98,7 +98,7 @@ class ShowDownloadedFragment : Fragment() {
             nodata_gif?.visibility=View.GONE
             selection_tv?.setText("Please wait...")
 
-            val mNoOfColumns = activity?.let { Utility.calculateNoOfColumns(it, 250F) }
+            val mNoOfColumns = activity?.let { Utility.calculateNoOfColumns(it, 190F) }
 
             val value = requireArguments().getInt("eDetailingID")
             val brandID = requireArguments().getInt("brandId")
@@ -121,7 +121,6 @@ class ShowDownloadedFragment : Fragment() {
                     topSearchParent?.visibility=View.VISIBLE
 
                 }
-
             }
 
             for ((index, valueDownload) in downloadList?.withIndex()!!)

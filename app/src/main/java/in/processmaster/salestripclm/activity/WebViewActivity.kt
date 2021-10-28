@@ -377,11 +377,7 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
         floating_action_button.setOnClickListener({
             onBackPressed()
         })
-
     }
-
-
-
 
     private val onTouchSimple = OnTouchListener { v, event ->
         if (gs == null) {
@@ -427,11 +423,6 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
 
                         override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
                             //Single Tab
-
-
-
-
-
                             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
                             return false
                         }
@@ -463,6 +454,7 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
 
     }
 
+/*
     fun getWebViewFilePath() {
         var edetailingList = db.getAlleDetail()   //fetch edetailing list from db
 
@@ -498,6 +490,7 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
             }
         }
     }
+*/
 
     fun setWebHorizontalAdapter(list: ArrayList<DownloadFileModel>, position: Int, modelweb: DownloadFileModel)
     {

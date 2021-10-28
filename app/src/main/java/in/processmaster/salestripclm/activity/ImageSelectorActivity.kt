@@ -31,7 +31,6 @@ import java.io.Serializable
 
 class ImageSelectorActivity : BaseActivity() {
 
-    //   var delete_imv:ImageView?=null
 
     var adapter=ImageSelectorAdapter()
     var nodata_gif: GifImageView?=null
@@ -141,61 +140,6 @@ class ImageSelectorActivity : BaseActivity() {
                         startActivity(intent)*/
         })
 
-        val installed: Boolean = isAppInstalled("com.whatsapp")
-        if (installed) {
-            println("App is already installed on your phone")
-        }
-        else {
-            println("App is not currently installed on your phone")
-        }
-
-        if(!installed)
-        {
-            sendImageWatsup?.setColorFilter(ContextCompat.getColor(this, R.color.gray), android.graphics.PorterDuff.Mode.MULTIPLY)
-            //  sendImageWatsup?.isEnabled=false
-        }
-
-        sendImageWatsup?.setOnClickListener({
-            // val url = "https://api.whatsapp.com/send?phone= ${918109107014}"
-
-            if(!installed)
-            {
-                Toast.makeText(this, "Whatsapp not installed", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-
-            var getArray= adapter.getAllWorkRows()
-            var filterList= getArray?.filter  { s -> s.isSend == true}
-            if(filterList?.size==0)
-            {
-                Toast.makeText(this, "No item selected", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val intent = Intent()
-            intent.action = Intent.ACTION_SEND_MULTIPLE
-
-            intent.putExtra("jid", "919424022744" + "@s.whatsapp.net");
-            intent .setPackage("com.whatsapp")
-
-            intent.type = "image/jpeg"
-
-            val files: ArrayList<Uri> = ArrayList<Uri>()
-
-            for (path in filterList!!)
-            {
-                val file = File(path.file?.absolutePath)
-                val uri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".provider", file);
-                files.add(uri)
-            }
-
-            intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files)
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent)
-        })
-
     }
 
 
@@ -219,8 +163,6 @@ class ImageSelectorActivity : BaseActivity() {
             override fun accept(dir: File?, name: String): Boolean {
                 return name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png")
             }
-
-
         })
 
         var fileList:ArrayList<SendImage>?=ArrayList()
@@ -309,8 +251,6 @@ class ImageSelectorActivity : BaseActivity() {
                     progressImageSelector.visibility=View.GONE
                 }
             }
-
-
         }
 
         cancel_btn.setOnClickListener{

@@ -2,13 +2,10 @@ package in.processmaster.salestripclm.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,46 +13,26 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.google.gson.Gson;
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
-
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import in.processmaster.salestripclm.ConnectivityChangeReceiver;
 import in.processmaster.salestripclm.R;
 import in.processmaster.salestripclm.adapter.ScheduleMeetingAdapter;
 import in.processmaster.salestripclm.fragments.JoinMeetingFragment;
 import in.processmaster.salestripclm.models.GetScheduleModel;
-import in.processmaster.salestripclm.models.LoginModel;
-import in.processmaster.salestripclm.models.ZoomCredientialModel;
-import in.processmaster.salestripclm.networkUtils.APIClient;
-import in.processmaster.salestripclm.networkUtils.APIInterface;
 import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.RawDataMeetingActivity;
 import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.SimpleZoomUIDelegate;
 import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.MeetingOptionBar;
@@ -65,24 +42,10 @@ import in.processmaster.salestripclm.sdksampleapp.startjoinmeeting.UserLoginCall
 import in.processmaster.salestripclm.sdksampleapp.startjoinmeeting.emailloginuser.EmailUserLoginHelper;
 import in.processmaster.salestripclm.sdksampleapp.ui.InitAuthSDKActivity;
 import in.processmaster.salestripclm.utils.DatabaseHandler;
-import in.processmaster.salestripclm.utils.PreferenceClass;
-import in.processmaster.salestripclm.utils.ZoomInitilizeClass;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.GET;
-import retrofit2.http.Header;
-import retrofit2.http.Path;
-import retrofit2.http.Query;
 import us.zoom.sdk.CustomizedMiniMeetingViewSize;
 import us.zoom.sdk.IBOAssistant;
 import us.zoom.sdk.IBOAttendee;
 import us.zoom.sdk.InMeetingBOController;
-import us.zoom.sdk.InMeetingNotificationHandle;
 import us.zoom.sdk.InMeetingService;
 import us.zoom.sdk.MeetingError;
 import us.zoom.sdk.MeetingItem;
@@ -101,7 +64,7 @@ import us.zoom.sdk.ZoomSDKAuthenticationListener;
 import us.zoom.sdk.ZoomSDKInitializeListener;
 
 
-public class JoinMeetingActivity extends FragmentActivity implements MeetingServiceListener, View.OnClickListener, UserLoginCallback.ZoomDemoAuthenticationListener, PreMeetingServiceListener, ZoomSDKAuthenticationListener, ZoomSDKInitializeListener {
+public class JoinMeetingActivity extends BaseActivity implements MeetingServiceListener, View.OnClickListener, UserLoginCallback.ZoomDemoAuthenticationListener, PreMeetingServiceListener, ZoomSDKAuthenticationListener, ZoomSDKInitializeListener {
 
     private final static String TAG = "ZoomSDKExample";
 
@@ -169,7 +132,7 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
         zoomSDK = ZoomSDK.getInstance();
         if(!zoomSDK.isLoggedIn())
         {
-           getCredientail_api();
+           getCredientail_api(this);
         }
         else{
             initilizeZoom();
@@ -601,7 +564,7 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
 
 
 
-    InMeetingNotificationHandle handle=new InMeetingNotificationHandle() {
+ /*   InMeetingNotificationHandle handle=new InMeetingNotificationHandle() {
 
         @Override
         public boolean handleReturnToConfNotify(Context context, Intent intent) {
@@ -615,7 +578,7 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
             return true;
         }
     };
-
+*/
 
 
     @Override
@@ -635,8 +598,6 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
           //  callApis();
         }
     }
-
-
 
 
     private void setMiniWindows() {
@@ -741,6 +702,7 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
 
 
 
+    /*
     private void showLeaveMeetingDialogAdapter(MeetingItem item) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         if (mInMeetingService.isMeetingConnected()) {
@@ -787,11 +749,15 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
         }
         builder.create().show();
     }
-
+*/
+    /*
     private void leaveAdapter(boolean end, MeetingItem item) {
-      /*  if (meetingShareHelper.isSharingOut()) {
+      */
+    /*  if (meetingShareHelper.isSharingOut()) {
             meetingShareHelper.stopShare();
         }*/
+    /*
+
         mInMeetingService.leaveCurrentMeeting(end);
 
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
@@ -801,6 +767,7 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
             }
         }, 500);
     }
+*/
 
     private void showLeaveMeetingDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -873,87 +840,6 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
         mInMeetingService.leaveCurrentMeeting(end);
     }
 
-    class  ScheduledMeetingAdapter extends RecyclerView.Adapter<ScheduledMeetingAdapter.ViewHolders>
-    {
-
-        int viewType=0;
-        ArrayList<MeetingItem> meetingList;
-        Context context;
-
-       public ScheduledMeetingAdapter(int viewType, ArrayList<MeetingItem> meetingListMain, Context context)
-        {
-            this.viewType=viewType;
-            this.meetingList=meetingListMain;
-            this.context=context;
-        }
-
-
-        @NonNull
-        @Override
-        public ScheduledMeetingAdapter.ViewHolders onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
-            View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.shedulemeeting_view, parent, false);
-            return new ViewHolders(itemView);
-
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull ScheduledMeetingAdapter.ViewHolders holder, int position) {
-
-           MeetingItem item=meetingList.get(position);
-            if(viewType==1)
-            {
-                holder.startmeeting_btn.setVisibility(View.VISIBLE);
-            }
-
-
-            Date date=new Date(item.getStartTime());
-            SimpleDateFormat dateSdf=new SimpleDateFormat("dd-MM-yyyy");
-            SimpleDateFormat timeSdf=new SimpleDateFormat("HH:mm");
-
-            holder.subject_tv.setText("Topic: "+item.getMeetingTopic());
-            holder.appointmentDate_tv.setText("Appointment Date: "+dateSdf.format(date));
-           // holder.appointmentTime_tv.setText("Time: "+timeSdf.format(date));
-
-
-            holder.startmeeting_btn.setOnClickListener( new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-
-                    if (mMeetingService.getMeetingStatus() == MeetingStatus.MEETING_STATUS_INMEETING)
-                    {
-                        showLeaveMeetingDialogAdapter(item);
-                        meetingItemGlobal=item;
-                        return;
-                    }
-
-                    meetingItemGlobal=null;
-
-                    onClickBtnStart(item);
-                }
-            });
-
-        }
-
-        @Override
-        public int getItemCount() {
-           return meetingList.size();
-        }
-
-        public class ViewHolders extends RecyclerView.ViewHolder {
-
-            Button startmeeting_btn;
-            TextView subject_tv,appointmentDate_tv,appointmentTime_tv;
-            public ViewHolders(@NonNull View itemView) {
-                super(itemView);
-                startmeeting_btn=itemView.findViewById(R.id.startmeeting_btn);
-                subject_tv=itemView.findViewById(R.id.subject_tv);
-                appointmentDate_tv=itemView.findViewById(R.id.appointmentDate_tv);
-
-            }
-        }
-    }
-
     void onClickBtnStart(MeetingItem item) {
         ZoomSDK zoomSDK = ZoomSDK.getInstance();
 
@@ -982,7 +868,7 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
     }
 
 
-    private void getCredientail_api() {
+   /* private void getCredientail_api() {
 
         dialog = ProgressDialog.show(this, "",
                 "Loading. Please wait...", true);
@@ -1019,7 +905,7 @@ public class JoinMeetingActivity extends FragmentActivity implements MeetingServ
             }
 
         });
-    }
+    }*/
 
     }
 

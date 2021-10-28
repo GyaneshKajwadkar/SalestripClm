@@ -4,12 +4,9 @@ import DoctorManagerSelector_Adapter
 import IntegerInterface
 import SelectedDocManList_adapter
 import SelectorInterface
-import `in`.processmaster.salestripclm.ConnectivityChangeReceiver
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.adapter.ScheduleMeetingAdapter
-import `in`.processmaster.salestripclm.inbuild_mail.GmailSender
 import `in`.processmaster.salestripclm.models.*
-import `in`.processmaster.salestripclm.sdksampleapp.startjoinmeeting.UserLoginCallback
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
@@ -56,13 +53,12 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 
-class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface, PreMeetingServiceListener, UserLoginCallback.ZoomDemoAuthenticationListener
+class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/*, PreMeetingServiceListener, UserLoginCallback.ZoomDemoAuthenticationListener*/
 {
     val myCalendar = Calendar.getInstance()
     private var mPreMeetingService: PreMeetingService? = null
     private var mAccoutnService: AccountService? = null
     var mCountry: MobileRTCDialinCountry? = null
-    var connectivityChangeReceiver= ConnectivityChangeReceiver()
     var arrayListSelectorDoctor: ArrayList<DocManagerModel> = ArrayList()
     var arrayListSelectorTeams: ArrayList<DocManagerModel> = ArrayList()
     var selectedAdapeter :SelectedDocManList_adapter? = null
@@ -79,20 +75,16 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
         getTeamsApi()
         var zoomSDKBase = ZoomSDK.getInstance()
 
-        Log.e("checkTheZoomLogin", zoomSDKBase.isLoggedIn().toString() + "")
-
         if(!zoomSDKBase.isLoggedIn)
         {
             getCredientail_api(this)
         }
-
 
         Handler(Looper.getMainLooper()).postDelayed({
             init()
         }, 10)
 
         setScheduleAdapter()
-
     }
 
     fun setScheduleAdapter()
@@ -334,6 +326,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
                 return@setOnClickListener
             }
 
+            //240000
             if(subject_et.text.toString().isEmpty())
             {
                 subject_et.requestFocus()
@@ -342,6 +335,8 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
             }
             if(selectDate_tv.text.equals("Select Date"))
             {
+                stopTimeHeader_tv.setTextColor(ContextCompat.getColorStateList(this, R.color.appColor))
+                startTimeheader_id.setTextColor(ContextCompat.getColorStateList(this, R.color.appColor))
                 selectDateHeader_tv.setTextColor(ContextCompat.getColorStateList(this, R.color.zm_red))
                 showSnackbar(parentSetSchedule,"Please select date")
                 return@setOnClickListener
@@ -390,7 +385,12 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
                 return@setOnClickListener
             }
 
-            setSheduleApi()
+           //yyyy-MM-ddTHH:mm:ss
+             setSheduleApi()
+
+
+
+
          /*   if (mPreMeetingService == null)
             {
                 return@setOnClickListener
@@ -495,7 +495,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
         }
     }
 
-    override fun onZoomSDKLoginResult(result: Long) {
+ /*   override fun onZoomSDKLoginResult(result: Long) {
         if (result == ZoomAuthenticationError.ZOOM_AUTH_ERROR_SUCCESS.toLong()) {
             UserLoginCallback.getInstance().removeListener(this)
         }
@@ -527,7 +527,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
     }
 
     override fun onScheduleMeeting(result: Int, meetingNumber: Long) {
-        if (result == PreMeetingError.PreMeetingError_Success) {
+      *//*  if (result == PreMeetingError.PreMeetingError_Success) {
 
             runOnUiThread {
                 disableProgress(progressView_parentRv!!)
@@ -554,7 +554,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
             runOnUiThread {
                 disableProgress(progressView_parentRv!!)
             }
-        }
+        }*//*
     }
 
     private fun sendMessage(invitationEmailContentWithTime: String) {
@@ -612,40 +612,50 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
     }
 
     override fun onDeleteMeeting(p0: Int) {
-    }
+    }*/
 
     fun compareTimes() :Boolean
     {
-        var dateCheck=false
-        val sdf = SimpleDateFormat("hh:mm")
-        val startTime = sdf.parse(startTime.text.toString())
-        val endTime = sdf.parse(stopTime.text.toString())
+        val sdf = SimpleDateFormat("HH:mm")
+        val date12Format = SimpleDateFormat("hh:mm a")
+        val compareStart = sdf.format(date12Format.parse(startTime.text.toString())).toString().replace(":","")
+        val compareEnd =  sdf.format(date12Format.parse(stopTime.text.toString())).toString().replace(":","")
 
-        val dateDelta = endTime.compareTo(startTime)
-        when (dateDelta) {
-            0 ->
-            {
-                showSnackbar(parentSetSchedule,"Meeting start time and end time are equal")
-                dateCheck=false
-                //startTime and endTime not **Equal**
-                return false
-            }
-            1 ->
-            {
-                dateCheck=true
-                //endTime is **Greater** then startTime
-                return true
-            }
-            -1 -> {
+        val startInt : Int =compareStart.toInt()
+        val endInt : Int =compareEnd.toInt()
 
-                dateCheck=false
-                //startTime is **Greater** then endTime
-                showSnackbar(parentSetSchedule,"Meeting start time greater then end time")
-                return false
-            }
+        /*  if (sdf.format(date12Format.parse(startTime.text.toString())).toString() .compareTo(sdf.format(date12Format.parse(stopTime.text.toString())).toString()) < 0)
+        {
+            // Do your staff
+            Log.e("Returndfsdfsdf","getTestTime less than getCurrentTime");
         }
+        else
+        {
+            Log.e("Returnfdsgrgvdf","getTestTime older than getCurrentTime");
+        }*/
 
-        return dateCheck
+        if(startInt==endInt)
+        {
+            showSnackbar(parentSetSchedule,"Meeting start time and end time are equal")
+            //startTime and endTime not **Equal**
+            return false
+        }
+        else if(endInt<startInt)
+        {
+            //startTime is **Greater** then endTime
+
+                if(endInt>1200 && startInt>1200)
+                {
+                    showSnackbar(parentSetSchedule,"Reduce meeting duration and try again")
+                    return false
+                }
+
+            showSnackbar(parentSetSchedule,"Meeting start time greater then end time")
+            return false
+        }
+        else {
+            return true
+        }
     }
 
     fun selectDoctorManager_alert(selectionType: Int)
@@ -831,14 +841,20 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
         enableProgress(progressView_parentRv!!)
 
         val originalFormat: DateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
-        val targetFormat: DateFormat = SimpleDateFormat("MM/dd/yyyy")
+        val targetFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd")
         val date: Date = originalFormat.parse(selectDate_tv.text.toString())
         val formattedDate: String = targetFormat.format(date) // 20120821
 
         var spf = SimpleDateFormat("hh:mm aaa")
         val startTimeStr = spf.parse(startTime.text.toString())
         val endTimeStr = spf.parse(stopTime.text.toString())
-        spf= SimpleDateFormat("hh:mm:ss aaa")
+        spf= SimpleDateFormat("HH:mm:ss")
+
+        val formatabc = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US)
+
+        val dateTimeStart = formatabc.parse(formattedDate+"T"+spf.format(startTimeStr))
+        val dateTimeEnd = formatabc.parse(formattedDate+"T"+spf.format(endTimeStr))
+
 
 
         val paramObject = JSONObject()
@@ -962,8 +978,6 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface,
                 call.cancel()
             }
         })
-
-
     }
 
 }

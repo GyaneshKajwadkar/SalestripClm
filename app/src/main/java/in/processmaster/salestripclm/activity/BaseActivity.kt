@@ -58,7 +58,7 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
     var sharePreferanceBase: PreferenceClass?= null
     var loginModelBase= LoginModel()
     var dbBase= DatabaseHandler(this)
-     var zoomSDKBase: ZoomSDK? = null
+    var zoomSDKBase: ZoomSDK? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -177,9 +177,9 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
 
     //common alert with message and ok button
     @SuppressLint("WrongViewCast")
-    public fun commonAlert(context: Context, headerString: String, message: String) {
+    public fun commonAlert(context: Activity, headerString: String, message: String) {
         val dialogBuilder = AlertDialog.Builder(context)
-        val inflater = this.layoutInflater
+        val inflater = context.layoutInflater
         val dialogView: View = inflater.inflate(R.layout.common_alert, null)
         dialogBuilder.setView(dialogView)
 
@@ -257,8 +257,8 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
         dialogBuilder.setView(dialogView)
 
         alertDialog = dialogBuilder.create()
-        alertDialog!!.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
-        alertDialog!!.setCanceledOnTouchOutside(false);
+        alertDialog!!.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        alertDialog!!.setCanceledOnTouchOutside(false)
 
         val ok_btn =
             dialogView.findViewById<View>(R.id.ok_btn) as AppCompatButton
@@ -383,9 +383,21 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
 
     //enable progress with screen not touchable
     fun enableProgress(progressBar: RelativeLayout) {
-
         progressBar?.visibility = View.VISIBLE
         getWindow().setFlags(
+            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+        )
+    }
+
+    //disable progress bar
+    fun disableProgress(progressBar: RelativeLayout,context: Activity) {
+        progressBar?.visibility = View.GONE
+        context.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+    }
+    fun enableProgress(progressBar: RelativeLayout,context: Activity) {
+        progressBar?.visibility = View.VISIBLE
+        context.getWindow().setFlags(
             WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
             WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
         )
@@ -395,9 +407,7 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
     fun disableProgress(progressBar: RelativeLayout) {
         progressBar?.visibility = View.GONE
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-
     }
-
 
     //enable progress with screen not touchable
     fun enableProgress(progressBar: ProgressBar) {
@@ -405,7 +415,7 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
         getWindow().setFlags(
             WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
             WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-        );
+        )
     }
 
     //disable progress bar
@@ -530,7 +540,7 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
         return dbBase.getApiDetail(1)
     }
 
-     fun getCredientail_api(context: Context) {
+     fun getCredientail_api(context: Activity) {
 
          var call: Call<ZoomCredientialModel> = getSecondaryApiInterface().getZoomCredientail("bearer " + loginModelBase?.accessToken,loginModelBase.empId.toString()) as Call<ZoomCredientialModel>
         call.enqueue(object : Callback<ZoomCredientialModel?> {

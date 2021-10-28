@@ -46,7 +46,6 @@ class LoginActivity : BaseActivity() {
     var companyVerfy_ll: LinearLayout?=null
     var progressView_parentRv: RelativeLayout?=null
     var login_ll: LinearLayout?=null
-    private var shareTarget: Target? = null
 
 
     var apiInterface: APIInterface? = null
@@ -58,12 +57,7 @@ class LoginActivity : BaseActivity() {
         setContentView(R.layout.activity_main)
 
         dexterPermission(this)
-
-
     }
-
-
-
 
     // initilizeVariables and click
     fun initView()
@@ -174,8 +168,6 @@ class LoginActivity : BaseActivity() {
         {
             companyVerfy_ll?.visibility = View.GONE
             login_ll?.visibility = View.VISIBLE
-            Log.e("companyCode", sharePreferance?.getPref("companyCode")!!)
-
             checkVersioin_api(sharePreferance?.getPref("companyCode")!!)
         }
     }

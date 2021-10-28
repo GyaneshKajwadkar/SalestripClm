@@ -5,6 +5,7 @@ class DocManagerModel
     private var routeName: String? = null
     private var specialityName: String? = null
     private var mailId: String? = null
+
     private var id: Int? = null
     private var checked: Boolean? = false
 

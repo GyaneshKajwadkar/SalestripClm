@@ -134,7 +134,6 @@ class HomeFragment : Fragment(), OnChartGestureListener {
             createAlert("Create task!", "Create", requireActivity())
         })
 
-
         chart = root.findViewById(R.id.chart1)
         charthalf = root.findViewById(R.id.charthalf)
 
@@ -174,6 +173,12 @@ class HomeFragment : Fragment(), OnChartGestureListener {
 
         expandable_Rv?.layoutManager = LinearLayoutManager(requireActivity())
 
+
+        return root
+    }
+
+    override fun onResume() {
+        super.onResume()
         val responseData=db.getApiDetail(1)
         var getScheduleModel=GetScheduleModel()
         if(!responseData.equals(""))
@@ -181,20 +186,13 @@ class HomeFragment : Fragment(), OnChartGestureListener {
             getScheduleModel= Gson().fromJson(responseData, GetScheduleModel::class.java)
         }
 
-
         var arrayListString : ArrayList<String> = ArrayList()
-
         arrayListString.add("Today's meetings")
         arrayListString.add("Tommorow meetings")
         arrayListString.add("This week meetings")
         arrayListString.add("Next week meetings")
         val adapter = MeetingExpandableHeaderAdapter(requireActivity(),arrayListString,getScheduleModel)
-
-
         expandable_Rv?.adapter = adapter
-
-
-        return root
     }
 
 
@@ -368,11 +366,7 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         alertDialog.show()
     }
 
-
-
-
     var date: DatePickerDialog.OnDateSetListener = object : DatePickerDialog.OnDateSetListener {
-
 
         override fun onDateSet(
                 view: DatePicker?, year: Int, monthOfYear: Int,
@@ -445,8 +439,6 @@ class HomeFragment : Fragment(), OnChartGestureListener {
 
     }
 
-
-
     //=============================================Chart code================================================
     private fun setChart(size: Int) {
         val incomeEntries: List<BarEntry> = getIncomeEntries(size)!!
@@ -456,14 +448,12 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         val expenseEntries4: List<BarEntry> = getIncomeEntries3(size)!!
         dataSets = java.util.ArrayList<IBarDataSet>()
 
-
         set1 = BarDataSet(incomeEntries, "Income")
         set1?.color = Color.rgb(255, 127, 80)
         set1?.valueTextColor = Color.rgb(55, 70, 73)
         set1?.valueTextSize = 7f
         set1?.setDrawValues(true)
         set1?.valueFormatter = MyFormatter(myText)
-
 
         set2 = BarDataSet(expenseEntries, "Expense")
         set2?.color = Color.rgb(154, 205, 50)
@@ -566,17 +556,14 @@ class HomeFragment : Fragment(), OnChartGestureListener {
             override fun onValueSelected(e: Entry, h: Highlight?) {
                 val x = e.x
                 val y = e.y
-
                 viewChartAlert(requireActivity())
 
             }
-
-            override fun onNothingSelected() {
+            override fun onNothingSelected()
+            {
 
             }
         })
-
-
     }
 
 
@@ -796,16 +783,15 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         dialogBuilder.setView(dialogView)
 
         val alertDialog: AlertDialog = dialogBuilder.create()
-        alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
-        alertDialog.setCancelable(false);
+        alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        alertDialog.setCancelable(false)
 
         val ok_btn =
                 dialogView.findViewById<View>(R.id.ok_btn) as MaterialButton
 
         ok_btn.setOnClickListener{
             alertDialog.dismiss()
-            chart?.highlightValue(null);
-
+            chart?.highlightValue(null)
         }
 
         alertDialog.show()
@@ -884,8 +870,6 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         charthalf!!.setData(data)
 
         charthalf!!.setExtraOffsets(0f, 0f, 0f, -150f)
-
-
         charthalf!!.invalidate()
     }
 

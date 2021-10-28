@@ -98,8 +98,6 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
         MeetingAudioCallback.AudioEvent, MeetingShareCallback.ShareEvent,
         MeetingUserCallback.UserEvent, MeetingCommonCallback.CommonEvent, SmsListener, BOEventCallback.BOEvent
 {
-
-
     private final static String TAG = "MyMeetingFragment";
 
     public final static int REQUEST_CHAT_CODE = 1000;
@@ -1146,7 +1144,8 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
         }
     }
 
-    public int checkSelfPermission(String permission) {
+    public int checkSelfPermission(String permission)
+    {
         if (permission == null || permission.length() == 0) {
             return PackageManager.PERMISSION_DENIED;
         }
@@ -1227,6 +1226,15 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
     public void onMeetingUserJoin(List<Long> userList) {
         checkShowVideoLayout();
         updateVideoView(userList, 1);
+       for(int i=0;i<userList.size();i++)
+       {
+
+          // List<Long> userList124 =  ZoomSDK.getInstance().getInMeetingService().getInMeetingUserList();
+           InMeetingUserInfo userInfo = mInMeetingService.getUserInfoById(userList.get(i));
+           Log.e("zoomParticipant",userInfo.getUserName());
+       }
+
+
     }
 
     @Override
@@ -1252,9 +1260,7 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
         meetingShareHelper.stopShare();
         if (!mMeetingFailed)
         {
-
         }
-
     }
 
     @Override
@@ -1266,6 +1272,7 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
     @Override
     public void onMeetingNeedPasswordOrDisplayName(boolean needPassword, boolean needDisplayName, InMeetingEventHandler handler) {
         showPsswordDialog(needPassword, needDisplayName, handler);
+
     }
 
     @Override

@@ -493,14 +493,14 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
 
        if(meetingShareHelper?.isSharingOut!!)
        {
-           logoutAppAlert()
+           stopPresentationAlert()
        }
         else{
            super.onBackPressed()
        }
 
     }
-    fun logoutAppAlert()
+    fun stopPresentationAlert()
     {
         val dialogBuilder = AlertDialog.Builder(this)
         val inflater = this.layoutInflater
@@ -508,7 +508,7 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
         dialogBuilder.setView(dialogView)
 
         val alertDialog: AlertDialog = dialogBuilder.create()
-        alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+        alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         val mainHeading_tv = dialogView.findViewById<View>(R.id.mainHeading_tv) as TextView
         val message_tv = dialogView.findViewById<View>(R.id.message_tv) as TextView

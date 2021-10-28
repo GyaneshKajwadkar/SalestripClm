@@ -422,12 +422,6 @@ class SelectBrandFragment : BaseFragment(), DisplayVisualInterface, SortingDispl
         }
     }
 
-
-    fun getClickedData(message: String)
-    {
-        Log.e("getClickedData", "message")
-    }
-
     override fun onClickDisplayVisual(eDetailinId: Int,brandID: Int,selectionType: Int)
     {
 

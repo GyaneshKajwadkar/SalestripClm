@@ -2,10 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="in.processmaster.salestripclm">
 
+ <!--   android:theme="@style/ZMTheme.SubWindow"-->
+
     <supports-screens
         android:anyDensity="true"
         android:resizeable="true"
-        android:xlargeScreens="true" />
+        android:largeScreens="true" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -133,7 +135,6 @@
             android:hardwareAccelerated="true"
             android:launchMode="singleTop"
             android:screenOrientation="landscape"
-            android:theme="@style/ZMTheme.SubWindow"
             android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

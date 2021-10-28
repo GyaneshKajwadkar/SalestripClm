@@ -20,11 +20,9 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_all_data_sharing.*
 import java.io.File
 
-
 class AllDataSharingActivity : BaseActivity()
 {
     var db : DatabaseHandler? = null
-    var stringArrayList: ArrayList<String> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?)
     {

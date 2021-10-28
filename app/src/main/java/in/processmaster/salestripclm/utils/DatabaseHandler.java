@@ -206,7 +206,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
     }
 
-    @SuppressLint("Range")
+ /*   @SuppressLint("Range")
     public boolean getFavEdetailing(String idModel)
     {
         boolean isFavAdded=false;
@@ -227,7 +227,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             } while (cursor.moveToNext());
         }
         return isFavAdded;
-    }
+    }*/
 
     // check data is already exist.
     public boolean CheckIsDataAlreadyInDBorNot(String fieldValue) {

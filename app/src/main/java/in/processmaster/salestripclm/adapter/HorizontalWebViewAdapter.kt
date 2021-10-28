@@ -31,7 +31,6 @@ class HorizontalWebViewAdapter(
 ) : RecyclerView.Adapter<HorizontalWebViewAdapter.MyViewHolder>() {
 
    var relativeViewList: ArrayList<RelativeLayout> =  ArrayList();
-    private var gs: GestureDetector? = null
 
     inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var webview: WebView = view.findViewById(R.id.horizontal_wv)
