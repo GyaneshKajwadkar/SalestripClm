@@ -1,18 +1,36 @@
 package `in`.processmaster.salestripclm.adapter
-
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.BaseActivity
+import `in`.processmaster.salestripclm.activity.SetSchedule_Activity
+import `in`.processmaster.salestripclm.common_classes.AlertClass
+import `in`.processmaster.salestripclm.common_classes.AlertClass.Companion.retunDialog
+import `in`.processmaster.salestripclm.common_classes.ProgressClass
 import `in`.processmaster.salestripclm.models.GetScheduleModel
+import `in`.processmaster.salestripclm.models.LoginModel
+import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import `in`.processmaster.salestripclm.sdksampleapp.inmeetingfunction.zoommeetingui.ZoomMeetingUISettingHelper
+import `in`.processmaster.salestripclm.utils.DatabaseHandler
+import `in`.processmaster.salestripclm.utils.PreferenceClass
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
+import kotlinx.coroutines.*
+import okhttp3.MediaType
+import okhttp3.RequestBody
+import org.json.JSONArray
+import org.json.JSONObject
 import us.zoom.sdk.*
+import java.io.Serializable
+import java.lang.Runnable
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -35,6 +53,8 @@ class ScheduleMeetingAdapter(
         var appointmentDate_tv=view.findViewById<TextView>(R.id.appointmentDate_tv)
         var doctorsName_tv=view.findViewById<TextView>(R.id.doctorsName_tv)
         var buttonParent_ll=view.findViewById<LinearLayout>(R.id.buttonParent_ll)
+        var cancelMeeting_btn=view.findViewById<Button>(R.id.cancelMeeting_btn)
+        var updateMeeting_btn=view.findViewById<Button>(R.id.updateMeeting_btn)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleMeetingAdapter.MyViewHolder {
@@ -57,12 +77,44 @@ class ScheduleMeetingAdapter(
       return filteredData!!.size
     }
 
-    override fun onBindViewHolder(holder: ScheduleMeetingAdapter.MyViewHolder, position: Int)
+    override fun onBindViewHolder(holder: ScheduleMeetingAdapter.MyViewHolder, @SuppressLint("RecyclerView") position: Int)
     {
 
         if(viewTypeConst==1)
         {
             holder.buttonParent_ll.visibility=View.VISIBLE
+
+            holder.cancelMeeting_btn.setOnClickListener({
+
+                val r: Runnable = object : Runnable {
+                    override fun run() {
+                    if(retunDialog)
+                        initilizeDelete(position)
+                    }
+                }
+             AlertClass(context).twoButtonAlert("cancel dialog","cancel meeting",
+                    1,"cancel meeting","Cancel Meeting?",r)
+
+            })
+
+            holder.updateMeeting_btn.setOnClickListener({
+                val r: Runnable = object : Runnable {
+                    override fun run() {
+                        if(retunDialog)
+                        {
+                            val args = Bundle()
+                            args.putSerializable("ARRAYOBJECT", filteredData.get(position) as Serializable?)
+                            val intent = Intent(context, SetSchedule_Activity::class.java)
+                            intent.putExtra("fillData", args)
+                            context.startActivity(intent)
+                        }
+                    }
+                }
+                AlertClass(context).twoButtonAlert("No","Yes",
+                    1,"update meeting","Update Meeting?",r)
+            })
+
+
             holder.startmeeting_btn.setOnClickListener({
                 val zoomSDK = ZoomSDK.getInstance()
                // val preMeetingService: PreMeetingService = zoomSDK.getPreMeetingService()
@@ -167,4 +219,102 @@ class ScheduleMeetingAdapter(
             }
         }
     }
+
+    fun initilizeDelete(position: Int)
+    {
+        ProgressClass(context).showAlert("Deleting data...")
+        val coroutine=CoroutineScope(Dispatchers.IO).launch {
+            val deleteSchedule= async {
+                setSheduleApi(filteredData?.get(position))
+            }
+            val deleteComplete= deleteSchedule.await()
+            if(deleteComplete!=null)
+            {
+                val getAllSchedule= async{
+                    getSheduleMeetingAPI(position)
+                }
+                getAllSchedule.await()
+            }
+        }
+        coroutine.invokeOnCompletion {
+            ProgressClass(context).hideAlert()
+        }
+
+    }
+
+    suspend fun setSheduleApi(data: GetScheduleModel.Data.Meeting)
+    {
+        val paramObject = JSONObject()
+        paramObject.put("MeetingId", data.meetingId)
+        paramObject.put("MeetingDate",data.meetingDate )
+        paramObject.put("topic",data.topic)
+        paramObject.put("Start_Time",data.startTime?.replace("Z", ""))
+        paramObject.put("End_Time", data.endTime?.replace("Z", ""))
+        paramObject.put("MeetingType", data.meetingType)
+        paramObject.put("EmpId", data.empId)
+        paramObject.put("Mode", "3")
+        paramObject.put("isCancel", true)
+
+        val doctorList = JSONArray()
+
+        paramObject.put("DoctorList", doctorList)
+        val teamList = JSONArray()
+
+        paramObject.put("EmployeeList", teamList)
+
+        val bodyRequest: RequestBody =
+            RequestBody.create(MediaType.parse("application/json"), paramObject.toString())
+
+
+        var profileData =PreferenceClass(context)?.getPref("profileData")
+
+        val response = APIClientKot().getUsersService(2, PreferenceClass(context)?.getPref("secondaryUrl")!!
+        ).setScheduleMeetingApi("bearer " + Gson().fromJson(profileData, LoginModel::class.java)?.accessToken,bodyRequest)
+        withContext(Dispatchers.Main) {
+            if (response!!.isSuccessful)
+            {
+                Log.e("meetingAPiIS",response.body().toString())
+            }
+            else
+            {
+                Log.e("responseERROR", response.errorBody().toString())
+            }
+        }
+    }
+
+    suspend fun getSheduleMeetingAPI(position: Int)
+    {
+        var profileData =PreferenceClass(context)?.getPref("profileData")
+        val profile=Gson().fromJson(profileData, LoginModel::class.java)
+
+        val response = APIClientKot().getUsersService(2, PreferenceClass(context)?.getPref("secondaryUrl")!!
+        ).getScheduledMeetingCoo("bearer " + profile?.accessToken,profile.empId.toString())
+        withContext(Dispatchers.Main) {
+            Log.e("getScheduleAPI",response.toString())
+            if (response!!.isSuccessful)
+            {
+                if (response.code() == 200 && !response.body().toString().isEmpty()) {
+                    val gson = Gson()
+                    var model = response.body()
+                    Log.e("abcdef",model.toString())
+
+                    DatabaseHandler(context)?.insertOrUpdateAPI("1",gson.toJson(model))
+
+
+                    filteredData.removeAt(position)
+
+                    notifyDataSetChanged()
+                }
+                else
+                {
+                    Log.e("elseGetScheduled", response.code().toString())
+                }
+            }
+            else
+            {   Log.e("scheduleERROR", response.errorBody().toString())
+            }
+        }
+
+    }
+
 }

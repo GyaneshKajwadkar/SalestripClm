@@ -7,6 +7,7 @@ import SelectorInterface
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.adapter.ScheduleMeetingAdapter
 import `in`.processmaster.salestripclm.models.*
+import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
@@ -40,6 +41,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import androidx.recyclerview.widget.GridLayoutManager
+import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.IO
 import okhttp3.MediaType
 import org.json.JSONArray
 import org.json.JSONObject
@@ -51,6 +54,7 @@ import java.text.DateFormat
 import okhttp3.RequestBody
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import kotlin.concurrent.schedule
 
 
 class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/*, PreMeetingServiceListener, UserLoginCallback.ZoomDemoAuthenticationListener*/
@@ -77,18 +81,103 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
 
         if(!zoomSDKBase.isLoggedIn)
         {
-            getCredientail_api(this)
+            CoroutineScope(IO).launch {
+                async {
+                    getCredientailAPI(this@SetSchedule_Activity)
+                }
+            }
+          //  getCredientail_api(this)
         }
 
-        Handler(Looper.getMainLooper()).postDelayed({
-            init()
-        }, 10)
+        Timer().schedule(50){
 
-        setScheduleAdapter()
+            runOnUiThread(java.lang.Runnable {
+                init()
+                setScheduleAdapter()
+            })
+        }
+
     }
+
+    fun updateSchedule()
+    {
+        val args =intent.getBundleExtra("fillData")
+        val scheduledObject = args?.getSerializable("ARRAYOBJECT") as? GetScheduleModel.Data.Meeting
+        if(scheduledObject!=null)
+        {
+            subject_et.setText(scheduledObject.topic)
+
+            startTime.setText(scheduledObject.startTime)
+            stopTime.setText(scheduledObject.endTime)
+            remark_et.setText(scheduledObject.description)
+
+            if(scheduledObject.type==1)
+                physical_rb.isChecked
+            else
+                first.isChecked
+
+            val inputPattern = "yyyy-MM-dd HH:mm:ss"
+            val outputPattern = "dd/MM/yyyy"
+            val inputTime="MMM dd, YYYY h:mm a"
+            val outputTime="h:mm a"
+
+            val inputFormat = SimpleDateFormat(inputPattern)
+            val outputFormat = SimpleDateFormat(outputPattern)
+            val setStartFormat = SimpleDateFormat(inputTime)
+            val setEndFormat = SimpleDateFormat(outputTime)
+
+
+            try {
+                val date = inputFormat.parse(scheduledObject.meetingDate?.replace("T"," ")?.replace("Z"," "))
+                val startTimeVal = setStartFormat.parse(scheduledObject.strStartTime)
+                val endTimeVal = setStartFormat.parse(scheduledObject.strEndTime)
+                selectDate_tv.setText(outputFormat.format(date))
+                startTime.setText(setEndFormat.format(startTimeVal))
+                stopTime.setText(setEndFormat.format(endTimeVal))
+
+            } catch (e: ParseException) {
+                e.printStackTrace()
+            }
+
+            for(intentDocList in scheduledObject.doctorList!!)
+            {
+                for((i,apiDoctorList) in arrayListSelectorDoctor.withIndex())
+                {
+                    if(intentDocList.memberId==apiDoctorList.getId())
+                    {
+                        apiDoctorList.setChecked(true)
+                        apiDoctorList.setMeetingId(intentDocList.meetingId.toString())
+                        arrayListSelectorDoctor.set(i,apiDoctorList)
+                    }
+                }
+            }
+            callSelectedAdapter(1)
+
+            Log.e("theSizeOFTeam",scheduledObject.employeeList?.size.toString())
+            Log.e("theSiz",arrayListSelectorTeams?.size.toString())
+
+            for(intentTeamList in scheduledObject.employeeList!!)
+            {
+                for((i,apiTeamList) in arrayListSelectorTeams.withIndex())
+                {
+                    if(intentTeamList.memberId==apiTeamList.getId())
+                    {
+                        apiTeamList.setChecked(true)
+                        apiTeamList.setMeetingId(intentTeamList.meetingId.toString())
+                        arrayListSelectorTeams.set(i,apiTeamList)
+                    }
+                }
+            }
+            callSelectedAdapter(2)
+
+
+        }
+    }
+
 
     fun setScheduleAdapter()
     {
+
         val responseData=dbBase.getApiDetail(1)
 
         if(!responseData.equals(""))
@@ -154,7 +243,6 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
 
         var date: DatePickerDialog.OnDateSetListener = object : DatePickerDialog.OnDateSetListener {
 
-
             @RequiresApi(Build.VERSION_CODES.N)
             override fun onDateSet(view: DatePicker?, year: Int, monthOfYear: Int,
                                    dayOfMonth: Int) {
@@ -204,7 +292,6 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
                     try {
                         val sdf = SimpleDateFormat("H:mm")
                         val dateObj = sdf.parse(selectedHour.toString()+":"+selectedMinute.toString())
-                        System.out.println(dateObj)
                         val strDate= SimpleDateFormat("K:mm").format(dateObj)
                         startTime.setText("$strDate $AM_PM" )
 
@@ -760,6 +847,17 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
 
     }
 
+    fun setAdapterDefault()
+    {
+        selectedAdapeter=SelectedDocManList_adapter(constructorList,this,1)
+        selectedoctor_rv.adapter=selectedAdapeter
+        selectedAdapeter?.notifyDataSetChanged()
+
+        selectedAdapeterTeams=SelectedDocManList_adapter(constructorListTeam,this,2)
+        recyclerView_teams.adapter=selectedAdapeterTeams
+        selectedAdapeterTeams?.notifyDataSetChanged()
+    }
+
     override fun passid(id: Int, selectionType: Int)
     {
         if(selectionType==1)
@@ -792,6 +890,9 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
         callSelectedAdapter(selectionType)
     }
 
+
+
+
     private fun getTeamsApi()
     {
         progressView_parentRv?.visibility=View.VISIBLE
@@ -819,6 +920,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
                         selectorModel.setMailId(singleItem.emailId)
                         arrayListSelectorTeams.add(selectorModel)
                     }
+                    updateSchedule()
                 }
                 else
                 {
@@ -856,16 +958,32 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
         val dateTimeEnd = formatabc.parse(formattedDate+"T"+spf.format(endTimeStr))
 
 
+        val args =intent.getBundleExtra("fillData");
+        val scheduledObject = args?.getSerializable("ARRAYOBJECT") as? GetScheduleModel.Data.Meeting
 
         val paramObject = JSONObject()
-        paramObject.put("MeetingId", "0")
+
+        if(scheduledObject!=null)
+        {
+            paramObject.put("MeetingId", scheduledObject.meetingId)
+            paramObject.put("Mode", "2")
+        }
+
+        else
+        {
+            paramObject.put("MeetingId", "0")
+            paramObject.put("Mode", "1")
+        }
+        val selectedId: Int = radio_meeting.getCheckedRadioButtonId()
+
+        val radioButton = findViewById(selectedId) as RadioButton
+
         paramObject.put("MeetingDate",formattedDate )
         paramObject.put("topic",subject_et.text.toString())
-        paramObject.put("StartTime",formattedDate+" "+spf.format(startTimeStr))
-        paramObject.put("EndTime", formattedDate+" "+spf.format(endTimeStr))
-        paramObject.put("MeetingType", if(radio_meeting.getCheckedRadioButtonId()==1) "P" else "O")
+        paramObject.put("Start_Time",formattedDate+"T"+spf.format(startTimeStr))
+        paramObject.put("End_Time", formattedDate+"T"+spf.format(endTimeStr))
+        paramObject.put("MeetingType", if(radioButton.getText().toString().equals("Online meeting")) "O" else "P")
         paramObject.put("EmpId", loginModelBase.empId)
-        paramObject.put("Mode", "1")
         paramObject.put("Description", remark_et.text.toString())
 
         val doctorList = JSONArray()
@@ -874,7 +992,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
             if(item.getChecked()!!)
             {
                 val arrayObject = JSONObject()
-                arrayObject.put("MeetingId","1")
+                arrayObject.put("MeetingId",item.getMeetingID())
                 arrayObject.put("MemberId",item.getId())
                 arrayObject.put("MemberType","doc")
                 arrayObject.put("EmailId",item.getMailId())
@@ -883,27 +1001,27 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
             }
 
         }
-        paramObject.put("DoctorList", doctorList)
+        paramObject.put("doctorList", doctorList)
         val teamList = JSONArray()
         for( item in arrayListSelectorTeams)
         {
             if(item.getChecked()!!)
             {
                 val arrayObject = JSONObject()
-                arrayObject.put("MeetingId","1")
+                arrayObject.put("MeetingId",item.getMeetingID())
                 arrayObject.put("MemberId",item.getId())
-                arrayObject.put("MemberType","doc")
+                arrayObject.put("MemberType","Empl")
                 arrayObject.put("EmailId",item.getMailId())
                 arrayObject.put("name",item.getName())
                 teamList.put(arrayObject)
             }
         }
-        paramObject.put("EmployeeList", teamList)
+        paramObject.put("employeeList", teamList)
 
         val bodyRequest: RequestBody =
             RequestBody.create(MediaType.parse("application/json"), paramObject.toString())
 
-        var call: Call<GenerateOTPModel> = getSecondaryApiInterface().setScheduleMeetingApi(
+        var call: Call<GenerateOTPModel> = getSecondaryApiInterface().setScheduleFirstApi(
             "bearer " + loginModelBase?.accessToken,
             bodyRequest
         ) as Call<GenerateOTPModel>
@@ -924,6 +1042,19 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
                         disableProgress(progressView_parentRv!!)
                         commonAlert(this@SetSchedule_Activity,getResponse?.data?.message.toString(),"")
 
+                        for((i,apiDoctorList) in arrayListSelectorDoctor.withIndex())
+                        {
+                            apiDoctorList.setChecked(false)
+                            arrayListSelectorDoctor.set(i,apiDoctorList)
+                        }
+
+                        for((i,apiTeamList) in arrayListSelectorTeams.withIndex())
+                        {
+                            apiTeamList.setChecked(false)
+                            arrayListSelectorTeams.set(i,apiTeamList)
+
+                        }
+
                         subject_et.setText("")
                         remark_et.setText("")
                         selectDate_tv.setText("Select Date")
@@ -932,15 +1063,8 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
                         first.isChecked=true
                         constructorList= ArrayList()
                         constructorListTeam= ArrayList()
+                        setAdapterDefault()
                         getsheduled_Meeting_api()
-
-
-                    /*  selectedAdapeter=SelectedDocManList_adapter(constructorList,this@SetSchedule_Activity,1)
-                        selectedoctor_rv.adapter=selectedAdapeter
-                        selectedAdapeter?.notifyDataSetChanged()
-                        selectedAdapeterTeams=SelectedDocManList_adapter(constructorListTeam,this@SetSchedule_Activity,1)
-                        recyclerView_teams.adapter=selectedAdapeterTeams
-                        selectedAdapeterTeams?.notifyDataSetChanged()*/
 
                     }
                 }
@@ -965,13 +1089,15 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
         call.enqueue(object : Callback<GetScheduleModel?> {
             override fun onResponse(call: Call<GetScheduleModel?>?, response: Response<GetScheduleModel?>) {
                 Log.e("getscheduled_api", response.code().toString() + "")
-                if (response.code() == 200 && !response.body().toString().isEmpty()) {
+                if (response.code() == 200 && !response.body().toString().isEmpty())
+                {
                     val gson = Gson()
                     var model = response.body()
                     dbBase?.insertOrUpdateAPI("1",gson.toJson(model))
                     setScheduleAdapter()
                 }
-                else { }
+                else
+                { }
             }
 
             override fun onFailure(call: Call<GetScheduleModel?>, t: Throwable?) {

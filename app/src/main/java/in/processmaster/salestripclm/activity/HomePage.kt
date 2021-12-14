@@ -7,10 +7,7 @@ import `in`.processmaster.salestripclm.fragments.HomeFragment
 import `in`.processmaster.salestripclm.models.DevisionModel
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.models.SyncModel
-import `in`.processmaster.salestripclm.sdksampleapp.initsdk.InitAuthSDKCallback
-import `in`.processmaster.salestripclm.sdksampleapp.initsdk.InitAuthSDKHelper
-import `in`.processmaster.salestripclm.sdksampleapp.startjoinmeeting.UserLoginCallback
-import `in`.processmaster.salestripclm.sdksampleapp.startjoinmeeting.emailloginuser.EmailUserLoginHelper
+import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageInfo
@@ -18,13 +15,10 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
@@ -39,9 +33,8 @@ import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_home_page.*
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.progress_view.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.IO
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
@@ -65,6 +58,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
       //  mZoomSDK = ZoomSDK.getInstance()
         initView()
+        callingMultipleAPI()
     }
 
 
@@ -122,17 +116,17 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         //call sync api
         if(isInternetAvailable(this)==true)
         {
-            sync_api()
-            getsheduledMeeting_api()
+           // sync_api()
+           // getsheduledMeeting_api()
 
-            GlobalScope.launch(Dispatchers.IO)
+        /*    GlobalScope.launch(Dispatchers.IO)
             {
                 var zoomSDKBase = ZoomSDK.getInstance()
                 if(!zoomSDKBase.isLoggedIn)
                 {
                     getCredientail_api(this@HomePage)
                 }
-            }
+            }*/
 
             Picasso
                 .get()
@@ -521,7 +515,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             }
             else
             {
-                Log.e("bdfusgduifdsfs","sdfuiogsduifdgsbf")
                 sync_api()
                 sharePreferanceBase?.setPref("SyncDate", formattedDate)
             }
@@ -670,6 +663,149 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         stopConnectivity(this)
     }
 
+    fun callingMultipleAPI()
+    {
+     //   progressMessage_tv?.setText("Please wait....")
+        enableProgress(progressView_parentRv!!)
+
+        val coroutineScope= CoroutineScope(IO).launch {
+             val ans= async {
+                 callingSyncAPI()
+             }
+
+             val divisionApi =async {
+                 callingDivisionAPI()
+             }
+
+            val credientialApi= async {
+                getSheduleMeetingAPI()
+            }
+
+            val initilizeZoom= async {
+                var zoomSDKBase = ZoomSDK.getInstance()
+                if(!zoomSDKBase.isLoggedIn)
+                {
+                    getCredientailAPI(this@HomePage)
+                }
+            }
+
+            ans.await()
+            divisionApi.await()
+            credientialApi.await()
+            initilizeZoom.await()
+
+        }
+        coroutineScope.invokeOnCompletion {
+            this.runOnUiThread(java.lang.Runnable {
+                disableProgress(progressView_parentRv!!)
+            })
+        }
+
+    }
+
+    suspend fun callingDivisionAPI()
+    {
+        val jsonObject = JSONObject(loginModelBase?.getEmployeeObj().toString())
+
+        val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
+        ).detailingApiCoo( "bearer " + loginModelBase?.accessToken, jsonObject.getString(
+            "Division"
+        ))
+        withContext(Dispatchers.Main) {
+            if (response!!.isSuccessful)
+            {
+                if (response.code() == 200 && !response.body().toString().isEmpty())
+                {
+                    for ((index, value) in response.body()?.data?.geteDetailingList()
+                        ?.withIndex()!!) {
+                        //store edetailing data to db
+                        val gson = Gson()
+                        dbBase.insertOrUpdateEDetail(
+                            value.geteDetailId().toString(),
+                            gson.toJson(value)
+                        )
+
+                    }
+
+                    // clear database
+                    for (dbList in dbBase.getAlleDetail()) {
+                        var isSet = false
+                        for (mainList in response.body()?.data?.geteDetailingList()!!) {
+                            if (mainList.geteDetailId() == dbList.geteDetailId()) {
+                                isSet = true
+                            }
+                        }
+
+                        //this clear database and files from device which is not in used
+                        if (!isSet) {
+                            dbBase.deleteEdetailingData(dbList.geteDetailId().toString())
+
+                            var downloadModelArrayList =
+                                dbBase.getAllDownloadedData(dbList.geteDetailId())
+
+                            //Delete files from folder before erase db
+                            for (item in downloadModelArrayList) {
+                                val someDir = File(item.fileDirectoryPath)
+                                someDir.deleteRecursively()
+                            }
+
+                            dbBase.deleteEdetailDownloada(dbList.geteDetailId().toString())
+
+                        }
+                }
+                }
+
+                // if token expire go to login page again
+                else
+                {
+                    Log.e("responseCode", "error")
+                    sharePreferanceBase?.setPrefBool("isLogin", false)
+                    val intent = Intent(this@HomePage, LoginActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }
+            }
+            else
+            {
+                checkInternet()
+            }
+        }
+    }
+
+    suspend fun callingSyncAPI()
+    {
+        val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
+        ).syncApiCoo("bearer " + loginModelBase?.accessToken)
+        withContext(Dispatchers.Main) {
+            if (response!!.isSuccessful)
+            {
+                if (response.code() == 200 && !response.body().toString().isEmpty())
+                {
+                    if (dbBase.datasCount > 0) {
+                        dbBase.deleteAll()
+                    }
+                    val gson = Gson()
+                    var model = response.body()
+                    dbBase?.addData(gson.toJson(model))
+                    bottomNavigation?.selectedItemId= R.id.landingPage
+                }
+
+                // if token expire go to login page again
+                else{
+                    Log.e("responseCode", "error")
+                    sharePreferanceBase?.setPrefBool("isLogin", false)
+                    val intent = Intent(this@HomePage, LoginActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }
+            }
+            else
+            {   Log.e("responseERROR", response.errorBody().toString())
+                checkInternet()
+            }
+        }
+
+    }
 
 
 }

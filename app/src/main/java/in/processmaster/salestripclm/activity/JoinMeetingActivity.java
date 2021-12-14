@@ -1,5 +1,7 @@
 package in.processmaster.salestripclm.activity;
 
+import static io.reactivex.annotations.SchedulerSupport.IO;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import androidx.core.view.GravityCompat;
@@ -31,6 +33,7 @@ import java.util.List;
 import in.processmaster.salestripclm.ConnectivityChangeReceiver;
 import in.processmaster.salestripclm.R;
 import in.processmaster.salestripclm.adapter.ScheduleMeetingAdapter;
+import in.processmaster.salestripclm.common_classes.AlertClass;
 import in.processmaster.salestripclm.fragments.JoinMeetingFragment;
 import in.processmaster.salestripclm.models.GetScheduleModel;
 import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.RawDataMeetingActivity;
@@ -42,6 +45,9 @@ import in.processmaster.salestripclm.sdksampleapp.startjoinmeeting.UserLoginCall
 import in.processmaster.salestripclm.sdksampleapp.startjoinmeeting.emailloginuser.EmailUserLoginHelper;
 import in.processmaster.salestripclm.sdksampleapp.ui.InitAuthSDKActivity;
 import in.processmaster.salestripclm.utils.DatabaseHandler;
+import kotlin.coroutines.CoroutineContext;
+import kotlinx.coroutines.CoroutineScope;
+import kotlinx.coroutines.GlobalScope;
 import us.zoom.sdk.CustomizedMiniMeetingViewSize;
 import us.zoom.sdk.IBOAssistant;
 import us.zoom.sdk.IBOAttendee;
@@ -70,7 +76,7 @@ public class JoinMeetingActivity extends BaseActivity implements MeetingServiceL
 
     private View mProgressPanel;
     private MobileRTCShareView mShareView;
-
+      ScheduleMeetingAdapter adapterRecycler;
     ArrayList<MeetingItem> meetingListMain= new ArrayList<>();
     ConnectivityChangeReceiver  connectivityChangeReceiver= new ConnectivityChangeReceiver();
 
@@ -107,7 +113,6 @@ public class JoinMeetingActivity extends BaseActivity implements MeetingServiceL
         meetingsDrawer = findViewById(R.id.meetingsDrawer);
         noData_tv = findViewById(R.id.noData_tv);
         menu_img = findViewById(R.id.menu_img);
-
         parentToolbar = findViewById(R.id.parentToolbar);
         zoomImageView = findViewById(R.id.zoomImageView);
 
@@ -123,7 +128,8 @@ public class JoinMeetingActivity extends BaseActivity implements MeetingServiceL
                 {
                     meetingsDrawer.openDrawer(GravityCompat.END);
                 }
-                else {
+                else
+                {
                     meetingsDrawer.closeDrawer(GravityCompat.START);
                 }
             }
@@ -132,9 +138,10 @@ public class JoinMeetingActivity extends BaseActivity implements MeetingServiceL
         zoomSDK = ZoomSDK.getInstance();
         if(!zoomSDK.isLoggedIn())
         {
-           getCredientail_api(this);
+            getCredientail_api(this);
         }
-        else{
+        else
+        {
             initilizeZoom();
         }
 
@@ -210,7 +217,7 @@ public class JoinMeetingActivity extends BaseActivity implements MeetingServiceL
     }
 
 
-    private void setScheduleAdapter()
+    public void setScheduleAdapter( )
     {
 
         String responseData= new DatabaseHandler(this).getApiDetail(1);
@@ -226,7 +233,7 @@ public class JoinMeetingActivity extends BaseActivity implements MeetingServiceL
                     meetinglist.add(getScheduleModel.getData().getMeetingList().get(i));
                 }
             }
-            ScheduleMeetingAdapter adapterRecycler= new ScheduleMeetingAdapter(this,1,meetinglist,zoomSDK);
+             adapterRecycler= new ScheduleMeetingAdapter(this,1,meetinglist,zoomSDK);
             sheduled_rv.setLayoutManager(new LinearLayoutManager(this));
             sheduled_rv.setAdapter(adapterRecycler);
             adapterRecycler.notifyDataSetChanged();
@@ -289,6 +296,8 @@ public class JoinMeetingActivity extends BaseActivity implements MeetingServiceL
 
         IntentFilter intentFilter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
         this.registerReceiver(connectivityChangeReceiver, intentFilter);
+
+        setScheduleAdapter( );
     }
 
     @Override
@@ -654,7 +663,6 @@ public class JoinMeetingActivity extends BaseActivity implements MeetingServiceL
         if(preMeetingService != null) {
             if (meetingList != null) {
                 for (long meetingUniqueId : meetingList) {
-                    Log.e("theUniqueId",meetingUniqueId+"");
                     MeetingItem item = preMeetingService.getMeetingItemByUniqueId(meetingUniqueId);
                     if(item != null) {
                         meetingListMain.add(item);
@@ -896,6 +904,7 @@ public class JoinMeetingActivity extends BaseActivity implements MeetingServiceL
                 dialog.dismiss();
 
             }
+
 
             @Override
             public void onFailure(Call<ZoomCredientialModel> call, Throwable t) {

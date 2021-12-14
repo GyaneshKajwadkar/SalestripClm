@@ -5,9 +5,19 @@ class DocManagerModel
     private var routeName: String? = null
     private var specialityName: String? = null
     private var mailId: String? = null
+    private var meetingId="1"
 
     private var id: Int? = null
     private var checked: Boolean? = false
+
+    fun getMeetingID(): String? {
+        return meetingId
+    }
+
+    fun setMeetingId(checked: String?) {
+        this.meetingId = checked.toString()
+    }
+
 
     fun getChecked(): Boolean? {
         return checked

@@ -4,6 +4,7 @@ package `in`.processmaster.salestripclm.activity
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.networkUtils.APIClient.getClient
+import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.content.ActivityNotFoundException
@@ -27,26 +28,30 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.google.android.material.button.MaterialButton
 import com.google.gson.Gson
+import io.reactivex.internal.util.HalfSerializer.onError
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.progress_view.*
+import kotlinx.coroutines.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import retrofit2.await
 import java.io.*
 
 
 class LoginActivity : BaseActivity() {
 
-    var mpin_tv:TextView? =null
-    var progressMessage_tv:TextView? =null
-    var forgotPass_tv:TextView? = null
-    var password_et:EditText?=null
-    var userName_et:EditText?=null
-    var companyCode_et:EditText?=null
-    var signIn_btn: MaterialButton?=null
-    var verifyCompany_btn: MaterialButton?=null
-    var companyVerfy_ll: LinearLayout?=null
-    var progressView_parentRv: RelativeLayout?=null
-    var login_ll: LinearLayout?=null
-
+ //  var mpin_tv:TextView? =null
+ //  var progressMessage_tv:TextView? =null
+ //  var forgotPass_tv:TextView? = null
+ //  var password_et:EditText?=null
+ //  var userName_et:EditText?=null
+ //  var companyCode_et:EditText?=null
+ //  var signIn_btn: MaterialButton?=null
+ //  var verifyCompany_btn: MaterialButton?=null
+ //  var companyVerfy_ll: LinearLayout?=null
+ //  var progressView_parentRv: RelativeLayout?=null
+ //  var login_ll: LinearLayout?=null
 
     var apiInterface: APIInterface? = null
     var sharePreferance: PreferenceClass?= null
@@ -62,17 +67,17 @@ class LoginActivity : BaseActivity() {
     // initilizeVariables and click
     fun initView()
     {
-        mpin_tv=findViewById(R.id.mpin_tv) as TextView
-        forgotPass_tv=findViewById(R.id.forgotPass_tv) as TextView
-        password_et=findViewById(R.id.password_et) as EditText
-        userName_et=findViewById(R.id.userName_et) as EditText
-        signIn_btn=findViewById(R.id.signIn_btn) as MaterialButton
-        companyCode_et=findViewById(R.id.companyCode_et) as EditText
-        verifyCompany_btn=findViewById(R.id.verifyCompany_btn) as MaterialButton
-        companyVerfy_ll=findViewById(R.id.companyVerfy_ll) as LinearLayout
-        login_ll=findViewById(R.id.login_ll) as LinearLayout
-        progressView_parentRv=findViewById(R.id.progressView_parentRv) as RelativeLayout
-        progressMessage_tv=findViewById(R.id.progressMessage_tv) as TextView
+      //  mpin_tv=findViewById(R.id.mpin_tv) as TextView
+      //  forgotPass_tv=findViewById(R.id.forgotPass_tv) as TextView
+      //  password_et=findViewById(R.id.password_et) as EditText
+      //  userName_et=findViewById(R.id.userName_et) as EditText
+      //  signIn_btn=findViewById(R.id.signIn_btn) as MaterialButton
+      //  companyCode_et=findViewById(R.id.companyCode_et) as EditText
+      //  verifyCompany_btn=findViewById(R.id.verifyCompany_btn) as MaterialButton
+      //  companyVerfy_ll=findViewById(R.id.companyVerfy_ll) as LinearLayout
+      //  login_ll=findViewById(R.id.login_ll) as LinearLayout
+      //  progressView_parentRv=findViewById(R.id.progressView_parentRv) as RelativeLayout
+      //  progressMessage_tv=findViewById(R.id.progressMessage_tv) as TextView
 
         sharePreferance = PreferenceClass(this)
 
@@ -149,7 +154,9 @@ class LoginActivity : BaseActivity() {
                 val imm: InputMethodManager =
                     getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
-            } catch (e: java.lang.Exception) {
+            }
+            catch (e: java.lang.Exception)
+            {
                 // TODO: handle exception
             }
 
@@ -176,14 +183,65 @@ class LoginActivity : BaseActivity() {
     //Login APi
     private fun login_api()
     {
-        //call api interface with seconday url
         progressMessage_tv?.setText("Verify User")
         enableProgress(progressView_parentRv!!)
         apiInterface= getClient(2, sharePreferance?.getPref("secondaryUrl")).create(APIInterface::class.java)
 
+
+        /* CoroutineScope(Dispatchers.IO ).launch {
+           Log.e("sgfuisfs","beforeeeee")
+
+           val ans= async {   val response = APIClientKot().getUsersService(2,
+               sharePreferance?.getPref("secondaryUrl")!!
+           ).loginAPICoo(
+               "password", userName_et?.getText().toString() + "," +
+                       sharePreferance?.getPref("companyCode"), password_et?.getText().toString())
+               withContext(Dispatchers.Main) {
+                   if (response!!.isSuccessful)
+                   {
+                       Log.e("sgfuisfs","inAPIIIIIII")
+                       //syncom formulations
+                       //dhenu buildcon intra ltd
+
+                       if(response!!.code()==200)
+                       {
+                           var loginModel = response.body()
+                           // saveLoginData(loginModel)
+
+                           sharePreferance?.setPref("userName_login", userName_et?.getText().toString())
+                           sharePreferance?.setPrefBool("isLogin", true)
+                           sharePreferance?.setPref(
+                               "userNameLogin", userName_et?.getText().toString() + "," +
+                                       sharePreferance?.getPref("companyCode")
+                           )
+                           sharePreferance?.setPref("password", password_et?.getText().toString())
+                           val gson = Gson()
+                           sharePreferance?.setPref("profileData", gson.toJson(loginModel))
+                           callHomePage()
+                       }
+                       else
+                       {
+                           commonAlert(this@LoginActivity, "", "Incorrect username or password")
+
+                       }
+                       Log.e("dfdsfdsfdsfsdf",response.body()?.accessToken.toString())
+                       disableProgress(progressView_parentRv!!)
+                   }
+                   else
+                   {
+                       print("fsfError : ${response.message()} ")
+                       checkInternet()
+                       disableProgress(progressView_parentRv!!)
+                   }
+               } }
+            ans.await()
+            Log.e("sgfuisfs","hellow")
+        }*/
+
+
         var call: Call<LoginModel> = apiInterface?.loginAPI(
                 "password", userName_et?.getText().toString() + "," +
-                sharePreferance?.getPref("companyCode"), password_et?.getText().toString()
+                sharePreferance?.getPref("companyCode").toString(), password_et?.getText().toString()
         ) as Call<LoginModel>
         call.enqueue(object : Callback<LoginModel?> {
             override fun onResponse(call: Call<LoginModel?>?, response: Response<LoginModel?>) {
@@ -232,7 +290,7 @@ class LoginActivity : BaseActivity() {
         enableProgress(progressView_parentRv!!)
 
         var call: Call<String> = apiInterface?.checkCompanyCode(
-                companyCode_et?.getText().toString().toUpperCase()
+                companyCode_et?.getText().toString().uppercase()
         ) as Call<String>
         call.enqueue(object : Callback<String?> {
             override fun onResponse(call: Call<String?>?, response: Response<String?>) {
@@ -243,11 +301,12 @@ class LoginActivity : BaseActivity() {
                 } else {
                     //check and save company code in sp
                     sharePreferance?.setPref("secondaryUrl", response.body().toString())
+                  //  sharePreferance?.setPref("secondaryUrl", "https://app.salestrip.in/")
                     sharePreferance?.setPref(
                             "companyCode",
-                            companyCode_et?.getText().toString().toUpperCase()
+                            companyCode_et?.getText().toString().uppercase()
                     )
-                    checkVersioin_api(companyCode_et?.getText().toString().toUpperCase())
+                    checkVersioin_api(companyCode_et?.getText().toString().uppercase())
                 }
 
                 disableProgress(progressView_parentRv!!)
@@ -273,8 +332,8 @@ class LoginActivity : BaseActivity() {
             override fun onResponse(call: Call<String?>?, response: Response<String?>) {
                 Log.e("checkVersioin_api", response.code().toString() + "")
                 if (response.body().toString().isEmpty()) {
-
-                } else {
+                }
+                else {
                     sharePreferance?.setPref("version", response.body().toString())
                     var onlineVersion: String = response.body().toString()
                     val namesList: List<String> = onlineVersion.split(",")
@@ -433,7 +492,7 @@ class LoginActivity : BaseActivity() {
     }
 
 
- /*   //download profile pic from url and save to local storage
+ /* //download profile pic from url and save to local storage
     fun saveImageTofolder(uRl: String, picName: String)
     {
 
@@ -509,7 +568,7 @@ class LoginActivity : BaseActivity() {
                             Log.e("exceptionProfileSave", e.message.toString())
                             e.printStackTrace()
                             disableProgress(progressView_parentRv!!)
-                        }                    }
+                        }  }
                     override fun onLoadCleared(placeholder: Drawable?) {
                         // this is called when imageView is cleared on lifecycle call or for
                         // some other reason.

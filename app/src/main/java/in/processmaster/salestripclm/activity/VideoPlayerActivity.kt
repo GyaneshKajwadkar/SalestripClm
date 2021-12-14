@@ -176,7 +176,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
                 mPlayer!!.addListener(object : Player.EventListener {
                     override fun onPlayerStateChanged(playWhenReady: Boolean,playbackState: Int) {
 
-                      /*  if(playWhenReady) {
+                        /* if(playWhenReady) {
                             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
 
                         } else {

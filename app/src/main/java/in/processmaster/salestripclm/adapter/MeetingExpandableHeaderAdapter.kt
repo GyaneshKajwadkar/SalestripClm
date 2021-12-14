@@ -13,8 +13,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.iamkamrul.expandablerecyclerviewlist.viewholder.ChildViewHolder
-import com.iamkamrul.expandablerecyclerviewlist.viewholder.ParentViewHolder
 import us.zoom.sdk.ZoomSDK
 import java.text.SimpleDateFormat
 import java.util.*
@@ -37,7 +35,8 @@ class MeetingExpandableHeaderAdapter(
 
         holder.headingTxt.setText(arrayListString.get(position))
 
-        if (currentPosition == position) {
+        if (currentPosition == position)
+        {
             //creating an animation
             val slideDown = AnimationUtils.loadAnimation(context, R.anim.slide_down)
 
@@ -47,7 +46,9 @@ class MeetingExpandableHeaderAdapter(
             //adding sliding effect
             holder.showmeeting_rv.startAnimation(slideDown)
             holder.arrowImage.animate().rotation(180f).start()
-        } else {
+        }
+        else
+        {
             val slideDown = AnimationUtils.loadAnimation(context, R.anim.slideup)
 
             //adding sliding effect

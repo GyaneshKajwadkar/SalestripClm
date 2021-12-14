@@ -117,7 +117,7 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
 
     private int from = 0;
 
-    private int currentLayoutType = -1;
+    private int  currentLayoutType = -1;
     private final int LAYOUT_TYPE_PREVIEW = 0;
     private final int LAYOUT_TYPE_WAITHOST = 1;
     private final int LAYOUT_TYPE_IN_WAIT_ROOM = 2;
@@ -201,7 +201,7 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
         mInMeetingService = zoomSDK.getInMeetingService();
 
         from = getArguments().getInt("from");
-    /*    if (null != getIntent().getExtras()) {
+        /* if (null != getIntent().getExtras()) {
             from = getIntent().getExtras().getInt("from");
         }*/
         meetingAudioHelper = new MeetingAudioHelper(audioCallBack);
@@ -254,10 +254,7 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
 
         view.setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent event) {
-
                 gestureDetector.onTouchEvent(event);
-
-
                 if(event.getAction() == MotionEvent.ACTION_MOVE){
                     //do something
                 }
@@ -280,7 +277,8 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
         @Override
         public boolean requestVideoPermission()
         {
-            if (Build.VERSION.SDK_INT >= 23 && checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= 23 && checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+            {
                 ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.CAMERA}, REQUEST_CAMERA_CODE);
                 return false;
             }
@@ -317,13 +315,16 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
         }
 
         @Override
-        public MobileRTCShareView getShareView() {
+        public MobileRTCShareView getShareView()
+        {
             return mShareView;
         }
 
         @Override
-        public boolean requestStoragePermission() {
-            if (Build.VERSION.SDK_INT >= 23 && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+        public boolean requestStoragePermission()
+        {
+            if (Build.VERSION.SDK_INT >= 23 && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+            {
                 ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_STORAGE_CODE);
                 return false;
             }

@@ -105,11 +105,11 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
         parentRl = findViewById(R.id.parentRl) as RelativeLayout
         productParent_ll = findViewById(R.id.productParent_ll) as LinearLayout
 
-        horizontal_rv = findViewById<RecyclerView>(R.id.horizontal_rv)
-        fab_send = findViewById<FloatingActionButton>(R.id.fab_send)
+        horizontal_rv = findViewById(R.id.horizontal_rv)
+        fab_send = findViewById(R.id.fab_send)
 
-        currentProduct_btn = findViewById<Button>(R.id.currentProduct_btn)
-        otherProduct_btn = findViewById<Button>(R.id.otherProduct_btn)
+        currentProduct_btn = findViewById(R.id.currentProduct_btn)
+        otherProduct_btn = findViewById(R.id.otherProduct_btn)
 
          fabLike    = findViewById<View>(R.id.fabLike) as FloatingActionButton
          fabComment = findViewById<View>(R.id.fabComment) as FloatingActionButton
@@ -155,7 +155,6 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
             //  val file = File(webUrlPath)
 
             db?.insertFileID(model!!.fileId,startDateTime)
-
 
             eDetailingId= model?.geteDetailingId()!!
 
@@ -233,10 +232,10 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
                 }
             })
 
+
             otherProduct_btn?.setOnClickListener({
                 if(isCurrent)
                 {
-
                     edetailingList = getAllEdetailingProduct()
 
                     otherProduct_btn?.setBackgroundColor(ContextCompat.getColor(this,R.color.appColor))

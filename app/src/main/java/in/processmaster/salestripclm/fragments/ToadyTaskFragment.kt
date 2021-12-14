@@ -50,7 +50,6 @@ class ToadyTaskFragment : Fragment() {
 
     fun deleteAlert(subtitle: String, buttonText: String, mainHeading: String, context: Activity)
     {
-
         val dialogBuilder = AlertDialog.Builder(context)
         val inflater = context.layoutInflater
         val dialogView: View = inflater.inflate(R.layout.exitalert, null)

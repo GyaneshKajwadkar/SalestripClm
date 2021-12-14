@@ -13,24 +13,26 @@ import `in`.processmaster.salestripclm.models.GenerateOTPModel
 import `in`.processmaster.salestripclm.networkUtils.APIClient
 import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import com.google.android.material.button.MaterialButton
+import kotlinx.android.synthetic.main.activity_forgot.*
+import kotlinx.android.synthetic.main.progress_view.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class ForgotActivity : BaseActivity() {
 
-    var signIn_tv: TextView?= null
-    var companyCode_et: EditText?=null
-    var userName_et: EditText?=null
-    var password_et: EditText?=null
-    var conPass_et: EditText?=null
-    var newPassParent_ll: LinearLayout?=null
-    var forgotParent_ll: LinearLayout?=null
-    var sendOtp_btn: MaterialButton?=null
+  //  var signIn_tv: TextView?= null
+  //  var companyCode_et: EditText?=null
+  //  var userName_et: EditText?=null
+  //  var password_et: EditText?=null
+  //  var conPass_et: EditText?=null
+  //  var newPassParent_ll: LinearLayout?=null
+  //  var forgotParent_ll: LinearLayout?=null
+  //  var sendOtp_btn: MaterialButton?=null
     var apiInterface: APIInterface? = null
     var generateModel: GenerateOTPModel?=null
-    var progressView_parentRv: RelativeLayout?=null
-    var progressMessage_tv:TextView? =null
+  //  var progressView_parentRv: RelativeLayout?=null
+  //  var progressMessage_tv:TextView? =null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         getSupportActionBar()?.hide()   //Hiding Toolbar
@@ -42,16 +44,16 @@ class ForgotActivity : BaseActivity() {
 
     fun initView()
     {
-        signIn_tv=findViewById(R.id.signIn_tv)as TextView
-        companyCode_et=findViewById(R.id.companyCode_et) as EditText
-        userName_et=findViewById(R.id.userName_et) as EditText
-        conPass_et=findViewById(R.id.conPass_et) as EditText
-        password_et=findViewById(R.id.password_et) as EditText
-        sendOtp_btn=findViewById(R.id.sendOtp_btn) as MaterialButton
-        forgotParent_ll=findViewById(R.id.forgotParent_ll) as LinearLayout
-        newPassParent_ll=findViewById(R.id.newPassParent_ll) as LinearLayout
-        progressView_parentRv=findViewById(R.id.progressView_parentRv) as RelativeLayout
-        progressMessage_tv=findViewById(R.id.progressMessage_tv) as TextView
+       // signIn_tv=findViewById(R.id.signIn_tv)as TextView
+       // companyCode_et=findViewById(R.id.companyCode_et) as EditText
+       // userName_et=findViewById(R.id.userName_et) as EditText
+       // conPass_et=findViewById(R.id.conPass_et) as EditText
+       // password_et=findViewById(R.id.password_et) as EditText
+       // sendOtp_btn=findViewById(R.id.sendOtp_btn) as MaterialButton
+       // forgotParent_ll=findViewById(R.id.forgotParent_ll) as LinearLayout
+       // newPassParent_ll=findViewById(R.id.newPassParent_ll) as LinearLayout
+       // progressView_parentRv=findViewById(R.id.progressView_parentRv) as RelativeLayout
+       // progressMessage_tv=findViewById(R.id.progressMessage_tv) as TextView
 
         signIn_tv!!.setOnClickListener{
             onBackPressed()
@@ -164,7 +166,7 @@ class ForgotActivity : BaseActivity() {
         enableProgress(progressView_parentRv!!)
 
         var call: Call<GenerateOTPModel> = apiInterface?.generateOtpApi(
-                companyCode_et?.getText().toString().toUpperCase(), userName_et?.getText().toString() , "user"
+                companyCode_et?.getText().toString().uppercase(), userName_et?.getText().toString() , "user"
         ) as Call<GenerateOTPModel>
         call.enqueue(object : Callback<GenerateOTPModel?> {
             override fun onResponse(call: Call<GenerateOTPModel?>?, response: Response<GenerateOTPModel?>) {
@@ -216,7 +218,7 @@ class ForgotActivity : BaseActivity() {
         enableProgress(progressBar!!)
 
         var call: Call<GenerateOTPModel> = apiInterface?.verifyOtpAPI(
-                companyCode_et?.getText().toString().toUpperCase(), empId , otpString
+                companyCode_et?.getText().toString().uppercase(), empId , otpString
         ) as Call<GenerateOTPModel>
         call.enqueue(object : Callback<GenerateOTPModel?> {
             override fun onResponse(call: Call<GenerateOTPModel?>?, response: Response<GenerateOTPModel?>) {
@@ -261,7 +263,7 @@ class ForgotActivity : BaseActivity() {
         enableProgress(progressView_parentRv!!)
 
         var call: Call<GenerateOTPModel> = apiInterface?.changePassAPI(
-                companyCode_et?.getText().toString().toUpperCase(), generateModel?.data?.userData?.empId.toString() , conPass_et?.getText().toString()
+                companyCode_et?.getText().toString().uppercase(), generateModel?.data?.userData?.empId.toString() , conPass_et?.getText().toString()
         ) as Call<GenerateOTPModel>
         call.enqueue(object : Callback<GenerateOTPModel?> {
             override fun onResponse(call: Call<GenerateOTPModel?>?, response: Response<GenerateOTPModel?>) {
@@ -269,8 +271,6 @@ class ForgotActivity : BaseActivity() {
                 if (response.code() == 200 && !response.body().toString().isEmpty())
                 {
                     var generateModel = response.body()
-
-
 
                     if(generateModel?.data?.message.isNullOrEmpty())
                     {
@@ -282,7 +282,6 @@ class ForgotActivity : BaseActivity() {
                         Toast.makeText(this@ForgotActivity,generateModel?.data?.message,Toast.LENGTH_LONG).show()
                         onBackPressed()
                         finish()
-
                     }
                 }
 

@@ -190,8 +190,6 @@ class ImageSelectorActivity : BaseActivity() {
 
     }
 
-
-
     //Model class for sending image
     class SendImage :Serializable
     {
@@ -226,7 +224,7 @@ class ImageSelectorActivity : BaseActivity() {
         dialogBuilder.setView(dialogView)
 
         val alertDialog: AlertDialog = dialogBuilder.create()
-        alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+        alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         val mainHeading_tv = dialogView.findViewById<View>(R.id.mainHeading_tv) as TextView
         val message_tv = dialogView.findViewById<View>(R.id.message_tv) as TextView

@@ -100,7 +100,7 @@ class HomeTaskAdapter(var context: FragmentActivity,var tasktype: Int) : Recycle
         dialogBuilder.setView(dialogView)
 
         val alertDialog: AlertDialog = dialogBuilder.create()
-        alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+        alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
 
         val exit_btn = dialogView.findViewById<View>(R.id.exit_btn) as MaterialButton

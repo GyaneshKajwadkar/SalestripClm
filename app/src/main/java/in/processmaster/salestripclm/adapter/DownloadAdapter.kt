@@ -400,12 +400,10 @@ class DownloadAdapter constructor() :
 
                     var downloadedModel=db.getSingleDownloadedData(zipmodel.fileId!!)
                     deleteAvailableFiles(downloadedModel.favFilePath)
-
                 }
                 else
                 {
                     favAlertHTML(videoView,zipmodel,db)
-
                 }
                 checkIsItemIsFav(db)
             })

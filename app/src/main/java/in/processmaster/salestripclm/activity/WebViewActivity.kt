@@ -83,18 +83,14 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
     var thread: Thread?= null
     var productParent_ll: LinearLayout?=null
 
-
     companion object {
         var modelweb : DownloadFileModel?= null
     }
-
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_web_view)
-
 
         //WebView initialization
         webview = findViewById<WebView>(R.id.webview)
@@ -131,9 +127,6 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
         webview.getSettings().setAllowFileAccess(true)
         webview.settings.setLoadWithOverviewMode(true)
 
-
-
-
         webview.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
                 view.loadUrl(url)
@@ -147,7 +140,6 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
                 //Your code to do
                 Log.e("webViewError", error.toString())
             }
-
         }
 
 
@@ -180,8 +172,6 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
                 intent.putExtra("filePath",getFilesDir()?.getAbsolutePath() + "/Screenshots/")
                 intent.putExtra("selection","send")
                 startActivity(intent)
-
-
             })
 
             fab_sc?.setOnClickListener({

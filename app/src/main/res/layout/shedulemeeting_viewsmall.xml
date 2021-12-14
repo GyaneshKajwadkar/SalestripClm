@@ -138,6 +138,7 @@
                         android:orientation="horizontal">
 
                         <Button
+                            android:id="@+id/cancelMeeting_btn"
                             android:textAllCaps="false"
                             android:layout_gravity="right"
                             android:backgroundTint="@color/appColor"
@@ -149,6 +150,7 @@
                             android:layout_weight="1"
                             android:layout_height="wrap_content"/>
                         <Button
+                            android:id="@+id/updateMeeting_btn"
                             android:textAllCaps="false"
                             android:layout_weight="1"
                             android:layout_gravity="right"

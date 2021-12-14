@@ -3,8 +3,9 @@ package `in`.processmaster.salestripclm.models
 import com.google.gson.annotations.Expose
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
-class GetScheduleModel {
+class GetScheduleModel :Serializable {
 
     @SerializedName("responseCode")
     @Expose
@@ -42,7 +43,7 @@ class GetScheduleModel {
         this.data = data
     }
 
-    class ErrorObj {
+    class ErrorObj :Serializable {
         @SerializedName("errorMessage")
         @Expose
         var errorMessage: String? = null
@@ -51,12 +52,12 @@ class GetScheduleModel {
         @Expose
         var fldErrors: Any? = null
     }
-    class Data {
+    class Data :Serializable {
         @SerializedName("meetingList")
         @Expose
         var meetingList: List<Meeting>? = null
 
-        class Meeting {
+        class Meeting :Serializable{
             @SerializedName("meetingId")
             @Expose
             var meetingId: Int? = null
@@ -169,7 +170,7 @@ class GetScheduleModel {
             @Expose
             var employeeList: List<Employee>? = null
 
-            class Employee {
+            class Employee :Serializable {
                 @SerializedName("meetingId")
                 @Expose
                 var meetingId: Int? = null
@@ -190,7 +191,7 @@ class GetScheduleModel {
                 @Expose
                 var name: String? = null
             }
-            class Doctor {
+            class Doctor :Serializable {
                 @SerializedName("meetingId")
                 @Expose
                 var meetingId: Int? = null

@@ -4,7 +4,9 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout-sw600dp-land/activity_display_visual.xml" value="0.33" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout-sw600dp-land/activity_downloaded_activtiy.xml" value="0.22" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout-sw600dp-land/activity_edetailing_.xml" value="0.25" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout-sw600dp-land/activity_forgot.xml" value="0.11311914323962517" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout-sw600dp-land/activity_home_page.xml" value="0.11613119143239625" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout-sw600dp-land/activity_image_selecror.xml" value="0.10546875" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout-sw600dp-land/activity_rawdata.xml" value="0.33" />
@@ -42,6 +44,7 @@
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/fragment_schedule_new_metting_frag.xml" value="0.13179347826086957" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/fragment_scheduled_metting_frag.xml" value="0.16979166666666667" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/fragment_show_downloaded.xml" value="0.16666666666666666" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/fragment_toady_task.xml" value="0.13489583333333333" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/imageselector.xml" value="0.14945652173913043" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/itemexp.xml" value="0.14945652173913043" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/join_activity_view.xml" value="0.11666666666666667" />
@@ -53,6 +56,7 @@
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/selectorlayout.xml" value="0.13949275362318841" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/shedulemeeting_view.xml" value="0.25" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/shedulemeeting_viewsmall.xml" value="0.25" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/taskalert.xml" value="0.13489583333333333" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/taskview.xml" value="0.14945652173913043" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/Salestrip/app/src/main/res/layout/update_app_dialog.xml" value="0.13949275362318841" />
       </map>

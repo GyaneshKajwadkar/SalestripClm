@@ -340,9 +340,6 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
         paramObject.put("mailDetailList", arr)
         paramObject.put("attachmentList", arrAttachment)
 
-
-        Log.e("sdgufg",paramObject.toString())
-
         var reqBody = RequestBody.create(MediaType.parse("text/plain"), paramObject.toString());
 
         var call: Call<GenerateOTPModel> = getSecondaryApiInterface().sendEmail(
@@ -371,8 +368,6 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
                 }
                 else
                 {
-                    Log.e("yupId",response.body().toString())
-
                     Toast.makeText(this@MailActivity, "Server error ", Toast.LENGTH_SHORT).show()
                 }
                 disableProgress(progressView_parentRv!!)

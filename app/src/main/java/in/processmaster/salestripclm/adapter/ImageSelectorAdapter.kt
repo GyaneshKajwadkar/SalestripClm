@@ -33,7 +33,6 @@ class ImageSelectorAdapter constructor() :
     {
         var imageSelectionImg=view.findViewById<ImageView>(R.id.imageSelectionImg)
         var parentImage_rl=view.findViewById<RelativeLayout>(R.id.parentImage_rl)
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder

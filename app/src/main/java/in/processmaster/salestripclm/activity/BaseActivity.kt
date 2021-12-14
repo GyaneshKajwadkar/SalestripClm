@@ -10,6 +10,7 @@ import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.models.TeamsModel
 import `in`.processmaster.salestripclm.models.ZoomCredientialModel
 import `in`.processmaster.salestripclm.networkUtils.APIClient
+import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
@@ -44,6 +45,8 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import kotlinx.android.synthetic.main.progress_view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -509,6 +512,34 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
         return getResponseList
     }
 
+    suspend fun getSheduleMeetingAPI()
+    {
+        val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
+        ).getScheduledMeetingCoo("bearer " + loginModelBase?.accessToken,loginModelBase.empId.toString())
+        withContext(Dispatchers.Main) {
+            Log.e("getScheduleAPI",response.toString())
+            if (response!!.isSuccessful)
+            {
+                if (response.code() == 200 && !response.body().toString().isEmpty()) {
+                    val gson = Gson()
+                    var model = response.body()
+                    dbBase?.insertOrUpdateAPI("1",gson.toJson(model))
+             Log.e("theScheduledApiModel",model?.getData()?.meetingList?.size.toString())
+
+                }
+                else
+                {
+                    Log.e("elseGetScheduled", response.code().toString())
+                }
+            }
+            else
+            {   Log.e("scheduleERROR", response.errorBody().toString())
+            }
+        }
+
+    }
+
+
      fun getsheduledMeeting_api(): String? {
 
         progressMessage_tv?.setText("Please wait")
@@ -539,6 +570,32 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
 
         return dbBase.getApiDetail(1)
     }
+
+    suspend fun getCredientailAPI(context: Activity)
+    {
+        val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
+        ).getZoomCredientailCoo("bearer " + loginModelBase?.accessToken,loginModelBase.empId.toString())
+        withContext(Dispatchers.Main) {
+            Log.e("getScheduleAPI",response.toString())
+            if (response!!.isSuccessful)
+            {
+                if (response.code() == 200 && !response.body().toString().isEmpty())
+                {
+                    var model = response.body()
+                    ZoomInitilizeClass().initilizeZoom(context as Activity,model)
+                }
+                else
+                {
+                    Log.e("elseGetCrediential", response.code().toString())
+                }
+            }
+            else
+            {
+                Log.e("scheduleERROR", response.errorBody().toString())
+            }
+        }
+    }
+
 
      fun getCredientail_api(context: Activity) {
 

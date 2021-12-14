@@ -11,7 +11,6 @@ import kotlin.collections.ArrayList
 import retrofit2.http.POST
 import retrofit2.Response
 
-
 interface APIInterface
 {
     //in.processmaster.salestripclm
@@ -33,6 +32,22 @@ interface APIInterface
         @Field("username") username: String?,
         @Field("password") password: String?
     ): Call<LoginModel?>?
+
+
+    @FormUrlEncoded
+    @POST("token")
+    suspend  fun  // login api
+            loginAPICoo(
+        @Field("grant_type") grant_type: String?,
+        @Field("username") username: String?,
+        @Field("password") password: String?
+    ): Response<LoginModel?>?
+
+    @GET("api/common/syncData")
+    suspend fun  //sync api
+            syncApiCoo(@Header("Authorization") authorization: String?): Response<SyncModel?>?
+
+
 
     @GET("api/common/syncData")
     fun  //sync api
@@ -72,6 +87,12 @@ interface APIInterface
         @Path("divisionId") divisionId: String?
     ): Call<DevisionModel?>?
 
+    @GET("api/e-detailing/publish/{divisionId}")
+    suspend fun detailingApiCoo(
+        @Header("Authorization") authorization: String?,
+        @Path("divisionId") divisionId: String?
+    ): Response<DevisionModel?>?
+
     @GET("api/e-detailing/documents/{eDetailId}")
     fun  //download file api
             downloadUrl(
@@ -103,6 +124,14 @@ interface APIInterface
         @Path("empId") empId: String?
     ): Call<TeamsModel?>?
 
+    @GET("api/users/allLevelHierarchyEmp/{empId}")
+    suspend fun  //get teams members
+            getTeamsMemberCoo(
+        @Header("Authorization") authorization: String?,
+        @Path("empId") empId: String?
+    ): Response<TeamsModel?>?
+
+
     @GET("api/users/{empId}")
     fun getProfileData(
         @Header("Authorization") authorization: String?,
@@ -116,8 +145,7 @@ interface APIInterface
     @POST("api/users/documents")
     fun changeProflePic(@Header("Authorization") authorization: String?,
                         @Part filePart: MultipartBody.Part?, @Part("model") model: RequestBody
-    ):
-            Call<GenerateOTPModel?>?
+    ): Call<GenerateOTPModel?>?
 
     @Multipart
     @POST("api/mailBox/mailWithAttachment")
@@ -127,7 +155,11 @@ interface APIInterface
 
 
     @POST("api/zoomMeeting/schedule")
-    fun setScheduleMeetingApi(@Header("Authorization") authorization: String?, @Body params: RequestBody ):Call<GenerateOTPModel?>?
+    suspend fun setScheduleMeetingApi(@Header("Authorization") authorization: String?, @Body params: RequestBody):Response<GenerateOTPModel?>?
+
+    @POST("api/zoomMeeting/schedule")
+    fun setScheduleFirstApi(@Header("Authorization") authorization: String?, @Body params: RequestBody):Call<GenerateOTPModel?>?
+
 
     @GET("api/zoomMeeting/employeewise/{empId}")
     fun getScheduledMeeting(
@@ -135,10 +167,23 @@ interface APIInterface
         @Path("empId") empId: String?
     ): Call<GetScheduleModel?>?
 
+    @GET("api/zoomMeeting/employeewise/{empId}")
+    suspend fun getScheduledMeetingCoo(
+        @Header("Authorization") authorization: String?,
+        @Path("empId") empId: String?
+    ): Response<GetScheduleModel?>?
+
     @GET("api/zoomMeeting/credentials/{empId}")
     fun getZoomCredientail(
         @Header("Authorization") authorization: String?,
         @Path("empId") empId: String?
     ): Call<ZoomCredientialModel?>?
+
+    @GET("api/zoomMeeting/credentials/{empId}")
+    suspend fun getZoomCredientailCoo(
+        @Header("Authorization") authorization: String?,
+        @Path("empId") empId: String?
+    ): Response<ZoomCredientialModel?>?
+
 
 }
