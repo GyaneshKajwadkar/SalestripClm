@@ -2,6 +2,7 @@ package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.BuildConfig
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.models.GenerateOTPModel
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.models.ProfileModel
@@ -407,7 +408,7 @@ class ProfileeActivity : BaseActivity() {
 
                     return@setOnClickListener
                 }
-                HideKeyboard(it)
+                GeneralClass(this).HideKeyboard(it)
                 changePasswordApi(currentpassword_et,newpassword_et,alertDialog,progressViewDilog)
 
             }

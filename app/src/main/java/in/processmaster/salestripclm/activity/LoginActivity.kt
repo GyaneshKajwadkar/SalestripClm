@@ -2,6 +2,9 @@
 package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.common_classes.AlertClass
+import `in`.processmaster.salestripclm.common_classes.GeneralClass
+import `in`.processmaster.salestripclm.common_classes.ProgressClass
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.networkUtils.APIClient.getClient
 import `in`.processmaster.salestripclm.networkUtils.APIClientKot
@@ -41,20 +44,11 @@ import java.io.*
 
 class LoginActivity : BaseActivity() {
 
- //  var mpin_tv:TextView? =null
- //  var progressMessage_tv:TextView? =null
- //  var forgotPass_tv:TextView? = null
- //  var password_et:EditText?=null
- //  var userName_et:EditText?=null
- //  var companyCode_et:EditText?=null
- //  var signIn_btn: MaterialButton?=null
- //  var verifyCompany_btn: MaterialButton?=null
- //  var companyVerfy_ll: LinearLayout?=null
- //  var progressView_parentRv: RelativeLayout?=null
- //  var login_ll: LinearLayout?=null
-
     var apiInterface: APIInterface? = null
     var sharePreferance: PreferenceClass?= null
+    val alertClass= AlertClass(this)
+    val generalClass= GeneralClass(this)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         getSupportActionBar()?.hide()   //Hiding Toolbar
@@ -67,17 +61,6 @@ class LoginActivity : BaseActivity() {
     // initilizeVariables and click
     fun initView()
     {
-      //  mpin_tv=findViewById(R.id.mpin_tv) as TextView
-      //  forgotPass_tv=findViewById(R.id.forgotPass_tv) as TextView
-      //  password_et=findViewById(R.id.password_et) as EditText
-      //  userName_et=findViewById(R.id.userName_et) as EditText
-      //  signIn_btn=findViewById(R.id.signIn_btn) as MaterialButton
-      //  companyCode_et=findViewById(R.id.companyCode_et) as EditText
-      //  verifyCompany_btn=findViewById(R.id.verifyCompany_btn) as MaterialButton
-      //  companyVerfy_ll=findViewById(R.id.companyVerfy_ll) as LinearLayout
-      //  login_ll=findViewById(R.id.login_ll) as LinearLayout
-      //  progressView_parentRv=findViewById(R.id.progressView_parentRv) as RelativeLayout
-      //  progressMessage_tv=findViewById(R.id.progressMessage_tv) as TextView
 
         sharePreferance = PreferenceClass(this)
 
@@ -102,14 +85,16 @@ class LoginActivity : BaseActivity() {
             userName_et?.setText(sharePreferance?.getPref("userName_login"))
         }
 
-       userName_et?.setText("shubham")
-       password_et?.setText("jack@321")
+        userName_et?.setText("shubham")
+        // userName_et?.setText("Uatbe")
+        password_et?.setText("jack@321")
+        // password_et?.setText("jack@321")
 
         //forgot click
         forgotPass_tv!!.setOnClickListener {
             val intent = Intent(
-                    this,
-                    ForgotActivity::class.java
+                this,
+                ForgotActivity::class.java
             )
             startActivity(intent)
         }
@@ -130,13 +115,13 @@ class LoginActivity : BaseActivity() {
                 return@setOnClickListener
             }
 
-            if(isInternetAvailable(this)==true)
+            if(generalClass.isInternetAvailable())
             {
                 login_api()
             }
             else
             {
-                networkAlert(this)
+                alertClass.networkAlert()
             }
         }
 
@@ -160,13 +145,13 @@ class LoginActivity : BaseActivity() {
                 // TODO: handle exception
             }
 
-            if(isInternetAvailable(this)==true)
+            if(generalClass.isInternetAvailable())
             {
                 checkCC_api()
             }
             else
             {
-                networkAlert(this)
+                alertClass.networkAlert()
             }
         }
 
@@ -183,65 +168,13 @@ class LoginActivity : BaseActivity() {
     //Login APi
     private fun login_api()
     {
-        progressMessage_tv?.setText("Verify User")
-        enableProgress(progressView_parentRv!!)
+        alertClass.showAlert("Verify User")
+
         apiInterface= getClient(2, sharePreferance?.getPref("secondaryUrl")).create(APIInterface::class.java)
 
-
-        /* CoroutineScope(Dispatchers.IO ).launch {
-           Log.e("sgfuisfs","beforeeeee")
-
-           val ans= async {   val response = APIClientKot().getUsersService(2,
-               sharePreferance?.getPref("secondaryUrl")!!
-           ).loginAPICoo(
-               "password", userName_et?.getText().toString() + "," +
-                       sharePreferance?.getPref("companyCode"), password_et?.getText().toString())
-               withContext(Dispatchers.Main) {
-                   if (response!!.isSuccessful)
-                   {
-                       Log.e("sgfuisfs","inAPIIIIIII")
-                       //syncom formulations
-                       //dhenu buildcon intra ltd
-
-                       if(response!!.code()==200)
-                       {
-                           var loginModel = response.body()
-                           // saveLoginData(loginModel)
-
-                           sharePreferance?.setPref("userName_login", userName_et?.getText().toString())
-                           sharePreferance?.setPrefBool("isLogin", true)
-                           sharePreferance?.setPref(
-                               "userNameLogin", userName_et?.getText().toString() + "," +
-                                       sharePreferance?.getPref("companyCode")
-                           )
-                           sharePreferance?.setPref("password", password_et?.getText().toString())
-                           val gson = Gson()
-                           sharePreferance?.setPref("profileData", gson.toJson(loginModel))
-                           callHomePage()
-                       }
-                       else
-                       {
-                           commonAlert(this@LoginActivity, "", "Incorrect username or password")
-
-                       }
-                       Log.e("dfdsfdsfdsfsdf",response.body()?.accessToken.toString())
-                       disableProgress(progressView_parentRv!!)
-                   }
-                   else
-                   {
-                       print("fsfError : ${response.message()} ")
-                       checkInternet()
-                       disableProgress(progressView_parentRv!!)
-                   }
-               } }
-            ans.await()
-            Log.e("sgfuisfs","hellow")
-        }*/
-
-
         var call: Call<LoginModel> = apiInterface?.loginAPI(
-                "password", userName_et?.getText().toString() + "," +
-                sharePreferance?.getPref("companyCode").toString(), password_et?.getText().toString()
+            "password", userName_et?.getText().toString() + "," +
+                    sharePreferance?.getPref("companyCode").toString(), password_et?.getText().toString()
         ) as Call<LoginModel>
         call.enqueue(object : Callback<LoginModel?> {
             override fun onResponse(call: Call<LoginModel?>?, response: Response<LoginModel?>) {
@@ -249,13 +182,13 @@ class LoginActivity : BaseActivity() {
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
 
                     var loginModel = response.body()
-                   // saveLoginData(loginModel)
+                    // saveLoginData(loginModel)
 
                     sharePreferance?.setPref("userName_login", userName_et?.getText().toString())
                     sharePreferance?.setPrefBool("isLogin", true)
                     sharePreferance?.setPref(
-                            "userNameLogin", userName_et?.getText().toString() + "," +
-                            sharePreferance?.getPref("companyCode")
+                        "userNameLogin", userName_et?.getText().toString() + "," +
+                                sharePreferance?.getPref("companyCode")
                     )
                     sharePreferance?.setPref("password", password_et?.getText().toString())
                     val gson = Gson()
@@ -263,15 +196,15 @@ class LoginActivity : BaseActivity() {
                     callHomePage()
                 }
                 else {
-                    commonAlert(this@LoginActivity, "", "Incorrect username or password")
+                    alertClass.commonAlert("","Incorrect username or password")
                 }
-                disableProgress(progressView_parentRv!!)
+                alertClass.hideAlert()
             }
 
             override fun onFailure(call: Call<LoginModel?>, t: Throwable?) {
-                checkInternet()
+                generalClass.checkInternet()
                 call.cancel()
-                disableProgress(progressView_parentRv!!)
+                alertClass.hideAlert()
             }
         })
     }
@@ -286,11 +219,10 @@ class LoginActivity : BaseActivity() {
     //CheckCompanyCode Api
     fun  checkCC_api()
     {
-        progressMessage_tv?.setText("Verify Company code")
-        enableProgress(progressView_parentRv!!)
+        alertClass.showAlert("Verify Company code")
 
         var call: Call<String> = apiInterface?.checkCompanyCode(
-                companyCode_et?.getText().toString().uppercase()
+            companyCode_et?.getText().toString().uppercase()
         ) as Call<String>
         call.enqueue(object : Callback<String?> {
             override fun onResponse(call: Call<String?>?, response: Response<String?>) {
@@ -301,21 +233,20 @@ class LoginActivity : BaseActivity() {
                 } else {
                     //check and save company code in sp
                     sharePreferance?.setPref("secondaryUrl", response.body().toString())
-                  //  sharePreferance?.setPref("secondaryUrl", "https://app.salestrip.in/")
+                    //  sharePreferance?.setPref("secondaryUrl", "https://app.salestrip.in/")
                     sharePreferance?.setPref(
-                            "companyCode",
-                            companyCode_et?.getText().toString().uppercase()
+                        "companyCode",
+                        companyCode_et?.getText().toString().uppercase()
                     )
                     checkVersioin_api(companyCode_et?.getText().toString().uppercase())
                 }
-
-                disableProgress(progressView_parentRv!!)
+                alertClass.hideAlert()
             }
 
             override fun onFailure(call: Call<String?>, t: Throwable?) {
-                checkInternet()
+                generalClass.checkInternet()
                 call.cancel()
-                disableProgress(progressView_parentRv!!)
+                alertClass.hideAlert()
             }
         })
     }
@@ -323,10 +254,10 @@ class LoginActivity : BaseActivity() {
     //check Version API
     fun  checkVersioin_api(companyCode: String)
     {
-        enableProgress(progressView_parentRv!!)
+        alertClass.showAlert("")
 
         var call: Call<String> = apiInterface?.checkVersion(
-              /*  companyCode*/
+            /*  companyCode*/
         ) as Call<String>
         call.enqueue(object : Callback<String?> {
             override fun onResponse(call: Call<String?>?, response: Response<String?>) {
@@ -342,20 +273,20 @@ class LoginActivity : BaseActivity() {
 
                     try {
                         val pInfo: PackageInfo =
-                                getPackageManager().getPackageInfo(getPackageName(), 0)
+                            getPackageManager().getPackageInfo(getPackageName(), 0)
                         var version = pInfo.versionName.replace(".","").toInt()
-                      //  version = "2.1.30"
+                        //  version = "2.1.30"
 
-                     //   var updateLower: Boolean = checkForUpdateLower(version, namesList.get(0))
-                     //   var updateHigher: Boolean = checkForUpdateHigher(version, namesList.get(1))
+                        //   var updateLower: Boolean = checkForUpdateLower(version, namesList.get(0))
+                        //   var updateHigher: Boolean = checkForUpdateHigher(version, namesList.get(1))
 
-                     //   Log.e("versionCodeiS", version)
-                     //   Log.e("response", response.body().toString())
-                     //   Log.e("updateLower", updateLower.toString())
-                     //   Log.e("updateHigher", updateHigher.toString())
+                        //   Log.e("versionCodeiS", version)
+                        //   Log.e("response", response.body().toString())
+                        //   Log.e("updateLower", updateLower.toString())
+                        //   Log.e("updateHigher", updateHigher.toString())
 
-                       val verionLower = namesList.get(0).replace(".","").toInt()
-                       val versionHigher = namesList.get(1).replace(".","").toInt()
+                        val verionLower = namesList.get(0).replace(".","").toInt()
+                        val versionHigher = namesList.get(1).replace(".","").toInt()
 
                         Log.e("replacedString",verionLower.toString())
                         Log.e("replacedHString",versionHigher.toString())
@@ -369,40 +300,39 @@ class LoginActivity : BaseActivity() {
 
 
 
-                      /*  if (updateLower) {
-                            try {
-                                startActivity(
-                                        Intent(
-                                                Intent.ACTION_VIEW,
-                                                Uri.parse("market://details?id=$packageName")
-                                        )
-                                )
-                            } catch (e: ActivityNotFoundException) {
-                                startActivity(
-                                        Intent(
-                                                Intent.ACTION_VIEW,
-                                                Uri.parse("https://play.google.com/store/apps/details?id=$packageName")
-                                        )
-                                )
-                            }
-                        }*/
+                        /*  if (updateLower) {
+                              try {
+                                  startActivity(
+                                          Intent(
+                                                  Intent.ACTION_VIEW,
+                                                  Uri.parse("market://details?id=$packageName")
+                                          )
+                                  )
+                              } catch (e: ActivityNotFoundException) {
+                                  startActivity(
+                                          Intent(
+                                                  Intent.ACTION_VIEW,
+                                                  Uri.parse("https://play.google.com/store/apps/details?id=$packageName")
+                                          )
+                                  )
+                              }
+                          }*/
                     } catch (e: PackageManager.NameNotFoundException) {
                         e.printStackTrace()
                     }
                 }
-
-                disableProgress(progressView_parentRv!!)
+                alertClass.hideAlert()
             }
 
             override fun onFailure(call: Call<String?>, t: Throwable?) {
-                checkInternet()
+                generalClass.checkInternet()
                 call.cancel()
-                disableProgress(progressView_parentRv!!)
+                alertClass.hideAlert()
             }
         })
     }
 
-    public fun needUpdateAlert()
+    fun needUpdateAlert()
     {
         val dialogBuilder = AlertDialog.Builder(this)
         val inflater = this.layoutInflater
@@ -422,9 +352,9 @@ class LoginActivity : BaseActivity() {
         okBtn_rl.setOnClickListener {
 
             try {
-                   startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")))
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")))
             } catch (e: ActivityNotFoundException) {
-                   startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$packageName")))
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$packageName")))
             }
             alertDialog.dismiss()
         }
@@ -458,126 +388,113 @@ class LoginActivity : BaseActivity() {
         alertDialog.show()
     }
 
-    //checkInternet connection
-    fun checkInternet()
-    {
-        if(isInternetAvailable(this)==true)
-        {
-            commonAlert(this, "Error", "Something went wrong please try again later")
-        }
-        else
-        {
-            networkAlert(this)
-        }
-    }
-
-    fun saveLoginData(loginModel: LoginModel?)
-    {
-        //check is image name is empty or not
-        if(!loginModel?.imageName?.isEmpty()!!)
-        {
-            //save user data to shareprefrance
-            val gson = Gson()
-            sharePreferance?.setPref("profileData", gson.toJson(loginModel))
-            //save profile image to local storage
-            saveImageTofolder(loginModel.imageName, "profilePic")
-           // loginModel?.imageName?.let { saveImageTofolder(it, "profilePic") }
-        }
-        else
-        {
-            val gson = Gson()
-            sharePreferance?.setPref("profileData", gson.toJson(loginModel))
-            callHomePage()
-        }
-    }
+    /*   fun saveLoginData(loginModel: LoginModel?)
+       {
+           //check is image name is empty or not
+           if(!loginModel?.imageName?.isEmpty()!!)
+           {
+               //save user data to shareprefrance
+               val gson = Gson()
+               sharePreferance?.setPref("profileData", gson.toJson(loginModel))
+               //save profile image to local storage
+               saveImageTofolder(loginModel.imageName, "profilePic")
+              // loginModel?.imageName?.let { saveImageTofolder(it, "profilePic") }
+           }
+           else
+           {
+               val gson = Gson()
+               sharePreferance?.setPref("profileData", gson.toJson(loginModel))
+               callHomePage()
+           }
+       }*/
 
 
- /* //download profile pic from url and save to local storage
-    fun saveImageTofolder(uRl: String, picName: String)
-    {
+    /* //download profile pic from url and save to local storage
+       fun saveImageTofolder(uRl: String, picName: String)
+       {
 
-        Log.e("uRlyes", uRl)
+           Log.e("uRlyes", uRl)
 
-            Picasso.get().load(uRl).
-            into(object : com.squareup.picasso.Target {
-                override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                    Log.e("exception", e.toString())
-                    disableProgress(progressBar!!)
-                }
+               Picasso.get().load(uRl).
+               into(object : com.squareup.picasso.Target {
+                   override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+                       Log.e("exception", e.toString())
+                       disableProgress(progressBar!!)
+                   }
 
-                override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                   override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
 
-                    val file: File =
-                            File(getFilesDir()?.getAbsolutePath() + "/" + picName + ".jpg")
-                    if (file.exists()) {
-                        file.delete()
-                    }
-                    file.createNewFile()
-                    val bitmap12 = bitmap
-                    try {
-                        val out = FileOutputStream(file)
-                        bitmap12?.compress(Bitmap.CompressFormat.JPEG, 100, out)
-                        out.flush()
-                        out.close()
+                       val file: File =
+                               File(getFilesDir()?.getAbsolutePath() + "/" + picName + ".jpg")
+                       if (file.exists()) {
+                           file.delete()
+                       }
+                       file.createNewFile()
+                       val bitmap12 = bitmap
+                       try {
+                           val out = FileOutputStream(file)
+                           bitmap12?.compress(Bitmap.CompressFormat.JPEG, 100, out)
+                           out.flush()
+                           out.close()
 
-                        Log.e("uuyes", "gsefgwesf")
+                           Log.e("uuyes", "gsefgwesf")
 
-                        sharePreferance?.setPref(picName, file.absolutePath)
-                        callHomePage()
-                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                           sharePreferance?.setPref(picName, file.absolutePath)
+                           callHomePage()
+                           getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
-                    } catch (e: java.lang.Exception) {
-                        Log.e("exceptionProfileSave", e.message.toString())
-                        e.printStackTrace()
-                        disableProgress(progressBar!!)
-                    }
-                }
+                       } catch (e: java.lang.Exception) {
+                           Log.e("exceptionProfileSave", e.message.toString())
+                           e.printStackTrace()
+                           disableProgress(progressBar!!)
+                       }
+                   }
 
-                override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-                    Log.e("placeHolderDrawable", "placeHolderDrawable")
-                }
+                   override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
+                       Log.e("placeHolderDrawable", "placeHolderDrawable")
+                   }
 
-            })
- }*/
+               })
+    }*/
 
-    fun saveImageTofolder(uRl: String, picName: String)
-    {
-        Glide.with(this)
-                .asBitmap()
-                .load(uRl)
-                .into(object : CustomTarget<Bitmap>(){
-                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                        val file: File =
-                                File(getFilesDir()?.getAbsolutePath() + "/" + picName + ".jpg")
-                        if (file.exists()) {
-                            file.delete()
-                        }
-                        file.createNewFile()
-                        val bitmap12 = resource
-                        try {
-                            val out = FileOutputStream(file)
-                            bitmap12?.compress(Bitmap.CompressFormat.JPEG, 100, out)
-                            out.flush()
-                            out.close()
+    /*  fun saveImageTofolder(uRl: String, picName: String)
+      {
+          Glide.with(this)
+                  .asBitmap()
+                  .load(uRl)
+                  .into(object : CustomTarget<Bitmap>(){
+                      override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                          val file: File =
+                                  File(getFilesDir()?.getAbsolutePath() + "/" + picName + ".jpg")
+                          if (file.exists()) {
+                              file.delete()
+                          }
+                          file.createNewFile()
+                          val bitmap12 = resource
+                          try {
+                              val out = FileOutputStream(file)
+                              bitmap12?.compress(Bitmap.CompressFormat.JPEG, 100, out)
+                              out.flush()
+                              out.close()
 
-                            sharePreferance?.setPref(picName, file.absolutePath)
-                            callHomePage()
-                            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                              sharePreferance?.setPref(picName, file.absolutePath)
+                              callHomePage()
+                              getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
-                        } catch (e: java.lang.Exception) {
-                            Log.e("exceptionProfileSave", e.message.toString())
-                            e.printStackTrace()
-                            disableProgress(progressView_parentRv!!)
-                        }  }
-                    override fun onLoadCleared(placeholder: Drawable?) {
-                        // this is called when imageView is cleared on lifecycle call or for
-                        // some other reason.
-                        // if you are referencing the bitmap somewhere else too other than this imageView
-                        // clear it here as you can no longer have the bitmap
-                    }
-                })
-    }
-
+                          } catch (e: java.lang.Exception) {
+                              Log.e("exceptionProfileSave", e.message.toString())
+                              e.printStackTrace()
+                             // disableProgress(progressView_parentRv!!)
+                          }  }
+                      override fun onLoadCleared(placeholder: Drawable?) {
+                          // this is called when imageView is cleared on lifecycle call or for
+                          // some other reason.
+                          // if you are referencing the bitmap somewhere else too other than this imageView
+                          // clear it here as you can no longer have the bitmap
+                      }
+                  })
+      }
+  */
     override fun onResume() {
         super.onResume()
         initView()

@@ -1,0 +1,527 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.SubmitE_DetailingActivity"
+    android:orientation="vertical">
+    <include layout="@layout/common_toolbar"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:weightSum="2">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:background="@color/lightpurple">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="1dp"
+                    android:padding="5dp"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/zm_red"
+                    android:text="E-detailing summary"
+                    android:background="@color/white"/>
+
+                <LinearLayout
+                    android:background="@color/white"
+                    android:weightSum="4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/darkblue_background_white_text"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginRight="1dp"
+                        android:text="Name" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Duration"
+                        android:layout_weight="0.6"
+                        android:layout_marginRight="1dp"
+                        style="@style/darkblue_background_white_text" />
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Rating"
+                        android:layout_weight="0.5"
+                        android:layout_marginRight="1dp"
+                        style="@style/darkblue_background_white_text" />
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Feedback"
+                        android:layout_weight="1.9"
+                        style="@style/darkblue_background_white_text" />
+
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:background="@color/white"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentTop="true"
+                    android:id="@+id/edetailing_rv"
+                    android:layout_marginBottom="2dp"
+                    android:padding="5dp" />
+
+            </LinearLayout>
+
+
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:padding="5dp"
+            android:layout_weight="1">
+
+                <LinearLayout
+                    android:weightSum="4"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_weight="1">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/header_text"
+                            android:background="@drawable/box_boarder"
+                            android:orientation="vertical"
+                            android:padding="5dp">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Visit purpose" />
+
+                            <Spinner
+                                android:id="@+id/visitPurpose_spinner"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content" />
+                        </LinearLayout>
+                        <TextView
+                            style="@style/header_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@color/appDarkColor"
+                            android:text="Working with"
+                            android:id="@+id/workingWith_tv"
+                            android:textColor="@color/white" />
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/marginTenLeftRight"
+                            android:id="@+id/workingWithRv"
+                            android:background="@drawable/box_boarder" />
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@color/gray"/>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_weight="1">
+                        <TextView
+                            style="@style/header_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@color/appDarkColor"
+                            android:text="Samples"
+                            android:id="@+id/clickSample_tv"
+                            android:textColor="@color/white" />
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/marginTenLeftRight"
+                            android:id="@+id/sample_rv"
+                            android:background="@drawable/box_boarder" />
+
+                    </LinearLayout>
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@color/gray"/>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_weight="1">
+                        <TextView
+                            style="@style/header_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@color/appDarkColor"
+                            android:text="Gifts"
+                            android:id="@+id/giftClick_tv"
+                            android:textColor="@color/white" />
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/marginTenLeftRight"
+                            android:id="@+id/gift_rv"
+                            android:background="@drawable/box_boarder" />
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@color/gray"/>
+
+                    <ScrollView
+                        android:fillViewport="true"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:padding="2dp"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Detailing start time/end time"/>
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@color/zm_red"
+                                android:textSize="18sp"
+                                android:textColor="@color/white"
+                                android:padding="5dp"
+                                android:id="@+id/detailingMainDateTime_tv"/>
+
+
+
+                            <TextView
+                                android:id="@+id/remarkHeader"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_above="@+id/remark_cv"
+                                android:text="Remark"
+                                android:textColor="@color/appColor"
+                                android:textSize="18sp"
+                                android:layout_marginLeft="10dp"
+                                android:textStyle="bold" />
+
+                            <androidx.cardview.widget.CardView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/remark_cv"
+                                android:layout_alignParentBottom="true"
+                                style="@style/generalCard"
+                                android:layout_marginBottom="10dp">
+
+                                <EditText
+                                    android:id="@+id/remark_Et"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:lines="3"
+                                    android:textSize="16sp" />
+                            </androidx.cardview.widget.CardView>
+
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
+
+                                <Button
+                                    android:id="@+id/submitDetailing_btn"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_alignParentBottom="true"
+                                    android:backgroundTint="@color/orange"
+                                    android:text="Submit detailing"
+                                    android:textSize="16sp" />
+                            </RelativeLayout>
+
+
+                        </LinearLayout>
+
+
+                    </ScrollView>
+
+
+
+
+
+                </LinearLayout>
+
+
+            <androidx.coordinatorlayout.widget.CoordinatorLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentBottom="true"
+                android:elevation="3dp">
+
+                <include layout="@layout/checkbox_bottom_sheet" />
+
+            </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+        </RelativeLayout>
+    </LinearLayout>
+
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="horizontal"-->
+<!--        android:padding="6dp"-->
+<!--        android:weightSum="2">-->
+<!--        <RelativeLayout-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:layout_weight="1.5">-->
+
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:layout_above="@+id/remarkHeader"-->
+<!--                android:orientation="vertical"-->
+<!--                android:background="@color/lightpurple">-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_margin="1dp"-->
+<!--                    android:padding="5dp"-->
+<!--                    android:textSize="18sp"-->
+<!--                    android:textStyle="bold"-->
+<!--                    android:textColor="@color/zm_red"-->
+<!--                    android:text="E-detailing summary"-->
+<!--                    android:background="@color/white"/>-->
+
+<!--                <LinearLayout-->
+<!--                    android:background="@color/white"-->
+<!--                    android:weightSum="4"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:orientation="horizontal">-->
+
+<!--                    <TextView-->
+<!--                        style="@style/darkblue_background_white_text"-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:layout_marginRight="1dp"-->
+<!--                        android:text="Name" />-->
+
+<!--                    <TextView-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="Duration"-->
+<!--                        android:layout_weight="0.6"-->
+<!--                        android:layout_marginRight="1dp"-->
+<!--                        style="@style/darkblue_background_white_text" />-->
+<!--                    <TextView-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="Rating"-->
+<!--                        android:layout_weight="0.5"-->
+<!--                        android:layout_marginRight="1dp"-->
+<!--                        style="@style/darkblue_background_white_text" />-->
+<!--                    <TextView-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="Feedback"-->
+<!--                        android:layout_weight="1.9"-->
+<!--                        style="@style/darkblue_background_white_text" />-->
+
+<!--                </LinearLayout>-->
+
+<!--                <androidx.recyclerview.widget.RecyclerView-->
+<!--                    android:background="@color/white"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:layout_alignParentTop="true"-->
+<!--                    android:id="@+id/edetailing_rv"-->
+<!--                    android:layout_marginBottom="1dp"-->
+<!--                    android:padding="5dp" />-->
+
+<!--            </LinearLayout>-->
+
+
+<!--            <TextView-->
+<!--                android:id="@+id/remarkHeader"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_above="@+id/remark_cv"-->
+<!--                android:text="Remark"-->
+<!--                android:textColor="@color/appColor"-->
+<!--                android:textSize="18sp"-->
+<!--                android:layout_marginLeft="10dp"-->
+<!--                android:textStyle="bold" />-->
+
+<!--            <androidx.cardview.widget.CardView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:id="@+id/remark_cv"-->
+<!--                android:layout_alignParentBottom="true"-->
+<!--                style="@style/generalCard"-->
+<!--                android:layout_marginBottom="10dp">-->
+
+<!--                <EditText-->
+<!--                    android:id="@+id/remark_Et"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:lines="5"-->
+<!--                    android:textSize="16sp" />-->
+<!--            </androidx.cardview.widget.CardView>-->
+
+<!--        </RelativeLayout>-->
+<!--        <View-->
+<!--            android:layout_width="1dp"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:background="@color/gray" />-->
+
+<!--        <RelativeLayout-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:padding="5dp"-->
+<!--            android:layout_weight="0.5">-->
+
+<!--            <androidx.core.widget.NestedScrollView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:layout_above="@+id/submitDetailing_btn"-->
+<!--                android:layout_alignParentTop="true">-->
+
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:orientation="vertical">-->
+
+<!--                    <LinearLayout-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        style="@style/header_text"-->
+<!--                        android:background="@drawable/box_boarder"-->
+<!--                        android:orientation="vertical"-->
+<!--                        android:padding="5dp">-->
+
+<!--                        <TextView-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="Visit purpose" />-->
+
+<!--                        <Spinner-->
+<!--                            android:id="@+id/visitPurpose_spinner"-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="wrap_content" />-->
+<!--                    </LinearLayout>-->
+
+<!--                    <TextView-->
+<!--                        style="@style/header_text"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:background="@color/appDarkColor"-->
+<!--                        android:text="Working with"-->
+<!--                        android:id="@+id/workingWith_tv"-->
+<!--                        android:textColor="@color/white" />-->
+
+<!--                    <androidx.recyclerview.widget.RecyclerView-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                       style="@style/marginTenLeftRight"-->
+<!--                        android:id="@+id/workingWithRv"-->
+<!--                        android:nestedScrollingEnabled="false"-->
+<!--                        android:background="@drawable/box_boarder" />-->
+
+
+<!--                    <TextView-->
+<!--                        style="@style/header_text"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:background="@color/appDarkColor"-->
+<!--                        android:text="Samples"-->
+<!--                        android:id="@+id/clickSample_tv"-->
+<!--                        android:textColor="@color/white" />-->
+
+<!--                    <androidx.recyclerview.widget.RecyclerView-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        style="@style/marginTenLeftRight"-->
+<!--                        android:id="@+id/sample_rv"-->
+<!--                        android:nestedScrollingEnabled="false"-->
+<!--                        android:background="@drawable/box_boarder" />-->
+
+<!--                    <TextView-->
+<!--                        style="@style/header_text"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:background="@color/appDarkColor"-->
+<!--                        android:text="Gifts"-->
+<!--                        android:id="@+id/giftClick_tv"-->
+<!--                        android:textColor="@color/white" />-->
+
+<!--                    <androidx.recyclerview.widget.RecyclerView-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        style="@style/marginTenLeftRight"-->
+<!--                        android:id="@+id/gift_rv"-->
+<!--                        android:nestedScrollingEnabled="false"-->
+<!--                        android:background="@drawable/box_boarder" />-->
+
+
+<!--                </LinearLayout>-->
+
+
+<!--            </androidx.core.widget.NestedScrollView>-->
+
+<!--            <Button-->
+<!--                android:id="@+id/submitDetailing_btn"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_alignParentBottom="true"-->
+<!--                android:backgroundTint="@color/orange"-->
+<!--                android:textSize="16sp"-->
+<!--                android:text="Submit detailing" />-->
+
+
+<!--            <androidx.coordinatorlayout.widget.CoordinatorLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:layout_alignParentBottom="true"-->
+<!--                android:elevation="3dp">-->
+
+<!--                <include layout="@layout/checkbox_bottom_sheet" />-->
+
+<!--            </androidx.coordinatorlayout.widget.CoordinatorLayout>-->
+
+<!--        </RelativeLayout>-->
+
+
+<!--    </LinearLayout>-->
+
+
+</LinearLayout>

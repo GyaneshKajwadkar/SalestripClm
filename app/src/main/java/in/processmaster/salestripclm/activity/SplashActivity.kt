@@ -2,6 +2,7 @@ package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.ConnectivityChangeReceiver
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.models.SyncModel
 import `in`.processmaster.salestripclm.networkUtils.APIClient
@@ -32,10 +33,12 @@ import us.zoom.sdk.ZoomSDK
 
 class SplashActivity : BaseActivity()
 {
+    val generalClass= GeneralClass(this)
 
     companion object {
-         var  connectivityChangeReceiver= ConnectivityChangeReceiver()
-         var alertDialogNetwork: AlertDialog? = null
+        var connectivityChangeReceiver= ConnectivityChangeReceiver()
+        var alertDialogNetwork: AlertDialog? = null
+        var staticSyncData: SyncModel? =null
     }
 
     var sharePreferance: PreferenceClass?= null
@@ -54,24 +57,24 @@ class SplashActivity : BaseActivity()
         sharePreferance = PreferenceClass(this)
         progressBar=findViewById(R.id.progressBar) as ProgressBar
 
-       // FirebaseMessaging.getInstance().setAutoInitEnabled(true);
+        // FirebaseMessaging.getInstance().setAutoInitEnabled(true);
         FirebaseMessaging.getInstance().token
-                .addOnCompleteListener(OnCompleteListener { task ->
-                    if (!task.isSuccessful) {
+            .addOnCompleteListener(OnCompleteListener { task ->
+                if (!task.isSuccessful) {
 
-                        return@OnCompleteListener
-                    }
+                    return@OnCompleteListener
+                }
 
-                    // Get new FCM registration token
-                    val token: String = task.getResult().toString()
+                // Get new FCM registration token
+                val token: String = task.getResult().toString()
                 Log.e("TOKEN",token)
 
-                })
+            })
 
         if(sharePreferance!!.getPrefBool("isLogin"))
         {
-           /* //if no internet connection and database have sync data then open directly home page
-            if(isInternetAvailable(this)==false && db.datasCount > 0)
+//         //if no internet connection and database have sync data then open directly home page
+            if(!generalClass.isInternetAvailable() && db.datasCount > 0)
             {
                 Handler(Looper.getMainLooper()).postDelayed({
                     val intent = Intent(this@SplashActivity, HomePage::class.java)
@@ -84,11 +87,11 @@ class SplashActivity : BaseActivity()
                 //call sync api for token check
                 sync_api()
             }
-            //login_api()*/
+//            //login_api()
 
-            sync_api()
+            // sync_api()
         }
-       //call login screen
+        //call login screen
         else
         {
             Handler(Looper.getMainLooper()).postDelayed({
@@ -106,7 +109,7 @@ class SplashActivity : BaseActivity()
         var profileData =sharePreferance?.getPref("profileData")
         val loginModel= Gson().fromJson(profileData, LoginModel::class.java)
 
-        enableProgress(progressBar!!)
+        generalClass.enableSimpleProgress(progressBar!!)
         apiInterface= APIClient.getClient(2, sharePreferance?.getPref("secondaryUrl")).create(APIInterface::class.java)
 
         var call: Call<SyncModel> = apiInterface?.syncApi("bearer " + loginModel?.accessToken) as Call<SyncModel>
@@ -116,6 +119,7 @@ class SplashActivity : BaseActivity()
 
                 if (response.code() == 200 && !response.body().toString().isEmpty())
                 {
+                    staticSyncData = response.body()
                     val intent = Intent(this@SplashActivity, HomePage::class.java)
                     startActivity(intent)
                     finish()
@@ -130,29 +134,16 @@ class SplashActivity : BaseActivity()
 
             override fun onFailure(call: Call<SyncModel?>, t: Throwable?) {
                 Log.e("syncApiError", t?.message.toString())
-                checkInternet()
+                generalClass.checkInternet()
                 call.cancel()
-                disableProgress(progressBar!!)
+                generalClass.disableSimpleProgress(progressBar!!)
             }
         })
     }
 
-
-    fun checkInternet()
-    {
-        if(isInternetAvailable(this)==true)
-        {
-            commonAlert(this, "Error", "Something went wrong please try again later")
-        }
-        else
-        {
-            networkAlert(this)
-        }
-    }
-
     override fun onDestroy() {
         super.onDestroy()
-        disableProgress(progressBar!!)
+        generalClass.disableSimpleProgress(progressBar!!)
     }
 
 }

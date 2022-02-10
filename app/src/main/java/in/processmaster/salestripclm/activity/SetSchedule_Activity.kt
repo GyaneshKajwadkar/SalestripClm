@@ -6,6 +6,8 @@ import SelectedDocManList_adapter
 import SelectorInterface
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.adapter.ScheduleMeetingAdapter
+import `in`.processmaster.salestripclm.common_classes.AlertClass
+import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.models.*
 import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
@@ -69,6 +71,8 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
     var selectedAdapeterTeams :SelectedDocManList_adapter? = null
     var constructorList: ArrayList<DocManagerModel> = ArrayList()
     var constructorListTeam: ArrayList<DocManagerModel> = ArrayList()
+    val generalClass= GeneralClass(this)
+
 
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?)
@@ -86,7 +90,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
                     getCredientailAPI(this@SetSchedule_Activity)
                 }
             }
-          //  getCredientail_api(this)
+            //  getCredientail_api(this)
         }
 
         Timer().schedule(50){
@@ -99,6 +103,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     fun updateSchedule()
     {
         val args =intent.getBundleExtra("fillData")
@@ -178,7 +183,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
     fun setScheduleAdapter()
     {
 
-        val responseData=dbBase.getApiDetail(1)
+        val responseData=dbBase.getApiDetail(-1)
 
         if(!responseData.equals(""))
         {
@@ -263,12 +268,12 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
 
         selectDate_tv.setOnClickListener({
             selectDateHeader_tv.setTextColor(ContextCompat.getColorStateList(this, R.color.appColor))
-            HideKeyboard(currentFocus ?: View(this))
+            generalClass.HideKeyboard(currentFocus ?: View(this))
             datePicker.show()
         })
 
         startTime.setOnClickListener({
-            HideKeyboard(currentFocus ?: View(this))
+            generalClass.HideKeyboard(currentFocus ?: View(this))
             startTimeheader_id.setTextColor(ContextCompat.getColorStateList(this, R.color.appColor))
             stopTimeHeader_tv.setTextColor(ContextCompat.getColorStateList(this, R.color.appColor))
 
@@ -310,7 +315,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
             stopTimeHeader_tv.setTextColor(ContextCompat.getColorStateList(this, R.color.appColor))
             startTimeheader_id.setTextColor(ContextCompat.getColorStateList(this, R.color.appColor))
 
-            HideKeyboard(currentFocus ?: View(this))
+            generalClass.HideKeyboard(currentFocus ?: View(this))
 
             val mcurrentTime = Calendar.getInstance()
             val hour = mcurrentTime[Calendar.HOUR_OF_DAY]
@@ -333,7 +338,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
                         val sdf = SimpleDateFormat("H:mm")
                         val dateObj = sdf.parse(selectedHour.toString()+":"+selectedMinute.toString())
                         System.out.println(dateObj)
-                       val strDate= SimpleDateFormat("K:mm").format(dateObj)
+                        val strDate= SimpleDateFormat("K:mm").format(dateObj)
                         stopTime.setText("$strDate $AM_PM" )
 
                     } catch (e: ParseException) {
@@ -353,12 +358,12 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
 
         var arrayListDoctor: ArrayList<String> = ArrayList()
 
-        var model = Gson().fromJson(db.getAllData(), SyncModel::class.java)
+        // var model = Gson().fromJson(db.getAllData(), SyncModel::class.java)
 
 
         arrayListDoctor.add("Select Doctor")
 
-        for(item in model.data.doctorList)
+        for(item in SplashActivity.staticSyncData?.data?.doctorList!!)
         {
             arrayListDoctor.add(item.doctorName)
 
@@ -369,7 +374,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
         doctor_spinner?.setAdapter(langAdapter)
 
         radio_meeting.setOnCheckedChangeListener(RadioGroup.OnCheckedChangeListener { group, checkedId ->
-            HideKeyboard(currentFocus ?: View(this@SetSchedule_Activity))
+            generalClass.HideKeyboard(currentFocus ?: View(this@SetSchedule_Activity))
 
             /*   when (checkedId) {
 
@@ -383,7 +388,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
         })
 
 
-        for(item in model.data.doctorList)
+        for(item in SplashActivity.staticSyncData?.data?.doctorList!!)
         {
             val selectorModel = DocManagerModel()
             selectorModel.setName(item.doctorName)
@@ -405,7 +410,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
         })
 
         submit_newSchedule.setOnClickListener({
-            HideKeyboard(currentFocus ?: View(this@SetSchedule_Activity))
+            generalClass.HideKeyboard(currentFocus ?: View(this@SetSchedule_Activity))
 
             if(constructorList.size==0)
             {
@@ -425,21 +430,21 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
                 stopTimeHeader_tv.setTextColor(ContextCompat.getColorStateList(this, R.color.appColor))
                 startTimeheader_id.setTextColor(ContextCompat.getColorStateList(this, R.color.appColor))
                 selectDateHeader_tv.setTextColor(ContextCompat.getColorStateList(this, R.color.zm_red))
-                showSnackbar(parentSetSchedule,"Please select date")
+                generalClass.showSnackbar(parentSetSchedule,"Please select date")
                 return@setOnClickListener
             }
 
             if(startTime.text.equals("Start time"))
             {
                 startTimeheader_id.setTextColor(ContextCompat.getColorStateList(this, R.color.zm_red))
-                showSnackbar(parentSetSchedule,"Please select start time")
+                generalClass.showSnackbar(parentSetSchedule,"Please select start time")
                 return@setOnClickListener
             }
 
             if(stopTime.text.equals("End time"))
             {
                 stopTimeHeader_tv.setTextColor(ContextCompat.getColorStateList(this, R.color.zm_red))
-                showSnackbar(parentSetSchedule,"Please select end time")
+                generalClass.showSnackbar(parentSetSchedule,"Please select end time")
 
                 return@setOnClickListener
             }
@@ -453,7 +458,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
                 val time2: LocalTime = LocalTime.parse(currentTime, timeFormatter)
                 if (time1.isBefore(time2)) {
                     startTimeheader_id.setTextColor(ContextCompat.getColorStateList(this, R.color.zm_red))
-                    showSnackbar(parentSetSchedule,"Time has already passed")
+                    generalClass.showSnackbar(parentSetSchedule,"Time has already passed")
                     return@setOnClickListener
                 }
             }
@@ -472,61 +477,61 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
                 return@setOnClickListener
             }
 
-           //yyyy-MM-ddTHH:mm:ss
-             setSheduleApi()
+            //yyyy-MM-ddTHH:mm:ss
+            setSheduleApi()
 
 
 
 
-         /*   if (mPreMeetingService == null)
-            {
-                return@setOnClickListener
-            }*/
+            /*   if (mPreMeetingService == null)
+               {
+                   return@setOnClickListener
+               }*/
 
 
 
-       /*     val meetingItem = mPreMeetingService!!.createScheduleMeetingItem()
+            /*     val meetingItem = mPreMeetingService!!.createScheduleMeetingItem()
 
-            meetingItem.meetingTopic = subject_et.text.toString()
-            meetingItem.startTime =getTimeDate().time
-            meetingItem.durationInMinutes = getDurationInMinutes()
-            meetingItem.canJoinBeforeHost = true
-            meetingItem.password = "zoom"
-            meetingItem.isHostVideoOff = false
-            meetingItem.isAttendeeVideoOff = true
+                 meetingItem.meetingTopic = subject_et.text.toString()
+                 meetingItem.startTime =getTimeDate().time
+                 meetingItem.durationInMinutes = getDurationInMinutes()
+                 meetingItem.canJoinBeforeHost = true
+                 meetingItem.password = "zoom"
+                 meetingItem.isHostVideoOff = false
+                 meetingItem.isAttendeeVideoOff = true
 
-            meetingItem.availableDialinCountry = mCountry
+                 meetingItem.availableDialinCountry = mCountry
 
-            meetingItem.isEnableMeetingToPublic = false
-            meetingItem.isEnableLanguageInterpretation =false
-            meetingItem.isEnableWaitingRoom = false
-            meetingItem.isUsePmiAsMeetingID = false
-            var mTimeZoneId = TimeZone.getDefault().id
-            meetingItem.audioType = MeetingItem.AudioType.AUDIO_TYPE_VOIP
+                 meetingItem.isEnableMeetingToPublic = false
+                 meetingItem.isEnableLanguageInterpretation =false
+                 meetingItem.isEnableWaitingRoom = false
+                 meetingItem.isUsePmiAsMeetingID = false
+                 var mTimeZoneId = TimeZone.getDefault().id
+                 meetingItem.audioType = MeetingItem.AudioType.AUDIO_TYPE_VOIP
 
-            meetingItem.timeZoneId = mTimeZoneId
+                 meetingItem.timeZoneId = mTimeZoneId
 
-            if (mPreMeetingService != null) {
-               mPreMeetingService!!.addListener(this)
-                val error = mPreMeetingService!!.scheduleMeeting(meetingItem)
-                if (error == ScheduleOrEditMeetingError.SUCCESS) {
-                    progressMessage_tv?.setText("Scheduling Meeting")
-                    enableProgress(progressView_parentRv!!)
-                }
-                else {
-                    Toast.makeText(this, error.toString(), Toast.LENGTH_LONG).show()
-                }
-            } else {
-                Toast.makeText(this, "User not login.", Toast.LENGTH_LONG).show()
-               // finish()
-            }*/
+                 if (mPreMeetingService != null) {
+                    mPreMeetingService!!.addListener(this)
+                     val error = mPreMeetingService!!.scheduleMeeting(meetingItem)
+                     if (error == ScheduleOrEditMeetingError.SUCCESS) {
+                         progressMessage_tv?.setText("Scheduling Meeting")
+                         enableProgress(progressView_parentRv!!)
+                     }
+                     else {
+                         Toast.makeText(this, error.toString(), Toast.LENGTH_LONG).show()
+                     }
+                 } else {
+                     Toast.makeText(this, "User not login.", Toast.LENGTH_LONG).show()
+                    // finish()
+                 }*/
 
         })
 
         doctor_spinner.setOnTouchListener(object : View.OnTouchListener {
             override fun onTouch(v: View?, event: MotionEvent?): Boolean
             {
-                HideKeyboard(currentFocus ?: View(this@SetSchedule_Activity))
+                generalClass.HideKeyboard(currentFocus ?: View(this@SetSchedule_Activity))
 
                 return false
             }
@@ -582,39 +587,39 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
         }
     }
 
- /*   override fun onZoomSDKLoginResult(result: Long) {
-        if (result == ZoomAuthenticationError.ZOOM_AUTH_ERROR_SUCCESS.toLong()) {
-            UserLoginCallback.getInstance().removeListener(this)
-        }
+    /*   override fun onZoomSDKLoginResult(result: Long) {
+           if (result == ZoomAuthenticationError.ZOOM_AUTH_ERROR_SUCCESS.toLong()) {
+               UserLoginCallback.getInstance().removeListener(this)
+           }
 
-        else {
-            Log.e("errorMessageghfh", result.toString())
-            Toast.makeText(this, "Login failed result code = $result", Toast.LENGTH_SHORT).show()
-        }
-    }
+           else {
+               Log.e("errorMessageghfh", result.toString())
+               Toast.makeText(this, "Login failed result code = $result", Toast.LENGTH_SHORT).show()
+           }
+       }
 
-    override fun onZoomIdentityExpired() {
+       override fun onZoomIdentityExpired() {
 
-    }
+       }
 
-    override fun onZoomSDKLogoutResult(result: Long) {
+       override fun onZoomSDKLogoutResult(result: Long) {
 
-    }
+       }
 
-    override fun onZoomAuthIdentityExpired() {
+       override fun onZoomAuthIdentityExpired() {
 
-    }
+       }
 
-    override fun onUpdateMeeting(p0: Int, p1: Long) {
+       override fun onUpdateMeeting(p0: Int, p1: Long) {
 
-    }
+       }
 
-    override fun onGetInviteEmailContent(p0: Int, p1: Long, p2: String?) {
-     Log.e("fg8uisdf",p2.toString())
-    }
+       override fun onGetInviteEmailContent(p0: Int, p1: Long, p2: String?) {
+        Log.e("fg8uisdf",p2.toString())
+       }
 
-    override fun onScheduleMeeting(result: Int, meetingNumber: Long) {
-      *//*  if (result == PreMeetingError.PreMeetingError_Success) {
+       override fun onScheduleMeeting(result: Int, meetingNumber: Long) {
+         *//*  if (result == PreMeetingError.PreMeetingError_Success) {
 
             runOnUiThread {
                 disableProgress(progressView_parentRv!!)
@@ -723,7 +728,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
 
         if(startInt==endInt)
         {
-            showSnackbar(parentSetSchedule,"Meeting start time and end time are equal")
+            generalClass.showSnackbar(parentSetSchedule,"Meeting start time and end time are equal")
             //startTime and endTime not **Equal**
             return false
         }
@@ -731,13 +736,13 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
         {
             //startTime is **Greater** then endTime
 
-                if(endInt>1200 && startInt>1200)
-                {
-                    showSnackbar(parentSetSchedule,"Reduce meeting duration and try again")
-                    return false
-                }
+            if(endInt>1200 && startInt>1200)
+            {
+                generalClass.showSnackbar(parentSetSchedule,"Reduce meeting duration and try again")
+                return false
+            }
 
-            showSnackbar(parentSetSchedule,"Meeting start time greater then end time")
+            generalClass.showSnackbar(parentSetSchedule,"Meeting start time greater then end time")
             return false
         }
         else {
@@ -765,11 +770,11 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
 
         if(selectionType==1)
         {
-             adapterView= DoctorManagerSelector_Adapter(arrayListSelectorDoctor,this,selectionType)
+            adapterView= DoctorManagerSelector_Adapter(arrayListSelectorDoctor,this,selectionType)
         }
         else
         {
-             adapterView= DoctorManagerSelector_Adapter(arrayListSelectorTeams,this,selectionType)
+            adapterView= DoctorManagerSelector_Adapter(arrayListSelectorTeams,this,selectionType)
         }
         list_rv.adapter = adapterView
 
@@ -902,6 +907,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
             loginModelBase.empId.toString()
         ) as Call<TeamsModel>
         call.enqueue(object : Callback<TeamsModel?> {
+            @RequiresApi(Build.VERSION_CODES.N)
             override fun onResponse(
                 call: Call<TeamsModel?>?,
                 response: Response<TeamsModel?>
@@ -912,7 +918,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
 
                     for(singleItem in getTeamslist?.data?.employeeList!!)
                     {
-                    var selectorModel =DocManagerModel()
+                        var selectorModel =DocManagerModel()
                         selectorModel.setName(singleItem.firstName+" "+singleItem.lastName)
                         selectorModel.setRoute(singleItem.headQuaterName)
                         selectorModel.setSpeciality(singleItem.divisionName)
@@ -940,7 +946,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
     private fun setSheduleApi()
     {
         progressMessage_tv?.setText("Scheduling Meeting")
-        enableProgress(progressView_parentRv!!)
+        generalClass.enableProgress(progressView_parentRv!!)
 
         val originalFormat: DateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
         val targetFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd")
@@ -1039,8 +1045,8 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
 
                     }
                     else{
-                        disableProgress(progressView_parentRv!!)
-                        commonAlert(this@SetSchedule_Activity,getResponse?.data?.message.toString(),"")
+                        generalClass.disableProgress(progressView_parentRv!!)
+                        AlertClass(this@SetSchedule_Activity).commonAlert(getResponse?.data?.message.toString(),"")
 
                         for((i,apiDoctorList) in arrayListSelectorDoctor.withIndex())
                         {
@@ -1072,13 +1078,13 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
                 {
                     Toast.makeText(this@SetSchedule_Activity, "Server error ", Toast.LENGTH_SHORT).show()
                 }
-                disableProgress(progressView_parentRv!!)
+                generalClass.disableProgress(progressView_parentRv!!)
 
             }
 
             override fun onFailure(call: Call<GenerateOTPModel?>, t: Throwable?) {
                 call.cancel()
-                disableProgress(progressView_parentRv!!)
+                generalClass.disableProgress(progressView_parentRv!!)
 
             }
         })
@@ -1093,7 +1099,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
                 {
                     val gson = Gson()
                     var model = response.body()
-                    dbBase?.insertOrUpdateAPI("1",gson.toJson(model))
+                    dbBase?.insertOrUpdateAPI(-1,gson.toJson(model))
                     setScheduleAdapter()
                 }
                 else

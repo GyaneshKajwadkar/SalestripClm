@@ -1747,6 +1747,10 @@ public class SyncModel {
                 this.workType = workType;
             }
 
+            @Override
+            public String toString() {
+                return workType ;
+            }
         }
         public class Retailer {
 

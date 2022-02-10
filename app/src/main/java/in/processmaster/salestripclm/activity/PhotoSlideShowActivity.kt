@@ -2,6 +2,7 @@ package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.adapter.OtherFileAdapter
+import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.interfaceCode.ItemClickDisplayVisual
 import `in`.processmaster.salestripclm.interfaceCode.StringInterface
 import `in`.processmaster.salestripclm.models.DevisionModel
@@ -63,6 +64,8 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
     var runnable: Runnable? = null
     var position=0
     var parentRl: RelativeLayout? =null
+    val currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
+
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var bottomSheetWeb: ConstraintLayout
@@ -94,6 +97,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
     }
 
     var thread: Thread?= null
+    var threadBrand: Thread?= null
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -111,8 +115,8 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
         currentProduct_btn = findViewById(R.id.currentProduct_btn)
         otherProduct_btn = findViewById(R.id.otherProduct_btn)
 
-         fabLike    = findViewById<View>(R.id.fabLike) as FloatingActionButton
-         fabComment = findViewById<View>(R.id.fabComment) as FloatingActionButton
+        fabLike    = findViewById<View>(R.id.fabLike) as FloatingActionButton
+        fabComment = findViewById<View>(R.id.fabComment) as FloatingActionButton
 
         bottomSheetWeb=findViewById(R.id.bottomSheetWeb)as ConstraintLayout
         end_btn=findViewById(R.id.end_btn)as Button
@@ -122,11 +126,11 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
         db=DatabaseHandler(this)
 
         horizontal_rv?.setLayoutManager(
-                LinearLayoutManager(
-                        this,
-                        LinearLayoutManager.HORIZONTAL,
-                        false
-                )
+            LinearLayoutManager(
+                this,
+                LinearLayoutManager.HORIZONTAL,
+                false
+            )
         )
         horizontal_rv?.itemAnimator = DefaultItemAnimator()
 
@@ -161,47 +165,48 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
             end_btn?.setOnClickListener({
 
                 val currentDate: String = SimpleDateFormat(
-                        "dd-MM-yyyy",
-                        Locale.getDefault()
+                    "dd-MM-yyyy",
+                    Locale.getDefault()
                 ).format(Date())
                 val currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(
-                        Date()
+                    Date()
                 )
+                db?.updateBrandEndTime(currentTime.toString(),startDateTime,doctorId,brandId)
                 db?.updateendData(currentDate + " " + currentTime,startDateTime)
                 onBackPressed()
                 finish()
 
-           /*     if (doctorId != 0) {
-                    if (!startDateTime!!.isEmpty()) {
+                /*     if (doctorId != 0) {
+                         if (!startDateTime!!.isEmpty()) {
 
-                        val currentDate: String = SimpleDateFormat(
-                            "dd-MM-yyyy",
-                            Locale.getDefault()
-                        ).format(Date())
-                        val currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(
-                            Date()
-                        )
+                             val currentDate: String = SimpleDateFormat(
+                                 "dd-MM-yyyy",
+                                 Locale.getDefault()
+                             ).format(Date())
+                             val currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(
+                                 Date()
+                             )
 
-                        var visualAdsModel = VisualAdsModel_Send()
-                        visualAdsModel.setBrandId(brandId.toString())
-                        visualAdsModel.setDoctorId(doctorId.toString())
-                        visualAdsModel.setStartDate(startDateTime)
-                        visualAdsModel.setEmpId(empId.toString())
-                        visualAdsModel.setEndDate(currentDate + " " + currentTime)
-                        val gson = Gson()
+                             var visualAdsModel = VisualAdsModel_Send()
+                             visualAdsModel.setBrandId(brandId.toString())
+                             visualAdsModel.setDoctorId(doctorId.toString())
+                             visualAdsModel.setStartDate(startDateTime)
+                             visualAdsModel.setEmpId(empId.toString())
+                             visualAdsModel.setEndDate(currentDate + " " + currentTime)
+                             val gson = Gson()
 
-                    }
-                } else {
-                    onBackPressed()
-                    finish()
-                }*/
+                         }
+                     } else {
+                         onBackPressed()
+                         finish()
+                     }*/
             })
 
 
 
             fabLike?.setOnClickListener({
                 if (isList) {
-                   db?.insertlike(0, model!!.fileId,startDateTime)
+                    db?.insertlike(0, model!!.fileId,startDateTime)
                     fabLike?.setColorFilter(Color.BLACK)
                     isList = false
                 }
@@ -272,10 +277,10 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
                 }
                 override fun onPageSelected(position: Int) {
 
-                 //   bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
-                 //   model=arrayImage.get(position)
-                 //   setHorizontalAdapter(arrayImage, position, model!!)
-                 //   adapterVisualFile?.notifyDataSetChanged()
+                    //   bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
+                    //   model=arrayImage.get(position)
+                    //   setHorizontalAdapter(arrayImage, position, model!!)
+                    //   adapterVisualFile?.notifyDataSetChanged()
 
 
                 }
@@ -283,7 +288,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
                 }
             })
-
+            slideBrandWiseInsert(startDateTime,brandId)
         }
 
         if(intent.getStringExtra("singleSelection")!=null)
@@ -370,13 +375,13 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
     @RequiresApi(Build.VERSION_CODES.N)
     fun getAllEdetailingProduct() : java.util.ArrayList<DevisionModel.Data.EDetailing>
     {
-       var  edetailingList = db?.getAlleDetail() //fetch edetailing list from db
-       var  filteredList: ArrayList<DevisionModel.Data.EDetailing> = ArrayList()
+        var  edetailingList = db?.getAlleDetail() //fetch edetailing list from db
+        var  filteredList: ArrayList<DevisionModel.Data.EDetailing> = ArrayList()
         for (itemParent in edetailingList!! )
         {
             if(itemParent.isSaved==1)
             {
-               var downloadedList = db?.getAllDownloadedData(itemParent.geteDetailId())
+                var downloadedList = db?.getAllDownloadedData(itemParent.geteDetailId())
 
                 if(downloadedList?.stream()!!.anyMatch({ o -> o.downloadType.equals("IMAGE") }))
                 {
@@ -411,15 +416,15 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
 
 
-      /*      if(floating_action_button_image.visibility==View.VISIBLE)
-            {
-                floating_action_button_image.visibility=View.GONE
-            }
-            else
-            {
-                floating_action_button_image.visibility=View.VISIBLE
+            /*      if(floating_action_button_image.visibility==View.VISIBLE)
+                  {
+                      floating_action_button_image.visibility=View.GONE
+                  }
+                  else
+                  {
+                      floating_action_button_image.visibility=View.VISIBLE
 
-            }*/
+                  }*/
 
             return true
         }
@@ -451,7 +456,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
                 }
                 // right to left swipe
                 if (e1.x - e2.x > SWIPE_MIN_DISTANCE
-                        && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                    && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
 
 
                     if(imageFrame?.displayedChild!! < arrayImage.size-1)
@@ -476,7 +481,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
                 }
 
                 else if (e2.x - e1.x > SWIPE_MIN_DISTANCE
-                        && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                    && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
 
 
                     //commonlib/
@@ -520,10 +525,10 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
     private fun inFromRightAnimation(): Animation? {
         val inFromRight: Animation = TranslateAnimation(
-                Animation.RELATIVE_TO_PARENT, +1.2f,
-                Animation.RELATIVE_TO_PARENT, 0.0f,
-                Animation.RELATIVE_TO_PARENT, 0.0f,
-                Animation.RELATIVE_TO_PARENT, 0.0f)
+            Animation.RELATIVE_TO_PARENT, +1.2f,
+            Animation.RELATIVE_TO_PARENT, 0.0f,
+            Animation.RELATIVE_TO_PARENT, 0.0f,
+            Animation.RELATIVE_TO_PARENT, 0.0f)
         inFromRight.duration = 200
         inFromRight.interpolator = AccelerateInterpolator()
         return inFromRight
@@ -531,10 +536,10 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
     private fun outToLeftAnimation(): Animation? {
         val outtoLeft: Animation = TranslateAnimation(
-                Animation.RELATIVE_TO_PARENT, 0.0f,
-                Animation.RELATIVE_TO_PARENT, -1.2f,
-                Animation.RELATIVE_TO_PARENT, 0.0f,
-                Animation.RELATIVE_TO_PARENT, 0.0f)
+            Animation.RELATIVE_TO_PARENT, 0.0f,
+            Animation.RELATIVE_TO_PARENT, -1.2f,
+            Animation.RELATIVE_TO_PARENT, 0.0f,
+            Animation.RELATIVE_TO_PARENT, 0.0f)
         outtoLeft.duration = 200
         outtoLeft.interpolator = AccelerateInterpolator()
         return outtoLeft
@@ -542,10 +547,10 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
     private fun inFromLeftAnimation(): Animation? {
         val inFromLeft: Animation = TranslateAnimation(
-                Animation.RELATIVE_TO_PARENT, -1.2f,
-                Animation.RELATIVE_TO_PARENT, 0.0f,
-                Animation.RELATIVE_TO_PARENT, 0.0f,
-                Animation.RELATIVE_TO_PARENT, 0.0f)
+            Animation.RELATIVE_TO_PARENT, -1.2f,
+            Animation.RELATIVE_TO_PARENT, 0.0f,
+            Animation.RELATIVE_TO_PARENT, 0.0f,
+            Animation.RELATIVE_TO_PARENT, 0.0f)
         inFromLeft.duration = 200
         inFromLeft.interpolator = AccelerateInterpolator()
         return inFromLeft
@@ -553,10 +558,10 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
     private fun outToRightAnimation(): Animation? {
         val outtoRight: Animation = TranslateAnimation(
-                Animation.RELATIVE_TO_PARENT, 0.0f,
-                Animation.RELATIVE_TO_PARENT, +1.2f,
-                Animation.RELATIVE_TO_PARENT, 0.0f,
-                Animation.RELATIVE_TO_PARENT, 0.0f)
+            Animation.RELATIVE_TO_PARENT, 0.0f,
+            Animation.RELATIVE_TO_PARENT, +1.2f,
+            Animation.RELATIVE_TO_PARENT, 0.0f,
+            Animation.RELATIVE_TO_PARENT, 0.0f)
         outtoRight.duration = 200
         outtoRight.interpolator = AccelerateInterpolator()
         return outtoRight
@@ -570,13 +575,13 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
 
     //======================================Image view bottom sheet=================================================
-   inner class HorizontalImageViewAdapter(
-            var list: ArrayList<DownloadFileModel>,
-            var context: Context,
-            var positionConst: Int,
-            var modeladapter: DownloadFileModel,
-            var imageFrame: ViewFlipper?,
-            var mCallback :StringInterface
+    inner class HorizontalImageViewAdapter(
+        var list: ArrayList<DownloadFileModel>,
+        var context: Context,
+        var positionConst: Int,
+        var modeladapter: DownloadFileModel,
+        var imageFrame: ViewFlipper?,
+        var mCallback :StringInterface
     ) : RecyclerView.Adapter<HorizontalImageViewAdapter.MyViewHolder>() {
 
         var relativeViewList: ArrayList<LinearLayout> =  ArrayList();
@@ -593,7 +598,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder
         {
             val itemView = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.downloaedimage_view, parent, false)
+                .inflate(R.layout.downloaedimage_view, parent, false)
 
 
             return MyViewHolder(itemView)
@@ -620,7 +625,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
                 holder.parent_llImage.setBackgroundColor(ContextCompat.getColor(context, R.color.purple_500));
 
                 imageFrame!!.setDisplayedChild(position)
-                 model=downloadedfiles
+                model=downloadedfiles
                 viewPagerMain.setCurrentItem(position);
 
                 mCallback.onClickString("callBack")
@@ -636,9 +641,9 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
             val requestOptions = RequestOptions()
             requestOptions.isMemoryCacheable
             Glide.with(context).setDefaultRequestOptions(requestOptions)
-                    .load(Uri.fromFile(File(downloadedfiles.fileDirectoryPath,downloadedfiles.fileName)))
-                    .placeholder(circularProgressDrawable)
-                    .into(holder.imageThumb_iv)
+                .load(Uri.fromFile(File(downloadedfiles.fileDirectoryPath,downloadedfiles.fileName)))
+                .placeholder(circularProgressDrawable)
+                .into(holder.imageThumb_iv)
 
         }
 
@@ -696,6 +701,9 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
     override fun onClickDisplayVisual(passingInterface: Int, brandIDInterface: Int,selectionType: Int)
     {
+
+        db?.updateBrandEndTime(currentTime.toString(),startDateTime,doctorId,brandId)
+
         arrayImage.clear()
 
         for (itemParent in db!!.getAllDownloadedData(passingInterface) )
@@ -728,13 +736,14 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
         otherFileAdapter?.notifyDataSetChanged()
 
         brandId=brandIDInterface
-        db?.insertStartTimeSlide(startDateTime,doctorId,brandId)
+        db?.insertStartTimeSlide(startDateTime,doctorId,brandId,model?.brandName,0,currentTime.toString())
 
         onClickString("")
 
         mViewPagerAdapter = ViewPagerAdapter(this, arrayImage)
         viewPagerMain.adapter = mViewPagerAdapter
 
+        slideBrandWiseInsert(startDateTime,brandId)
     }
 
 
@@ -778,28 +787,28 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
     fun setSlideViewTime()
     {
-            thread?.interrupt()
-            var dbTimer=db?.getTime(model!!.fileId.toString(),startDateTime)
+        thread?.interrupt()
+        var dbTimer=db?.getTime(model!!.fileId.toString(),startDateTime)
 
-            thread = object : Thread() {
-                override fun run() {
-                    try {
-                        while (!this.isInterrupted) {
-                            sleep(1000)
-                            runOnUiThread {
-                                dbTimer=dbTimer!!+1
+        thread = object : Thread() {
+            override fun run() {
+                try {
+                    while (!this.isInterrupted) {
+                        sleep(1000)
+                        runOnUiThread {
+                            dbTimer=dbTimer!!+1
 
-                                Log.e("timerSlider",dbTimer.toString())
-                                db?.insertTime(dbTimer!!, model!!.fileId ,startDateTime)
-                            }
+                            //  Log.e("timerSlider",dbTimer.toString())
+                            db?.insertTime(dbTimer!!, model!!.fileId ,startDateTime)
                         }
-                    } catch (e: InterruptedException) {
                     }
+                } catch (e: InterruptedException) {
                 }
             }
-
-            thread?.start()
         }
+
+        thread?.start()
+    }
 
     override fun onDestroy()
     {
@@ -807,67 +816,67 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
         thread?.interrupt()
     }
 
-  //set image adapter
-  inner class ViewPagerAdapter(context: Context, images: java.util.ArrayList<DownloadFileModel>) : PagerAdapter() {
+    //set image adapter
+    inner class ViewPagerAdapter(context: Context, images: java.util.ArrayList<DownloadFileModel>) : PagerAdapter() {
 
-      var context: Context
-      var images: java.util.ArrayList<DownloadFileModel>
-      var mLayoutInflater: LayoutInflater
-      var doubleClick = false
+        var context: Context
+        var images: java.util.ArrayList<DownloadFileModel>
+        var mLayoutInflater: LayoutInflater
+        var doubleClick = false
 
-      override fun getCount(): Int {
-          return images.size
-      }
+        override fun getCount(): Int {
+            return images.size
+        }
 
-      override fun isViewFromObject(view: View, `object`: Any): Boolean {
-          return view === `object` as LinearLayout
-      }
+        override fun isViewFromObject(view: View, `object`: Any): Boolean {
+            return view === `object` as LinearLayout
+        }
 
-      override fun instantiateItem(container: ViewGroup, position: Int): Any {
+        override fun instantiateItem(container: ViewGroup, position: Int): Any {
 
-          val itemView = mLayoutInflater.inflate(R.layout.itemexp, container, false)
-          val imageView = itemView.findViewById<View>(R.id.imageViewMain) as ImageView
-          val model = images[position]
-          imageView.setImageBitmap(BitmapFactory.decodeFile(model.filePath))
-          Objects.requireNonNull(container).addView(itemView)
+            val itemView = mLayoutInflater.inflate(R.layout.itemexp, container, false)
+            val imageView = itemView.findViewById<View>(R.id.imageViewMain) as ImageView
+            val model = images[position]
+            imageView.setImageBitmap(BitmapFactory.decodeFile(model.filePath))
+            Objects.requireNonNull(container).addView(itemView)
 
-          imageView.setOnClickListener(object : View.OnClickListener {
-              override fun onClick(v: View?) {
+            imageView.setOnClickListener(object : View.OnClickListener {
+                override fun onClick(v: View?) {
 
-                  if(intent.getSerializableExtra("imageArray")!=null)
-                  {
-                      Handler(Looper.getMainLooper())
-                              .postDelayed({
-                                  doubleClick = false
-                              }, 200)
+                    if(intent.getSerializableExtra("imageArray")!=null)
+                    {
+                        Handler(Looper.getMainLooper())
+                            .postDelayed({
+                                doubleClick = false
+                            }, 200)
 
-                      if (doubleClick)
-                      {
-                          floating_action_button_image.visibility=View.GONE
-                          bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED)
-                      }
-                      else
-                      {
-                          doubleClick = true
-                      }
-                  }
-              }
-          })
+                        if (doubleClick)
+                        {
+                            floating_action_button_image.visibility=View.GONE
+                            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED)
+                        }
+                        else
+                        {
+                            doubleClick = true
+                        }
+                    }
+                }
+            })
 
-          return itemView
-      }
+            return itemView
+        }
 
-      override fun destroyItem(container: ViewGroup, position: Int, `object`: Any)
-      {
-          (container as ViewPager).removeView(`object` as View)
-      }
+        override fun destroyItem(container: ViewGroup, position: Int, `object`: Any)
+        {
+            (container as ViewPager).removeView(`object` as View)
+        }
 
-      init {
-          this.context = context
-          this.images = images
-          mLayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-      }
-  }
+        init {
+            this.context = context
+            this.images = images
+            mLayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        }
+    }
 
     override fun onResume() {
         super.onResume()
@@ -877,6 +886,35 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
     override fun onPause() {
         super.onPause()
         stopConnectivity(this)
+    }
+
+    fun slideBrandWiseInsert(startDateTime: String,brandID:Int)
+    {
+        threadBrand?.interrupt()
+        var dbTimer=db?.getBrandTime(brandID.toString(),startDateTime)
+        threadBrand = object : Thread() {
+            override fun run() {
+                try {
+                    while (!this.isInterrupted) {
+                        sleep(1000)
+                        runOnUiThread {
+                            dbTimer=dbTimer!!+1
+
+                            Log.e("timerBrandWiseSlider",dbTimer.toString())
+                            db?.insertBrandTime(dbTimer!!  ,startDateTime,brandID.toString())
+                        }
+                    }
+                } catch (e: InterruptedException) {
+                }
+            }
+        }
+        threadBrand?.start()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        threadBrand?.interrupt()
+        thread?.interrupt()
     }
 
 }

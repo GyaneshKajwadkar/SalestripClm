@@ -62,44 +62,49 @@ class DownloadedFolderAdapter(
     }
     class ViewHoldersWeb(view: View): RecyclerView.ViewHolder(view)
     {
-
         var html_wv:WebView=view.findViewById(R.id.html_wv)
         var webViewTitle:TextView=view.findViewById(R.id.webViewTitle)
-
     }
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
 
-      var itemView :View
-       if(downloadedType.equals("VIDEO"))
-       {
-           itemView = LayoutInflater.from(parent.context)
-               .inflate(R.layout.downloaedvideo_view, parent, false)
-           return ViewHoldersVideo(itemView)
-       }
+        var itemView :View
+        if(downloadedType.equals("VIDEO"))
+        {
+            itemView = LayoutInflater.from(parent.context)
+                .inflate(R.layout.downloaedvideo_view, parent, false)
+            return ViewHoldersVideo(itemView)
+        }
         else if(downloadedType.equals("IMAGE"))
-       {
-           itemView = LayoutInflater.from(parent.context)
-               .inflate(R.layout.downloaedimage_view, parent, false)
-           return ViewHoldersImage(itemView)
-       }
-       else
-       {
-           itemView = LayoutInflater.from(parent.context)
-               .inflate(R.layout.downloaedhtml_view, parent, false)
-           return ViewHoldersWeb(itemView)
-       }
+        {
+            itemView = LayoutInflater.from(parent.context)
+                .inflate(R.layout.downloaedimage_view, parent, false)
+            return ViewHoldersImage(itemView)
+        }
+        else
+        {
+            itemView = LayoutInflater.from(parent.context)
+                .inflate(R.layout.downloaedhtml_view, parent, false)
+            return ViewHoldersWeb(itemView)
+        }
 
     }
 
 
     override fun getItemCount(): Int
     {
-         return filteredData?.size!!
+        return filteredData?.size!!
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+
+        //get current date and time
+        val currentDate: String = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(
+            Date()
+        )
+
+        val currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
 
         if(downloadedType.equals("VIDEO"))
         {
@@ -129,44 +134,38 @@ class DownloadedFolderAdapter(
                 val requestOptions = RequestOptions()
                 requestOptions.isMemoryCacheable
                 Glide.with(context).setDefaultRequestOptions(requestOptions)
-                        .load(Uri.fromFile(File(videomodel.fileDirectoryPath, videomodel.fileName)))
-                        .placeholder(circularProgressDrawable)
-                        .into(videoView.videoThumb_iv)
+                    .load(Uri.fromFile(File(videomodel.fileDirectoryPath, videomodel.fileName)))
+                    .placeholder(circularProgressDrawable)
+                    .into(videoView.videoThumb_iv)
 
 
                 holder.videoThumb_iv.setOnClickListener(View.OnClickListener { v ->
 
                     val intent = Intent(context, VideoPlayerActivity::class.java)
 
-                        //get profile data from share prefrance
-                        var sharePreferance = PreferenceClass(context)
-                        var profileData =sharePreferance?.getPref("profileData")
-                        var  loginModel= Gson().fromJson(profileData, LoginModel::class.java)
+                    //get profile data from share prefrance
+                    var sharePreferance = PreferenceClass(context)
+                    var profileData =sharePreferance?.getPref("profileData")
+                    var  loginModel= Gson().fromJson(profileData, LoginModel::class.java)
 
-                        //get current date and time
-                        val currentDate: String = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(
-                            Date()
-                        )
+                    intent.putExtra("empId", loginModel.empId)
+                    intent.putExtra("brandId", videomodel?.brandId)
+                    intent.putExtra("doctorId", doctorIdDisplayVisual)
+                    intent.putExtra("currentDateTime", currentDate + " " + currentTime)
 
-                        val currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
-                        intent.putExtra("empId", loginModel.empId)
-                        intent.putExtra("brandId", videomodel?.brandId)
-                        intent.putExtra("doctorId", doctorIdDisplayVisual)
-                        intent.putExtra("currentDateTime", currentDate + " " + currentTime)
-
-                        intent.putExtra("videoArray", arraylist)
-                        for ((index, value) in arraylist?.withIndex()!!) {
+                    intent.putExtra("videoArray", arraylist)
+                    for ((index, value) in arraylist?.withIndex()!!) {
                         if(value==videomodel)
                         {
                             intent.putExtra("position", index)
 
                         }
-                         }
-                        intent.putExtra("model", videomodel)
-                        context.startActivity(intent)
+                    }
+                    intent.putExtra("model", videomodel)
+                    context.startActivity(intent)
 
-                        val db= DatabaseHandler(context)
-                        db.insertStartTimeSlide(currentDate + " " + currentTime,doctorIdDisplayVisual,brandID)
+                    val db= DatabaseHandler(context)
+                    db.insertStartTimeSlide(currentDate + " " + currentTime,doctorIdDisplayVisual,brandID,videomodel.brandName,0, currentTime)
 
                 })
 
@@ -204,9 +203,9 @@ class DownloadedFolderAdapter(
                 val requestOptions = RequestOptions()
                 requestOptions.isMemoryCacheable
                 Glide.with(context).setDefaultRequestOptions(requestOptions)
-                        .load(Uri.fromFile(File(imagemodel.fileDirectoryPath, imagemodel.fileName)))
-                        .placeholder(circularProgressDrawable)
-                        .into(videoView.pics_iv)
+                    .load(Uri.fromFile(File(imagemodel.fileDirectoryPath, imagemodel.fileName)))
+                    .placeholder(circularProgressDrawable)
+                    .into(videoView.pics_iv)
 
                 videoView.pics_iv.setOnClickListener({
                     val intent = Intent(context, PhotoSlideShowActivity::class.java)
@@ -216,12 +215,7 @@ class DownloadedFolderAdapter(
                     var profileData =sharePreferance?.getPref("profileData")
                     var  loginModel= Gson().fromJson(profileData, LoginModel::class.java)
 
-                    //get current date and time
-                    val currentDate: String = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(
-                            Date()
-                    )
 
-                    val currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
                     intent.putExtra("empId", loginModel.empId)
                     intent.putExtra("brandId", imagemodel?.brandId)
                     intent.putExtra("doctorId", doctorIdDisplayVisual)
@@ -230,17 +224,17 @@ class DownloadedFolderAdapter(
 
                     for ((index, value) in arraylist?.withIndex()!!)
                     {
-                    if(value==imagemodel)
-                    {
-                        intent.putExtra("position", index)
-                    }
+                        if(value==imagemodel)
+                        {
+                            intent.putExtra("position", index)
+                        }
                     }
 
                     intent.putExtra("model", imagemodel)
                     context.startActivity(intent)
                     val db= DatabaseHandler(context)
 
-                    db.insertStartTimeSlide(currentDate + " " + currentTime,doctorIdDisplayVisual,imagemodel!!.brandId)
+                    db.insertStartTimeSlide(currentDate + " " + currentTime,doctorIdDisplayVisual,imagemodel!!.brandId,imagemodel.brandName,0, currentTime)
 
                 })
             }
@@ -304,11 +298,6 @@ class DownloadedFolderAdapter(
                         var profileData =sharePreferance?.getPref("profileData")
                         var  loginModel= Gson().fromJson(profileData, LoginModel::class.java)
 
-                        //get current date and time
-                        val currentDate: String = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(
-                                Date()
-                        )
-
                         val currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
                         intent.putExtra("empId", loginModel.empId)
                         intent.putExtra("brandId", zipmodel?.brandId)
@@ -329,7 +318,7 @@ class DownloadedFolderAdapter(
                         context.startActivity(intent)
 
                         val db= DatabaseHandler(context)
-                        db.insertStartTimeSlide(currentDate + " " + currentTime,doctorIdDisplayVisual,zipmodel?.brandId)
+                        db.insertStartTimeSlide(currentDate + " " + currentTime,doctorIdDisplayVisual,zipmodel?.brandId,zipmodel.brandName,0, currentTime)
 
                         oneTime = false
 
@@ -338,7 +327,7 @@ class DownloadedFolderAdapter(
                         }, 500)
 
                     }
-                          true
+                    true
                 })
 
 

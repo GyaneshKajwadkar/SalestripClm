@@ -5,6 +5,7 @@ import `in`.processmaster.salestripclm.ConnectivityChangeReceiver
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.alertDialogNetwork
 import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.connectivityChangeReceiver
+import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.models.GetScheduleModel
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.models.TeamsModel
@@ -148,66 +149,6 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
 
     }
 
-
-    //exit app alert
-    fun exitAppAlert(context: Context) {
-        val dialogBuilder = AlertDialog.Builder(context)
-        val inflater = this.layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.exitalert, null)
-        dialogBuilder.setView(dialogView)
-
-        val alertDialog: AlertDialog = dialogBuilder.create()
-        alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
-
-        val exit_btn =
-            dialogView.findViewById<View>(R.id.exit_btn) as MaterialButton
-        val cancel_btn =
-            dialogView.findViewById<View>(R.id.cancel_btn) as MaterialButton
-
-        exit_btn.setOnClickListener {
-            finish();
-            System.exit(0);
-            alertDialog.dismiss()
-        }
-
-        cancel_btn.setOnClickListener {
-            alertDialog.dismiss()
-        }
-
-        alertDialog.show()
-    }
-
-
-    //common alert with message and ok button
-    @SuppressLint("WrongViewCast")
-    public fun commonAlert(context: Activity, headerString: String, message: String) {
-        val dialogBuilder = AlertDialog.Builder(context)
-        val inflater = context.layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.common_alert, null)
-        dialogBuilder.setView(dialogView)
-
-        val alertDialog: AlertDialog = dialogBuilder.create()
-        alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
-
-        val okBtn_rl =
-            dialogView.findViewById<View>(R.id.ok_btn) as AppCompatButton
-
-        var headerTv =
-            dialogView.findViewById<View>(R.id.header_tv) as TextView
-        var messageTv =
-            dialogView.findViewById<View>(R.id.message_tv) as TextView
-
-        headerTv.setText(headerString)
-        messageTv.setText(message)
-
-        okBtn_rl.setOnClickListener {
-            alertDialog.dismiss()
-        }
-
-        alertDialog.show()
-    }
-
-
     //check permission
     fun dexterPermission(context: Context) {
         Dexter.withContext(this)
@@ -252,8 +193,6 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
                 alertDialog!!.dismiss()
             }
         }
-
-
         val dialogBuilder = AlertDialog.Builder(context)
         val inflater = this.layoutInflater
         val dialogView: View = inflater.inflate(R.layout.permissiondenied, null)
@@ -351,100 +290,7 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
         return higherVersion.toInt() <= existingVersion.toInt()
     }
 
-
-    //check internet availability
-    fun isInternetAvailable(context: Context): Boolean {
-        var result = false
-        val connectivityManager =
-            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        //check versin of mobile device
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val networkCapabilities = connectivityManager.activeNetwork ?: return false
-            val actNw =
-                connectivityManager.getNetworkCapabilities(networkCapabilities) ?: return false
-            result = when {
-                actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
-                actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
-                actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
-                else -> false
-            }
-        } else {
-            connectivityManager.run {
-                connectivityManager.activeNetworkInfo?.run {
-                    result = when (type) {
-                        ConnectivityManager.TYPE_WIFI -> true
-                        ConnectivityManager.TYPE_MOBILE -> true
-                        ConnectivityManager.TYPE_ETHERNET -> true
-                        else -> false
-                    }
-                }
-            }
-        }
-
-        return result
-    }
-
-    //enable progress with screen not touchable
-    fun enableProgress(progressBar: RelativeLayout) {
-        progressBar?.visibility = View.VISIBLE
-        getWindow().setFlags(
-            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-        )
-    }
-
-    //disable progress bar
-    fun disableProgress(progressBar: RelativeLayout,context: Activity) {
-        progressBar?.visibility = View.GONE
-        context.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-    }
-    fun enableProgress(progressBar: RelativeLayout,context: Activity) {
-        progressBar?.visibility = View.VISIBLE
-        context.getWindow().setFlags(
-            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-        )
-    }
-
-    //disable progress bar
-    fun disableProgress(progressBar: RelativeLayout) {
-        progressBar?.visibility = View.GONE
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-    }
-
-    //enable progress with screen not touchable
-    fun enableProgress(progressBar: ProgressBar) {
-        progressBar?.visibility = View.VISIBLE
-        getWindow().setFlags(
-            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-        )
-    }
-
-    //disable progress bar
-    fun disableProgress(progressBar: ProgressBar) {
-        progressBar?.visibility = View.GONE
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-
-    }
-
-    fun HideKeyboard(view: View) {
-        val inputMethodManager =
-            getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
-    }
-
-    fun showSnackbar(view: View, message: String) {
-        Snackbar.make(view, message, Snackbar.LENGTH_LONG)
-            .setAction("Close", View.OnClickListener { })
-            .setActionTextColor(Color.YELLOW)
-            .show()
-    }
-
-
-
-
-   fun stopConnectivity(activity: Activity)
+    fun stopConnectivity(activity: Activity)
     {
         try {
             activity.unregisterReceiver(connectivityChangeReceiver);
@@ -460,12 +306,11 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
             APIInterface::class.java)
     }
 
-
     //Get teams api
-    fun getTeamsApi( context:Context, progressmessage:String) : ArrayList<DocManagerModel>
+    fun getTeamsApi( context:Activity, progressmessage:String) : ArrayList<DocManagerModel>
     {
         progressMessage_tv?.setText(progressmessage)
-        enableProgress(progressView_parentRv!!)
+        GeneralClass(this).enableProgress(progressView_parentRv!!)
         var getResponseList=ArrayList<DocManagerModel>()
 
         var call: Call<TeamsModel> = getSecondaryApiInterface().getTeamsMember(
@@ -499,13 +344,13 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
                     Toast.makeText(this@BaseActivity, "Server error ", Toast.LENGTH_SHORT).show()
                     return
                 }
-                disableProgress(progressView_parentRv!!)
+                GeneralClass(context).disableProgress(progressView_parentRv!!)
 
             }
 
             override fun onFailure(call: Call<TeamsModel?>, t: Throwable?) {
                 call.cancel()
-                disableProgress(progressView_parentRv!!)
+                GeneralClass(context).disableProgress(progressView_parentRv!!)
 
             }
         })
@@ -523,8 +368,8 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
                     val gson = Gson()
                     var model = response.body()
-                    dbBase?.insertOrUpdateAPI("1",gson.toJson(model))
-             Log.e("theScheduledApiModel",model?.getData()?.meetingList?.size.toString())
+                    dbBase?.insertOrUpdateAPI(-1,gson.toJson(model))
+                    Log.e("theScheduledApiModel",model?.getData()?.meetingList?.size.toString())
 
                 }
                 else
@@ -540,36 +385,33 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
     }
 
 
-     fun getsheduledMeeting_api(): String? {
-
-        progressMessage_tv?.setText("Please wait")
-        enableProgress(progressView_parentRv!!)
-
-
-        var call: Call<GetScheduleModel> = getSecondaryApiInterface().getScheduledMeeting("bearer " + loginModelBase?.accessToken,loginModelBase.empId.toString()) as Call<GetScheduleModel>
-        call.enqueue(object : Callback<GetScheduleModel?> {
-            override fun onResponse(call: Call<GetScheduleModel?>?, response: Response<GetScheduleModel?>) {
-                Log.e("getscheduled_api", response.code().toString() + "")
-                if (response.code() == 200 && !response.body().toString().isEmpty()) {
-                    val gson = Gson()
-                    var model = response.body()
-                    dbBase?.insertOrUpdateAPI("1",gson.toJson(model))
-                }
-                else
-                {
-                    Log.e("elseGetScheduled", response.code().toString())
-                }
-                disableProgress(progressView_parentRv!!)
-            }
-
-            override fun onFailure(call: Call<GetScheduleModel?>, t: Throwable?) {
-                call.cancel()
-                disableProgress(progressView_parentRv!!)
-            }
-        })
-
-        return dbBase.getApiDetail(1)
-    }
+//     fun getsheduledMeeting_api(): String? {
+//
+//        progressMessage_tv?.setText("Please wait")
+//
+//
+//        var call: Call<GetScheduleModel> = getSecondaryApiInterface().getScheduledMeeting("bearer " + loginModelBase?.accessToken,loginModelBase.empId.toString()) as Call<GetScheduleModel>
+//        call.enqueue(object : Callback<GetScheduleModel?> {
+//            override fun onResponse(call: Call<GetScheduleModel?>?, response: Response<GetScheduleModel?>) {
+//                Log.e("getscheduled_api", response.code().toString() + "")
+//                if (response.code() == 200 && !response.body().toString().isEmpty()) {
+//                    val gson = Gson()
+//                    var model = response.body()
+//                    dbBase?.insertOrUpdateAPI("1",gson.toJson(model))
+//                }
+//                else
+//                {
+//                    Log.e("elseGetScheduled", response.code().toString())
+//                }
+//            }
+//
+//            override fun onFailure(call: Call<GetScheduleModel?>, t: Throwable?) {
+//                call.cancel()
+//            }
+//        })
+//
+//        return dbBase.getApiDetail(1)
+//    }
 
     suspend fun getCredientailAPI(context: Activity)
     {
@@ -597,9 +439,9 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
     }
 
 
-     fun getCredientail_api(context: Activity) {
+    fun getCredientail_api(context: Activity) {
 
-         var call: Call<ZoomCredientialModel> = getSecondaryApiInterface().getZoomCredientail("bearer " + loginModelBase?.accessToken,loginModelBase.empId.toString()) as Call<ZoomCredientialModel>
+        var call: Call<ZoomCredientialModel> = getSecondaryApiInterface().getZoomCredientail("bearer " + loginModelBase?.accessToken,loginModelBase.empId.toString()) as Call<ZoomCredientialModel>
         call.enqueue(object : Callback<ZoomCredientialModel?> {
             override fun onResponse(call: Call<ZoomCredientialModel?>?, response: Response<ZoomCredientialModel?>) {
                 Log.e("getcrediential_api", response.code().toString() + "")
@@ -623,89 +465,89 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
     }
 
 
-  /*  override fun onZoomSDKLoginResult(result: Long) {
-        if (result == ZoomAuthenticationError.ZOOM_AUTH_ERROR_SUCCESS.toLong())
-        {
-            Log.e("logResult", "loginSuccessoverride")
-            UserLoginCallback.getInstance().removeListener(this)
-        }
-        else
-        {
-            Log.e("logResult", "loginErroroverride")
-        }
-    }
+    /*  override fun onZoomSDKLoginResult(result: Long) {
+          if (result == ZoomAuthenticationError.ZOOM_AUTH_ERROR_SUCCESS.toLong())
+          {
+              Log.e("logResult", "loginSuccessoverride")
+              UserLoginCallback.getInstance().removeListener(this)
+          }
+          else
+          {
+              Log.e("logResult", "loginErroroverride")
+          }
+      }
 
-    override fun onZoomSDKLogoutResult(result: Long) {
-        if (result == ZoomAuthenticationError.ZOOM_AUTH_ERROR_SUCCESS.toLong()) {
+      override fun onZoomSDKLogoutResult(result: Long) {
+          if (result == ZoomAuthenticationError.ZOOM_AUTH_ERROR_SUCCESS.toLong()) {
 
-            Toast.makeText(
-                this,
-                "Logout successfully",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
+              Toast.makeText(
+                  this,
+                  "Logout successfully",
+                  Toast.LENGTH_SHORT
+              ).show()
+          }
 
-        else {
-            Toast.makeText(
-                this,
-                "Logout failed result code = $result",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-    }
+          else {
+              Toast.makeText(
+                  this,
+                  "Logout failed result code = $result",
+                  Toast.LENGTH_SHORT
+              ).show()
+          }
+      }
 
-    override fun onZoomIdentityExpired() {
-    }
+      override fun onZoomIdentityExpired() {
+      }
 
-    override fun onZoomAuthIdentityExpired() {
-    }
+      override fun onZoomAuthIdentityExpired() {
+      }
 
-    override fun onZoomSDKInitializeResult(errorCode: Int, internalErrorCode: Int) {
-        if (errorCode != ZoomError.ZOOM_ERROR_SUCCESS) {
-            Log.e("zoomErrorLog","error- $errorCode internalErrorcode- $internalErrorCode")
-        }
-        else {
-            if (zoomSDKBase?.tryAutoLoginZoom() == ZoomApiError.ZOOM_API_ERROR_SUCCESS) {
-                UserLoginCallback.getInstance().addListener(this)
+      override fun onZoomSDKInitializeResult(errorCode: Int, internalErrorCode: Int) {
+          if (errorCode != ZoomError.ZOOM_ERROR_SUCCESS) {
+              Log.e("zoomErrorLog","error- $errorCode internalErrorcode- $internalErrorCode")
+          }
+          else {
+              if (zoomSDKBase?.tryAutoLoginZoom() == ZoomApiError.ZOOM_API_ERROR_SUCCESS) {
+                  UserLoginCallback.getInstance().addListener(this)
 
-            }
-            else if(!zoomSDKBase?.isLoggedIn!!)
-            {
-                loginFirstbase()
-                UserLoginCallback.getInstance().addListener(this)
-            }}
-    }
+              }
+              else if(!zoomSDKBase?.isLoggedIn!!)
+              {
+                  loginFirstbase()
+                  UserLoginCallback.getInstance().addListener(this)
+              }}
+      }
 
 
 
-    override fun onMeetingStatusChanged(p0: MeetingStatus?, p1: Int, p2: Int) {
-        TODO("Not yet implemented")
-    }
+      override fun onMeetingStatusChanged(p0: MeetingStatus?, p1: Int, p2: Int) {
+          TODO("Not yet implemented")
+      }
 
-   private fun loginFirstbase(): Unit {
+     private fun loginFirstbase(): Unit {
 
-        //  val meetingService: MeetingService? = ZoomSDK.getInstance().getMeetingService()
+          //  val meetingService: MeetingService? = ZoomSDK.getInstance().getMeetingService()
 
-        val ret: Int = EmailUserLoginHelper.getInstance().login(
-            "kajwadkar13@gmail.com",
-            "13Zoom@003"
-        )
-        if (ret != ZoomApiError.ZOOM_API_ERROR_SUCCESS) {
-            if (ret == ZoomApiError.ZOOM_API_ERROR_EMAIL_LOGIN_IS_DISABLED)
-            {
-                Log.e("logResult", "loginErrorFirst")
-            }
+          val ret: Int = EmailUserLoginHelper.getInstance().login(
+              "kajwadkar13@gmail.com",
+              "13Zoom@003"
+          )
+          if (ret != ZoomApiError.ZOOM_API_ERROR_SUCCESS) {
+              if (ret == ZoomApiError.ZOOM_API_ERROR_EMAIL_LOGIN_IS_DISABLED)
+              {
+                  Log.e("logResult", "loginErrorFirst")
+              }
 
-            else if(ret == ZoomApiError.ZOOM_API_ERROR_SUCCESS)
-            {
-                Log.e("logResult", "loginSuccessFirst")
-            }
+              else if(ret == ZoomApiError.ZOOM_API_ERROR_SUCCESS)
+              {
+                  Log.e("logResult", "loginSuccessFirst")
+              }
 
-            else
-            {
-                Log.e("logResult", "login and initilized")
-            }
-        } else {
-        }
-    }*/
+              else
+              {
+                  Log.e("logResult", "login and initilized")
+              }
+          } else {
+          }
+      }*/
 }

@@ -22,7 +22,6 @@ import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import in.processmaster.salestripclm.R;
-import in.processmaster.salestripclm.presentation_and_zoom.OnlinePresentationActivity;
 import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.AndroidAppUtil;
 import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.MyMeetingActivity;
 import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.adapter.SimpleMenuAdapter;

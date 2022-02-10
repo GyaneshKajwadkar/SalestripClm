@@ -60,21 +60,21 @@ class ScheduleMeetingAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleMeetingAdapter.MyViewHolder {
 
         if(viewTypeConst==1)
-       {
-           val itemView = LayoutInflater.from(parent.context)
-               .inflate(R.layout.shedulemeeting_viewsmall, parent, false)
-           return MyViewHolder(itemView)
-       }
+        {
+            val itemView = LayoutInflater.from(parent.context)
+                .inflate(R.layout.shedulemeeting_viewsmall, parent, false)
+            return MyViewHolder(itemView)
+        }
         else
-       {
-           val itemView = LayoutInflater.from(parent.context)
-               .inflate(R.layout.shedulemeeting_view, parent, false)
-           return MyViewHolder(itemView)
-       }
+        {
+            val itemView = LayoutInflater.from(parent.context)
+                .inflate(R.layout.shedulemeeting_view, parent, false)
+            return MyViewHolder(itemView)
+        }
     }
 
     override fun getItemCount(): Int {
-      return filteredData!!.size
+        return filteredData!!.size
     }
 
     override fun onBindViewHolder(holder: ScheduleMeetingAdapter.MyViewHolder, @SuppressLint("RecyclerView") position: Int)
@@ -88,11 +88,11 @@ class ScheduleMeetingAdapter(
 
                 val r: Runnable = object : Runnable {
                     override fun run() {
-                    if(retunDialog)
-                        initilizeDelete(position)
+                        if(retunDialog)
+                            initilizeDelete(position)
                     }
                 }
-             AlertClass(context).twoButtonAlert("cancel dialog","cancel meeting",
+                AlertClass(context).twoButtonAlert("cancel dialog","cancel meeting",
                     1,"cancel meeting","Cancel Meeting?",r)
 
             })
@@ -117,7 +117,7 @@ class ScheduleMeetingAdapter(
 
             holder.startmeeting_btn.setOnClickListener({
                 val zoomSDK = ZoomSDK.getInstance()
-               // val preMeetingService: PreMeetingService = zoomSDK.getPreMeetingService()
+                // val preMeetingService: PreMeetingService = zoomSDK.getPreMeetingService()
                 //val item = preMeetingService.getMeetingItemByUniqueId(meetingList?.get(position)?.zoomMeetingId?.toLong()!!)
                 val c: Date = Calendar.getInstance().getTime()
                 val df = SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault())
@@ -148,12 +148,12 @@ class ScheduleMeetingAdapter(
                     }
                     else
                     {
-                        BaseActivity().commonAlert(context as Activity,"Meeting Alert","Meeting not start before the scheduled time")
+                        AlertClass(context).commonAlert("Meeting Alert","Meeting not start before the scheduled time")
                     }
 
                 }
                 else{
-                    BaseActivity().commonAlert(context as Activity,"Meeting Alert","Meeting not start before the scheduled time")
+                    AlertClass(context).commonAlert("Meeting Alert","Meeting not start before the scheduled time")
                 }
 
             })
@@ -222,7 +222,7 @@ class ScheduleMeetingAdapter(
 
     fun initilizeDelete(position: Int)
     {
-        ProgressClass(context).showAlert("Deleting data...")
+        AlertClass(context).showAlert("Deleting data...")
         val coroutine=CoroutineScope(Dispatchers.IO).launch {
             val deleteSchedule= async {
                 setSheduleApi(filteredData?.get(position))
@@ -237,7 +237,7 @@ class ScheduleMeetingAdapter(
             }
         }
         coroutine.invokeOnCompletion {
-            ProgressClass(context).hideAlert()
+            AlertClass(context).hideAlert()
         }
 
     }
@@ -298,7 +298,7 @@ class ScheduleMeetingAdapter(
                     var model = response.body()
                     Log.e("abcdef",model.toString())
 
-                    DatabaseHandler(context)?.insertOrUpdateAPI("1",gson.toJson(model))
+                    DatabaseHandler(context)?.insertOrUpdateAPI(-1,gson.toJson(model))
 
 
                     filteredData.removeAt(position)

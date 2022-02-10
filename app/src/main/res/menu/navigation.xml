@@ -17,6 +17,9 @@
         android:icon="@drawable/ic_display_visual"
         android:title="Presentation"/>
 
-
+    <item
+        android:id="@+id/callPage"
+        android:icon="@drawable/ic_call"
+        android:title="Calls"/>
 
 </menu>

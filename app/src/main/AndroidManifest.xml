@@ -2,8 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="in.processmaster.salestripclm">
 
- <!--   android:theme="@style/ZMTheme.SubWindow"-->
-
     <supports-screens
         android:anyDensity="true"
         android:resizeable="true"
@@ -30,6 +28,12 @@
         android:usesCleartextTraffic="true">
 
         <activity
+            android:name=".activity.SubmitE_DetailingActivity"
+            android:exported="true"
+            android:screenOrientation="landscape"
+            android:windowSoftInputMode="adjustPan"/>
+
+        <activity
             android:name=".activity.MailActivity"
             android:exported="true"
             android:launchMode="singleTop"
@@ -37,7 +41,7 @@
             android:windowSoftInputMode="stateHidden" />
 
         <activity
-            android:name=".presentation_and_zoom.OnlinePresentationActivity"
+            android:name=".activity.OnlinePresentationActivity"
             android:launchMode="singleTop"
             android:screenOrientation="landscape"
             android:windowSoftInputMode="stateHidden" />

@@ -20,7 +20,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     Context context;
 
-   //=========================================hold SyncData===============================================
+    //=========================================hold SyncData===============================================
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "SalesTrip_CLM_db";
     private static final String TABLE_DATA = "SyncData";
@@ -42,16 +42,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String EDETALING_TYPE = "e_Type";
     private static final String ISFAVITEM = "is_favItem";
 
-    //=========================================hold VisualData=====================================
+    //=========================================hold eDetailingData==================================
     private static final String TABLE_SENDVISUALADS = "visual_ads";
     private static final String DOCTOR_ID = "doctor_id";
     private static final String BRAND_ID = "brand_id";
     private static final String SLIDE_START_TIME = "set_timeslide";
     private static final String SLIDE_STOP_TIME = "end_timeslide";
     private static final String IS_SUBMIT = "data_submit";
+    private static final String BRAND_NAME = "brand_name";
+    private static final String MONITOR_TIME = "monitorTime";
+    private static final String START_TIME_BRANDS = "starttimebrands";
+    private static final String END_TIME_BRANDS = "endtimebrands";
 
 
-    //=======================================VisualAdsChild========================================
+    //=======================================eDetailingChild=========================================
     private static final String TABLE_CHILD_VISUAL_ADS = "visual_ads_child";
     private static final String TIMESET = "setTime";
     private static final String ISLIKE = "is_like";
@@ -92,7 +96,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"+ DOCTOR_ID
                 + " INTEGER," +  BRAND_ID + " INTEGER,"
                 +  SLIDE_START_TIME + " TEXT," +  SLIDE_STOP_TIME + " TEXT,"
-                 +  IS_SUBMIT + " INTEGER" +")";
+                +  IS_SUBMIT + " INTEGER," +BRAND_NAME + " TEXT," +MONITOR_TIME + " INTEGER,"
+                +START_TIME_BRANDS + " TEXT,"+ END_TIME_BRANDS +" TEXT" +")";
         db.execSQL(CREATE_VISUALADS_TABLE);
 
         //visual child database
@@ -100,14 +105,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_ID + " INTEGER,"
                 +  TIMESET + " TEXT,"
                 +  ISLIKE + " INTEGER," +  COMMENT + " TEXT,"
-                +  SINGLE_SLIDE_TIMER + " INTEGER," +  FILE_ID + " INTEGER"+ ")";
+                +  SINGLE_SLIDE_TIMER + " INTEGER," +  FILE_ID + " INTEGER" +")";
         db.execSQL(CREATE_VISUALADS_CHILD_TABLE);
 
         //api store database
         String CREATE_API_TABLE = "CREATE TABLE " + TABLE_API_DATA + "("
                 + APIKEY_ID + " INTEGER,"
                 +  APIKEY_DATA + " TEXT"
-              + ")";
+                + ")";
         db.execSQL(CREATE_API_TABLE);
 
     }
@@ -127,7 +132,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     //=====================================Sync DataBase method=====================================
     //add data to database as a string.
-    public void addData(String data) {
+    public void addSyncData(String data) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_DATA, data);
@@ -149,26 +154,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     // delete all data
     public void deleteAll()
     {  SQLiteDatabase db = this.getWritableDatabase();
-      db.execSQL("delete from "+ TABLE_DATA);
+        db.execSQL("delete from "+ TABLE_DATA);
     }
 
     // code to get all data in a list view
-    public String getAllData() {
-       String strData = "";
-        // Select All Query
+    public String getAllDataSync() {
+        String strData = "";
         String selectQuery = "SELECT  * FROM " + TABLE_DATA;
-
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
-
-        // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
             do {
                 strData=cursor.getString(1);
             } while (cursor.moveToNext());
         }
-
-        // return contact list
         return strData;
     }
 
@@ -183,17 +182,23 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         initialValues.put(EDETAILING_DATA, data);
 
         //first check is data available if yes then update if no then insert
-        if(CheckIsDataAlreadyInDBorNot(String.valueOf(idModel)))
-        {
-            db.update(TABLE_EDETAILING, initialValues, "id=?", new String[] {String.valueOf(idModel)});
-            db.close();
-        }
-        else
-        {
+        int u = db.update(TABLE_EDETAILING, initialValues, "id=?", new String[]{String.valueOf(idModel)});
+
+        if (u == 0) {
             db.insert(TABLE_EDETAILING, null, initialValues);
-            db.close();
         }
 
+//        if(CheckIsDataAlreadyInDBorNot(String.valueOf(idModel)))
+//        {
+//            db.update(TABLE_EDETAILING, initialValues, "id=?", new String[] {String.valueOf(idModel)});
+//
+//        }
+//        else
+//        {
+//            db.insert(TABLE_EDETAILING, null, initialValues);
+//
+//        }
+        db.close();
     }
 
     public void updateFavourite(String idModel,int isFavInt)
@@ -205,29 +210,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.update(TABLE_EDETAILING, initialValues, "id=?", new String[] {String.valueOf(idModel)});
         db.close();
     }
-
- /*   @SuppressLint("Range")
-    public boolean getFavEdetailing(String idModel)
-    {
-        boolean isFavAdded=false;
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        Cursor cursor = db.query(TABLE_EDETAILING, new String[] { ISFAV}, KEY_ID + "=?",
-                new String[] { String.valueOf(idModel) }, null, null, null, null);
-        if (cursor.moveToFirst()) {
-            do {
-                if(cursor.getInt(cursor.getColumnIndex("is_fav"))==1)
-                {
-                    isFavAdded= true;
-                }
-                else{
-                    isFavAdded= false;
-                }
-
-            } while (cursor.moveToNext());
-        }
-        return isFavAdded;
-    }*/
 
     // check data is already exist.
     public boolean CheckIsDataAlreadyInDBorNot(String fieldValue) {
@@ -272,7 +254,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 {
                     contact.setFilePath(cursor.getString(3));
                     contact.setIsSaved(Integer.parseInt(cursor.getString(2)));
-
                 }
 
                 edetailList.add(contact);
@@ -300,23 +281,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 //if downloaded file path exist then add to edetailng model class
                 if(cursor.getString(3)!=null)
                 {
-                   edetailModel.setFilePath(cursor.getString(3));
-                   edetailModel.setIsSaved(Integer.parseInt(cursor.getString(2)));
-
+                    edetailModel.setFilePath(cursor.getString(3));
+                    edetailModel.setIsSaved(Integer.parseInt(cursor.getString(2)));
                 }
 
                 if(isDownloaded && edetailModel.getIsSaved()==1)
                 {
                     edetailList.add(edetailModel);
-
                 }
                 else if(!isDownloaded && edetailModel.getIsSaved()!=1)
                 {
                     edetailList.add(edetailModel);
-
                 }
-
-
 
             } while (cursor.moveToNext());
         }
@@ -341,7 +317,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             }
         }
 
-       return returnValue;
+        return returnValue;
     }
 
 
@@ -349,7 +325,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     @SuppressLint("Range")
     public  ArrayList<DevisionModel.Data.EDetailing> getAllFavBrands()
     {
-       int id=1;
+        int id=1;
         ArrayList<DevisionModel.Data.EDetailing> downloadFileList=new ArrayList<>();
         String data="";
         SQLiteDatabase db = this.getReadableDatabase();
@@ -387,7 +363,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 new String[] { String.valueOf(id) }, null, null, null, null);
         if (cursor.moveToFirst()) {
             do {
-                 data=cursor.getString(cursor.getColumnIndex("filePath"));
+                data=cursor.getString(cursor.getColumnIndex("filePath"));
             } while (cursor.moveToNext());
         }
         return data;
@@ -395,12 +371,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public void deleteEdetailingData(String id)
     {
-
         SQLiteDatabase db = getWritableDatabase();
-        db.delete(
-                TABLE_EDETAILING,  // Where to delete
-                KEY_ID+" = ?",
-                new String[]{id});  // What to delete
+        db.delete(TABLE_EDETAILING, KEY_ID+" = ?", new String[]{id});
         db.close();
 
     }
@@ -561,7 +533,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     TABLE_EDETAILINGDOWNLOAD,  // Where to delete
                     KEY_IDParent+" = ?",
                     new String[]{id}
-                    );
+            );
         }
         db.close();
 
@@ -638,17 +610,26 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     //=======================================VisualAds table==============================================
     //insert or update visual ads table
-    public void insertStartTimeSlide(String currentTime,int addDoctorId,int addBrandId)
+    public void insertStartTimeSlide(String currentTime,int addDoctorId,int addBrandId, String brandName,int monitorTime,String startTime)
     {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues initialValues = new ContentValues();
         initialValues.put(SLIDE_START_TIME, currentTime);
         initialValues.put(DOCTOR_ID, addDoctorId);
         initialValues.put(BRAND_ID, addBrandId);
+        initialValues.put(BRAND_NAME, brandName);
+        initialValues.put(START_TIME_BRANDS, startTime);
 
         if(CheckVisualAds(currentTime,addBrandId))
         {
-            Log.e("insertStartTimeSlide","update");
+//           String brandingStartTime=getBrandStartTime(String.valueOf(addBrandId),currentTime);
+//           Log.e("hfisdhfuisgf",brandingStartTime);
+//           ContentValues initialValues2 = new ContentValues();
+//           initialValues2.put(START_TIME_BRANDS, brandingStartTime+startTime);
+//
+//           db.update(TABLE_SENDVISUALADS, initialValues2, "set_timeslide=? AND brand_id= ? AND doctor_id= ?", new String[] {String.valueOf(startTime), String.valueOf(addBrandId), String.valueOf(addDoctorId)});  // number 1 is the _id here, update to variable for your code
+//
+//           Log.e("insertStartTimeSlide","update");
         }
         else
         {
@@ -656,6 +637,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             db.insert(TABLE_SENDVISUALADS, null, initialValues);
         }
         db.close();
+    }
+
+    public void updateBrandEndTime(String endTime, String startTime, int doctorID, int brandID)
+    {
+        //  String brandingStartTime=getBrandStartTime(String.valueOf(brandID),startTime);
+//
+        //  SQLiteDatabase db = this.getWritableDatabase();
+        //  ContentValues initialValues = new ContentValues();
+        //  initialValues.put(START_TIME_BRANDS, brandingStartTime+"-"+endTime+", ");
+        //  db.update(TABLE_SENDVISUALADS, initialValues, "set_timeslide=? AND brand_id= ? AND doctor_id= ?", new String[] {String.valueOf(startTime), String.valueOf(brandID), String.valueOf(doctorID)});  // number 1 is the _id here, update to variable for your code
+        //  db.close();
     }
 
     //Add end time
@@ -666,9 +658,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         initialValues.put(SLIDE_STOP_TIME, endTime);
         initialValues.put(IS_SUBMIT, 1);
 
-        long isUpdated=  db.update(TABLE_SENDVISUALADS, initialValues, "set_timeslide=?", new String[] {String.valueOf(startTime)});  // number 1 is the _id here, update to variable for your code
+        db.update(TABLE_SENDVISUALADS, initialValues, "set_timeslide=?", new String[] {String.valueOf(startTime)});  // number 1 is the _id here, update to variable for your code
         db.close();
-        Log.e("isUpdated",isUpdated+"");
     }
 
     //get all submitted visualads list
@@ -684,23 +675,29 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 String startTime= cursor.getString(3);
                 int isEnd=cursor.getInt(5);
 
-                VisualAdsModel_Send visualModel  = new VisualAdsModel_Send();
-                visualModel.setId(id);
-                visualModel.setDoctorId(cursor.getString(1));
-                visualModel.setStartDate(startTime);
-                visualModel.setEndDate(cursor.getString(4));
-                visualModel.setBrandId(cursor.getString(2));
                 if(isEnd==1)
                 {
+                    VisualAdsModel_Send visualModel  = new VisualAdsModel_Send();
+                    visualModel.setId(id);
+                    visualModel.setDoctorId(cursor.getString(1));
+                    visualModel.setStartDate(startTime);
+                    visualModel.setEndDate(cursor.getString(4));
+                    visualModel.setBrandId(cursor.getString(2));
+                    visualModel.setBrandName(cursor.getString(6));
+                    visualModel.setMonitorTime(cursor.getInt(7));
+                    visualModel.setBrandWiseStartTime(cursor.getString(8));
+                    visualModel.setBrandWiseStopTime(cursor.getString(9));
+
                     visualModel.setEnd(true);
                     visualModel.setChildDataArray(getAllChildBy_ID(startTime));
+                    edetailList.add(visualModel);
+
                 }
                 else{
                     deleteVisualAds(String.valueOf(id));
                     deleteVisualAdsChild(startTime);
                 }
 
-                edetailList.add(visualModel);
             } while (cursor.moveToNext());
         }
         return edetailList;
@@ -718,6 +715,46 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void deleteAllVisualAds()
     {  SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("delete from "+ TABLE_SENDVISUALADS);
+    }
+
+    public void insertBrandTime(int setTime, String mainTime,String brandId)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues initialValues = new ContentValues();
+        initialValues.put(MONITOR_TIME, setTime);
+        db.update(TABLE_SENDVISUALADS, initialValues, SLIDE_START_TIME+" = ? AND "+BRAND_ID+" = ? ", new String[] {mainTime, brandId});  // number 1 is the _id here, update to variable for your code
+        db.close();
+    }
+
+    @SuppressLint("Range")
+    public int getBrandTime(String brandId, String mainTime)
+    {
+        int getDbTimer= 0;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_SENDVISUALADS, new String[] {MONITOR_TIME}, SLIDE_START_TIME+" = ? AND "+BRAND_ID+" = ? ",
+                new String[] {mainTime,brandId}, null, null, null, null);
+        if (cursor.moveToFirst())
+        {
+            do { getDbTimer=cursor.getInt(cursor.getColumnIndex(MONITOR_TIME)); }
+            while (cursor.moveToNext());
+        }
+        return getDbTimer;
+    }
+
+    @SuppressLint("Range")
+    public String getBrandStartTime(String brandId, String mainTime)
+    {
+        String getSingleStartTime="";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_SENDVISUALADS, new String[] {START_TIME_BRANDS}, SLIDE_START_TIME+" = ? AND "+BRAND_ID+" = ? ",
+                new String[] {mainTime,brandId}, null, null, null, null);
+        if (cursor.moveToFirst())
+        {
+            do { getSingleStartTime=cursor.getString(cursor.getColumnIndex(START_TIME_BRANDS));
+            }
+            while (cursor.moveToNext());
+        }
+        return getSingleStartTime;
     }
 
 
@@ -950,22 +987,28 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     // =======================================api storage table================================================
 
-    public void insertOrUpdateAPI(String id,String data) {
+    public void insertOrUpdateAPI(int id,String data) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues initialValues = new ContentValues();
         initialValues.put(APIKEY_ID, id);
         initialValues.put(APIKEY_DATA, data);
 
-        if(CheckDataAPIStorage(String.valueOf(id)))
-        {
-            db.update(TABLE_API_DATA, initialValues, "id=?", new String[] {String.valueOf(id)});
-            db.close();
-        }
-        else
-        {
+        int u = db.update(TABLE_API_DATA, initialValues, "id=?", new String[]{String.valueOf(id)});
+
+        if (u == 0) {
             db.insert(TABLE_API_DATA, null, initialValues);
-            db.close();
         }
+
+//        if(CheckDataAPIStorage(String.valueOf(id)))
+//        {
+//            db.update(TABLE_API_DATA, initialValues, "id=?", new String[] {String.valueOf(id)});
+//            db.close();
+//        }
+//        else
+//        {
+//            db.insert(TABLE_API_DATA, null, initialValues);
+//            db.close();
+//        }
 
     }
 

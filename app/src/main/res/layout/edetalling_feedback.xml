@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@color/gray"
+    android:weightSum="4">
+
+    <LinearLayout
+        android:layout_margin="1dp"
+        android:background="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            style="@style/white_background_black_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginRight="1dp"
+            android:text="Name"
+            android:id="@+id/brandName_headerTv"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Start time"
+            android:layout_weight="0.6"
+            android:layout_marginRight="1dp"
+            style="@style/white_background_black_text"
+            android:id="@+id/startEndTime_tv"/>
+
+        <RelativeLayout
+            android:layout_gravity="center"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="1dp"
+            android:layout_weight="0.5">
+
+            <RatingBar
+                android:id="@+id/ratingBar"
+                style="?android:attr/ratingBarStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:isIndicator="false"
+                android:numStars="5"
+                android:progressBackgroundTint="@color/darkBlue"
+                android:rating="0"
+                android:stepSize="0.5" />
+        </RelativeLayout>
+
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="feedback"
+            android:layout_weight="1.9"
+            android:id="@+id/feeback_et"/>
+    </LinearLayout>
+
+</LinearLayout>

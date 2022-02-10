@@ -4,6 +4,7 @@ import static io.reactivex.annotations.SchedulerSupport.IO;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
@@ -220,7 +221,7 @@ public class JoinMeetingActivity extends BaseActivity implements MeetingServiceL
     public void setScheduleAdapter( )
     {
 
-        String responseData= new DatabaseHandler(this).getApiDetail(1);
+        String responseData= new DatabaseHandler(this).getApiDetail(-1);
 
         if(!responseData.equals(""))
         {

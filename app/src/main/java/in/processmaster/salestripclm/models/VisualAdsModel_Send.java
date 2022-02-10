@@ -4,7 +4,61 @@ import java.util.ArrayList;
 
 public class VisualAdsModel_Send {
     String startDate,endDate,empId,doctorId,brandId;
+    String brandName,feedback;
+    int monitorTime;
+    float rating;
+    String brandWiseStartTime,brandWiseStopTime;
+
+    public String getBrandWiseStartTime() {
+        return brandWiseStartTime;
+    }
+
+    public void setBrandWiseStartTime(String brandWiseStartTime) {
+        this.brandWiseStartTime = brandWiseStartTime;
+    }
+
+    public String getBrandWiseStopTime() {
+        return brandWiseStopTime;
+    }
+
+    public void setBrandWiseStopTime(String brandWiseStopTime) {
+        this.brandWiseStopTime = brandWiseStopTime;
+    }
+
+    public int getMonitorTime() {
+        return monitorTime;
+    }
+
+    public void setMonitorTime(int monitorTime) {
+        this.monitorTime = monitorTime;
+    }
+
+    public String getFeedback() {
+        return feedback;
+    }
+
+    public void setFeedback(String feedback) {
+        this.feedback = feedback;
+    }
+
+    public float getRating() {
+        return rating;
+    }
+
+    public void setRating(float rating) {
+        this.rating = rating;
+    }
+
     boolean isEnd;
+
+    public String getBrandName() {
+        return brandName;
+    }
+
+    public void setBrandName(String brandName) {
+        this.brandName = brandName;
+    }
+
     ArrayList<childData>childDataArray;
 
     public ArrayList<childData> getChildDataArray() {
@@ -80,6 +134,15 @@ public class VisualAdsModel_Send {
         String fileId, viewTime;
         boolean isLike;
         String comment;
+        String productName;
+
+        public String getProductName() {
+            return productName;
+        }
+
+        public void setProductName(String productName) {
+            this.productName = productName;
+        }
 
         public String getFileId() {
             return fileId;

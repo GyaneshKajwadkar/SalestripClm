@@ -101,19 +101,19 @@ class DownloadAdapter constructor() :
         if(downloadedType.equals("VIDEO"))
         {
             itemView = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.downloadvideo_view, parent, false)
+                .inflate(R.layout.downloadvideo_view, parent, false)
             return ViewHoldersVideo(itemView)
         }
         else if(downloadedType.equals("IMAGE"))
         {
             itemView = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.downloadimage_view, parent, false)
+                .inflate(R.layout.downloadimage_view, parent, false)
             return ViewHoldersImage(itemView)
         }
         else
         {
             itemView = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.downloadhtml_view, parent, false)
+                .inflate(R.layout.downloadhtml_view, parent, false)
             return ViewHoldersWeb(itemView)
         }
     }
@@ -125,50 +125,50 @@ class DownloadAdapter constructor() :
             val videoView: ViewHoldersVideo = holder as ViewHoldersVideo
             var videomodel=arraylistVideo.get(position)
 
-         var db = DatabaseHandler(context)
-        var dbdata=db.getSingleDownloadedData(videomodel.fileId!!)
-              if(dbdata.fileName!=null)
-              {
-                  if(getAllfileList(dbdata.fileDirectoryPath,dbdata.fileName))
-                 {
-                     videoView.reDownload_rl.visibility=View.VISIBLE
-                     videoView.fav_iv.visibility=View.VISIBLE
-                     videoView.download_rl.visibility=View.GONE
+            var db = DatabaseHandler(context)
+            var dbdata=db.getSingleDownloadedData(videomodel.fileId!!)
+            if(dbdata.fileName!=null)
+            {
+                if(getAllfileList(dbdata.fileDirectoryPath,dbdata.fileName))
+                {
+                    videoView.reDownload_rl.visibility=View.VISIBLE
+                    videoView.fav_iv.visibility=View.VISIBLE
+                    videoView.download_rl.visibility=View.GONE
 
-                     val circularProgressDrawable = CircularProgressDrawable(context!!)
-                     circularProgressDrawable.strokeWidth = 5f
-                     circularProgressDrawable.centerRadius = 30f
-                     circularProgressDrawable.start()
+                    val circularProgressDrawable = CircularProgressDrawable(context!!)
+                    circularProgressDrawable.strokeWidth = 5f
+                    circularProgressDrawable.centerRadius = 30f
+                    circularProgressDrawable.start()
 
                     val requestOptions = RequestOptions()
                     requestOptions.isMemoryCacheable
                     Glide.with(context!!).setDefaultRequestOptions(requestOptions)
-                   .load(Uri.fromFile(File(dbdata.fileDirectoryPath,dbdata.fileName)))
-                   .placeholder(circularProgressDrawable)
-                   .into(videoView.videoThumb_iv)
+                        .load(Uri.fromFile(File(dbdata.fileDirectoryPath,dbdata.fileName)))
+                        .placeholder(circularProgressDrawable)
+                        .into(videoView.videoThumb_iv)
 
-                     if(dbdata.favFile!!)
-                     {
-                         videoView.fav_iv.setColorFilter(ContextCompat.getColor(context!!, R.color.zm_red));
-                         videoView.fav_iv.setTag("set")
-                     }
-                     else
-                     {
-                         videoView.fav_iv.setColorFilter(ContextCompat.getColor(context!!, R.color.gray));
-                         videoView.fav_iv.setTag("not")
-                     }
+                    if(dbdata.favFile!!)
+                    {
+                        videoView.fav_iv.setColorFilter(ContextCompat.getColor(context!!, R.color.zm_red));
+                        videoView.fav_iv.setTag("set")
+                    }
+                    else
+                    {
+                        videoView.fav_iv.setColorFilter(ContextCompat.getColor(context!!, R.color.gray));
+                        videoView.fav_iv.setTag("not")
+                    }
 
 
-                     videoView.videoThumb_iv.setOnClickListener({
-                         if(videoView.reDownload_rl.visibility==View.VISIBLE)
-                         {
-                             val intent = Intent(context, VideoPlayerActivity::class.java)
-                             intent.putExtra("singleSelection",dbdata.filePath)
-                             context!!.startActivity(intent)
-                         }
-                     })
-                 }
-              }
+                    videoView.videoThumb_iv.setOnClickListener({
+                        if(videoView.reDownload_rl.visibility==View.VISIBLE)
+                        {
+                            val intent = Intent(context, VideoPlayerActivity::class.java)
+                            intent.putExtra("singleSelection",dbdata.filePath)
+                            context!!.startActivity(intent)
+                        }
+                    })
+                }
+            }
 
             videoView.fav_iv.setOnClickListener({
 
@@ -192,11 +192,11 @@ class DownloadAdapter constructor() :
             videoView.videoTitle.setText(videomodel.fileName)
             videoView.videoTitle.setSelected(true);
 
-             videoView.download_rl.setOnClickListener({
-                 progressDialog()
-                 progressBarAlert?.setIndeterminate(true)
-                 downloadUrl(videomodel.filePath!!,position,"VIDEO",videomodel)
-             })
+            videoView.download_rl.setOnClickListener({
+                progressDialog()
+                progressBarAlert?.setIndeterminate(true)
+                downloadUrl(videomodel.filePath!!,position,"VIDEO",videomodel)
+            })
 
             videoView.reDownload_rl.setOnClickListener({
                 progressDialog()
@@ -224,17 +224,17 @@ class DownloadAdapter constructor() :
                     videoView.fav_iv.visibility=View.VISIBLE
                     videoView.download_rl.visibility=View.GONE
 
-                         val circularProgressDrawable = CircularProgressDrawable(context!!)
-                         circularProgressDrawable.strokeWidth = 5f
-                         circularProgressDrawable.centerRadius = 30f
-                         circularProgressDrawable.start()
+                    val circularProgressDrawable = CircularProgressDrawable(context!!)
+                    circularProgressDrawable.strokeWidth = 5f
+                    circularProgressDrawable.centerRadius = 30f
+                    circularProgressDrawable.start()
 
-                          val requestOptions = RequestOptions()
-                          requestOptions.isMemoryCacheable
-                          Glide.with(context!!).setDefaultRequestOptions(requestOptions)
-                         .load(Uri.fromFile(File(dbdata.fileDirectoryPath,dbdata.fileName)))
-                         .placeholder(circularProgressDrawable)
-                         .into(videoView.pics_iv)
+                    val requestOptions = RequestOptions()
+                    requestOptions.isMemoryCacheable
+                    Glide.with(context!!).setDefaultRequestOptions(requestOptions)
+                        .load(Uri.fromFile(File(dbdata.fileDirectoryPath,dbdata.fileName)))
+                        .placeholder(circularProgressDrawable)
+                        .into(videoView.pics_iv)
 
                     videoView.pics_iv.setOnClickListener({
                         if(videoView.reDownload_rl.visibility==View.VISIBLE)
@@ -327,17 +327,17 @@ class DownloadAdapter constructor() :
 
                     videoView.html_wv.loadUrl("file:///$filePath")
 
-                 /*   videoView.html_wv.webViewClient = object : WebViewClient() {
-                        override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-                            view.loadUrl(url)
-                            return true
-                        }
-                        override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError) {
-                            //Your code to do
-                            Log.e("webViewError", error.toString())
-                        }
+                    /*   videoView.html_wv.webViewClient = object : WebViewClient() {
+                           override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
+                               view.loadUrl(url)
+                               return true
+                           }
+                           override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError) {
+                               //Your code to do
+                               Log.e("webViewError", error.toString())
+                           }
 
-                    }*/
+                       }*/
 
 
                     var oneTime=true
@@ -443,8 +443,8 @@ class DownloadAdapter constructor() :
     {
         val yourDir = File(pathdirectoryIs)
         for (f in yourDir.listFiles()) {
-             val name = f.name
-                Log.i("filenames", name)
+            val name = f.name
+            Log.i("filenames", name)
             if(name.trim().equals(fileName.trim()))
             {
                 return true
@@ -454,10 +454,10 @@ class DownloadAdapter constructor() :
     }
 
     fun downloadUrl(
-            urlMain: String,
-            position: Int,
-            category: String,
-            model: DownloadEdetail_model.Data.EDetailingImages)
+        urlMain: String,
+        position: Int,
+        category: String,
+        model: DownloadEdetail_model.Data.EDetailingImages)
     {
 
         val extension: String = urlMain.substring(urlMain.lastIndexOf("/"))
@@ -522,6 +522,7 @@ class DownloadAdapter constructor() :
                     fileModel.downloadType=category
                     fileModel.fileId=model.fileId!!
                     fileModel.brandId=parentId
+                    fileModel.brandName=brandName
 
                     var downloadedModel=db.getSingleDownloadedData(model.fileId!!)
 
@@ -538,7 +539,7 @@ class DownloadAdapter constructor() :
 
 
                     context!!.runOnUiThread(Runnable {
-                   //     progressBarAlert?.setIndeterminate(true)
+                        //     progressBarAlert?.setIndeterminate(true)
                         alertDialog?.dismiss()
                         notifyItemChanged(position)
 
@@ -561,9 +562,9 @@ class DownloadAdapter constructor() :
 
     //download files
     fun downloadHtmlZip(
-            urlMain: String,
-            position: Int,
-            zipmodel: DownloadEdetail_model.Data.EDetailingImages)
+        urlMain: String,
+        position: Int,
+        zipmodel: DownloadEdetail_model.Data.EDetailingImages)
     {
 
         val extension: String = urlMain.substring(urlMain.lastIndexOf("/"))
@@ -623,9 +624,9 @@ class DownloadAdapter constructor() :
                     val filePathzip=folder.getAbsolutePath() + extension;
                     //get main path
                     val zipName: String = filePathzip.substring(
-                            filePathzip.lastIndexOf(
-                                    "/"
-                            )
+                        filePathzip.lastIndexOf(
+                            "/"
+                        )
                     )
                     //break and get file name
 
@@ -731,6 +732,7 @@ class DownloadAdapter constructor() :
                     fileModel.fileId=zipmodel.fileId!!
                     fileModel.downloadType="ZIP"
                     fileModel.brandId=parentId
+                    fileModel.brandName=brandName
 
                     var db = DatabaseHandler(context)
 
@@ -767,17 +769,17 @@ class DownloadAdapter constructor() :
             {
                 isaddedtoFav=true
             }
-        if(index==eDeatilingList.size-1)
-        {
-            if(isaddedtoFav)
+            if(index==eDeatilingList.size-1)
             {
-                db.updateFavourite(eDetailingId,1)
+                if(isaddedtoFav)
+                {
+                    db.updateFavourite(eDetailingId,1)
+                }
+                else
+                {
+                    db.updateFavourite(eDetailingId,0)
+                }
             }
-            else
-            {
-                db.updateFavourite(eDetailingId,0)
-            }
-        }
         }
 
     }
@@ -798,7 +800,7 @@ class DownloadAdapter constructor() :
         val favName_et = dialogView.findViewById<View>(R.id.favName_et) as EditText
         val save_btn = dialogView.findViewById<View>(R.id.save_btn) as MaterialButton
         val cancel_btn =
-                dialogView.findViewById<View>(R.id.cancel_btn) as MaterialButton
+            dialogView.findViewById<View>(R.id.cancel_btn) as MaterialButton
 
         save_btn.setOnClickListener(object : View.OnClickListener {
             override fun onClick(view: View?) {
@@ -845,7 +847,7 @@ class DownloadAdapter constructor() :
         val favName_et = dialogView.findViewById<View>(R.id.favName_et) as EditText
         val save_btn = dialogView.findViewById<View>(R.id.save_btn) as MaterialButton
         val cancel_btn =
-                dialogView.findViewById<View>(R.id.cancel_btn) as MaterialButton
+            dialogView.findViewById<View>(R.id.cancel_btn) as MaterialButton
 
         save_btn.setOnClickListener(object : View.OnClickListener {
             override fun onClick(view: View?) {
@@ -896,7 +898,7 @@ class DownloadAdapter constructor() :
         val favName_et = dialogView.findViewById<View>(R.id.favName_et) as EditText
         val save_btn = dialogView.findViewById<View>(R.id.save_btn) as MaterialButton
         val cancel_btn =
-                dialogView.findViewById<View>(R.id.cancel_btn) as MaterialButton
+            dialogView.findViewById<View>(R.id.cancel_btn) as MaterialButton
 
 
         save_btn.setOnClickListener(object : View.OnClickListener {
@@ -1003,34 +1005,34 @@ class DownloadAdapter constructor() :
 
     fun deleteAndsaveRedownloads(db: DatabaseHandler, videomodel: DownloadEdetail_model.Data.EDetailingImages, downloadedModel: DownloadFileModel)
     {
-     if(downloadedModel.isFavFile)
-     {
-         val sourcePath = downloadedModel.filePath
-         val source = File(sourcePath)
+        if(downloadedModel.isFavFile)
+        {
+            val sourcePath = downloadedModel.filePath
+            val source = File(sourcePath)
 
-         val fdelete = File(downloadedModel.favFilePath)
-         if (fdelete.exists()) {
-             if (fdelete.delete())
-             {
-                 val destinationPath =  downloadedModel.favFilePath
-                 val destination = File(destinationPath)
-                 try
-                 {
-                     FileUtils.copyFile(source, destination)
-                     Log.e("createAgain","againagain")
-                 }
-                 catch (e: IOException)
-                 {
-                     e.printStackTrace()
-                     Log.e("destinationPathError",e.message.toString())
-                 }
-             }
-             else
-             {
+            val fdelete = File(downloadedModel.favFilePath)
+            if (fdelete.exists()) {
+                if (fdelete.delete())
+                {
+                    val destinationPath =  downloadedModel.favFilePath
+                    val destination = File(destinationPath)
+                    try
+                    {
+                        FileUtils.copyFile(source, destination)
+                        Log.e("createAgain","againagain")
+                    }
+                    catch (e: IOException)
+                    {
+                        e.printStackTrace()
+                        Log.e("destinationPathError",e.message.toString())
+                    }
+                }
+                else
+                {
 
-             }
-         }
-     }
+                }
+            }
+        }
     }
 
     fun Context.hideKeyboard(view: View) {

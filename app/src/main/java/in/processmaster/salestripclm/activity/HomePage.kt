@@ -1,14 +1,15 @@
 package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.R
-import `in`.processmaster.salestripclm.fragments.DisplayVisualFragment
-import `in`.processmaster.salestripclm.fragments.EdetailingFragment
-import `in`.processmaster.salestripclm.fragments.HomeFragment
+import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.staticSyncData
+import `in`.processmaster.salestripclm.common_classes.GeneralClass
+import `in`.processmaster.salestripclm.fragments.*
 import `in`.processmaster.salestripclm.models.DevisionModel
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.models.SyncModel
 import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
@@ -19,6 +20,7 @@ import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
@@ -47,18 +49,27 @@ import java.util.*
 class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/*, UserLoginCallback.ZoomDemoAuthenticationListener , MeetingServiceListener, InitAuthSDKCallback*/
 {
     var drawer_layout : DrawerLayout?=null
-  //  private var mZoomSDK: ZoomSDK? = null
+    //  private var mZoomSDK: ZoomSDK? = null
     var drawerProfileIv: ImageView?=null
     var bottomNavigation: BottomNavigationView? = null
     var openFragmentStr=""
+    val generalClass= GeneralClass(this)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_page)
 
-      //  mZoomSDK = ZoomSDK.getInstance()
+        //  mZoomSDK = ZoomSDK.getInstance()
         initView()
-        callingMultipleAPI()
+
+        if(generalClass.isInternetAvailable())
+            callingMultipleAPI()
+        else
+            staticSyncData=Gson().fromJson(dbBase?.getAllDataSync(), SyncModel::class.java)
+
+        // dbBase?.insertOrUpdateAPI(3,"")
+
     }
 
 
@@ -114,19 +125,19 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
 
         //call sync api
-        if(isInternetAvailable(this)==true)
+        if(generalClass.isInternetAvailable())
         {
-           // sync_api()
-           // getsheduledMeeting_api()
+            // sync_api()
+            // getsheduledMeeting_api()
 
-        /*    GlobalScope.launch(Dispatchers.IO)
-            {
-                var zoomSDKBase = ZoomSDK.getInstance()
-                if(!zoomSDKBase.isLoggedIn)
+            /*    GlobalScope.launch(Dispatchers.IO)
                 {
-                    getCredientail_api(this@HomePage)
-                }
-            }*/
+                    var zoomSDKBase = ZoomSDK.getInstance()
+                    if(!zoomSDKBase.isLoggedIn)
+                    {
+                        getCredientail_api(this@HomePage)
+                    }
+                }*/
 
             Picasso
                 .get()
@@ -186,20 +197,20 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         nav_view?.setNavigationItemSelectedListener(this)
         nav_view?.getMenu()?.getItem(0)?.setChecked(true)
 
-     //   InitAuthSDKHelper.getInstance().initSDK(this, this)
+        //   InitAuthSDKHelper.getInstance().initSDK(this, this)
 
 
         //This is timer for zoom api
-       /* var count=0
-        val T = Timer()
-        T.scheduleAtFixedRate(object : TimerTask() {
-            override fun run() {
-                runOnUiThread {
-                   Log.e("hfioshfisgfuio",count.toString())
-                    count++
-                }
-            }
-        }, 1000, 1000)*/
+        /* var count=0
+         val T = Timer()
+         T.scheduleAtFixedRate(object : TimerTask() {
+             override fun run() {
+                 runOnUiThread {
+                    Log.e("hfioshfisgfuio",count.toString())
+                     count++
+                 }
+             }
+         }, 1000, 1000)*/
 
     }
 
@@ -207,23 +218,17 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     private fun sync_api()
     {
         progressMessage_tv?.setText("Sync in progress")
-        enableProgress(progressView_parentRv!!)
-
+        generalClass.enableProgress(progressView_parentRv!!)
 
         var call: Call<SyncModel> = getSecondaryApiInterface().syncApi("bearer " + loginModelBase?.accessToken) as Call<SyncModel>
         call.enqueue(object : Callback<SyncModel?> {
             override fun onResponse(call: Call<SyncModel?>?, response: Response<SyncModel?>) {
                 Log.e("sync_api", response.code().toString() + "")
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
-
-                    //if data base have value
                     if (dbBase.datasCount > 0) {
                         dbBase.deleteAll()
                     }
-                    //add new data to db
-                    val gson = Gson()
-                    var model = response.body()
-                    dbBase?.addData(gson.toJson(model))
+                    dbBase?.addSyncData(Gson().toJson(response.body()))
 
                     bottomNavigation?.selectedItemId= R.id.landingPage
                     division_api()
@@ -236,14 +241,14 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                     val intent = Intent(this@HomePage, LoginActivity::class.java)
                     startActivity(intent)
                     finish()
-                    disableProgress(progressView_parentRv!!)
+                    generalClass.disableProgress(progressView_parentRv!!)
                 }
             }
 
             override fun onFailure(call: Call<SyncModel?>, t: Throwable?) {
-                checkInternet()
+                generalClass.checkInternet()
                 call.cancel()
-                disableProgress(progressView_parentRv!!)
+                generalClass.disableProgress(progressView_parentRv!!)
 
             }
         })
@@ -276,7 +281,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                             value.geteDetailId().toString(),
                             gson.toJson(value)
                         )
-
                     }
 
                     // clear database
@@ -306,17 +310,17 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                         }
                     }
 
-                //    Log.e("isZoomLogin",mZoomSDK!!.isLoggedIn!!.toString()+" 456")
+                    //    Log.e("isZoomLogin",mZoomSDK!!.isLoggedIn!!.toString()+" 456")
 
                 }
-                disableProgress(progressView_parentRv!!)
+                generalClass.disableProgress(progressView_parentRv!!)
 
             }
 
             override fun onFailure(call: Call<DevisionModel?>, t: Throwable?) {
-                checkInternet()
+                generalClass.checkInternet()
                 call.cancel()
-                disableProgress(progressView_parentRv!!)
+                generalClass.disableProgress(progressView_parentRv!!)
 
             }
         })
@@ -339,8 +343,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                 val fragment = HomeFragment()
                 openFragment(fragment)
                 openFragmentStr = "HomeFragment"
-
-
                 return@OnNavigationItemSelectedListener true
             }
 
@@ -364,6 +366,14 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                 openFragmentStr = "DisplayVisualFragment"
                 return@OnNavigationItemSelectedListener true
             }
+
+            R.id.callPage->{
+                toolbarTv?.setText("Create Calls")
+                val fragment = NewCallFragment()
+                openFragment(fragment)
+                openFragmentStr = "CallsFragment"
+                return@OnNavigationItemSelectedListener true
+            }
         }
         false
     }
@@ -379,21 +389,14 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     //on back button press open exit alert
     override fun onBackPressed()
     {
+       // val openFragment: DoctorDetailFragment? = supportFragmentManager.findFragmentByTag("detailDoctor") as DoctorDetailFragment?
+       // if (openFragment != null && openFragment.isVisible()) {
+       //     if(getSupportFragmentManager().getBackStackEntryCount() > 0)
+       //         getSupportFragmentManager().popBackStack()
+       //     return
+       // }
+
         exitAppAlert(this)
-    }
-
-
-    //checkInternet connection
-    fun checkInternet()
-    {
-        if(isInternetAvailable(this)==true)
-        {
-            commonAlert(this, "Error", "Something went wrong please try again later")
-        }
-        else
-        {
-            networkAlert(this)
-        }
     }
 
 
@@ -466,7 +469,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
             R.id.sync_menu -> {
                 //call sync api
-                if (isInternetAvailable(this) == true) {
+                if (generalClass.isInternetAvailable()) {
                     sync_api()
                 }
             }
@@ -502,7 +505,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         val df = SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault())
         val formattedDate: String = df.format(c)
 
-
         if(sharePreferanceBase?.getPref("SyncDate")==null || sharePreferanceBase?.getPref("SyncDate")!!.isEmpty())
         {
             sharePreferanceBase?.setPref("SyncDate", formattedDate)
@@ -510,12 +512,14 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         else
         {
             if(sharePreferanceBase?.getPref("SyncDate")==formattedDate)
-            {
-
-            }
+            { }
             else
             {
-                sync_api()
+                if(generalClass.isInternetAvailable())
+                    callingMultipleAPI()
+                else
+                    staticSyncData=Gson().fromJson(dbBase?.getAllDataSync(), SyncModel::class.java)
+
                 sharePreferanceBase?.setPref("SyncDate", formattedDate)
             }
 
@@ -537,127 +541,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             .into(drawerProfileIv)
     }
 
-  /*  override fun onZoomSDKLoginResult(result: Long)
-    {
-        if (result == ZoomAuthenticationError.ZOOM_AUTH_ERROR_SUCCESS.toLong())
-        {
-            Log.e("logResult", "loginSuccessoverride")
-            UserLoginCallback.getInstance().removeListener(this)
-        }
-        else
-        {
-            Log.e("logResult", "loginErroroverride")
-        }
-
-        disableProgress(progressView_parentRv!!)
-    }*/
-
-  /*  override fun onZoomIdentityExpired()
-    {
-
-    }
-
-    override fun onZoomSDKLogoutResult(result: Long) {
-        if (result == ZoomAuthenticationError.ZOOM_AUTH_ERROR_SUCCESS.toLong()) {
-
-            Toast.makeText(
-                this,
-                "Logout successfully",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-
-        else {
-            Toast.makeText(
-                this,
-                "Logout failed result code = $result",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-
-        disableProgress(progressView_parentRv!!)
-
-    }
-
-    override fun onZoomAuthIdentityExpired() {
-
-    }
-
-    fun loginFirst(): Unit {
-
-        //  val meetingService: MeetingService? = ZoomSDK.getInstance().getMeetingService()
-
-        val ret: Int = EmailUserLoginHelper.getInstance().login(
-            "kajwadkar13@gmail.com",
-            "13Zoom@003"
-        )
-        if (ret != ZoomApiError.ZOOM_API_ERROR_SUCCESS) {
-            if (ret == ZoomApiError.ZOOM_API_ERROR_EMAIL_LOGIN_IS_DISABLED)
-            {
-                Toast.makeText(this, "Account had disable email login ", Toast.LENGTH_LONG).show()
-                Log.e("logResult", "loginErrorFirst")
-            }
-
-            else if(ret == ZoomApiError.ZOOM_API_ERROR_SUCCESS)
-            {
-                Toast.makeText(this, "this is sucess ", Toast.LENGTH_LONG).show()
-                Log.e("logResult", "loginSuccessFirst")
-
-            }
-
-            else
-            {
-                Log.e("logResult", "loginInitilizeFirst")
-
-                Toast.makeText(
-                    this,
-                    "ZoomSDK has not been initialized successfully or sdk is logging in.",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-        } else {
-        }
-    }
-
-
-    override fun onZoomSDKInitializeResult(errorCode: Int, internalErrorCode: Int) {
-        if (errorCode != ZoomError.ZOOM_ERROR_SUCCESS) {
-
-            Log.e("zoomErrorLog","error- $errorCode internalErrorcode- $internalErrorCode")
-
-            Toast.makeText(
-                this,
-                "Failed to initialize Zoom SDK. Error: $errorCode, internalErrorCode=$internalErrorCode",
-                Toast.LENGTH_LONG
-            ).show()
-        } else {
-            ZoomSDK.getInstance().zoomUIService.enableMinimizeMeeting(true)
-            ZoomSDK.getInstance().zoomUIService.setMiniMeetingViewSize(
-                CustomizedMiniMeetingViewSize(
-                    0,
-                    0,
-                    360,
-                    540
-                )
-            )
-            ZoomSDK.getInstance().meetingSettingsHelper.enable720p(false)
-            ZoomSDK.getInstance().meetingSettingsHelper.enableShowMyMeetingElapseTime(true)
-            ZoomSDK.getInstance().meetingService.addListener(this)
-
-            if (mZoomSDK?.tryAutoLoginZoom() == ZoomApiError.ZOOM_API_ERROR_SUCCESS) {
-                UserLoginCallback.getInstance().addListener(this)
-
-            }
-            else if(!mZoomSDK?.isLoggedIn!!)
-            {
-                loginFirst()
-                UserLoginCallback.getInstance().addListener(this)
-                disableProgress(progressView_parentRv!!)
-            }}}
-
-    override fun onMeetingStatusChanged(p0: MeetingStatus?, p1: Int, p2: Int) {
-    }*/
-
     override fun onPause() {
         super.onPause()
         stopConnectivity(this)
@@ -665,17 +548,17 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
     fun callingMultipleAPI()
     {
-     //   progressMessage_tv?.setText("Please wait....")
-        enableProgress(progressView_parentRv!!)
+        //   progressMessage_tv?.setText("Please wait....")
+        generalClass.enableProgress(progressView_parentRv!!)
 
         val coroutineScope= CoroutineScope(IO).launch {
-             val ans= async {
-                 callingSyncAPI()
-             }
+            val ans= async {
+                callingSyncAPI()
+            }
 
-             val divisionApi =async {
-                 callingDivisionAPI()
-             }
+            val divisionApi =async {
+                callingDivisionAPI()
+            }
 
             val credientialApi= async {
                 getSheduleMeetingAPI()
@@ -697,7 +580,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         }
         coroutineScope.invokeOnCompletion {
             this.runOnUiThread(java.lang.Runnable {
-                disableProgress(progressView_parentRv!!)
+                generalClass.disableProgress(progressView_parentRv!!)
             })
         }
 
@@ -752,7 +635,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                             dbBase.deleteEdetailDownloada(dbList.geteDetailId().toString())
 
                         }
-                }
+                    }
                 }
 
                 // if token expire go to login page again
@@ -767,7 +650,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             }
             else
             {
-                checkInternet()
+                generalClass.checkInternet()
             }
         }
     }
@@ -784,10 +667,9 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                     if (dbBase.datasCount > 0) {
                         dbBase.deleteAll()
                     }
-                    val gson = Gson()
-                    var model = response.body()
-                    dbBase?.addData(gson.toJson(model))
+                    dbBase?.addSyncData(Gson().toJson(response.body()))
                     bottomNavigation?.selectedItemId= R.id.landingPage
+                    staticSyncData=response.body();
                 }
 
                 // if token expire go to login page again
@@ -801,11 +683,38 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             }
             else
             {   Log.e("responseERROR", response.errorBody().toString())
-                checkInternet()
+                generalClass.checkInternet()
             }
         }
 
     }
 
+    //exit app alert
+    fun exitAppAlert(context: Context) {
+        val dialogBuilder = AlertDialog.Builder(context)
+        val inflater = this.layoutInflater
+        val dialogView: View = inflater.inflate(R.layout.exitalert, null)
+        dialogBuilder.setView(dialogView)
+
+        val alertDialog: AlertDialog = dialogBuilder.create()
+        alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+
+        val exit_btn =
+            dialogView.findViewById<View>(R.id.exit_btn) as MaterialButton
+        val cancel_btn =
+            dialogView.findViewById<View>(R.id.cancel_btn) as MaterialButton
+
+        exit_btn.setOnClickListener {
+            finish();
+            System.exit(0);
+            alertDialog.dismiss()
+        }
+
+        cancel_btn.setOnClickListener {
+            alertDialog.dismiss()
+        }
+
+        alertDialog.show()
+    }
 
 }

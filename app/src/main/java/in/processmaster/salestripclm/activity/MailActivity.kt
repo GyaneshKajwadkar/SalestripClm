@@ -7,6 +7,7 @@ import SelectedDocManList_adapter
 import SelectorInterface
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.adapter.ImageSelectorAdapter
+import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.models.GenerateOTPModel
 import `in`.processmaster.salestripclm.models.SyncModel
 import android.graphics.Color
@@ -66,9 +67,9 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
             selectDoctor_tv.setTextColor(ContextCompat.getColorStateList(this, R.color.black))
         })
 
-        var model = Gson().fromJson(dbBase.getAllData(), SyncModel::class.java)
+        //  var model = Gson().fromJson(dbBase.getAllData(), SyncModel::class.java)
 
-        for(item in model.data.doctorList)
+        for(item in SplashActivity.staticSyncData?.data?.doctorList!!)
         {
             val selectorModel = DocManagerModel()
             selectorModel.setName(item.doctorName)
@@ -81,7 +82,7 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
         selectedoctor_rv.setLayoutManager(GridLayoutManager(this, 5))
         recyclerView_teams.setLayoutManager(GridLayoutManager(this, 5))
 
-        arrayListSelectorTeams= getTeamsApi(this,"Please wait...")
+        arrayListSelectorTeams= getTeamsApi(this@MailActivity,"Please wait...")
 
 
 
@@ -90,18 +91,18 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
         attachment_rv.adapter=adapter
 
         buttonSend.setOnClickListener({
-          if(constructorList.size==0)
+            if(constructorList.size==0)
             {
                 to_tv.setTextColor(ContextCompat.getColorStateList(this, R.color.zm_red))
                 selectDoctor_tv.setTextColor(ContextCompat.getColorStateList(this, R.color.zm_red))
                 return@setOnClickListener
             }
-          /*  if(constructorListTeam.size==0)
-            {
-                cc_tv.setTextColor(ContextCompat.getColorStateList(this, R.color.zm_red))
-                selectTeams_tv.setTextColor(ContextCompat.getColorStateList(this, R.color.zm_red))
-                return@setOnClickListener
-            }*/
+            /*  if(constructorListTeam.size==0)
+              {
+                  cc_tv.setTextColor(ContextCompat.getColorStateList(this, R.color.zm_red))
+                  selectTeams_tv.setTextColor(ContextCompat.getColorStateList(this, R.color.zm_red))
+                  return@setOnClickListener
+              }*/
             if(subject_et.text.toString().isEmpty())
             {
                 subject_et.requestFocus()
@@ -272,7 +273,7 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
     fun sendEmailApi()
     {
         progressMessage_tv?.setText("Please wait")
-        enableProgress(progressView_parentRv!!)
+        GeneralClass(this).enableProgress(progressView_parentRv!!)
 
         val selectedImage=retriveAttachment()
 
@@ -290,7 +291,7 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
                 MediaType.parse("image/*"),
                 value?.file
             )
-             // descriptionList.add(MultipartBody.Part.createFormData("file", file.name,surveyBody))
+            // descriptionList.add(MultipartBody.Part.createFormData("file", file.name,surveyBody))
             val objectAttachment = JSONObject()
             objectAttachment.put("docName",value?.file?.name.toString())
             arrAttachment.put(objectAttachment)
@@ -364,19 +365,19 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
                         onBackPressed()
                     }
 
-                   // var getTeamslist=response.body()
+                    // var getTeamslist=response.body()
                 }
                 else
                 {
                     Toast.makeText(this@MailActivity, "Server error ", Toast.LENGTH_SHORT).show()
                 }
-                disableProgress(progressView_parentRv!!)
+                GeneralClass(this@MailActivity).disableProgress(progressView_parentRv!!)
 
             }
 
             override fun onFailure(call: Call<GenerateOTPModel?>, t: Throwable?) {
                 call.cancel()
-                disableProgress(progressView_parentRv!!)
+                GeneralClass(this@MailActivity).disableProgress(progressView_parentRv!!)
 
             }
         })

@@ -1,0 +1,452 @@
+package `in`.processmaster.salestripclm.fragments
+import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.activity.SplashActivity
+import `in`.processmaster.salestripclm.adapter.SimpleListAdapter
+import `in`.processmaster.salestripclm.common_classes.GeneralClass
+import `in`.processmaster.salestripclm.models.LoginModel
+import `in`.processmaster.salestripclm.models.PreCallModel
+import `in`.processmaster.salestripclm.models.SyncModel
+import `in`.processmaster.salestripclm.networkUtils.APIClient
+import `in`.processmaster.salestripclm.networkUtils.APIInterface
+import `in`.processmaster.salestripclm.activity.OnlinePresentationActivity
+import `in`.processmaster.salestripclm.utils.DatabaseHandler
+import `in`.processmaster.salestripclm.utils.PreferenceClass
+import android.content.Intent
+import android.graphics.Color
+import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
+import android.widget.TextView
+import androidx.annotation.NonNull
+import androidx.cardview.widget.CardView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import kotlinx.android.synthetic.main.bottom_sheet_visualads.view.*
+import kotlinx.android.synthetic.main.fragment_new_call.view.*
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.gson.Gson
+import kotlinx.android.synthetic.main.bottom_sheet_visualads.view.bottomSheet
+import kotlinx.android.synthetic.main.bottom_sheet_visualads.view.close_imv
+import kotlinx.android.synthetic.main.checkbox_bottom_sheet.view.*
+import kotlinx.android.synthetic.main.fragment_new_call.*
+import kotlinx.android.synthetic.main.join_activity_view.view.*
+import kotlinx.android.synthetic.main.join_activity_view.view.noData_tv
+import kotlinx.android.synthetic.main.progress_view.view.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+
+class NewCallFragment : Fragment() {
+    var dataBase = DatabaseHandler(activity)
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
+    var views:View?=null
+    private lateinit var adapter:BottomSheetDoctorAdapter
+    var doctorList= SplashActivity.staticSyncData?.data?.doctorList!!
+    var routeList= SplashActivity.staticSyncData?.data?.routeList!!
+    var selectionType=0
+    var selectedDocID=0
+    var selectedDocName=""
+    var apiInterface: APIInterface? = null
+    var sharePreferance: PreferenceClass? = null
+
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        views= inflater.inflate(R.layout.fragment_new_call, container, false)
+
+        dataBase = DatabaseHandler(activity)
+        sharePreferance = PreferenceClass(activity)
+
+        bottomSheetBehavior = BottomSheetBehavior.from(views!!.bottomSheet)
+
+
+        if(SplashActivity.staticSyncData?.data?.settingDCR?.roleType=="FS") {
+            views!!.selectTeamsCv.visibility = View.GONE
+            views!!.selectRoutesCv.setEnabled(true) }
+        else
+           views!!.selectRoutesCv.setEnabled(false)
+           views!!.selectRoute_tv.setBackgroundColor(Color.parseColor("#FA8072"))
+
+
+        views!!.selectTeamsCv.setOnClickListener({
+            views!!.selectHeader_tv?.setText("Select Team")
+            selectionType=0;
+            openCloseModel() })
+
+        views!!.selectRoutesCv.setOnClickListener({
+            views!!.selectHeader_tv?.setText("Select route")
+            selectionType=1;
+            openCloseModel()})
+
+        views!!.selectDoctorsCv.setOnClickListener({
+            views!!.selectHeader_tv?.setText("Select Doctor")
+            selectionType=2;
+            if(doctorList.size<=0)
+            {   GeneralClass(requireActivity()).showSnackbar(it,"This route has no doctor")
+                return@setOnClickListener
+            }
+            openCloseModel()})
+
+        views!!.selectDoctorsCv.setEnabled(false)
+
+        views!!.close_imv?.setOnClickListener({ bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)})
+        views!!.doctorSearch_et!!.addTextChangedListener(filterTextWatcher)
+
+        views!!.startDetailing_btn.setOnClickListener({
+            val intent = Intent(activity, OnlinePresentationActivity::class.java)
+            intent.putExtra("doctorID", selectedDocID)
+            intent.putExtra("doctorName", selectedDocName)
+            startActivity(intent)
+        })
+
+        routeList = routeList.filter { s -> s.headQuaterName !=""} as java.util.ArrayList<SyncModel.Data.Route>
+
+
+        return views
+    }
+
+    fun openCloseModel()
+    {
+        adapter =BottomSheetDoctorAdapter()
+        views!!.doctorList_rv.setLayoutManager(GridLayoutManager(requireActivity(), 3))
+        views!!.doctorList_rv.adapter = adapter
+
+        val state =
+            if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED)
+                BottomSheetBehavior.STATE_COLLAPSED
+            else
+                BottomSheetBehavior.STATE_EXPANDED
+        bottomSheetBehavior.state = state
+    }
+
+    val filterTextWatcher: TextWatcher = object : TextWatcher {
+        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+            adapter?.getFilter()?.filter(s.toString())
+        }
+
+        override fun afterTextChanged(s: Editable) {
+            // TODO Auto-generated method stub
+        }
+    }
+
+
+     inner class BottomSheetDoctorAdapter() :
+        RecyclerView.Adapter<BottomSheetDoctorAdapter.MyViewHolder>(),
+        Filterable {
+
+        var filteredDataRoute:ArrayList<SyncModel.Data.Route> = routeList
+        var filteredDataDoctor:ArrayList<SyncModel.Data.Doctor> = doctorList
+
+
+        inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+            var headerDoctor_tv: TextView = view.findViewById(R.id.headerDoctor_tv)
+            var route_tv: TextView = view.findViewById(R.id.route_tv)
+            var speciality_tv: TextView = view.findViewById(R.id.speciality_tv)
+            var parent_cv: CardView = view.findViewById(R.id.parent_cv)
+        }
+        @NonNull
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder
+        {
+            val itemView = LayoutInflater.from(parent.context)
+                .inflate(R.layout.doctorlist_view, parent, false)
+            return MyViewHolder(itemView)
+        }
+        override fun onBindViewHolder(holder: MyViewHolder, position: Int)
+        {
+            if(selectionType==0)
+            {   if(filteredDataRoute.size<=0)  views!!.noData_tv?.visibility=View.VISIBLE
+                else  views!!.noData_tv?.visibility=View.GONE
+
+                val modeldata = filteredDataRoute?.get(position)
+                holder.headerDoctor_tv.setText(modeldata?.routeName)
+                holder.route_tv.setText("Head Quater Name- " + modeldata?.headQuaterName)
+                holder.speciality_tv.visibility=View.GONE
+
+                holder.parent_cv.setOnClickListener({
+                    views!!.selectTeam_tv.setText((modeldata?.routeName))
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
+                    onSelection()
+                })
+            }
+
+            else if(selectionType==1)
+            {    if(filteredDataRoute.size<=0)  views!!.noData_tv?.visibility=View.VISIBLE
+                 else  views!!.noData_tv?.visibility=View.GONE
+
+                val modeldata = filteredDataRoute?.get(position)
+                holder.headerDoctor_tv.setText(modeldata?.routeName)
+                holder.route_tv.setText("Head Quater Name- " + modeldata?.headQuaterName)
+                holder.speciality_tv.visibility=View.GONE
+
+                holder.parent_cv.setOnClickListener({
+                    views!!.selectRoute_tv.setText((modeldata?.routeName))
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
+                    onSelection()
+                    applySelectionFilter(modeldata.routeId)
+                })
+            }
+
+            else{
+                if(filteredDataDoctor.size<=0)  views!!.noData_tv?.visibility=View.VISIBLE
+                else  views!!.noData_tv?.visibility=View.GONE
+
+                val modeldata = filteredDataDoctor?.get(position)
+                holder.headerDoctor_tv.setText(modeldata?.doctorName)
+                holder.route_tv.setText("Route- " + modeldata?.routeName)
+                holder.speciality_tv.setText("Speciality- " + modeldata?.specialityName)
+
+                holder.parent_cv.setOnClickListener({
+                    views!!.selectDoctor_tv.setText((modeldata?.doctorName))
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
+                    setDoctor(modeldata)
+                    onSelection()
+                })
+            }
+
+        }
+        override fun getItemCount(): Int
+        {
+            if(selectionType==0)
+                return filteredDataDoctor?.size!!
+            else if(selectionType==1)
+                return filteredDataRoute?.size!!
+            else
+                return filteredDataDoctor?.size!!
+        }
+
+
+        //-------------------------------------filter list using text input from edit text
+        override fun getFilter(): Filter? {
+            return object : Filter() {
+                override fun publishResults(constraint: CharSequence?, results: FilterResults) {
+                    if(selectionType==0)
+                    { filteredDataDoctor = results.values as ArrayList<SyncModel.Data.Doctor> }
+                    else if(selectionType==1)
+                    { filteredDataRoute = results.values as ArrayList<SyncModel.Data.Route> }
+                    else
+                    { filteredDataDoctor = results.values as ArrayList<SyncModel.Data.Doctor> }
+                    notifyDataSetChanged()
+                }
+                override fun performFiltering(constraint: CharSequence): FilterResults? {
+                    var constraint = constraint
+                    val results = FilterResults()
+                    if(selectionType==0)
+                    {
+                        val FilteredArrayNames: ArrayList<SyncModel.Data.Doctor> = ArrayList()
+                        constraint = constraint.toString().lowercase()
+                        for (i in 0 until doctorList?.size!!) {
+                            val dataNames: SyncModel.Data.Doctor = doctorList?.get(i)!!
+                            if (dataNames.doctorName.lowercase().startsWith(constraint.toString())) {
+                                FilteredArrayNames.add(dataNames)
+                            }
+                        }
+                        results.count = FilteredArrayNames.size
+                        results.values = FilteredArrayNames
+                        return results
+                    }
+                    else if(selectionType==1)
+                    { val FilteredArrayNames: ArrayList<SyncModel.Data.Route> = ArrayList()
+                        constraint = constraint.toString().lowercase()
+                        for (i in 0 until routeList?.size!!) {
+                            val routeName: SyncModel.Data.Route = routeList?.get(i)!!
+                            if (routeName.routeName.lowercase().startsWith(constraint.toString())) {
+                                FilteredArrayNames.add(routeName)
+                            }
+                        }
+                        results.count = FilteredArrayNames.size
+                        results.values = FilteredArrayNames
+                        return results }
+                    else
+                    {   val FilteredArrayNames: ArrayList<SyncModel.Data.Doctor> = ArrayList()
+                        constraint = constraint.toString().lowercase()
+                        for (i in 0 until doctorList?.size!!) {
+                            val docNames: SyncModel.Data.Doctor = doctorList?.get(i)!!
+                            if (docNames.doctorName.lowercase().startsWith(constraint.toString())) {
+                                FilteredArrayNames.add(docNames)
+                            }
+                        }
+                        results.count = FilteredArrayNames.size
+                        results.values = FilteredArrayNames
+                        return results}
+                }
+            }
+        }
+    }
+
+    fun setDoctor(doctorDetailModel: SyncModel.Data.Doctor)
+    {
+        views?.precall_parent?.visibility=View.GONE
+
+        views?.doctorDetail_parent?.visibility=View.VISIBLE
+        views?.doctorName_tv?.setText(doctorDetailModel.doctorName)
+        views?.routeName_tv?.setText(doctorDetailModel.routeName)
+        views?.mobileNumber_tv?.setText(doctorDetailModel.mobileNo)
+        views?.emailId_tv?.setText(doctorDetailModel.emailId)
+        views?.city_tv?.setText(doctorDetailModel.cityName)
+        views?.specility_tv?.setText(doctorDetailModel.specialityName)
+        views?.qualifiction_tv?.setText(doctorDetailModel.qualificationName)
+        selectedDocID=doctorDetailModel.doctorId
+        selectedDocName=doctorDetailModel.doctorName
+        preCallAnalysisApi()
+
+        if(doctorDetailModel.mobileNo.isEmpty())
+            views?.mobileNumberParent?.visibility=View.GONE
+        if(doctorDetailModel.emailId.isEmpty())
+            views?.emailParent?.visibility=View.GONE
+        if(doctorDetailModel.cityName.isEmpty())
+            views?.cityParent?.visibility=View.GONE
+
+    }
+
+    fun onSelection()
+    {
+    views!!.doctorSearch_et!!.setText("")
+
+     if(selectionType==0)
+     {   views?.doctorDetail_parent?.visibility=View.GONE
+         views?.precall_parent?.visibility=View.GONE
+         views?.noData_gif?.visibility=View.VISIBLE
+         views!!.selectTeam_tv.setBackgroundColor(Color.parseColor("#3CB371"))
+         views!!.selectRoute_tv.setBackgroundColor(Color.parseColor("#FA8072"))
+         views!!.selectRoute_tv.setText("Select route")
+         views!!.selectDoctor_tv.setBackgroundColor(Color.parseColor("#A9A9A9"))
+         views!!.selectDoctor_tv.setText("Select Doctor")
+         views!!.selectRoutesCv.setEnabled(true)
+         views!!.selectDoctorsCv.setEnabled(false)
+     }
+     else if(selectionType==1)
+     {
+         views?.doctorDetail_parent?.visibility=View.GONE
+         views?.precall_parent?.visibility=View.GONE
+         views?.noData_gif?.visibility=View.VISIBLE
+         views!!.selectRoute_tv.setBackgroundColor(Color.parseColor("#3CB371"))
+         views!!.selectDoctor_tv.setBackgroundColor(Color.parseColor("#FA8072"))
+         views!!.selectDoctor_tv.setText("Select Doctor")
+         views!!.selectDoctorsCv.setEnabled(true)
+     }
+     else
+     {
+         views!!.selectDoctor_tv.setBackgroundColor(Color.parseColor("#3CB371"))
+     }
+    }
+
+    fun applySelectionFilter(id:Int)
+    {
+        if(selectionType==0)
+        {
+
+        }
+        else if(selectionType==1)
+         doctorList = SplashActivity.staticSyncData?.data?.doctorList!!.filter { s -> s.routeId == id } as java.util.ArrayList<SyncModel.Data.Doctor>
+
+    }
+
+    private fun preCallAnalysisApi() {
+
+        views?.noData_gif?.visibility=View.GONE
+        views?.analysisProgress?.visibility=View.VISIBLE
+
+        apiInterface = APIClient.getClient(2, sharePreferance?.getPref("secondaryUrl")).create(
+            APIInterface::class.java
+        )
+        var profileData = sharePreferance?.getPref("profileData")           //get profile data from share preferance
+        var loginModel = Gson().fromJson(profileData, LoginModel::class.java)
+
+        //call submit visual ads api interfae post method
+        var call: Call<PreCallModel> = apiInterface?.priCallAnalysisApi("bearer " + loginModel?.accessToken,selectedDocID) as Call<PreCallModel>
+        call.enqueue(object : Callback<PreCallModel?> {
+            override fun onResponse(call: Call<PreCallModel?>?, response: Response<PreCallModel?>) {
+                Log.e("preCallAnalysisApi", response.code().toString() + "")
+                if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage?.isEmpty()!!) {
+                    val analysisModel=response.body()?.getData()?.lastVisitSummary
+                    views?.precall_parent?.visibility=View.VISIBLE
+
+                    views?.lastVisitDate_tv?.setText(analysisModel?.strDcrDate)
+                    views?.reportedTime_tv?.setText(analysisModel?.strReportedTime)
+
+                    if(analysisModel?.visitPurpose!!?.isEmpty()) views?.visitPurpose_tv?.setText("-") else views?.visitPurpose_tv?.setText(analysisModel?.visitPurpose)
+                    if(analysisModel?.workWithName!!?.isEmpty()) views?.workingWith_tv?.setText("-") else views?.workingWith_tv?.setText(analysisModel?.workWithName)
+                    if(analysisModel?.remarks!!?.isEmpty()) views?.visitPurpose_tv?.visibility=View.INVISIBLE else views?.remark_tv?.setText(analysisModel?.remarks)
+
+
+                    views!!.brandList_rv.layoutManager=LinearLayoutManager(requireActivity())
+                    views!!.sampleGiven_rv.layoutManager=LinearLayoutManager(requireActivity())
+                    views!!.giftGiven_rv.layoutManager=LinearLayoutManager(requireActivity())
+
+                    var mainList= ArrayList<String>()
+                    var subList= ArrayList<Int>()
+
+                    if( analysisModel?.productList!=null)
+                    {
+                        for( data in analysisModel?.productList!!)
+                        {
+                            mainList.add(data.productName)
+                        }
+                        var adapterProduct=SimpleListAdapter(mainList,subList)
+                        views!!.brandList_rv.adapter=adapterProduct
+                    }
+
+                    if( analysisModel?.sampleList!=null)
+                    {
+                        mainList= ArrayList<String>()
+                        subList= ArrayList<Int>()
+                        for( data in analysisModel?.sampleList!!) {
+                            mainList.add(data.productName.toString())
+                            subList.add(data.qty!!) }
+
+                        var adapterSampleGiven=SimpleListAdapter(mainList,subList)
+                        views!!.sampleGiven_rv.adapter=adapterSampleGiven
+                    }
+
+                    if( analysisModel?.giftList!=null)
+                    {
+                        mainList= ArrayList<String>()
+                        subList= ArrayList<Int>()
+                        for( data in analysisModel?.giftList!!)
+                        {
+                            mainList.add(data.productName.toString())
+                            subList.add(data.qty!!)
+                        }
+                        var adapterGift=SimpleListAdapter(mainList,subList)
+                        views!!.giftGiven_rv.adapter=adapterGift
+                    }
+
+                    views!!.total_tv.setText("Total: "+analysisModel?.lastPOBDetails?.totalPOB)
+
+                    if(analysisModel?.lastPOBDetails?.remark == null)  views!!.remarkPOB_tv.visibility=View.GONE
+
+                    views!!.remarkPOB_tv.setText("Remark: "+analysisModel?.lastPOBDetails?.remark)
+                    views!!.datePob_tv.setText("Date: "+analysisModel?.lastPOBDetails?.lastPobDate)
+
+                    views!!.demoSales_tv.setText("Sales: "+analysisModel?.docLastRCPADetail?.ownSales)
+                    views!!.dateRCPA_tv.setText("Date: "+analysisModel?.docLastRCPADetail?.strRCPADate)
+
+                }
+                else
+                    views?.noData_gif?.visibility=View.VISIBLE
+
+                views?.analysisProgress?.visibility=View.GONE
+            }
+
+            override fun onFailure(call: Call<PreCallModel?>, t: Throwable?) {
+                views?.analysisProgress?.visibility=View.GONE
+                views?.noData_gif?.visibility=View.VISIBLE
+                GeneralClass(requireActivity()).checkInternet() // check internet connection
+                call.cancel()
+            }
+        })
+    }
+
+}

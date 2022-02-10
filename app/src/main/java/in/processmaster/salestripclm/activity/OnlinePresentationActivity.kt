@@ -1,7 +1,6 @@
-package `in`.processmaster.salestripclm.presentation_and_zoom
+package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.R
-import `in`.processmaster.salestripclm.activity.BaseActivity
 import `in`.processmaster.salestripclm.fragments.DisplayVisualFragment
 import `in`.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.other.MeetingCommonCallback
 import `in`.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.remotecontrol.MeetingRemoteControlHelper
@@ -13,6 +12,7 @@ import `in`.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customized
 import `in`.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.adapter.AttenderVideoAdapter.ItemClickListener
 import `in`.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.share.CustomShareView
 import android.app.Dialog
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -30,10 +30,12 @@ import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
+import kotlinx.android.synthetic.main.activity_online_presentation.*
+import kotlinx.android.synthetic.main.common_toolbar.*
 import us.zoom.sdk.*
 
 class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, LifecycleObserver,
-  MeetingUserCallback.UserEvent, MeetingCommonCallback.CommonEvent {
+    MeetingUserCallback.UserEvent, MeetingCommonCallback.CommonEvent {
 
     private var TAG: String = OnlinePresentationActivity::class.java.getSimpleName()
 
@@ -94,45 +96,7 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
             return
         }
 
-     //   if (null != intent.extras) {
-     //       from = intent.extras!!.getInt("from")
-     //   }
-
-    //    var inflater = layoutInflater
-//
-    //   var mNormalSenceView = inflater.inflate(R.layout.layout_meeting_content_normal, null)
-    //    mDefaultVideoView = mNormalSenceView.findViewById<View>(R.id.videoView) as MobileRTCVideoView
-//
-    //    customShareView = mNormalSenceView.findViewById<View>(R.id.custom_share_view) as CustomShareView
-    //    remoteControlHelper = MeetingRemoteControlHelper(customShareView)
-//
-//
-    //    mVideoListView = findViewById<View>(R.id.videoList) as RecyclerView
-    //    mVideoListView!!.bringToFront()
-//
-    //    videoListLayout = findViewById(R.id.videoListLayoutt)
-//
-    //    layout_lans = findViewById(R.id.layout_lans)
-
-
         registerListener()
-
-    //   mVideoListView!!.layoutManager = LinearLayoutManager(
-    //       this,
-    //       LinearLayoutManager.HORIZONTAL,
-    //       false
-    //   )
-    //   mAdapter = AttenderVideoAdapter(
-    //       this,
-    //       windowManager.defaultDisplay.width,
-    //       pinVideoListener
-    //   )
-    //   mVideoListView!!.adapter = mAdapter
-
-      //  MeetingWindowHelper.getInstance().hiddenMeetingWindow(false)
-      //  checkShowVideoLayout()
-      //  meetingVideoHelper!!.checkVideoRotation(this)
-      //  mDefaultVideoView!!.onResume()
 
         val fragment = DisplayVisualFragment()
         openFragment(fragment)
@@ -154,16 +118,31 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
         }
 
         override fun getShareView(): MobileRTCShareView? {
-           return null
+            return null
         }
     }
 
 
     private fun openFragment(fragment: Fragment)
     {
+        val intent: Intent = intent
+        val loadsPosition: Int = intent.getIntExtra("doctorID", -1)
+
+        if(intent.getStringExtra("doctorName")!=null)
+        {
+            val doctorName: String = intent.getStringExtra("doctorName")!!
+
+            doctorName_tv.setText(doctorName)
+            toolbarHeader_rl.visibility=View.VISIBLE
+            back_iv.setOnClickListener({onBackPressed()})
+        }
+
+
         val bundle = Bundle()
         bundle.putString("type", "present")
-        fragment.setArguments(bundle);
+        bundle.putInt("doctorID", loadsPosition)
+        bundle.putString("doctorName", doctorName_tv.text.toString())
+        fragment.setArguments(bundle)
 
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.framePresentatrion, fragment)
@@ -171,7 +150,7 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
     }
 
 
-//Zoom integration part
+    //Zoom integration part
     private fun registerListener()
     {
         MeetingUserCallback.getInstance().addListener(this)
@@ -306,68 +285,68 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
       //  videoListLayout!!.visibility = View.GONE
     }*/
 
-   /* private fun showOnlyMeLayout() {
-        mDefaultVideoView!!.visibility = View.VISIBLE
-     //   videoListLayout!!.visibility = View.GONE
-        var renderInfo = MobileRTCVideoUnitRenderInfo(0, 0, 100, 100)
-        var myUserInfo = mInMeetingService!!.myUserInfo
-        if (myUserInfo != null) {
-            mDefaultVideoViewMgr!!.removeAllVideoUnits()
+    /* private fun showOnlyMeLayout() {
+         mDefaultVideoView!!.visibility = View.VISIBLE
+      //   videoListLayout!!.visibility = View.GONE
+         var renderInfo = MobileRTCVideoUnitRenderInfo(0, 0, 100, 100)
+         var myUserInfo = mInMeetingService!!.myUserInfo
+         if (myUserInfo != null) {
+             mDefaultVideoViewMgr!!.removeAllVideoUnits()
 
-            mDefaultVideoViewMgr!!.addAttendeeVideoUnit(myUserInfo.userId, renderInfo)
-        }
-    }
-*/
-   /* private fun showOne2OneLayout() {
-        mDefaultVideoView!!.visibility = View.VISIBLE
-        videoListLayout!!.visibility = View.VISIBLE
-        var renderInfo = MobileRTCVideoUnitRenderInfo(0, 0, 100, 100)
-        //options.aspect_mode = MobileRTCVideoUnitAspectMode.VIDEO_ASPECT_PAN_AND_SCAN;
-        mDefaultVideoViewMgr!!.addActiveVideoUnit(renderInfo)
-        mAdapter!!.setUserList(mInMeetingService!!.inMeetingUserList)
-        mAdapter!!.notifyDataSetChanged()
-    }*/
+             mDefaultVideoViewMgr!!.addAttendeeVideoUnit(myUserInfo.userId, renderInfo)
+         }
+     }
+ */
+    /* private fun showOne2OneLayout() {
+         mDefaultVideoView!!.visibility = View.VISIBLE
+         videoListLayout!!.visibility = View.VISIBLE
+         var renderInfo = MobileRTCVideoUnitRenderInfo(0, 0, 100, 100)
+         //options.aspect_mode = MobileRTCVideoUnitAspectMode.VIDEO_ASPECT_PAN_AND_SCAN;
+         mDefaultVideoViewMgr!!.addActiveVideoUnit(renderInfo)
+         mAdapter!!.setUserList(mInMeetingService!!.inMeetingUserList)
+         mAdapter!!.notifyDataSetChanged()
+     }*/
 
-  /*  fun showVideoListLayout()
-    {
-        var renderInfo = MobileRTCVideoUnitRenderInfo(0, 0, 100, 100)
-        //options.aspect_mode = MobileRTCVideoUnitAspectMode.VIDEO_ASPECT_PAN_AND_SCAN;
-        mDefaultVideoViewMgr!!.addActiveVideoUnit(renderInfo)
-      //  videoListLayout?.visibility = View.VISIBLE
-        updateAttendeeVideos(mInMeetingService!!.inMeetingUserList, 0)
-    }*/
+    /*  fun showVideoListLayout()
+      {
+          var renderInfo = MobileRTCVideoUnitRenderInfo(0, 0, 100, 100)
+          //options.aspect_mode = MobileRTCVideoUnitAspectMode.VIDEO_ASPECT_PAN_AND_SCAN;
+          mDefaultVideoViewMgr!!.addActiveVideoUnit(renderInfo)
+        //  videoListLayout?.visibility = View.VISIBLE
+          updateAttendeeVideos(mInMeetingService!!.inMeetingUserList, 0)
+      }*/
 
     fun updateAttendeeVideos(
         userlist: List<Long>,
         action: Int)
-     {
+    {
         if (action == 0) {
             MeetingWindowHelper.getInstance().showMeetingWindow(this)
 
             // mAdapter!!.setUserList(userlist)
-           // mAdapter!!.notifyDataSetChanged()
+            // mAdapter!!.notifyDataSetChanged()
         } else if (action == 1)
         {
             MeetingWindowHelper.getInstance().showMeetingWindow(this)
 
             //  mAdapter!!.addUserList(userlist)
-          //  mAdapter!!.notifyDataSetChanged()
+            //  mAdapter!!.notifyDataSetChanged()
         }
         else {
             MeetingWindowHelper.getInstance().hiddenMeetingWindow(true)
 
             //  var userId = mAdapter!!.selectedUserId
-          //  if (userlist.contains(userId)) {
-          //      var inmeetingUserList =
-          //          mInMeetingService!!.inMeetingUserList
-          //      if (inmeetingUserList.size > 0) {
-          //          mDefaultVideoViewMgr!!.removeAllVideoUnits()
-          //          var renderInfo =
-          //              MobileRTCVideoUnitRenderInfo(0, 0, 100, 100)
-          //          mDefaultVideoViewMgr!!.addAttendeeVideoUnit(inmeetingUserList[0], renderInfo)
-          //      }
-          //  }
-          //  mAdapter!!.removeUserList(userlist)
+            //  if (userlist.contains(userId)) {
+            //      var inmeetingUserList =
+            //          mInMeetingService!!.inMeetingUserList
+            //      if (inmeetingUserList.size > 0) {
+            //          mDefaultVideoViewMgr!!.removeAllVideoUnits()
+            //          var renderInfo =
+            //              MobileRTCVideoUnitRenderInfo(0, 0, 100, 100)
+            //          mDefaultVideoViewMgr!!.addAttendeeVideoUnit(inmeetingUserList[0], renderInfo)
+            //      }
+            //  }
+            //  mAdapter!!.removeUserList(userlist)
         }
     }
 
@@ -379,7 +358,7 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
         }
         stopConnectivity(this)
 
-       // mDefaultVideoView!!.onPause()
+        // mDefaultVideoView!!.onPause()
     }
 
     override fun onStop() {
@@ -389,23 +368,13 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-      /*  if (null != remoteControlHelper) {
-            remoteControlHelper!!.onDestroy()
-        }*/
-            // unRegisterListener()
-
-
-    }
-
     var builder: Dialog? = null
 
     private fun updateVideoView(
         userList: List<Long>,
         action: Int
     ) {
-      updateAttendeeVideos(userList, action)
+        updateAttendeeVideos(userList, action)
     }
 
 
@@ -417,12 +386,12 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
 
 
     override fun onMeetingUserJoin(userList: List<Long>) {
-       // checkShowVideoLayout()
+        // checkShowVideoLayout()
         updateVideoView(userList, 1)
     }
 
     override fun onMeetingUserLeave(userList: List<Long>) {
-      //  checkShowVideoLayout()
+        //  checkShowVideoLayout()
         updateVideoView(userList, 2)
     }
 
@@ -455,7 +424,7 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
 
     }
 
-    override fun onMeetingNeedColseOtherMeeting(inMeetingEventHandler: InMeetingEventHandler) 
+    override fun onMeetingNeedColseOtherMeeting(inMeetingEventHandler: InMeetingEventHandler)
     {
     }
 
@@ -491,13 +460,13 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
 
     override fun onBackPressed() {
 
-       if(meetingShareHelper?.isSharingOut!!)
-       {
-           stopPresentationAlert()
-       }
+        if(meetingShareHelper?.isSharingOut!!)
+        {
+            stopPresentationAlert()
+        }
         else{
-           super.onBackPressed()
-       }
+            super.onBackPressed()
+        }
 
     }
     fun stopPresentationAlert()

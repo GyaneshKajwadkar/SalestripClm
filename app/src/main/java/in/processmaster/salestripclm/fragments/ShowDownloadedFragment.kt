@@ -98,7 +98,7 @@ class ShowDownloadedFragment : Fragment() {
             nodata_gif?.visibility=View.GONE
             selection_tv?.setText("Please wait...")
 
-            val mNoOfColumns = activity?.let { Utility.calculateNoOfColumns(it, 190F) }
+            val mNoOfColumns = activity?.let { Utility.calculateNoOfColumns(it, 200F) }
 
             val value = requireArguments().getInt("eDetailingID")
             val brandID = requireArguments().getInt("brandId")
@@ -199,9 +199,9 @@ class ShowDownloadedFragment : Fragment() {
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
         override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
 
-            adapterVideo?.getFilter()?.filter(s.toString());
-            adapterImage?.getFilter()?.filter(s.toString());
-            adapterWeb?.getFilter()?.filter(s.toString());
+            adapterVideo?.getFilter()?.filter(s.toString())
+            adapterImage?.getFilter()?.filter(s.toString())
+            adapterWeb?.getFilter()?.filter(s.toString())
         }
 
         override fun afterTextChanged(s: Editable) {

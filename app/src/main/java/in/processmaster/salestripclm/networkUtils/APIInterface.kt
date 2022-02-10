@@ -185,5 +185,9 @@ interface APIInterface
         @Path("empId") empId: String?
     ): Response<ZoomCredientialModel?>?
 
-
+    //in.processmaster.salestripclm
+    @GET("api/report/lastVisitSummary/{docId}")
+    fun priCallAnalysisApi(
+        @Header("Authorization") authorization: String?,
+        @Path("docId") dotorId: Int?): Call<PreCallModel>
 }

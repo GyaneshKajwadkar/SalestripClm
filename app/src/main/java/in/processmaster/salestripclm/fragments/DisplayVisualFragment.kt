@@ -1,7 +1,11 @@
 package `in`.processmaster.salestripclm.fragments
 
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.activity.SplashActivity
+import `in`.processmaster.salestripclm.activity.SubmitE_DetailingActivity
 import `in`.processmaster.salestripclm.adapter.VisualFileAdapter
+import `in`.processmaster.salestripclm.common_classes.AlertClass
+import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.interfaceCode.DisplayVisualInterface
 import `in`.processmaster.salestripclm.interfaceCode.ItemClickDisplayVisual
 import `in`.processmaster.salestripclm.interfaceCode.SortingDisplayVisual
@@ -11,6 +15,7 @@ import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -34,6 +39,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import kotlinx.android.synthetic.main.activity_display_visual.view.*
+import kotlinx.android.synthetic.main.activity_display_visual.view.noData_tv
+import kotlinx.android.synthetic.main.bottom_sheet_visualads.view.*
+import kotlinx.android.synthetic.main.progress_view.view.*
+import kotlinx.android.synthetic.main.progress_view.view.progressBar
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -41,150 +51,76 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class DisplayVisualFragment : BaseFragment(), DisplayVisualInterface, SortingDisplayVisual, ItemClickDisplayVisual {
-    //declare XML component
-    var doctorSearch_et: EditText? = null
-    var close_imv: ImageView? = null
-    private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
-    private lateinit var bottomSheet: ConstraintLayout
-    var doctorList_rv: RecyclerView? = null
-    var brand_rv: RecyclerView? = null
-    var submitBtn: Button? = null
-    var progressBar: ProgressBar? = null
-    var splitViewparent_ll:LinearLayout?=null
-    var noData_tv:TextView?=null
-    var division_spinner: Spinner?=null
-
-    var progressView_parentRv: RelativeLayout?=null
-    var progressMessage_tv: TextView? =null
-
-    //local variable initilization
-    var db = DatabaseHandler(activity)
-    var adapter: BottomSheetDoctorAdapter? = null
-
-    var adapterVisualFile: VisualFileAdapter? = null
-
-    var apiInterface: APIInterface? = null
-    var sharePreferance: PreferenceClass? = null
-
-    var contextFragment= getContext()
+class DisplayVisualFragment : Fragment(),  SortingDisplayVisual, ItemClickDisplayVisual {
 
     companion object
     {
         var doctorIdDisplayVisual = 0
         var doctor_et: EditText? = null
     }
-
-    //arrayList initilazation
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
+    private lateinit var bottomSheet: ConstraintLayout
+    var db = DatabaseHandler(activity)
+    var adapter: BottomSheetDoctorAdapter? = null
+    var adapterVisualFile: VisualFileAdapter? = null
+    var apiInterface: APIInterface? = null
+    var sharePreferance: PreferenceClass? = null
+    var contextFragment= getContext()
     var edetailingList: ArrayList<DevisionModel.Data.EDetailing>? = null
     var edetailingFavList: ArrayList<DevisionModel.Data.EDetailing>? = null
-
-    //For all brands
     var downloadFilePathList: ArrayList<DownloadFileModel> = ArrayList()
     var storedDownloadedList: ArrayList<DownloadFileModel> = ArrayList()
-
-
     var favProductDoctorList: ArrayList<SyncModel.Data.Doctor.LinkedBrand> = ArrayList()
-
-    var selectorButton_rv: RecyclerView? =null
-
-    var favBrand_rl: RelativeLayout?=null
-
-    var allbrandparent_ll: LinearLayout?=null
-    var favParent_ll: LinearLayout?=null
-
-    var allBrand_iv:ImageView?=null
-    var favBrand_iv:ImageView?=null
-    var sideparent_rl:RelativeLayout?=null
-
-    var allBrandParent_ll:LinearLayout?=null
-    var favBrand_frame:FrameLayout?=null
-
+    var views:View?=null
+    var doctorName=""
 
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        var view= inflater.inflate(R.layout.activity_display_visual, container, false)
+        views = inflater.inflate(R.layout.activity_display_visual, container, false)
         db = DatabaseHandler(activity)
-        initView(view)
-        return view
-    }
+        initView(views!!)
+        return views }
 
-    fun  initView(view: View)
+    fun  initView(views: View)
     {
-
-        //-------------------------------------Initilazation
-        doctor_et = view.findViewById(R.id.doctor_et) as EditText
-        doctorSearch_et = view.findViewById(R.id.doctorSearch_et) as EditText
-        bottomSheet = view.findViewById(R.id.bottomSheet) as ConstraintLayout
-        doctorList_rv = view.findViewById(R.id.doctorList_rv) as RecyclerView
-        brand_rv =view. findViewById(R.id.brand_rv) as RecyclerView
-        favBrand_rl =view. findViewById(R.id.favBrand_rl) as RelativeLayout
-        sideparent_rl =view. findViewById(R.id.sideparent_rl) as RelativeLayout
-
-        progressView_parentRv=view.findViewById(R.id.progressView_parentRv) as RelativeLayout
-        progressMessage_tv=view.findViewById(R.id.progressMessage_tv) as TextView
-
-        submitBtn = view.findViewById(R.id.submitBtn) as Button
-        close_imv = view.findViewById(R.id.close_imv) as ImageView
-        progressBar = view.findViewById(R.id.progressBar) as ProgressBar
-        selectorButton_rv = view.findViewById(R.id.selectorButton_rv) as RecyclerView
-
-        splitViewparent_ll = view.findViewById(R.id.splitViewparent_ll) as LinearLayout
-        noData_tv = view.findViewById(R.id.noData_tv) as TextView
-        division_spinner = view.findViewById(R.id.division_spinner) as Spinner
-        allbrandparent_ll = view.findViewById(R.id.allbrandparent_ll) as LinearLayout
-        favParent_ll = view.findViewById(R.id.favParent_ll) as LinearLayout
-        allBrand_iv = view.findViewById(R.id.allBrand_iv) as ImageView
-        favBrand_iv = view.findViewById(R.id.favBrand_iv) as ImageView
-
-        allBrandParent_ll = view.findViewById(R.id.allBrandParent_ll) as LinearLayout
-        favBrand_frame    = view.findViewById(R.id.favBrand_frame) as FrameLayout
-
+        doctor_et = views.findViewById(R.id.doctor_et) as EditText
+        bottomSheet = views.findViewById(R.id.bottomSheet) as ConstraintLayout
         sharePreferance = PreferenceClass(activity)
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
 
-
         doctor_et?.setOnClickListener({
             val state =
-                    if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED)
-                        BottomSheetBehavior.STATE_COLLAPSED
-                    else
-                        BottomSheetBehavior.STATE_EXPANDED
+                if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED)
+                    BottomSheetBehavior.STATE_COLLAPSED
+                else
+                    BottomSheetBehavior.STATE_EXPANDED
             bottomSheetBehavior.state = state
         })
 
-        close_imv?.setOnClickListener({
+        views!!.close_imv?.setOnClickListener({
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
         })
 
-        submitBtn?.setOnClickListener({
-            if (isInternetAvailable(requireActivity()) == false)
-            {
-                networkAlert(requireActivity())
-            }
-            else
-            {
-                sendVisual_api()
-            }
+        views!!.submitBtn?.setOnClickListener({
+            val intent = Intent(activity, SubmitE_DetailingActivity::class.java)
+            intent.putExtra("doctorID", doctorIdDisplayVisual)
+            intent.putExtra("doctorName", doctorName)
+            startActivity(intent)
+            //  if (!GeneralClass(requireActivity()).isInternetAvailable())
+            //  {
+            //      AlertClass(requireActivity()).networkAlert()
+            //  }
+            //  else
+            //  {
+            //      sendVisual_api()
+            //  }
         })
 
-        bottomSheetBehavior.addBottomSheetCallback(object :
-                BottomSheetBehavior.BottomSheetCallback() {
-            override fun onSlide(bottomSheet: View, slideOffset: Float)
-            {
-            }
-
-            override fun onStateChanged(bottomSheet: View, newState: Int)
-            {
-            }
-        })
-
-        progressMessage_tv?.setText("Loading e-Detailing")
-        activity?.let { enableProgress(progressView_parentRv!!, it) }
-
+        views!!.progressMessage_tv?.setText("Loading e-Detailing")
+        GeneralClass(requireActivity()).enableProgress(views!!.progressView_parentRv!!)
+        //  activity?.let { GeneralClass(requireActivity()).enableProgress(progressView_parentRv!!) }
 
         Handler(Looper.getMainLooper()).postDelayed({
 
@@ -192,8 +128,8 @@ class DisplayVisualFragment : BaseFragment(), DisplayVisualInterface, SortingDis
             setAdapter()
             setSelectorAdapter(downloadFilePathList)
             setUserFavAdapter()
-
-            activity?.let { disableProgress(progressView_parentRv!!, it) }
+            GeneralClass(requireActivity()).disableProgress(views!!.progressView_parentRv!!)
+            //  activity?.let { disableProgress(progressView_parentRv!!, it) }
         }, 50)
 
         callDownloadFragment()
@@ -204,81 +140,77 @@ class DisplayVisualFragment : BaseFragment(), DisplayVisualInterface, SortingDis
             {
                 doctor_et?.visibility=View.INVISIBLE
                 doctor_et?.setText("1")
-                doctorIdDisplayVisual=1
+
+                doctorIdDisplayVisual=requireArguments().getInt("doctorID")
+                doctorName= requireArguments().getString("doctorName").toString()
             }
         }
 
 
-        allBrand_iv?.setColorFilter(ContextCompat.getColor(requireActivity(), R.color.white))
+        views!!.allBrand_iv?.setColorFilter(ContextCompat.getColor(requireActivity(), R.color.white))
 
 
-        allbrandparent_ll?.setOnClickListener({
+        views!!.allbrandparent_ll?.setOnClickListener({
 
-            allBrand_iv?.setColorFilter(ContextCompat.getColor(requireActivity(), R.color.white))
-            favBrand_iv?.setColorFilter(ContextCompat.getColor(requireActivity(), R.color.gray))
-            division_spinner?.isEnabled=true
+            views!!.allBrand_iv?.setColorFilter(ContextCompat.getColor(requireActivity(), R.color.white))
+            views!!.favBrand_iv?.setColorFilter(ContextCompat.getColor(requireActivity(), R.color.gray))
+            views!!.division_spinner?.isEnabled=true
             callDownloadFragment()
-            sideparent_rl?.visibility=View.VISIBLE
-            allBrandParent_ll?.visibility=View.VISIBLE
-            division_spinner?.visibility=View.VISIBLE
-            favBrand_frame?.visibility=View.GONE
+            views!!.sideparent_rl?.visibility=View.VISIBLE
+            views!!.allBrandParent_ll?.visibility=View.VISIBLE
+            views!!.division_spinner?.visibility=View.VISIBLE
+            views!!.favBrand_frame?.visibility=View.GONE
         })
 
-        favParent_ll?.setOnClickListener({
+        views!!.favParent_ll?.setOnClickListener({
 
-            allBrand_iv?.setColorFilter(ContextCompat.getColor(requireActivity(), R.color.gray));
-            favBrand_iv?.setColorFilter(ContextCompat.getColor(requireActivity(), R.color.white));
-            division_spinner?.isEnabled=false
+            views!!.allBrand_iv?.setColorFilter(ContextCompat.getColor(requireActivity(), R.color.gray));
+            views!!.favBrand_iv?.setColorFilter(ContextCompat.getColor(requireActivity(), R.color.white));
+            views!!.division_spinner?.isEnabled=false
             onClickFavButton()
             setDownloadListAdapter(downloadFilePathList)
+            views!!.sideparent_rl?.visibility=View.GONE
+            views!!.allBrandParent_ll?.visibility=View.GONE
+            views!!.division_spinner?.visibility=View.INVISIBLE
+            views!!.favBrand_frame?.visibility=View.VISIBLE
+        })
 
-
-            sideparent_rl?.visibility=View.GONE
-
-            allBrandParent_ll?.visibility=View.GONE
-            division_spinner?.visibility=View.INVISIBLE
-            favBrand_frame?.visibility=View.VISIBLE
-
-            })
+        db.deleteAllVisualAds()
+        db.deleteAllChildVisual()
     }
 
     fun setDoctorList()
     {
-        var model = Gson().fromJson(db.getAllData(), SyncModel::class.java)      //get doctor list from db and convert it string to model class
+        //  var model = Gson().fromJson(db.getAllData(), SyncModel::class.java)      //get doctor list from db and convert it string to model class
         adapter = BottomSheetDoctorAdapter(
-                model.data.doctorList,
-                doctor_et!!,
-                bottomSheetBehavior,
-                this
+            SplashActivity.staticSyncData?.data?.doctorList!!,
+            doctor_et!!,
+            bottomSheetBehavior
         )
-        doctorList_rv?.itemAnimator = DefaultItemAnimator()
-        doctorList_rv?.adapter = adapter
-        doctorSearch_et!!.addTextChangedListener(filterTextWatcher)
+        views!!.doctorList_rv?.itemAnimator = DefaultItemAnimator()
+        views!!.doctorList_rv?.adapter = adapter
+        views!!.doctorSearch_et!!.addTextChangedListener(filterTextWatcher)
     }
 
     fun setSelectorAdapter(list: ArrayList<DownloadFileModel>)
     {
         var downloadTypeList: ArrayList<String> = ArrayList()
         downloadTypeList.add("All")
-        //Add all download type
         for ((index, valueDownload) in list?.withIndex()!!)
         {
             downloadTypeList.add(valueDownload.downloadType)
         }
-
-        //Removing duplicate value
         val hashSet: Set<String> = LinkedHashSet(downloadTypeList)
         downloadTypeList.clear()
         downloadTypeList.addAll(hashSet)
 
 
-
         val langAdapter = ArrayAdapter<String>(contextFragment!!, android.R.layout.simple_spinner_item, downloadTypeList)
         langAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        division_spinner?.setAdapter(langAdapter)
-        division_spinner?.setSelection(0)
+        views!!.division_spinner?.setAdapter(langAdapter)
+        views!!.division_spinner?.setSelection(0)
 
-        division_spinner?.setOnItemSelectedListener(object : OnItemSelectedListener {
+        views!!.division_spinner?.setOnItemSelectedListener(object : OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 val item = parent.selectedItem
 
@@ -287,7 +219,6 @@ class DisplayVisualFragment : BaseFragment(), DisplayVisualInterface, SortingDis
                     downloadFilePathList.clear()
                     downloadFilePathList.addAll(storedDownloadedList)
                     setDownloadListAdapter(downloadFilePathList)
-
                 }
                 else
                 {
@@ -302,13 +233,9 @@ class DisplayVisualFragment : BaseFragment(), DisplayVisualInterface, SortingDis
                             filterList?.add(valueDownload)
                         }
                     }
-
                     downloadFilePathList.clear()
                     downloadFilePathList.addAll(filterList)
-
                     setDownloadListAdapter(downloadFilePathList)
-
-
                 }
                 callDownloadFragment()
 
@@ -342,16 +269,15 @@ class DisplayVisualFragment : BaseFragment(), DisplayVisualInterface, SortingDis
     //-------------------------------------check end page of web view and enable submit button according to it
     override fun onResume() {
         super.onResume()
-        if (db.getAllSubmitVisual().size > 0) {
-
-            Log.e("dbGetAll",db.allSubmitVisual.size.toString())
-            if(db.allSubmitVisual.size==0)
-            {
-                return
-            }
-
-            submitBtn?.setEnabled(true)
-            submitBtn?.visibility=View.VISIBLE
+        if (db.getAllSubmitVisual().size > 0)
+        {
+            views!!.submitBtn?.setEnabled(true)
+            views!!.submitBtn?.visibility=View.VISIBLE
+        }
+        else
+        {
+            views!!.submitBtn?.setEnabled(false)
+            views!!.submitBtn?.visibility = View.GONE
         }
     }
 
@@ -361,18 +287,18 @@ class DisplayVisualFragment : BaseFragment(), DisplayVisualInterface, SortingDis
         //get all submit visual api
 
         apiInterface = APIClient.getClient(2, sharePreferance?.getPref("secondaryUrl")).create(
-                APIInterface::class.java
+            APIInterface::class.java
         )
         //initilize api interface
 
         var profileData = sharePreferance?.getPref("profileData")           //get profile data from share preferance
         var loginModel = Gson().fromJson(profileData, LoginModel::class.java)    //convert profile data string to model class
-        enableProgress(progressBar!!, requireActivity())                                            //visble progress bar
+        GeneralClass(requireActivity()).enableSimpleProgress(views!!.progressBar!!)                                            //visble progress bar
 
         //call submit visual ads api interfae post method
         var call: Call<SyncModel> = apiInterface?.submitVisualAds(
-                "bearer " + loginModel?.accessToken,
-                visualSendModel
+            "bearer " + loginModel?.accessToken,
+            visualSendModel
         ) as Call<SyncModel>
         call.enqueue(object : Callback<SyncModel?> {
             override fun onResponse(call: Call<SyncModel?>?, response: Response<SyncModel?>) {
@@ -383,20 +309,20 @@ class DisplayVisualFragment : BaseFragment(), DisplayVisualInterface, SortingDis
 
                     db.deleteAllVisualAds()
                     db.deleteAllChildVisual()
-                    submitBtn?.visibility=View.GONE
+                    views!!.submitBtn?.visibility=View.GONE
                     Toast.makeText(activity, "Data save successfully", Toast.LENGTH_LONG).show()
 
                 } else {
                 }
-                disableProgress(progressBar!!, requireActivity())
+                GeneralClass(requireActivity()).disableSimpleProgress(views!!.progressBar!!)                                            //visble progress bar
 
             }
 
             override fun onFailure(call: Call<SyncModel?>, t: Throwable?) {
                 //on failure of api.
-                checkInternet() // check internet connection
+                GeneralClass(requireActivity()).checkInternet() // check internet connection
                 call.cancel()
-                disableProgress(progressBar!!, requireActivity()) // disable progress bar
+                GeneralClass(requireActivity()).disableSimpleProgress(views!!.progressBar!!)                                            //visble progress bar
             }
         })
     }
@@ -409,8 +335,8 @@ class DisplayVisualFragment : BaseFragment(), DisplayVisualInterface, SortingDis
             if (value.isSaved == 1)    //check edetailing have saved file or not
             {
                 var downloadFilePathLocal: DownloadFileModel = Gson().fromJson(
-                        value.filePath,
-                        object : TypeToken<DownloadFileModel?>() {}.type
+                    value.filePath,
+                    object : TypeToken<DownloadFileModel?>() {}.type
                 )
                 //get and convert save file string to array list
 
@@ -427,8 +353,8 @@ class DisplayVisualFragment : BaseFragment(), DisplayVisualInterface, SortingDis
 
                 if(downloadFilePathList.size==0)
                 {
-                        splitViewparent_ll?.visibility=View.GONE
-                        noData_tv?.visibility=View.VISIBLE
+                    views!!.splitViewparent_ll?.visibility=View.GONE
+                    views!!.noData_tv?.visibility=View.VISIBLE
                 }
                 else
                 {
@@ -440,8 +366,8 @@ class DisplayVisualFragment : BaseFragment(), DisplayVisualInterface, SortingDis
 
         if(edetailingList!!.size==0)
         {
-            splitViewparent_ll?.visibility=View.GONE
-            noData_tv?.visibility=View.VISIBLE
+            views!!.splitViewparent_ll?.visibility=View.GONE
+            views!!.noData_tv?.visibility=View.VISIBLE
 
         }
 
@@ -455,8 +381,8 @@ class DisplayVisualFragment : BaseFragment(), DisplayVisualInterface, SortingDis
         for ((index, value) in edetailingFavList?.withIndex()!!) {
 
             var downloadFilePathLocal: DownloadFileModel = Gson().fromJson(
-                    value.filePath,
-                    object : TypeToken<DownloadFileModel?>() {}.type
+                value.filePath,
+                object : TypeToken<DownloadFileModel?>() {}.type
             )
             //get and convert save file string to array list
 
@@ -473,16 +399,16 @@ class DisplayVisualFragment : BaseFragment(), DisplayVisualInterface, SortingDis
     {
         //this method is used to arrange list in Ascending Order with resp to priority of doctor linkedBrandList data
         Collections.sort(favProductDoctorList, object :
-                Comparator<SyncModel.Data.Doctor.LinkedBrand> {
+            Comparator<SyncModel.Data.Doctor.LinkedBrand> {
 
             override fun compare(
-                    first: SyncModel.Data.Doctor.LinkedBrand?,
-                    second: SyncModel.Data.Doctor.LinkedBrand?
+                first: SyncModel.Data.Doctor.LinkedBrand?,
+                second: SyncModel.Data.Doctor.LinkedBrand?
             ): Int {
                 val p1: SyncModel.Data.Doctor.LinkedBrand =
-                        first as SyncModel.Data.Doctor.LinkedBrand
+                    first as SyncModel.Data.Doctor.LinkedBrand
                 val p2: SyncModel.Data.Doctor.LinkedBrand =
-                        second as SyncModel.Data.Doctor.LinkedBrand
+                    second as SyncModel.Data.Doctor.LinkedBrand
                 return p1.priorityOrder.compareTo(p2.priorityOrder)
             }
         })
@@ -531,48 +457,34 @@ class DisplayVisualFragment : BaseFragment(), DisplayVisualInterface, SortingDis
     }
 
     //-------------------------------------interface override method to get doctor id from bottom sheet adapter
-    override fun onClickString(passingInterface: String) {
-        doctorIdDisplayVisual= passingInterface?.toInt()!!
-
-        callDownloadFragment()
-    }
+//    override fun onClickString(passingInterface: String) {
+//        doctorIdDisplayVisual= passingInterface?.toInt()!!
+//
+//        callDownloadFragment()
+//    }
     //-------------------------------------interface override method to get doctor linkedBrandList from bottom sheet adapter
-    override fun onClickDoctor(passingInterfaceList: java.util.ArrayList<SyncModel.Data.Doctor.LinkedBrand>)
-    {
-        favProductDoctorList.addAll(passingInterfaceList!!)
-        //call rearrange linkedBrandList to set priority
-        rearrangeDownloadedList()
-    }
+//    override fun onClickDoctor(passingInterfaceList: java.util.ArrayList<SyncModel.Data.Doctor.LinkedBrand>)
+//    {
+//        favProductDoctorList.addAll(passingInterfaceList!!)
+//        //call rearrange linkedBrandList to set priority
+//        rearrangeDownloadedList()
+//    }
 
     //-------------------------------------initilize Visual file recycler view
     fun setDownloadListAdapter(list: ArrayList<DownloadFileModel>)
     {
         adapterVisualFile = VisualFileAdapter(list, requireActivity(), 1, this)
-        brand_rv?.setLayoutManager(LinearLayoutManager(requireActivity()));
-        brand_rv?.itemAnimator = DefaultItemAnimator()
-        brand_rv?.adapter = adapterVisualFile
-    }
-
-
-    //-------------------------------------checkInternet connection
-    fun checkInternet()
-    {
-        if(isInternetAvailable(requireActivity())==true)
-        {
-            commonAlert(requireActivity(), "Error", "Something went wrong please try again later")
-        }
-        else
-        {
-            networkAlert(requireActivity())
-        }
+        views!!.brand_rv?.setLayoutManager(LinearLayoutManager(requireActivity()));
+        views!!.brand_rv?.itemAnimator = DefaultItemAnimator()
+        views!!.brand_rv?.adapter = adapterVisualFile
     }
 
 
     //==========================================DoctorList_BottomSheet adapter==============================================
-    class BottomSheetDoctorAdapter(
-            public var doctorList: ArrayList<SyncModel.Data.Doctor>,
-            var doctor_et: EditText,
-            var bottomSheet: BottomSheetBehavior<ConstraintLayout>, var listener: DisplayVisualInterface
+    inner class BottomSheetDoctorAdapter(
+        public var doctorList: ArrayList<SyncModel.Data.Doctor>,
+        var doctor_et: EditText,
+        var bottomSheet: BottomSheetBehavior<ConstraintLayout>
     ) :
         RecyclerView.Adapter<BottomSheetDoctorAdapter.MyViewHolder>(), Filterable {
 
@@ -610,9 +522,12 @@ class DisplayVisualFragment : BaseFragment(), DisplayVisualInterface, SortingDis
                 bottomSheet.setState(BottomSheetBehavior.STATE_COLLAPSED)
 
                 //call Display Visual interface method
-                listener.onClickString(modeldata?.doctorId.toString())
-                listener.onClickDoctor(modeldata?.linkedBrandList!!)
-
+                // listener.onClickString(modeldata?.doctorId.toString())
+                // listener.onClickDoctor(modeldata?.linkedBrandList!!)
+                doctorIdDisplayVisual= modeldata?.doctorId!!
+                favProductDoctorList.addAll(modeldata?.linkedBrandList!!!!)
+                rearrangeDownloadedList()
+                callDownloadFragment()
 
             })
         }
@@ -641,7 +556,7 @@ class DisplayVisualFragment : BaseFragment(), DisplayVisualInterface, SortingDis
                     constraint = constraint.toString().toLowerCase()
                     for (i in 0 until doctorList?.size!!) {
                         val dataNames: SyncModel.Data.Doctor = doctorList?.get(i)!!
-                        if (dataNames.doctorName.toLowerCase().startsWith(constraint.toString())) {
+                        if (dataNames.doctorName.lowercase().startsWith(constraint.toString())) {
                             FilteredArrayNames.add(dataNames)
                         }
                     }
@@ -687,17 +602,16 @@ class DisplayVisualFragment : BaseFragment(), DisplayVisualInterface, SortingDis
 
     fun callDownloadFragment()
     {
-
-        if(favBrand_frame?.visibility==View.VISIBLE)
+        if(views!!.favBrand_frame?.visibility==View.VISIBLE)
         {
             onClickFavButton()
         }
         else
-            {
-                val childFragment: Fragment = ShowDownloadedFragment()
-                val transaction: FragmentTransaction = childFragmentManager.beginTransaction()
-                transaction.replace(R.id.child_fragment_container, childFragment).commit()
-            }
+        {
+            val childFragment: Fragment = ShowDownloadedFragment()
+            val transaction: FragmentTransaction = childFragmentManager.beginTransaction()
+            transaction.replace(R.id.child_fragment_container, childFragment).commit()
+        }
     }
 
 

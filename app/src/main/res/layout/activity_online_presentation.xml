@@ -1,53 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/root_view"
+<LinearLayout
+    android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <RelativeLayout
+    <include layout="@layout/common_toolbar"/>
+
+    <FrameLayout
+        android:id="@+id/framePresentatrion"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <LinearLayout
-            android:layout_marginRight="1dp"
-            android:background="@color/white"
-            android:id="@+id/frameLayoutparent"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:layout_toLeftOf="@+id/videoListLayoutt">
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbarHeader_rl"/>
 
-            <FrameLayout
-                android:id="@+id/framePresentatrion"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-
-        </LinearLayout>
-
-        <in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.VideoListLayout
-            android:id="@+id/videoListLayoutt"
-            android:visibility="invisible"
-            android:layout_width="wrap_content"
-            android:background="@color/white"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:orientation="vertical">
-
-            <ImageView
-                android:id="@+id/videoList_indicator"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:focusable="true"
-                />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/videoList"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:clipChildren="true"
-                android:clipToPadding="true"
-                android:focusable="false" />
-        </in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.VideoListLayout>
-
-    </RelativeLayout>
-
-</FrameLayout>
+</LinearLayout>

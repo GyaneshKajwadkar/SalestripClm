@@ -1,5 +1,6 @@
 package `in`.processmaster.salestripclm.fragments
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.activity.SplashActivity
 import `in`.processmaster.salestripclm.adapter.*
 import `in`.processmaster.salestripclm.models.GetScheduleModel
 import `in`.processmaster.salestripclm.models.SyncModel
@@ -179,7 +180,7 @@ class HomeFragment : Fragment(), OnChartGestureListener {
 
     override fun onResume() {
         super.onResume()
-        val responseData=db.getApiDetail(1)
+        val responseData=db.getApiDetail(-1)
         var getScheduleModel=GetScheduleModel()
         if(!responseData.equals(""))
         {
@@ -265,12 +266,12 @@ class HomeFragment : Fragment(), OnChartGestureListener {
 
         var arrayListDoctor: ArrayList<String> = ArrayList()
 
-        var model = Gson().fromJson(db.getAllData(), SyncModel::class.java)
+     //   var model = Gson().fromJson(db.getAllData(), SyncModel::class.java)
 
 
         arrayListDoctor.add("Select Doctor")
 
-        for(item in model.data.doctorList)
+        for(item in SplashActivity.staticSyncData?.data?.doctorList!!)
         {
             arrayListDoctor.add(item.doctorName)
 
@@ -660,7 +661,7 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         var selectedDate = dialogView.findViewById(R.id.selectedDate) as TextView
         var scheduledMeeting_rv = dialogView.findViewById(R.id.scheduledMeeting_rv) as RecyclerView
 
-        val responseData=db.getApiDetail(1)
+        val responseData=db.getApiDetail(-1)
         if(!responseData.equals(""))
         {
             var getScheduleModel= Gson().fromJson(responseData, GetScheduleModel::class.java)

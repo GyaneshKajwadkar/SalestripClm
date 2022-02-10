@@ -59,9 +59,9 @@ class DownloadedActivtiy : BaseActivity() {
     var brandName =""
     var eDetailingId =""
 
-     var adapterVideo =DownloadAdapter()
-     var adapterImage =DownloadAdapter()
-     var adapterWeb =DownloadAdapter()
+    var adapterVideo =DownloadAdapter()
+    var adapterImage =DownloadAdapter()
+    var adapterWeb =DownloadAdapter()
 
     //Download all single folders
     var downloadAllVideos_ll: LinearLayout?=null
@@ -114,7 +114,7 @@ class DownloadedActivtiy : BaseActivity() {
         eDetailingId = intent.getStringExtra("eDetailingId").toString()
 
         val args = intent.getBundleExtra("BUNDLE");
-         arrayList = args?.getSerializable("ARRAYLIST") as (ArrayList<DownloadEdetail_model.Data.EDetailingImages>)
+        arrayList = args?.getSerializable("ARRAYLIST") as (ArrayList<DownloadEdetail_model.Data.EDetailingImages>)
 
         var arraylistVideo:ArrayList<DownloadEdetail_model.Data.EDetailingImages> = ArrayList()
         var arraylistImages:ArrayList<DownloadEdetail_model.Data.EDetailingImages> = ArrayList()
@@ -157,25 +157,25 @@ class DownloadedActivtiy : BaseActivity() {
 
         val mNoOfColumns = Utility.calculateNoOfColumns(this, 197F)
 
-         adapterVideo= DownloadAdapter(this, "VIDEO", brandId,brandName,arraylistVideo,eDetailingId)
+        adapterVideo= DownloadAdapter(this, "VIDEO", brandId,brandName,arraylistVideo,eDetailingId)
         video_rv!!.layoutManager = GridLayoutManager(this, mNoOfColumns)
         video_rv?.itemAnimator = DefaultItemAnimator()
         video_rv?.adapter = adapterVideo
 
-         adapterImage= DownloadAdapter(this, "IMAGE", brandId,brandName,arraylistImages,eDetailingId)
+        adapterImage= DownloadAdapter(this, "IMAGE", brandId,brandName,arraylistImages,eDetailingId)
         images_rv!!.layoutManager = GridLayoutManager(this, mNoOfColumns)
         images_rv?.itemAnimator = DefaultItemAnimator()
         images_rv?.adapter = adapterImage
 
-         adapterWeb= DownloadAdapter(this, "ZIP", brandId,brandName,arraylistZip,eDetailingId)
+        adapterWeb= DownloadAdapter(this, "ZIP", brandId,brandName,arraylistZip,eDetailingId)
         html_rv!!.layoutManager = GridLayoutManager(this, mNoOfColumns)
         html_rv?.itemAnimator = DefaultItemAnimator()
         html_rv?.adapter = adapterWeb
 
-    if(arraylistVideo.size==0)
-    {
-        videoView_parent?.visibility=View.GONE
-    }
+        if(arraylistVideo.size==0)
+        {
+            videoView_parent?.visibility=View.GONE
+        }
         if(arraylistImages.size==0)
         {
             images_parent?.visibility=View.GONE
@@ -185,21 +185,21 @@ class DownloadedActivtiy : BaseActivity() {
             html_parent?.visibility=View.GONE
         }
 
-     /*   val intent = intent
-        var eDetailId = intent.extras!!.getString("eDetailId")
+        /*   val intent = intent
+           var eDetailId = intent.extras!!.getString("eDetailId")
 
-        //get downloaded file paths from db
-        var extractMainModel= db.getDownloadedSingleData(eDetailId)
+           //get downloaded file paths from db
+           var extractMainModel= db.getDownloadedSingleData(eDetailId)
 
-        //convert string to array list
-        subArray = Gson().fromJson(extractMainModel, object : TypeToken<List<DownloadFileModel?>?>() {}.type)
-        adapter = DownloadAdapter(subArray, this)
+           //convert string to array list
+           subArray = Gson().fromJson(extractMainModel, object : TypeToken<List<DownloadFileModel?>?>() {}.type)
+           adapter = DownloadAdapter(subArray, this)
 
-        //set recycler view
-        val mNoOfColumns = Utility.calculateNoOfColumns(this, 180F)
-        recyclerView!!.layoutManager = GridLayoutManager(this, mNoOfColumns)
-        recyclerView?.itemAnimator = DefaultItemAnimator()
-        recyclerView?.adapter = adapter*/
+           //set recycler view
+           val mNoOfColumns = Utility.calculateNoOfColumns(this, 180F)
+           recyclerView!!.layoutManager = GridLayoutManager(this, mNoOfColumns)
+           recyclerView?.itemAnimator = DefaultItemAnimator()
+           recyclerView?.adapter = adapter*/
 
 
     }
@@ -256,7 +256,7 @@ class DownloadedActivtiy : BaseActivity() {
         alertDialog!!.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
 
         progressBarAlert =
-                dialogView.findViewById<View>(R.id.valueProgressBar) as ProgressBar
+            dialogView.findViewById<View>(R.id.valueProgressBar) as ProgressBar
 
         textViewAlert = dialogView.findViewById<View>(R.id.progressNumber_tv) as TextView
 
@@ -340,6 +340,7 @@ class DownloadedActivtiy : BaseActivity() {
                         fileModel.downloadType=category
                         fileModel.fileId=model.fileId!!
                         fileModel.brandId=brandId
+                        fileModel.brandName=brandName
 
 
                         var downloadedModel=db.getSingleDownloadedData(model.fileId!!)
@@ -388,9 +389,9 @@ class DownloadedActivtiy : BaseActivity() {
 
                         //get main path
                         val zipName: String = filePathzip.substring(
-                                filePathzip.lastIndexOf(
-                                        "/"
-                                )
+                            filePathzip.lastIndexOf(
+                                "/"
+                            )
                         )
                         //break and get file name
 
@@ -509,6 +510,7 @@ class DownloadedActivtiy : BaseActivity() {
                     fileModel.downloadType="ZIP"
                     fileModel.fileId=zipmodel.fileId!!
                     fileModel.brandId=brandId
+                    fileModel.brandName=brandName
 
                     var downloadedModel=db.getSingleDownloadedData(zipmodel.fileId!!)
 
@@ -533,7 +535,7 @@ class DownloadedActivtiy : BaseActivity() {
                             alertDialog?.dismiss()
                             adapterVideo.notifyDataSetChanged()
                             adapterImage.notifyDataSetChanged()
-                              adapterWeb.notifyDataSetChanged()
+                            adapterWeb.notifyDataSetChanged()
                         })
                     }
                     else

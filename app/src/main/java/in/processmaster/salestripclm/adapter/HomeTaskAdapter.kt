@@ -1,6 +1,7 @@
 package `in`.processmaster.salestripclm.adapter
 
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.activity.SplashActivity
 import `in`.processmaster.salestripclm.fragments.ToadyTaskFragment
 import `in`.processmaster.salestripclm.models.SyncModel
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
@@ -83,12 +84,12 @@ class HomeTaskAdapter(var context: FragmentActivity,var tasktype: Int) : Recycle
 
         var arrayListDoctor: ArrayList<String> = ArrayList()
 
-        var model = Gson().fromJson(db.getAllData(), SyncModel::class.java)
+        // var model = Gson().fromJson(db.getAllData(), SyncModel::class.java)
 
 
         arrayListDoctor.add("Select Doctor")
 
-        for(item in model.data.doctorList)
+        for(item in SplashActivity.staticSyncData?.data?.doctorList!!)
         {
             arrayListDoctor.add(item.doctorName)
 
@@ -106,7 +107,7 @@ class HomeTaskAdapter(var context: FragmentActivity,var tasktype: Int) : Recycle
         val exit_btn = dialogView.findViewById<View>(R.id.exit_btn) as MaterialButton
         val doctor_spinner = dialogView.findViewById<View>(R.id.doctor_spinner) as Spinner
         val mainHeading_tv = dialogView.findViewById<View>(R.id.mainHeading_tv) as TextView
-         selectDate_tv = dialogView.findViewById<View>(R.id.selectDate_tv) as TextView
+        selectDate_tv = dialogView.findViewById<View>(R.id.selectDate_tv) as TextView
         val startTime = dialogView.findViewById<View>(R.id.startTime) as TextView
         val remark_et = dialogView.findViewById<View>(R.id.remark_et) as EditText
         val langAdapter = ArrayAdapter(context , android.R.layout.simple_spinner_item,arrayListDoctor)
@@ -120,7 +121,7 @@ class HomeTaskAdapter(var context: FragmentActivity,var tasktype: Int) : Recycle
         selectDate_tv?.setOnClickListener({
 
             var datePicker= DatePickerDialog(context, date, myCalendar[Calendar.YEAR], myCalendar[Calendar.MONTH],
-                    myCalendar[Calendar.DAY_OF_MONTH])
+                myCalendar[Calendar.DAY_OF_MONTH])
             datePicker.getDatePicker().setMinDate(myCalendar.getTimeInMillis());
             datePicker.show()
         })
@@ -163,7 +164,7 @@ class HomeTaskAdapter(var context: FragmentActivity,var tasktype: Int) : Recycle
         })
 
 
-        
+
         exit_btn.setOnClickListener{
 
             alertDialog.dismiss()
