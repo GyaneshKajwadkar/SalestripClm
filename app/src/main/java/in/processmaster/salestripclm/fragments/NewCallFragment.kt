@@ -51,7 +51,7 @@ class NewCallFragment : Fragment() {
     var views:View?=null
     private lateinit var adapter:BottomSheetDoctorAdapter
     var doctorList= SplashActivity.staticSyncData?.data?.doctorList!!
-    var routeList= SplashActivity.staticSyncData?.data?.routeList!!
+    var routeList= SplashActivity.staticSyncData?.data?.routeList
     var selectionType=0
     var selectedDocID=0
     var selectedDocName=""
@@ -110,7 +110,7 @@ class NewCallFragment : Fragment() {
             startActivity(intent)
         })
 
-        routeList = routeList.filter { s -> s.headQuaterName !=""} as java.util.ArrayList<SyncModel.Data.Route>
+        routeList = routeList?.filter { s -> s.headQuaterName !=""} as java.util.ArrayList<SyncModel.Data.Route>
 
 
         return views
@@ -146,8 +146,8 @@ class NewCallFragment : Fragment() {
         RecyclerView.Adapter<BottomSheetDoctorAdapter.MyViewHolder>(),
         Filterable {
 
-        var filteredDataRoute:ArrayList<SyncModel.Data.Route> = routeList
-        var filteredDataDoctor:ArrayList<SyncModel.Data.Doctor> = doctorList
+        var filteredDataRoute:ArrayList<SyncModel.Data.Route> = routeList as ArrayList<SyncModel.Data.Route>
+        var filteredDataDoctor:ArrayList<SyncModel.Data.Doctor> = doctorList as ArrayList<SyncModel.Data.Doctor>
 
 
         inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -376,9 +376,9 @@ class NewCallFragment : Fragment() {
                     views?.lastVisitDate_tv?.setText(analysisModel?.strDcrDate)
                     views?.reportedTime_tv?.setText(analysisModel?.strReportedTime)
 
-                    if(analysisModel?.visitPurpose!!?.isEmpty()) views?.visitPurpose_tv?.setText("-") else views?.visitPurpose_tv?.setText(analysisModel?.visitPurpose)
-                    if(analysisModel?.workWithName!!?.isEmpty()) views?.workingWith_tv?.setText("-") else views?.workingWith_tv?.setText(analysisModel?.workWithName)
-                    if(analysisModel?.remarks!!?.isEmpty()) views?.visitPurpose_tv?.visibility=View.INVISIBLE else views?.remark_tv?.setText(analysisModel?.remarks)
+                    if(analysisModel?.visitPurpose==null) views?.visitPurpose_tv?.setText("-") else views?.visitPurpose_tv?.setText(analysisModel?.visitPurpose)
+                    if(analysisModel?.workWithName==null) views?.workingWith_tv?.setText("-") else views?.workingWith_tv?.setText(analysisModel?.workWithName)
+                    if(analysisModel?.remarks==null) views?.visitPurpose_tv?.visibility=View.INVISIBLE else views?.remark_tv?.setText(analysisModel?.remarks)
 
 
                     views!!.brandList_rv.layoutManager=LinearLayoutManager(requireActivity())

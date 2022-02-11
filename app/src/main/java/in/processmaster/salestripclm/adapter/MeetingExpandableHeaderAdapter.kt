@@ -4,6 +4,7 @@ import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.models.GetScheduleModel
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -70,10 +71,9 @@ class MeetingExpandableHeaderAdapter(
         }
 
         var meetingArrayList=ArrayList<GetScheduleModel.Data.Meeting>()
-
-        if(getScheduleModel!=null)
+        if(getScheduleModel.getData()?.meetingList!=null)
         {
-            for(meeting in getScheduleModel?.getData()?.meetingList!!)
+            for(meeting in getScheduleModel!!.getData()!!.meetingList!!)
             {
                 var apiFormat = SimpleDateFormat("MMMM dd, yyyy")
                 val newDate = apiFormat.parse(meeting.strStartTime)

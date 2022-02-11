@@ -1,10 +1,8 @@
 package `in`.processmaster.salestripclm.adapter
 import `in`.processmaster.salestripclm.R
-import `in`.processmaster.salestripclm.activity.BaseActivity
 import `in`.processmaster.salestripclm.activity.SetSchedule_Activity
 import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.common_classes.AlertClass.Companion.retunDialog
-import `in`.processmaster.salestripclm.common_classes.ProgressClass
 import `in`.processmaster.salestripclm.models.GetScheduleModel
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.networkUtils.APIClientKot
@@ -12,7 +10,6 @@ import `in`.processmaster.salestripclm.sdksampleapp.inmeetingfunction.zoommeetin
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle

@@ -4,7 +4,6 @@ import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.PhotoSlideShowActivity
 import `in`.processmaster.salestripclm.activity.VideoPlayerActivity
 import `in`.processmaster.salestripclm.activity.WebViewActivity
-import `in`.processmaster.salestripclm.models.DevisionModel
 import `in`.processmaster.salestripclm.models.DownloadFileModel
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.utils.DatabaseHandler

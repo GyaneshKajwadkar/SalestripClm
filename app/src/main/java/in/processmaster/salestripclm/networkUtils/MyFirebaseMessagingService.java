@@ -1,4 +1,4 @@
-package in.processmaster.salestripclm;
+package in.processmaster.salestripclm.networkUtils;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 
+import in.processmaster.salestripclm.R;
 import in.processmaster.salestripclm.activity.SplashActivity;
 
 

@@ -20,7 +20,6 @@ import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
@@ -31,7 +30,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.navigation.NavigationView
 import com.google.gson.Gson
-import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_home_page.*
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.progress_view.*
@@ -45,6 +43,10 @@ import us.zoom.sdk.*
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
+import com.bumptech.glide.Glide
+
+import com.bumptech.glide.request.RequestOptions
+
 
 class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/*, UserLoginCallback.ZoomDemoAuthenticationListener , MeetingServiceListener, InitAuthSDKCallback*/
 {
@@ -139,11 +141,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                     }
                 }*/
 
-            Picasso
-                .get()
-                .load(loginModelBase?.imageName)
-                .noFade()
-                .into(profile_image)
+
         }
 
         //Logout
@@ -188,11 +186,8 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
              drawerProfileIv!!.setImageBitmap(BitmapFactory.decodeFile(profilePicPath, options));
          }*/
 
-        Picasso
-            .get()
-            .load(loginModelBase?.imageName)
-            .noFade()
-            .into(drawerProfileIv)
+
+        setImages()
 
         nav_view?.setNavigationItemSelectedListener(this)
         nav_view?.getMenu()?.getItem(0)?.setChecked(true)
@@ -528,17 +523,8 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         var profileData =sharePreferanceBase?.getPref("profileData")
         loginModelBase = Gson().fromJson(profileData, LoginModel::class.java)
 
-        Picasso
-            .get()
-            .load(loginModelBase?.imageName)
-            .noFade()
-            .into(profile_image)
+        setImages()
 
-        Picasso
-            .get()
-            .load(loginModelBase?.imageName)
-            .noFade()
-            .into(drawerProfileIv)
     }
 
     override fun onPause() {
@@ -585,6 +571,18 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         }
 
     }
+
+    fun setImages()
+    {
+        val options: RequestOptions = RequestOptions()
+            .centerCrop()
+            .placeholder(android.R.mipmap.sym_def_app_icon)
+            .error(android.R.mipmap.sym_def_app_icon)
+
+        Glide.with(this).load(loginModelBase?.imageName).apply(options).into(drawerProfileIv!!)
+        Glide.with(this).load(loginModelBase?.imageName).apply(options).into(profile_image)
+    }
+
 
     suspend fun callingDivisionAPI()
     {

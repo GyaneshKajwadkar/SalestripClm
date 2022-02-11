@@ -89,19 +89,25 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
         mMeetingService = ZoomSDK.getInstance().meetingService
         mInMeetingService = ZoomSDK.getInstance().inMeetingService
 
-        meetingShareHelper = MeetingShareHelper(this, shareCallBack)
+
 
         if (mMeetingService == null || mInMeetingService == null) {
-            finish()
-            return
+           // finish()
+          //  return
+        }
+        else
+        {
+            meetingShareHelper = MeetingShareHelper(this, shareCallBack)
+            registerListener()
+            ProcessLifecycleOwner.get().getLifecycle().addObserver(this)
+
         }
 
-        registerListener()
+
 
         val fragment = DisplayVisualFragment()
         openFragment(fragment)
 
-        ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
 
     }
     //Basic coding part
@@ -110,13 +116,9 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
     var shareCallBack: MeetingShareUICallBack = object : MeetingShareUICallBack {
         override fun showShareMenu(popupWindow: PopupWindow) {
         }
-
-
-
         override fun requestStoragePermission(): Boolean {
             return true
         }
-
         override fun getShareView(): MobileRTCShareView? {
             return null
         }
@@ -353,12 +355,10 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
 
     override fun onPause() {
         super.onPause()
+        stopConnectivity(this)
         if (mMeetingService == null || mInMeetingService == null) {
             return
         }
-        stopConnectivity(this)
-
-        // mDefaultVideoView!!.onPause()
     }
 
     override fun onStop() {
@@ -460,9 +460,9 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
 
     override fun onBackPressed() {
 
-        if(meetingShareHelper?.isSharingOut!!)
+        if(mMeetingService!=null && mInMeetingService == null)
         {
-            stopPresentationAlert()
+            if(meetingShareHelper?.isSharingOut!!) stopPresentationAlert()
         }
         else{
             super.onBackPressed()

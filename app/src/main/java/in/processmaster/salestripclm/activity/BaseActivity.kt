@@ -1,12 +1,11 @@
 package `in`.processmaster.salestripclm.activity
 
 import DocManagerModel
-import `in`.processmaster.salestripclm.ConnectivityChangeReceiver
+import `in`.processmaster.salestripclm.networkUtils.ConnectivityChangeReceiver
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.alertDialogNetwork
 import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.connectivityChangeReceiver
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
-import `in`.processmaster.salestripclm.models.GetScheduleModel
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.models.TeamsModel
 import `in`.processmaster.salestripclm.models.ZoomCredientialModel
@@ -16,29 +15,21 @@ import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import `in`.processmaster.salestripclm.utils.ZoomInitilizeClass
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.view.View
-import android.view.WindowManager
-import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -69,7 +60,8 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_base)
 
-        connectivityChangeReceiver= ConnectivityChangeReceiver()
+        connectivityChangeReceiver=
+            ConnectivityChangeReceiver()
 
         try{
             sharePreferanceBase = PreferenceClass(this)
@@ -83,29 +75,6 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
         zoomSDKBase = ZoomSDK.getInstance()
     }
 
-    //network alert
-    fun networkAlert(context: Activity) {
-        val dialogBuilder = AlertDialog.Builder(context)
-        val inflater = context.layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.networkalert, null)
-        dialogBuilder.setView(dialogView)
-
-        val alertDialog: AlertDialog = dialogBuilder.create()
-        alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
-
-        val okBtn_rl =
-            dialogView.findViewById<View>(R.id.okBtn_rl) as RelativeLayout
-
-        okBtn_rl.setOnClickListener {
-
-            if(context?.javaClass?.simpleName.toString().equals("SplashActivity"))
-            {
-                context.finish()
-            }
-            alertDialog.dismiss()
-        }
-        alertDialog.show()
-    }
 
     fun createConnectivity(context: Context)
     {
@@ -418,10 +387,10 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
         val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
         ).getZoomCredientailCoo("bearer " + loginModelBase?.accessToken,loginModelBase.empId.toString())
         withContext(Dispatchers.Main) {
-            Log.e("getScheduleAPI",response.toString())
+            Log.e("getScheduleAPIII",response.toString())
             if (response!!.isSuccessful)
             {
-                if (response.code() == 200 && !response.body().toString().isEmpty())
+                if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage=="")
                 {
                     var model = response.body()
                     ZoomInitilizeClass().initilizeZoom(context as Activity,model)

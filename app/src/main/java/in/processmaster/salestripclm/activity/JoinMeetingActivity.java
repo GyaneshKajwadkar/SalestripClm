@@ -1,7 +1,5 @@
 package in.processmaster.salestripclm.activity;
 
-import static io.reactivex.annotations.SchedulerSupport.IO;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 
@@ -31,10 +29,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
-import in.processmaster.salestripclm.ConnectivityChangeReceiver;
+import in.processmaster.salestripclm.networkUtils.ConnectivityChangeReceiver;
 import in.processmaster.salestripclm.R;
 import in.processmaster.salestripclm.adapter.ScheduleMeetingAdapter;
-import in.processmaster.salestripclm.common_classes.AlertClass;
 import in.processmaster.salestripclm.fragments.JoinMeetingFragment;
 import in.processmaster.salestripclm.models.GetScheduleModel;
 import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.RawDataMeetingActivity;
@@ -46,9 +43,6 @@ import in.processmaster.salestripclm.sdksampleapp.startjoinmeeting.UserLoginCall
 import in.processmaster.salestripclm.sdksampleapp.startjoinmeeting.emailloginuser.EmailUserLoginHelper;
 import in.processmaster.salestripclm.sdksampleapp.ui.InitAuthSDKActivity;
 import in.processmaster.salestripclm.utils.DatabaseHandler;
-import kotlin.coroutines.CoroutineContext;
-import kotlinx.coroutines.CoroutineScope;
-import kotlinx.coroutines.GlobalScope;
 import us.zoom.sdk.CustomizedMiniMeetingViewSize;
 import us.zoom.sdk.IBOAssistant;
 import us.zoom.sdk.IBOAttendee;
@@ -227,6 +221,12 @@ public class JoinMeetingActivity extends BaseActivity implements MeetingServiceL
         {
             GetScheduleModel getScheduleModel= new Gson().fromJson(responseData, GetScheduleModel.class);
             ArrayList<GetScheduleModel.Data.Meeting>meetinglist=new ArrayList<>();
+            if(getScheduleModel.getData().getMeetingList()==null)
+            {
+                scheduledProgess.setVisibility(View.GONE);
+                return;
+            }
+
             for(int i=0;i<getScheduleModel.getData().getMeetingList().size();i++)
             {
                 if(getScheduleModel.getData().getMeetingList().get(i).getMeetingType().equals("O"))

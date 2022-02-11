@@ -5,24 +5,16 @@ import `in`.processmaster.salestripclm.activity.DownloadedActivtiy
 import `in`.processmaster.salestripclm.models.DevisionModel
 import `in`.processmaster.salestripclm.models.DownloadEdetail_model
 import `in`.processmaster.salestripclm.models.DownloadFileModel
-import `in`.processmaster.salestripclm.models.LoginModel
-import `in`.processmaster.salestripclm.networkUtils.APIClient
-import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,24 +23,15 @@ import androidx.annotation.NonNull
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.Gson
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.io.*
-import java.net.URL
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import java.util.zip.ZipEntry
-import java.util.zip.ZipInputStream
 
 
 class Edetailing_Adapter(
-        var edetailidList: ArrayList<DevisionModel.Data.EDetailing>?,
-        private var sharePreferance: PreferenceClass?,
-        var context: Activity,
-        var db: DatabaseHandler,
-        var progressView_parentRv: RelativeLayout?
+    var edetailidList: ArrayList<DevisionModel.Data.EDetailing>?,
+    private var sharePreferance: PreferenceClass?,
+    var context: Activity,
+    var db: DatabaseHandler,
+    var progressView_parentRv: RelativeLayout?
 ) : RecyclerView.Adapter<Edetailing_Adapter.MyViewHolder>(), Filterable
 {
 

@@ -4,29 +4,23 @@ import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.fragments.DisplayVisualFragment.Companion.doctor_et
 import `in`.processmaster.salestripclm.interfaceCode.ItemClickDisplayVisual
 import `in`.processmaster.salestripclm.models.DownloadFileModel
-import `in`.processmaster.salestripclm.models.LoginModel
-import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.content.Context
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.NonNull
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.Gson
-import java.text.SimpleDateFormat
 import java.util.*
-import java.util.zip.ZipInputStream
 
 class VisualFileAdapter(
-        var downloadList: ArrayList<DownloadFileModel>?,
-        var context: Context,
-        var selectionType: Int,
-        var mCallback: ItemClickDisplayVisual?
+    var downloadList: ArrayList<DownloadFileModel>?,
+    var context: Context,
+    var selectionType: Int,
+    var mCallback: ItemClickDisplayVisual?
 ) :
         RecyclerView.Adapter<VisualFileAdapter.MyViewHolder>()
 {

@@ -1,20 +1,15 @@
 package `in`.processmaster.salestripclm.activity
 
-import `in`.processmaster.salestripclm.ConnectivityChangeReceiver
+import `in`.processmaster.salestripclm.networkUtils.ConnectivityChangeReceiver
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.models.SyncModel
 import `in`.processmaster.salestripclm.networkUtils.APIClient
-import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
-import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -28,7 +23,6 @@ import com.google.gson.Gson
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import us.zoom.sdk.ZoomSDK
 
 
 class SplashActivity : BaseActivity()
@@ -36,7 +30,8 @@ class SplashActivity : BaseActivity()
     val generalClass= GeneralClass(this)
 
     companion object {
-        var connectivityChangeReceiver= ConnectivityChangeReceiver()
+        var connectivityChangeReceiver=
+            ConnectivityChangeReceiver()
         var alertDialogNetwork: AlertDialog? = null
         var staticSyncData: SyncModel? =null
     }

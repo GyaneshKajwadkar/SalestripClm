@@ -23,11 +23,11 @@ import kotlin.collections.ArrayList
 
 
 class HorizontalWebViewAdapter(
-        var list: ArrayList<DownloadFileModel>,
-        var context: Context,
-        var stringInterface: StoreVisualInterface,
-        var brandId: Int,
-        var constPosition: Int
+    var list: ArrayList<DownloadFileModel>,
+    var context: Context,
+    var stringInterface: StoreVisualInterface,
+    var brandId: Int,
+    var constPosition: Int
 ) : RecyclerView.Adapter<HorizontalWebViewAdapter.MyViewHolder>() {
 
    var relativeViewList: ArrayList<RelativeLayout> =  ArrayList();

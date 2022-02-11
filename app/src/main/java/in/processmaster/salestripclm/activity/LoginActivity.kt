@@ -4,41 +4,30 @@ package `in`.processmaster.salestripclm.activity
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
-import `in`.processmaster.salestripclm.common_classes.ProgressClass
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.networkUtils.APIClient.getClient
-import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.*
 import android.util.Log
 import android.view.View
-import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
-import com.google.android.material.button.MaterialButton
 import com.google.gson.Gson
-import io.reactivex.internal.util.HalfSerializer.onError
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.progress_view.*
 import kotlinx.coroutines.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.await
 import java.io.*
 
 
@@ -85,11 +74,12 @@ class LoginActivity : BaseActivity() {
             userName_et?.setText(sharePreferance?.getPref("userName_login"))
         }
 
-        userName_et?.setText("shubham")
-        // userName_et?.setText("Uatbe")
-        password_et?.setText("jack@321")
-        // password_et?.setText("jack@321")
+        //userName_et?.setText("shubham")
+         userName_et?.setText("NILESH")
+       // password_et?.setText("jack@321")
+         password_et?.setText("NILESH")
 
+        companyCode_et.setText("UAT2")
         //forgot click
         forgotPass_tv!!.setOnClickListener {
             val intent = Intent(
@@ -169,7 +159,6 @@ class LoginActivity : BaseActivity() {
     private fun login_api()
     {
         alertClass.showAlert("Verify User")
-
         apiInterface= getClient(2, sharePreferance?.getPref("secondaryUrl")).create(APIInterface::class.java)
 
         var call: Call<LoginModel> = apiInterface?.loginAPI(
@@ -362,7 +351,16 @@ class LoginActivity : BaseActivity() {
         alertDialog.show()
     }
 
+    override fun onResume() {
+        super.onResume()
+        initView()
+        createConnectivity(this)
+    }
 
+    override fun onPause() {
+        super.onPause()
+        stopConnectivity(this)
+    }
 
     //CreateDialog
     fun openLocationAsk_Dialog()
@@ -495,15 +493,6 @@ class LoginActivity : BaseActivity() {
                   })
       }
   */
-    override fun onResume() {
-        super.onResume()
-        initView()
-        createConnectivity(this)
-    }
 
-    override fun onPause() {
-        super.onPause()
-        stopConnectivity(this)
-    }
 
 }

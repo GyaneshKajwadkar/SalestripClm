@@ -332,7 +332,7 @@ class DownloadedActivtiy : BaseActivity() {
 
                     if(!category.equals("ZIP"))
                     {
-                        var fileModel=DownloadFileModel()
+                        var fileModel= DownloadFileModel()
                         fileModel.fileName=extension.replace("/","")
                         fileModel.fileDirectoryPath=folder.absolutePath
                         fileModel.filePath=folder.absolutePath+extension

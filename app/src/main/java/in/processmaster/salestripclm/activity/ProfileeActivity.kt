@@ -6,10 +6,8 @@ import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.models.GenerateOTPModel
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.models.ProfileModel
-import `in`.processmaster.salestripclm.models.SyncModel
 import `in`.processmaster.salestripclm.networkUtils.APIClient
 import `in`.processmaster.salestripclm.networkUtils.APIInterface
-import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.DialogInterface
@@ -33,8 +31,6 @@ import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
 import kotlinx.android.synthetic.main.activity_profile.*
 import java.io.File
 import java.io.IOException
@@ -44,8 +40,9 @@ import java.util.*
 import android.view.WindowManager
 import android.widget.*
 import androidx.annotation.RequiresApi
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.google.gson.Gson
-import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.progress_view.*
 import org.json.JSONObject
 import retrofit2.Call
@@ -486,11 +483,13 @@ class ProfileeActivity : BaseActivity() {
                 {
                     var getObject=response.body()?.getData()?.users?.get(0)
 
-                    Picasso
-                        .get()
-                        .load(getObject?.absolutePath)
-                        .noFade()
-                        .into(changeProfilePic_civ)
+                    val options: RequestOptions = RequestOptions()
+                        .centerCrop()
+                        .placeholder(android.R.mipmap.sym_def_app_icon)
+                        .error(android.R.mipmap.sym_def_app_icon)
+
+                    Glide.with(this@ProfileeActivity).load(getObject?.absolutePath).apply(options).into(changeProfilePic_civ!!)
+
 
                     // dateOfbirth_tv.setText(getObject?.dateOfBirth)
                     gender_tv.setText(if(getObject?.gender == 1) "Male" else "Female")

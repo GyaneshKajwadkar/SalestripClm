@@ -4,9 +4,7 @@ import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.SplashActivity
 import `in`.processmaster.salestripclm.activity.SubmitE_DetailingActivity
 import `in`.processmaster.salestripclm.adapter.VisualFileAdapter
-import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
-import `in`.processmaster.salestripclm.interfaceCode.DisplayVisualInterface
 import `in`.processmaster.salestripclm.interfaceCode.ItemClickDisplayVisual
 import `in`.processmaster.salestripclm.interfaceCode.SortingDisplayVisual
 import `in`.processmaster.salestripclm.models.*
@@ -70,7 +68,7 @@ class DisplayVisualFragment : Fragment(),  SortingDisplayVisual, ItemClickDispla
     var edetailingFavList: ArrayList<DevisionModel.Data.EDetailing>? = null
     var downloadFilePathList: ArrayList<DownloadFileModel> = ArrayList()
     var storedDownloadedList: ArrayList<DownloadFileModel> = ArrayList()
-    var favProductDoctorList: ArrayList<SyncModel.Data.Doctor.LinkedBrand> = ArrayList()
+   // var favProductDoctorList: ArrayList<SyncModel.Data.Doctor.LinkedBrand> = ArrayList()
     var views:View?=null
     var doctorName=""
 
@@ -183,7 +181,7 @@ class DisplayVisualFragment : Fragment(),  SortingDisplayVisual, ItemClickDispla
     {
         //  var model = Gson().fromJson(db.getAllData(), SyncModel::class.java)      //get doctor list from db and convert it string to model class
         adapter = BottomSheetDoctorAdapter(
-            SplashActivity.staticSyncData?.data?.doctorList!!,
+            SplashActivity.staticSyncData?.data?.doctorList as ArrayList<SyncModel.Data.Doctor>,
             doctor_et!!,
             bottomSheetBehavior
         )
@@ -397,63 +395,62 @@ class DisplayVisualFragment : Fragment(),  SortingDisplayVisual, ItemClickDispla
     //-------------------------------------rearrange linkedBrandList according to priority
     fun rearrangeDownloadedList()
     {
-        //this method is used to arrange list in Ascending Order with resp to priority of doctor linkedBrandList data
-        Collections.sort(favProductDoctorList, object :
-            Comparator<SyncModel.Data.Doctor.LinkedBrand> {
-
-            override fun compare(
-                first: SyncModel.Data.Doctor.LinkedBrand?,
-                second: SyncModel.Data.Doctor.LinkedBrand?
-            ): Int {
-                val p1: SyncModel.Data.Doctor.LinkedBrand =
-                    first as SyncModel.Data.Doctor.LinkedBrand
-                val p2: SyncModel.Data.Doctor.LinkedBrand =
-                    second as SyncModel.Data.Doctor.LinkedBrand
-                return p1.priorityOrder.compareTo(p2.priorityOrder)
-            }
-        })
-
-        var priorityList: ArrayList<DownloadFileModel> = ArrayList()
-        var simpleList: ArrayList<DownloadFileModel> = ArrayList()
-
-        //check and add is downloaded list have same brand or not
-        for ((index, valueDownload) in downloadFilePathList?.withIndex()!!)
-        {
-            var found = false
-            for ((index, valueFavBrand) in favProductDoctorList?.withIndex()!!)
-            {
-                if(valueFavBrand.brandId==valueDownload.brandId)
-                {
-                    found = true
-                }
-            }
-            //if data not found add to simple list
-            if (!found)
-            {
-                simpleList.add(valueDownload)
-            }
-            // if data is same then add to priority list
-            else
-            {
-                valueDownload.setFileName(valueDownload.fileName + "*")
-                priorityList.add(valueDownload)
-            }
-
-
-            if(index== downloadFilePathList?.size!! -1)
-            {
-                //clear and add all data to downloaded list and call download adapter
-                downloadFilePathList.clear()
-                storedDownloadedList.clear()
-                downloadFilePathList.addAll(priorityList)
-                storedDownloadedList.addAll(priorityList)
-                downloadFilePathList.addAll(simpleList)
-                storedDownloadedList.addAll(simpleList)
-                setDownloadListAdapter(downloadFilePathList)
-
-            }
-
-        }
+//        Collections.sort(favProductDoctorList, object :
+//            Comparator<SyncModel.Data.Doctor.LinkedBrand> {
+//
+//            override fun compare(
+//                first: SyncModel.Data.Doctor.LinkedBrand?,
+//                second: SyncModel.Data.Doctor.LinkedBrand?
+//            ): Int {
+//                val p1: SyncModel.Data.Doctor.LinkedBrand =
+//                    first as SyncModel.Data.Doctor.LinkedBrand
+//                val p2: SyncModel.Data.Doctor.LinkedBrand =
+//                    second as SyncModel.Data.Doctor.LinkedBrand
+//                return p1.priorityOrder.compareTo(p2.priorityOrder)
+//            }
+//        })
+//
+//        var priorityList: ArrayList<DownloadFileModel> = ArrayList()
+//        var simpleList: ArrayList<DownloadFileModel> = ArrayList()
+//
+//        //check and add is downloaded list have same brand or not
+//        for ((index, valueDownload) in downloadFilePathList?.withIndex()!!)
+//        {
+//            var found = false
+//            for ((index, valueFavBrand) in favProductDoctorList?.withIndex()!!)
+//            {
+//                if(valueFavBrand.brandId==valueDownload.brandId)
+//                {
+//                    found = true
+//                }
+//            }
+//            //if data not found add to simple list
+//            if (!found)
+//            {
+//                simpleList.add(valueDownload)
+//            }
+//            // if data is same then add to priority list
+//            else
+//            {
+//                valueDownload.setFileName(valueDownload.fileName + "*")
+//                priorityList.add(valueDownload)
+//            }
+//
+//
+//            if(index== downloadFilePathList?.size!! -1)
+//            {
+//                //clear and add all data to downloaded list and call download adapter
+//                downloadFilePathList.clear()
+//                storedDownloadedList.clear()
+//                downloadFilePathList.addAll(priorityList)
+//                storedDownloadedList.addAll(priorityList)
+//                downloadFilePathList.addAll(simpleList)
+//                storedDownloadedList.addAll(simpleList)
+//                setDownloadListAdapter(downloadFilePathList)
+//
+//            }
+//
+//        }
     }
 
     //-------------------------------------interface override method to get doctor id from bottom sheet adapter
@@ -521,11 +518,8 @@ class DisplayVisualFragment : Fragment(),  SortingDisplayVisual, ItemClickDispla
                 //close bottom sheet
                 bottomSheet.setState(BottomSheetBehavior.STATE_COLLAPSED)
 
-                //call Display Visual interface method
-                // listener.onClickString(modeldata?.doctorId.toString())
-                // listener.onClickDoctor(modeldata?.linkedBrandList!!)
                 doctorIdDisplayVisual= modeldata?.doctorId!!
-                favProductDoctorList.addAll(modeldata?.linkedBrandList!!!!)
+              //  favProductDoctorList.addAll(modeldata?.linkedBrandList)
                 rearrangeDownloadedList()
                 callDownloadFragment()
 

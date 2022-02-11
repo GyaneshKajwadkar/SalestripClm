@@ -189,19 +189,21 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
         {
             var getScheduleModel= Gson().fromJson(responseData, GetScheduleModel::class.java)
             val zoomSdk=ZoomSDK.getInstance()
-            var adapterRecycler= ScheduleMeetingAdapter(this,0,
-                getScheduleModel.getData()?.meetingList as MutableList<GetScheduleModel.Data.Meeting>,zoomSdk)
-            recyclerNewSchedule!!.layoutManager = LinearLayoutManager(this)
-            recyclerNewSchedule?.adapter = adapterRecycler
-            adapterRecycler.notifyDataSetChanged()
+            if( getScheduleModel.getData()?.meetingList==null)
+            {
+                return
+            }
+
+                var adapterRecycler= ScheduleMeetingAdapter(this,0,
+                    getScheduleModel.getData()?.meetingList as MutableList<GetScheduleModel.Data.Meeting>,zoomSdk)
+                recyclerNewSchedule!!.layoutManager = LinearLayoutManager(this)
+                recyclerNewSchedule?.adapter = adapterRecycler
+                adapterRecycler.notifyDataSetChanged()
+
 
             selectDate_tv.addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(s: Editable) {}
-                override fun beforeTextChanged(
-                    s: CharSequence, start: Int,
-                    count: Int, after: Int
-                ) {
-                }
+                override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
 
                 override fun onTextChanged(
                     s: CharSequence, start: Int,
@@ -365,7 +367,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
 
         for(item in SplashActivity.staticSyncData?.data?.doctorList!!)
         {
-            arrayListDoctor.add(item.doctorName)
+            arrayListDoctor.add(item.doctorName!!)
 
         }
 

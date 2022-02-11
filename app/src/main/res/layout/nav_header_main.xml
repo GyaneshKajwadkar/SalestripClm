@@ -17,7 +17,6 @@
         android:id="@+id/profile_iv_drawer"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:src="@drawable/login_page_bg"
         app:civ_border_color="@color/white"
         app:civ_border_width="3dp" />
 

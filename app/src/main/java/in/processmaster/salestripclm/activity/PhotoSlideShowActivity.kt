@@ -2,7 +2,6 @@ package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.adapter.OtherFileAdapter
-import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.interfaceCode.ItemClickDisplayVisual
 import `in`.processmaster.salestripclm.interfaceCode.StringInterface
 import `in`.processmaster.salestripclm.models.DevisionModel

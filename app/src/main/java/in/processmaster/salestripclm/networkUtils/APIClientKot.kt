@@ -16,6 +16,7 @@ class APIClientKot {
 
         if (parent == 1) {
             commonUrl = "https://app.salestrip.in/api/"
+          //  commonUrl = "https://pms-test.azurewebsites.net/"
         } else {
             commonUrl = childUrl
         }

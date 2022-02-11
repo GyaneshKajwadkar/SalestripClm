@@ -111,7 +111,11 @@ class ZoomInitilizeClass() : Activity(), UserLoginCallback.ZoomDemoAuthenticatio
     private fun loginFirstbase(credentialData: ZoomCredientialModel.CredentialData?): Unit
     {
 
-        if(credentialData==null) return
+        if(credentialData==null)
+        {
+            if(progressDialog!=null)progressDialog?.dismiss()
+            return
+        }
 
         val ret: Int = EmailUserLoginHelper.getInstance().login(
             credentialData?.userName,

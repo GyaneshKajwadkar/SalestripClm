@@ -55,8 +55,8 @@ class SubmitE_DetailingActivity : AppCompatActivity(), IdNameBoll_interface {
         var workinWithList= ArrayList<SyncModel.Data.WorkingWith>()
         var visitPurposeList= ArrayList<SyncModel.Data.WorkType>()
 
-        var workingobj=SyncModel().Data().WorkingWith()
-        var visitobj=SyncModel().Data().WorkType()
+        var workingobj=SyncModel.Data.WorkingWith()
+        var visitobj=SyncModel.Data.WorkType()
 
         workingobj.fullName="Select"
         visitobj.workType="Select"

@@ -9,7 +9,6 @@ import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.adapter.ImageSelectorAdapter
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.models.GenerateOTPModel
-import `in`.processmaster.salestripclm.models.SyncModel
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -49,6 +48,7 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
     var selectedAdapeterTeams :SelectedDocManList_adapter? = null
     var constructorList: ArrayList<DocManagerModel> = ArrayList()
     var constructorListTeam: ArrayList<DocManagerModel> = ArrayList()
+    var generalClass=GeneralClass(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,8 +83,6 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
         recyclerView_teams.setLayoutManager(GridLayoutManager(this, 5))
 
         arrayListSelectorTeams= getTeamsApi(this@MailActivity,"Please wait...")
-
-
 
         var adapter= ImageSelectorAdapter(retriveAttachment(), this,false)
         attachment_rv.setLayoutManager(GridLayoutManager(this, 2))
@@ -148,9 +146,6 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
         val search_et= dialogView.findViewById<View>(R.id.search_et) as EditText
         val ok_btn= dialogView.findViewById<View>(R.id.ok_btn) as Button
 
-//emailid,
-
-
         val layoutManager = LinearLayoutManager(this)
         list_rv.layoutManager=layoutManager
         var adapterView : DoctorManagerSelector_Adapter? = null
@@ -209,12 +204,14 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
         if(selectionType==1)
         {
             constructorList= ArrayList()
-            for (item in arrayListSelectorDoctor) {
-                if(item.getChecked()!!)
-                {
-                    constructorList.add(item)
-                }
-            }
+            constructorList = arrayListSelectorDoctor.filter { s -> s.getChecked()==true } as ArrayList<DocManagerModel>
+
+//            for (item in arrayListSelectorDoctor) {
+//                if(item.getChecked()!!)
+//                {
+//                    constructorList.add(item)
+//                }
+//            }
 
             selectedAdapeter=SelectedDocManList_adapter(constructorList,this,selectionType)
             selectedoctor_rv.adapter=selectedAdapeter
@@ -224,12 +221,14 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
         {
             constructorListTeam= ArrayList()
 
-            for (item in arrayListSelectorTeams) {
-                if(item.getChecked()!!)
-                {
-                    constructorListTeam.add(item)
-                }
-            }
+            constructorListTeam = arrayListSelectorTeams.filter { s -> s.getChecked()==true } as ArrayList<DocManagerModel>
+
+//            for (item in arrayListSelectorTeams) {
+//                if(item.getChecked()!!)
+//                {
+//                    constructorListTeam.add(item)
+//                }
+//            }
 
             selectedAdapeterTeams=SelectedDocManList_adapter(constructorListTeam,this,selectionType)
             recyclerView_teams.adapter=selectedAdapeterTeams
@@ -246,9 +245,8 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
             {
                 if(itemMain.getId()== id)
                 {
-                    val modeldata=arrayListSelectorDoctor.get(iMain)
-                    modeldata.setChecked(false)
-                    arrayListSelectorDoctor.set(iMain,modeldata)
+                    itemMain.setChecked(false)
+                    arrayListSelectorDoctor.set(iMain,itemMain)
                     selectedAdapeter?.notifyDataSetChanged()
                 }
             }
@@ -259,9 +257,8 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
             {
                 if(itemMain.getId()== id)
                 {
-                    val modeldata=arrayListSelectorTeams.get(iMain)
-                    modeldata.setChecked(false)
-                    arrayListSelectorTeams.set(iMain,modeldata)
+                    itemMain.setChecked(false)
+                    arrayListSelectorTeams.set(iMain,itemMain)
                     selectedAdapeterTeams?.notifyDataSetChanged()
                 }
             }
@@ -273,15 +270,10 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
     fun sendEmailApi()
     {
         progressMessage_tv?.setText("Please wait")
-        GeneralClass(this).enableProgress(progressView_parentRv!!)
+        generalClass.enableProgress(progressView_parentRv!!)
 
         val selectedImage=retriveAttachment()
-
-        val descriptionList: MutableList<MultipartBody.Part> = ArrayList()
-
-        val surveyImagesParts = arrayOfNulls<MultipartBody.Part>(
-            selectedImage!!.size
-        )
+        val surveyImagesParts = arrayOfNulls<MultipartBody.Part>(selectedImage!!.size)
 
         val arrAttachment = JSONArray()
 
@@ -291,7 +283,7 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
                 MediaType.parse("image/*"),
                 value?.file
             )
-            // descriptionList.add(MultipartBody.Part.createFormData("file", file.name,surveyBody))
+
             val objectAttachment = JSONObject()
             objectAttachment.put("docName",value?.file?.name.toString())
             arrAttachment.put(objectAttachment)
@@ -357,28 +349,22 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
                 {
                     if(response.body()?.errorObj?.errorMessage?.isEmpty()==false)
                     {
-                        Toast.makeText(this@MailActivity, "Server error", Toast.LENGTH_SHORT).show()
+                        generalClass.showSnackbar(window.decorView.rootView, response.body()!!.errorObj.errorMessage)
                     }
                     else
                     {
-                        Toast.makeText(this@MailActivity, response.body()?.data?.message, Toast.LENGTH_SHORT).show()
+                        generalClass.showSnackbar(window.decorView.rootView, response.body()?.data?.message!!)
                         onBackPressed()
                     }
-
-                    // var getTeamslist=response.body()
                 }
                 else
-                {
-                    Toast.makeText(this@MailActivity, "Server error ", Toast.LENGTH_SHORT).show()
-                }
-                GeneralClass(this@MailActivity).disableProgress(progressView_parentRv!!)
-
+                {  generalClass.showSnackbar(window.decorView.rootView, "Server error") }
+                generalClass.disableProgress(progressView_parentRv!!)
             }
-
             override fun onFailure(call: Call<GenerateOTPModel?>, t: Throwable?) {
                 call.cancel()
-                GeneralClass(this@MailActivity).disableProgress(progressView_parentRv!!)
-
+                generalClass.disableProgress(progressView_parentRv!!)
+                generalClass.showSnackbar(window.decorView.rootView, "Server error")
             }
         })
 

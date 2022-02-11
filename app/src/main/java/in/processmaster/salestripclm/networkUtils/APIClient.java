@@ -23,6 +23,7 @@ public class APIClient {
         {
             //parentUrl
             commonUrl="https://app.salestrip.in/api/";
+           // commonUrl="https://pms-test.azurewebsites.net/";
         }
         // if parent is not one then use dynamic url
         else

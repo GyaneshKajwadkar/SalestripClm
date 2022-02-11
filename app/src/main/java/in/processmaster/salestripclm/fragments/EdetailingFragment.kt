@@ -2,6 +2,7 @@ package `in`.processmaster.salestripclm.fragments
 
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.adapter.Edetailing_Adapter
+import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.models.DevisionModel
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.networkUtils.APIClient
@@ -36,7 +37,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
 
-class EdetailingFragment : BaseFragment() {
+class EdetailingFragment : Fragment() {
 
     var recyclerView:RecyclerView?=null
     var apiInterface: APIInterface? = null
@@ -81,7 +82,8 @@ class EdetailingFragment : BaseFragment() {
         // Set Tabs inside Toolbar
         tabs = view.findViewById<View>(R.id.result_tabs) as TabLayout
         progressMessage_tv?.setText("Loading e-Detailing")
-        activity?.let { enableProgress(progressView_parentRv!!, it) }
+        //activity?.let { enableProgress(progressView_parentRv!!, it) }
+        GeneralClass(requireActivity()).enableProgress(progressView_parentRv!!)
 
         var profileData =sharePreferance?.getPref("profileData")
         loginModel= Gson().fromJson(profileData, LoginModel::class.java)
@@ -94,14 +96,18 @@ class EdetailingFragment : BaseFragment() {
 
         Handler(Looper.getMainLooper())
             .postDelayed({
-                activity?.let { disableProgress(progressView_parentRv!!, it)}
+              //  activity?.let { disableProgress(progressView_parentRv!!, it)}
+                GeneralClass(requireActivity()).disableProgress(progressView_parentRv!!)
+
             }, 200)
 
 
         syncData_ll?.setOnClickListener({
 
             progressMessage_tv?.setText("Loading e-Detailing")
-            activity?.let { enableProgress(progressView_parentRv!!, it) }
+           // activity?.let { enableProgress(progressView_parentRv!!, it) }
+            GeneralClass(requireActivity()).enableProgress(progressView_parentRv!!)
+
             division_api()
         })
 
@@ -200,14 +206,17 @@ class EdetailingFragment : BaseFragment() {
                     }
                 }
 
-                activity?.let { disableProgress(progressView_parentRv!!, it) }
+              //  activity?.let { disableProgress(progressView_parentRv!!, it) }
+                GeneralClass(requireActivity()).disableProgress(progressView_parentRv!!)
 
             }
 
             override fun onFailure(call: Call<DevisionModel?>, t: Throwable?) {
-                checkInternet()
+                GeneralClass(requireActivity()).checkInternet()
                 call.cancel()
-                activity?.let { disableProgress(progressView_parentRv!!, it) }
+               // activity?.let { disableProgress(progressView_parentRv!!, it) }
+                GeneralClass(requireActivity()).disableProgress(progressView_parentRv!!)
+
             }
         })
     }
@@ -219,18 +228,6 @@ class EdetailingFragment : BaseFragment() {
         tabs!!.setupWithViewPager(viewPager)
     }
 
-    //checkInternet connection
-    fun checkInternet()
-    {
-        if(activity?.let { isInternetAvailable(it) } ==true)
-        {
-            commonAlert(requireActivity(), "Error", "Something went wrong please try again later")
-        }
-        else
-        {
-            activity?.let { networkAlert(it) }
-        }
-    }
 
     // Add Fragments to Tabs
     private fun setupViewPager(

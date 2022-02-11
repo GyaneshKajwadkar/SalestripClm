@@ -1,5 +1,6 @@
 package in.processmaster.salestripclm.sdksampleapp.initsdk;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.util.Log;
 
@@ -50,6 +51,7 @@ public class InitAuthSDKHelper implements AuthConstants, ZoomSDKInitializeListen
             initParams.domain=AuthConstants.WEB_DOMAIN;
             initParams.videoRawDataMemoryMode = ZoomSDKRawDataMemoryMode.ZoomSDKRawDataMemoryModeStack;
             mZoomSDK.initialize(context, this, initParams);
+
         }
     }
 

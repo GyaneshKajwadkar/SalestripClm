@@ -1,4 +1,4 @@
-package in.processmaster.salestripclm;
+package in.processmaster.salestripclm.networkUtils;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -11,6 +11,7 @@ import android.os.Build;
 import androidx.annotation.RequiresApi;
 
 import in.processmaster.salestripclm.activity.BaseActivity;
+import in.processmaster.salestripclm.common_classes.GeneralClass;
 
 public class ConnectivityChangeReceiver extends BroadcastReceiver {
 

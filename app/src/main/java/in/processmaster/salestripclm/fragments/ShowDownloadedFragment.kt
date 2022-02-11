@@ -3,7 +3,6 @@ package `in`.processmaster.salestripclm.fragments
 import `in`.processmaster.salestripclm.fragments.DisplayVisualFragment.Companion.doctorIdDisplayVisual
 import `in`.processmaster.salestripclm.fragments.DisplayVisualFragment.Companion.doctor_et
 import `in`.processmaster.salestripclm.R
-import `in`.processmaster.salestripclm.adapter.DownloadAdapter
 import `in`.processmaster.salestripclm.adapter.DownloadedFolderAdapter
 import `in`.processmaster.salestripclm.models.DownloadFileModel
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
@@ -12,7 +11,6 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.DisplayMetrics
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup

@@ -4,12 +4,9 @@ import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.interfaceCode.ItemClickDisplayVisual
 import `in`.processmaster.salestripclm.models.DevisionModel
 import android.content.Context
-import android.graphics.Color
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.annotation.NonNull
@@ -17,10 +14,10 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 
 class OtherFileAdapter(
-        public var downloadList: ArrayList<DevisionModel.Data.EDetailing>?,
-        var context: Context,
-        var mCallback: ItemClickDisplayVisual?,
-        var parentmodel: Int) :
+    public var downloadList: ArrayList<DevisionModel.Data.EDetailing>?,
+    var context: Context,
+    var mCallback: ItemClickDisplayVisual?,
+    var parentmodel: Int) :
         RecyclerView.Adapter<OtherFileAdapter.MyViewHolder>() {
 
 
