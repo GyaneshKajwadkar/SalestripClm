@@ -116,10 +116,9 @@ class AlertClass(val context : Context)
         dialogBuilder.setView(dialogView)
 
         val alertDialog: AlertDialog = dialogBuilder.create()
-        alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+        alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
-        val okBtn_rl =
-            dialogView.findViewById<View>(R.id.okBtn_rl) as RelativeLayout
+        val okBtn_rl = dialogView.findViewById<View>(R.id.okBtn_rl) as RelativeLayout
 
         okBtn_rl.setOnClickListener {
 

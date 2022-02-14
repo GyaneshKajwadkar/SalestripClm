@@ -1,6 +1,7 @@
 package `in`.processmaster.salestripclm.networkUtils
 
 import `in`.processmaster.salestripclm.models.*
+import com.google.gson.JsonObject
 import io.reactivex.Observable
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -190,4 +191,11 @@ interface APIInterface
     fun priCallAnalysisApi(
         @Header("Authorization") authorization: String?,
         @Path("docId") dotorId: Int?): Call<PreCallModel>
+
+    @GET("api/dcr/byDCRDate/{empId}")
+    fun checkDCR_API(
+        @Header("Authorization") authorization: String?,
+        @Path("empId") empId: Int?,
+        @Query("date") date:String?
+    ): Call<JsonObject>
 }

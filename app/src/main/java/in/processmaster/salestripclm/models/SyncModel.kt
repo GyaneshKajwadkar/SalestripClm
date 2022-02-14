@@ -1960,6 +1960,10 @@ class SyncModel {
             @Expose
             var routeName: String = ""
 
+            override fun toString(): String {
+                return routeName
+            }
+
             @SerializedName("routeType")
             @Expose
             var routeType: Int = 0

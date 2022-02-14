@@ -15,6 +15,8 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import com.google.android.material.snackbar.Snackbar
+import java.text.SimpleDateFormat
+import java.util.*
 
 class GeneralClass(val activity: Activity) {
 
@@ -114,6 +116,10 @@ class GeneralClass(val activity: Activity) {
         inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
-
+    fun getCurrentDate():String{
+        val c: Date = Calendar.getInstance().getTime()
+        val df = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        return df.format(c)
+    }
 
 }

@@ -63,12 +63,7 @@
             android:launchMode="singleTop"
             android:screenOrientation="landscape"
             android:windowSoftInputMode="stateHidden" />
-        <activity
-            android:name=".activity.ExperimentalActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="landscape"
-            android:theme="@style/Theme.Salestrip.NoActionBar"
-            android:windowSoftInputMode="stateHidden" />
+
         <activity
             android:name=".activity.VideoPlayerActivity"
             android:launchMode="singleTop"

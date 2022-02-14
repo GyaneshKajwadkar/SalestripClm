@@ -9,10 +9,15 @@ import `in`.processmaster.salestripclm.models.SyncModel
 import `in`.processmaster.salestripclm.networkUtils.APIClient
 import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.activity.OnlinePresentationActivity
+import `in`.processmaster.salestripclm.common_classes.AlertClass
+import `in`.processmaster.salestripclm.common_classes.CommonListGetClass
+import `in`.processmaster.salestripclm.models.VisualAdsModel_Send
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -20,10 +25,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Filter
-import android.widget.Filterable
-import android.widget.TextView
+import android.view.WindowManager
+import android.widget.*
 import androidx.annotation.NonNull
+import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
@@ -34,6 +39,9 @@ import kotlinx.android.synthetic.main.fragment_new_call.view.*
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.Gson
+import com.google.gson.JsonObject
+import kotlinx.android.synthetic.main.activity_display_visual.view.*
+import kotlinx.android.synthetic.main.activity_submit_edetailing.*
 import kotlinx.android.synthetic.main.bottom_sheet_visualads.view.bottomSheet
 import kotlinx.android.synthetic.main.bottom_sheet_visualads.view.close_imv
 import kotlinx.android.synthetic.main.checkbox_bottom_sheet.view.*
@@ -41,9 +49,14 @@ import kotlinx.android.synthetic.main.fragment_new_call.*
 import kotlinx.android.synthetic.main.join_activity_view.view.*
 import kotlinx.android.synthetic.main.join_activity_view.view.noData_tv
 import kotlinx.android.synthetic.main.progress_view.view.*
+import kotlinx.android.synthetic.main.progress_view.view.progressBar
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 class NewCallFragment : Fragment() {
     var dataBase = DatabaseHandler(activity)
@@ -57,6 +70,8 @@ class NewCallFragment : Fragment() {
     var selectedDocName=""
     var apiInterface: APIInterface? = null
     var sharePreferance: PreferenceClass? = null
+    var generalClassObject:GeneralClass?=null
+
 
 
     override fun onCreateView(
@@ -69,7 +84,7 @@ class NewCallFragment : Fragment() {
         sharePreferance = PreferenceClass(activity)
 
         bottomSheetBehavior = BottomSheetBehavior.from(views!!.bottomSheet)
-
+        generalClassObject= GeneralClass(requireActivity())
 
         if(SplashActivity.staticSyncData?.data?.settingDCR?.roleType=="FS") {
             views!!.selectTeamsCv.visibility = View.GONE
@@ -81,17 +96,18 @@ class NewCallFragment : Fragment() {
 
         views!!.selectTeamsCv.setOnClickListener({
             views!!.selectHeader_tv?.setText("Select Team")
-            selectionType=0;
+            selectionType=0
             openCloseModel() })
 
         views!!.selectRoutesCv.setOnClickListener({
+            if(!checkDCRusingShareP()) return@setOnClickListener
             views!!.selectHeader_tv?.setText("Select route")
-            selectionType=1;
+            selectionType=1
             openCloseModel()})
 
         views!!.selectDoctorsCv.setOnClickListener({
             views!!.selectHeader_tv?.setText("Select Doctor")
-            selectionType=2;
+            selectionType=2
             if(doctorList.size<=0)
             {   GeneralClass(requireActivity()).showSnackbar(it,"This route has no doctor")
                 return@setOnClickListener
@@ -111,9 +127,17 @@ class NewCallFragment : Fragment() {
         })
 
         routeList = routeList?.filter { s -> s.headQuaterName !=""} as java.util.ArrayList<SyncModel.Data.Route>
-
+        checkDCRusingShareP()
 
         return views
+    }
+
+    fun checkDCRusingShareP():Boolean
+    {
+        if( sharePreferance?.getPref("todayDate") != generalClassObject?.getCurrentDate() || sharePreferance?.getPref("dcrId")!="0") {
+            checkCurrentDCR_API()
+            return false }
+        else return true
     }
 
     fun openCloseModel()
@@ -443,6 +467,94 @@ class NewCallFragment : Fragment() {
             override fun onFailure(call: Call<PreCallModel?>, t: Throwable?) {
                 views?.analysisProgress?.visibility=View.GONE
                 views?.noData_gif?.visibility=View.VISIBLE
+                GeneralClass(requireActivity()).checkInternet() // check internet connection
+                call.cancel()
+            }
+        })
+    }
+
+    fun createDCRAlert()
+    {
+
+        val dialogBuilder = AlertDialog.Builder(requireActivity())
+        val inflater = requireActivity().layoutInflater
+        val dialogView: View = inflater.inflate(R.layout.dcr_entry, null)
+        dialogBuilder.setView(dialogView)
+        dialogBuilder.setCancelable(false)
+        val alertDialog = dialogBuilder.create()
+
+        val headerText = dialogView.findViewById<View>(R.id.doctorName_tv) as TextView
+        val dcr_date_tv = dialogView.findViewById<View>(R.id.dcr_date_tv) as TextView
+        val activity_spin = dialogView.findViewById<View>(R.id.activity_spin) as Spinner
+        val workingArea_spin = dialogView.findViewById<View>(R.id.workingArea_spin) as Spinner
+        val startingStation_spin = dialogView.findViewById<View>(R.id.startingStation_spin) as Spinner
+        val ending_spin = dialogView.findViewById<View>(R.id.ending_spin) as Spinner
+        val startEndParent = dialogView.findViewById<View>(R.id.startEndParent) as LinearLayout
+        val cancelImag = dialogView.findViewById<View>(R.id.back_iv) as ImageView
+
+        headerText.setText("New DCR")
+        dcr_date_tv.setText(generalClassObject?.getCurrentDate())
+        cancelImag.setOnClickListener({alertDialog.dismiss()})
+
+        var fieldWorkingList= arrayOf("Select","HQ","Ex-Station","Out-Station")
+
+        val adapterRoute: ArrayAdapter<SyncModel.Data.Route> = ArrayAdapter<SyncModel.Data.Route>(requireActivity(),
+            android.R.layout.simple_spinner_dropdown_item, CommonListGetClass().getNonRouteListForSpinner())
+        activity_spin.setAdapter(adapterRoute)
+
+        val startEndRoute: ArrayAdapter<SyncModel.Data.Route> = ArrayAdapter<SyncModel.Data.Route>(requireActivity(),
+            android.R.layout.simple_spinner_dropdown_item, CommonListGetClass().getRouteListForSpinner())
+        startingStation_spin.setAdapter(startEndRoute)
+        ending_spin.setAdapter(startEndRoute)
+
+        val adapterField: ArrayAdapter<String> = ArrayAdapter<String>(requireActivity(),
+            android.R.layout.simple_spinner_dropdown_item, fieldWorkingList)
+        workingArea_spin.setAdapter(adapterField)
+
+
+        workingArea_spin.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
+               if(position==3)
+                   startEndParent.visibility=View.VISIBLE
+                else
+                   startEndParent.visibility=View.GONE
+            }
+
+            override fun onNothingSelected(parentView: AdapterView<*>?) {}
+        })
+
+
+        alertDialog.show()
+
+    }
+    fun checkCurrentDCR_API(){
+        apiInterface = APIClient.getClient(2, sharePreferance?.getPref("secondaryUrl")).create(APIInterface::class.java)
+
+        var profileData = sharePreferance?.getPref("profileData")
+        var loginModel = Gson().fromJson(profileData, LoginModel::class.java)
+
+        var call: Call<JsonObject> = apiInterface?.checkDCR_API("bearer " + loginModel?.accessToken, loginModel.empId,generalClassObject?.getCurrentDate()) as Call<JsonObject>
+        call.enqueue(object : Callback<JsonObject?> {
+            override fun onResponse(call: Call<JsonObject?>?, response: Response<JsonObject?>) {
+                if (response.code() == 200 && !response.body().toString().isEmpty()) {
+
+                  val jsonObjError:JsonObject = response.body()?.get("errorObj") as JsonObject
+                  if(jsonObjError.get("errorMessage").asString.isEmpty())
+                  {
+                      val data:JsonObject = response.body()?.get("data") as JsonObject
+                      val dcrData:JsonObject = data?.get("dcrData") as JsonObject
+
+                      if(dcrData.get("dcrId").asInt==0) {
+                          createDCRAlert()
+                          sharePreferance?.setPref("dcrId", dcrData.get("dcrId").asString) }
+                      else sharePreferance?.setPref("todayDate",generalClassObject?.getCurrentDate())
+                      sharePreferance?.setPref("dcrId",dcrData.get("dcrId").asString)
+                  }
+                }
+            }
+
+            override fun onFailure(call: Call<JsonObject?>, t: Throwable?) {
                 GeneralClass(requireActivity()).checkInternet() // check internet connection
                 call.cancel()
             }
