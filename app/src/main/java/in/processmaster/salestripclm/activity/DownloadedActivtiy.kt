@@ -304,6 +304,7 @@ class DownloadedActivtiy : BaseActivity() {
                     }
                 } catch (e: java.lang.Exception) {
                     e.printStackTrace()
+                    Log.e("downloadFirstError",e.message.toString())
                 }
 
                 var success = true
@@ -418,7 +419,7 @@ class DownloadedActivtiy : BaseActivity() {
                 }
                 input.close()
             } catch (e: Exception) {
-                Log.e("Error: ", e.message.toString())
+                Log.e("ErrorEnding: ", e.message.toString())
                 this.runOnUiThread(Runnable {
                     alertDialog?.dismiss()
                 })

@@ -5,6 +5,7 @@ import IntegerInterface
 import SelectedDocManList_adapter
 import SelectorInterface
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.activity.HomePage.Companion.apiInterface
 import `in`.processmaster.salestripclm.adapter.ScheduleMeetingAdapter
 import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
@@ -904,9 +905,9 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
     {
         progressView_parentRv?.visibility=View.VISIBLE
 
-        var call: Call<TeamsModel> = getSecondaryApiInterface().getTeamsMember(
-            "bearer " + loginModelBase?.accessToken,
-            loginModelBase.empId.toString()
+        var call: Call<TeamsModel> = apiInterface?.getTeamsMember(
+            "bearer " + HomePage.loginModelHomePage.accessToken,
+            HomePage.loginModelHomePage.empId.toString()
         ) as Call<TeamsModel>
         call.enqueue(object : Callback<TeamsModel?> {
             @RequiresApi(Build.VERSION_CODES.N)
@@ -991,7 +992,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
         paramObject.put("Start_Time",formattedDate+"T"+spf.format(startTimeStr))
         paramObject.put("End_Time", formattedDate+"T"+spf.format(endTimeStr))
         paramObject.put("MeetingType", if(radioButton.getText().toString().equals("Online meeting")) "O" else "P")
-        paramObject.put("EmpId", loginModelBase.empId)
+        paramObject.put("EmpId", HomePage.loginModelHomePage.empId)
         paramObject.put("Description", remark_et.text.toString())
 
         val doctorList = JSONArray()
@@ -1029,8 +1030,8 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
         val bodyRequest: RequestBody =
             RequestBody.create(MediaType.parse("application/json"), paramObject.toString())
 
-        var call: Call<GenerateOTPModel> = getSecondaryApiInterface().setScheduleFirstApi(
-            "bearer " + loginModelBase?.accessToken,
+        var call: Call<GenerateOTPModel> = apiInterface?.setScheduleFirstApi(
+            "bearer " + HomePage.loginModelHomePage.accessToken,
             bodyRequest
         ) as Call<GenerateOTPModel>
         call.enqueue(object : Callback<GenerateOTPModel?> {
@@ -1093,7 +1094,8 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
     }
 
     fun getsheduled_Meeting_api(){
-        var call: Call<GetScheduleModel> = getSecondaryApiInterface().getScheduledMeeting("bearer " + loginModelBase?.accessToken,loginModelBase.empId.toString()) as Call<GetScheduleModel>
+        var call: Call<GetScheduleModel> = apiInterface?.getScheduledMeeting("bearer " + HomePage.loginModelHomePage.accessToken,
+            HomePage.loginModelHomePage.empId.toString()) as Call<GetScheduleModel>
         call.enqueue(object : Callback<GetScheduleModel?> {
             override fun onResponse(call: Call<GetScheduleModel?>?, response: Response<GetScheduleModel?>) {
                 Log.e("getscheduled_api", response.code().toString() + "")

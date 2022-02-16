@@ -3,7 +3,7 @@ package `in`.processmaster.salestripclm.models
 import java.util.ArrayList
 
 class VisualAdsModel_Send {
-    var startDate=""
+    var startDate:String?=null
         get() = field
         set(value) { field = value }
 
@@ -11,27 +11,27 @@ class VisualAdsModel_Send {
         get() = field
         set(value) { field = value }
 
-    var endDate=""
+    var endDate:String?=null
         get() = field
         set(value) { field = value }
 
-    var empId=""
+    var empId:String?=null
         get() = field
         set(value) { field = value }
 
-    var doctorId=""
+    var doctorId:String?=null
         get() = field
         set(value) { field = value }
 
-    var brandId=""
+    var brandId:String?=null
         get() = field
         set(value) { field = value }
 
-    var brandName=""
+    var brandName:String?=null
         get() = field
         set(value) { field = value }
 
-    var feedback=""
+    var feedback:String?=null
         get() = field
         set(value) { field = value }
 
@@ -43,11 +43,11 @@ class VisualAdsModel_Send {
         get() = field
         set(value) { field = value }
 
-    var brandWiseStartTime = ""
+    var brandWiseStartTime :String?=null
         get() = field
         set(value) { field = value }
 
-    var brandWiseStopTime = ""
+    var brandWiseStopTime :String?=null
         get() = field
         set(value) { field = value }
 
@@ -61,10 +61,20 @@ class VisualAdsModel_Send {
 
 
     class childData {
-        var fileId: String=""
-        var viewTime: String=""
+        var fileId: String?=null
+            get() = field
+            set(value) { field = value }
+        var viewTime: String?=null
+            get() = field
+            set(value) { field = value }
         var isLike = false
-        var comment: String=""
-        var productName: String=""
+            get() = field
+            set(value) { field = value }
+        var comment: String?=null
+            get() = field
+            set(value) { field = value }
+        var productName: String?=null
+            get() = field
+            set(value) { field = value }
     }
 }

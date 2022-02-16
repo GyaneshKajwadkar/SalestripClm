@@ -3,6 +3,8 @@ package `in`.processmaster.salestripclm.activity
 import DocManagerModel
 import `in`.processmaster.salestripclm.networkUtils.ConnectivityChangeReceiver
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.activity.HomePage.Companion.apiInterface
+import `in`.processmaster.salestripclm.activity.HomePage.Companion.loginModelHomePage
 import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.alertDialogNetwork
 import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.connectivityChangeReceiver
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
@@ -51,7 +53,6 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
 
     var alertDialog: AlertDialog? = null
     var sharePreferanceBase: PreferenceClass?= null
-    var loginModelBase= LoginModel()
     var dbBase= DatabaseHandler(this)
     var zoomSDKBase: ZoomSDK? = null
 
@@ -63,16 +64,9 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
         connectivityChangeReceiver=
             ConnectivityChangeReceiver()
 
-        try{
-            sharePreferanceBase = PreferenceClass(this)
-            var profileData =sharePreferanceBase?.getPref("profileData")
-            loginModelBase = Gson().fromJson(profileData, LoginModel::class.java)
-        }
-        catch(e:Exception)
-        {
-
-        }
         zoomSDKBase = ZoomSDK.getInstance()
+        sharePreferanceBase = PreferenceClass(this)
+
     }
 
 
@@ -270,10 +264,6 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
 
     //=========================================API Calling Section===========================================
 
-    fun getSecondaryApiInterface(): APIInterface {
-        return APIClient.getClient(2, sharePreferanceBase?.getPref("secondaryUrl")).create(
-            APIInterface::class.java)
-    }
 
     //Get teams api
     fun getTeamsApi( context:Activity, progressmessage:String) : ArrayList<DocManagerModel>
@@ -282,9 +272,9 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
         GeneralClass(this).enableProgress(progressView_parentRv!!)
         var getResponseList=ArrayList<DocManagerModel>()
 
-        var call: Call<TeamsModel> = getSecondaryApiInterface().getTeamsMember(
-            "bearer " + loginModelBase?.accessToken,
-            loginModelBase.empId.toString()
+        var call: Call<TeamsModel> = apiInterface?.getTeamsMember(
+            "bearer " + loginModelHomePage.accessToken,
+            loginModelHomePage.empId.toString()
         ) as Call<TeamsModel>
 
         call.enqueue(object : Callback<TeamsModel?> {
@@ -329,7 +319,7 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
     suspend fun getSheduleMeetingAPI()
     {
         val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
-        ).getScheduledMeetingCoo("bearer " + loginModelBase?.accessToken,loginModelBase.empId.toString())
+        ).getScheduledMeetingCoo("bearer " + loginModelHomePage.accessToken,loginModelHomePage.empId.toString())
         withContext(Dispatchers.Main) {
             Log.e("getScheduleAPI",response.toString())
             if (response!!.isSuccessful)
@@ -385,7 +375,7 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
     suspend fun getCredientailAPI(context: Activity)
     {
         val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
-        ).getZoomCredientailCoo("bearer " + loginModelBase?.accessToken,loginModelBase.empId.toString())
+        ).getZoomCredientailCoo("bearer " + loginModelHomePage.accessToken,loginModelHomePage.empId.toString())
         withContext(Dispatchers.Main) {
             Log.e("getScheduleAPIII",response.toString())
             if (response!!.isSuccessful)
@@ -410,7 +400,7 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
 
     fun getCredientail_api(context: Activity) {
 
-        var call: Call<ZoomCredientialModel> = getSecondaryApiInterface().getZoomCredientail("bearer " + loginModelBase?.accessToken,loginModelBase.empId.toString()) as Call<ZoomCredientialModel>
+        var call: Call<ZoomCredientialModel> = apiInterface?.getZoomCredientail("bearer " + loginModelHomePage.accessToken,loginModelHomePage.empId.toString()) as Call<ZoomCredientialModel>
         call.enqueue(object : Callback<ZoomCredientialModel?> {
             override fun onResponse(call: Call<ZoomCredientialModel?>?, response: Response<ZoomCredientialModel?>) {
                 Log.e("getcrediential_api", response.code().toString() + "")

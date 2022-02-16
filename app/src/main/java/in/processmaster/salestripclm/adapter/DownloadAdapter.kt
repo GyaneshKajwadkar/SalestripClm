@@ -486,6 +486,7 @@ class DownloadAdapter constructor() :
                     }
                 } catch (e: java.lang.Exception) {
                     e.printStackTrace()
+                    Log.e("firstCatch",e.message.toString())
                 }
 
                 var success = true
@@ -547,6 +548,7 @@ class DownloadAdapter constructor() :
                     })
 
                 } else {
+                    Log.e("notSuccessfull","hsidhfidsh")
                     alertDialog?.dismiss()
                 }
                 input.close()
@@ -640,6 +642,7 @@ class DownloadAdapter constructor() :
 
                 } else {
                     alertDialog?.dismiss()
+                    Log.e("notSuccessfull","hisduhdf")
                 }
                 input.close()
             } catch (e: Exception) {

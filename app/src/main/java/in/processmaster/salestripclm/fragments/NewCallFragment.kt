@@ -1,23 +1,21 @@
 package `in`.processmaster.salestripclm.fragments
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.activity.HomePage.Companion.apiInterface
+import `in`.processmaster.salestripclm.activity.HomePage.Companion.loginModelHomePage
+import `in`.processmaster.salestripclm.activity.OnlinePresentationActivity
 import `in`.processmaster.salestripclm.activity.SplashActivity
 import `in`.processmaster.salestripclm.adapter.SimpleListAdapter
+import `in`.processmaster.salestripclm.common_classes.AlertClass
+import `in`.processmaster.salestripclm.common_classes.CommonListGetClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
+import `in`.processmaster.salestripclm.models.CommonModel
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.models.PreCallModel
 import `in`.processmaster.salestripclm.models.SyncModel
-import `in`.processmaster.salestripclm.networkUtils.APIClient
-import `in`.processmaster.salestripclm.networkUtils.APIInterface
-import `in`.processmaster.salestripclm.activity.OnlinePresentationActivity
-import `in`.processmaster.salestripclm.common_classes.AlertClass
-import `in`.processmaster.salestripclm.common_classes.CommonListGetClass
-import `in`.processmaster.salestripclm.models.VisualAdsModel_Send
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
-import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -25,38 +23,37 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.*
 import androidx.annotation.NonNull
 import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import kotlinx.android.synthetic.main.bottom_sheet_visualads.view.*
-import kotlinx.android.synthetic.main.fragment_new_call.view.*
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import kotlinx.android.synthetic.main.activity_display_visual.view.*
 import kotlinx.android.synthetic.main.activity_submit_edetailing.*
+import kotlinx.android.synthetic.main.bottom_sheet_visualads.view.*
 import kotlinx.android.synthetic.main.bottom_sheet_visualads.view.bottomSheet
 import kotlinx.android.synthetic.main.bottom_sheet_visualads.view.close_imv
 import kotlinx.android.synthetic.main.checkbox_bottom_sheet.view.*
+import kotlinx.android.synthetic.main.dcr_entry.*
+import kotlinx.android.synthetic.main.dcr_entry.view.*
 import kotlinx.android.synthetic.main.fragment_new_call.*
+import kotlinx.android.synthetic.main.fragment_new_call.view.*
 import kotlinx.android.synthetic.main.join_activity_view.view.*
 import kotlinx.android.synthetic.main.join_activity_view.view.noData_tv
 import kotlinx.android.synthetic.main.progress_view.view.*
-import kotlinx.android.synthetic.main.progress_view.view.progressBar
-import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+
 
 class NewCallFragment : Fragment() {
     var dataBase = DatabaseHandler(activity)
@@ -68,10 +65,10 @@ class NewCallFragment : Fragment() {
     var selectionType=0
     var selectedDocID=0
     var selectedDocName=""
-    var apiInterface: APIInterface? = null
     var sharePreferance: PreferenceClass? = null
     var generalClassObject:GeneralClass?=null
-
+    var routeIdGetDCR=""
+    var alertClass:AlertClass?=null
 
 
     override fun onCreateView(
@@ -82,6 +79,7 @@ class NewCallFragment : Fragment() {
 
         dataBase = DatabaseHandler(activity)
         sharePreferance = PreferenceClass(activity)
+        alertClass = AlertClass(requireActivity())
 
         bottomSheetBehavior = BottomSheetBehavior.from(views!!.bottomSheet)
         generalClassObject= GeneralClass(requireActivity())
@@ -382,9 +380,6 @@ class NewCallFragment : Fragment() {
         views?.noData_gif?.visibility=View.GONE
         views?.analysisProgress?.visibility=View.VISIBLE
 
-        apiInterface = APIClient.getClient(2, sharePreferance?.getPref("secondaryUrl")).create(
-            APIInterface::class.java
-        )
         var profileData = sharePreferance?.getPref("profileData")           //get profile data from share preferance
         var loginModel = Gson().fromJson(profileData, LoginModel::class.java)
 
@@ -474,67 +469,108 @@ class NewCallFragment : Fragment() {
     }
 
     fun createDCRAlert()
-    {
+    { var activityId=0; var startingStation=0; var endingStation=0;
 
-        val dialogBuilder = AlertDialog.Builder(requireActivity())
-        val inflater = requireActivity().layoutInflater
+        val dialogBuilder = AlertDialog.Builder(requireActivity()); val inflater = requireActivity().layoutInflater
         val dialogView: View = inflater.inflate(R.layout.dcr_entry, null)
-        dialogBuilder.setView(dialogView)
-        dialogBuilder.setCancelable(false)
-        val alertDialog = dialogBuilder.create()
+        dialogBuilder.setView(dialogView); dialogBuilder.setCancelable(false); val alertDialog = dialogBuilder.create()
 
         val headerText = dialogView.findViewById<View>(R.id.doctorName_tv) as TextView
-        val dcr_date_tv = dialogView.findViewById<View>(R.id.dcr_date_tv) as TextView
-        val activity_spin = dialogView.findViewById<View>(R.id.activity_spin) as Spinner
-        val workingArea_spin = dialogView.findViewById<View>(R.id.workingArea_spin) as Spinner
-        val startingStation_spin = dialogView.findViewById<View>(R.id.startingStation_spin) as Spinner
-        val ending_spin = dialogView.findViewById<View>(R.id.ending_spin) as Spinner
-        val startEndParent = dialogView.findViewById<View>(R.id.startEndParent) as LinearLayout
         val cancelImag = dialogView.findViewById<View>(R.id.back_iv) as ImageView
 
         headerText.setText("New DCR")
-        dcr_date_tv.setText(generalClassObject?.getCurrentDate())
+        dialogView.dcr_date_tv.setText(generalClassObject?.getCurrentDate())
         cancelImag.setOnClickListener({alertDialog.dismiss()})
 
-        var fieldWorkingList= arrayOf("Select","HQ","Ex-Station","Out-Station")
+        var fieldWorkingList= arrayOf("Select","HQ ","Ex Station","Out Station")
 
         val adapterRoute: ArrayAdapter<SyncModel.Data.Route> = ArrayAdapter<SyncModel.Data.Route>(requireActivity(),
             android.R.layout.simple_spinner_dropdown_item, CommonListGetClass().getNonRouteListForSpinner())
-        activity_spin.setAdapter(adapterRoute)
+        dialogView.activity_spin.setAdapter(adapterRoute)
 
         val startEndRoute: ArrayAdapter<SyncModel.Data.Route> = ArrayAdapter<SyncModel.Data.Route>(requireActivity(),
             android.R.layout.simple_spinner_dropdown_item, CommonListGetClass().getRouteListForSpinner())
-        startingStation_spin.setAdapter(startEndRoute)
-        ending_spin.setAdapter(startEndRoute)
+        dialogView.startingStation_spin.setAdapter(startEndRoute)
+        dialogView.ending_spin.setAdapter(startEndRoute)
 
         val adapterField: ArrayAdapter<String> = ArrayAdapter<String>(requireActivity(),
             android.R.layout.simple_spinner_dropdown_item, fieldWorkingList)
-        workingArea_spin.setAdapter(adapterField)
+        dialogView.workingArea_spin.setAdapter(adapterField)
 
-
-        workingArea_spin.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
+        dialogView.workingArea_spin.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
                if(position==3)
-                   startEndParent.visibility=View.VISIBLE
+                   dialogView.startEndParent.visibility=View.VISIBLE
                 else
-                   startEndParent.visibility=View.GONE
+                   dialogView.startEndParent.visibility=View.GONE
             }
-
             override fun onNothingSelected(parentView: AdapterView<*>?) {}
         })
 
+        dialogView.startingStation_spin.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
+                startingStation = CommonListGetClass().getRouteListForSpinner()[position].routeId
+            }
+            override fun onNothingSelected(parentView: AdapterView<*>?) {}
+        })
+        dialogView.ending_spin.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
+                if(position!=0)
+                    endingStation = CommonListGetClass().getRouteListForSpinner()[position].routeId
+
+            }
+            override fun onNothingSelected(parentView: AdapterView<*>?) {}
+        })
+        dialogView.activity_spin.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
+                if(position!=0)
+                    activityId = CommonListGetClass().getNonRouteListForSpinner()[position].routeId
+            }
+            override fun onNothingSelected(parentView: AdapterView<*>?) {}
+        })
+
+
+
+        dialogView.save_btn.setOnClickListener({
+            val activitySeletd: String = dialogView.activity_spin.getSelectedItem().toString()
+            val endingSeletd: String = dialogView.ending_spin.getSelectedItem().toString()
+            val workAreaSeletd: String = dialogView.workingArea_spin.getSelectedItem().toString()
+            val startingSeletd: String = dialogView.startingStation_spin.getSelectedItem().toString()
+
+            if(workAreaSeletd.equals("Select")) {generalClassObject?.showSnackbar(it,"Working area not selected"); return@setOnClickListener}
+            if(activitySeletd.equals("Select")) {generalClassObject?.showSnackbar(it,"Activity not selected"); return@setOnClickListener}
+            if(startingSeletd.equals("Select") && dialogView.startEndParent.visibility==View.VISIBLE) {generalClassObject?.showSnackbar(it,"Start date not selected"); return@setOnClickListener}
+            if(endingSeletd.equals("Select") && dialogView.startEndParent.visibility==View.VISIBLE) {generalClassObject?.showSnackbar(it,"End station not selected"); return@setOnClickListener}
+            if(dialogView.remarkEt.text.isEmpty()) {generalClassObject?.showSnackbar(it,"Remark is empty"); return@setOnClickListener}
+            val i: Int = workAreaSeletd.indexOf(' ')
+
+            val commonSaveDcrModel=CommonModel.SaveDcrModel()
+            commonSaveDcrModel.dcrDate= generalClassObject?.getCurrentDate()!!
+            commonSaveDcrModel.empId= loginModelHomePage.empId
+            commonSaveDcrModel.employeeId= loginModelHomePage.empId
+            commonSaveDcrModel.workingType=workAreaSeletd.substring(0, i)
+            if(dialogView.startEndParent.visibility==View.VISIBLE)
+            {
+                commonSaveDcrModel.startingStation=startingStation
+                commonSaveDcrModel.endingStation=endingStation
+            }
+
+
+            saveDCR_API(commonSaveDcrModel,alertDialog)
+
+        })
 
         alertDialog.show()
 
     }
     fun checkCurrentDCR_API(){
-        apiInterface = APIClient.getClient(2, sharePreferance?.getPref("secondaryUrl")).create(APIInterface::class.java)
+        alertClass?.showAlert("")
 
-        var profileData = sharePreferance?.getPref("profileData")
-        var loginModel = Gson().fromJson(profileData, LoginModel::class.java)
-
-        var call: Call<JsonObject> = apiInterface?.checkDCR_API("bearer " + loginModel?.accessToken, loginModel.empId,generalClassObject?.getCurrentDate()) as Call<JsonObject>
+        var call: Call<JsonObject> = apiInterface?.checkDCR_API("bearer " + loginModelHomePage.accessToken, loginModelHomePage.empId,generalClassObject?.getCurrentDate()) as Call<JsonObject>
         call.enqueue(object : Callback<JsonObject?> {
             override fun onResponse(call: Call<JsonObject?>?, response: Response<JsonObject?>) {
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
@@ -544,21 +580,62 @@ class NewCallFragment : Fragment() {
                   {
                       val data:JsonObject = response.body()?.get("data") as JsonObject
                       val dcrData:JsonObject = data?.get("dcrData") as JsonObject
+//                      if(dcrData.get("routeId").asString.isEmpty())
+//                      {
+//                          alertClass?.commonAlert("Alert!","Please submit tour program first")
+//                          alertClass?.hideAlert()
+//                          return
+//                      }
 
+                    routeIdGetDCR=dcrData.get("routeId").asString
                       if(dcrData.get("dcrId").asInt==0) {
                           createDCRAlert()
                           sharePreferance?.setPref("dcrId", dcrData.get("dcrId").asString) }
-                      else sharePreferance?.setPref("todayDate",generalClassObject?.getCurrentDate())
+                      else
+                      sharePreferance?.setPref("todayDate",generalClassObject?.getCurrentDate())
                       sharePreferance?.setPref("dcrId",dcrData.get("dcrId").asString)
                   }
                 }
+                alertClass?.hideAlert()
             }
 
             override fun onFailure(call: Call<JsonObject?>, t: Throwable?) {
-                GeneralClass(requireActivity()).checkInternet() // check internet connection
+                GeneralClass(requireActivity()).checkInternet()
+                alertClass?.hideAlert()// check internet connection
                 call.cancel()
             }
         })
     }
 
+    fun saveDCR_API(dcrObject: CommonModel.SaveDcrModel, alertDialog: AlertDialog) {
+        alertClass?.showAlert("")
+
+        var call: Call<JsonObject> = apiInterface?.saveDCS("bearer " + loginModelHomePage.accessToken,dcrObject) as Call<JsonObject>
+        call.enqueue(object : Callback<JsonObject?> {
+            override fun onResponse(call: Call<JsonObject?>?, response: Response<JsonObject?>) {
+                alertClass?.hideAlert()
+
+
+                if (response.code() == 200 && !response.body().toString().isEmpty()) {
+                    val jsonObjError:JsonObject = response.body()?.get("errorObj") as JsonObject
+                if(!jsonObjError.get("errorMessage").asString.isEmpty())
+                    {
+                    alertClass?.commonAlert("",jsonObjError.get("errorMessage").asString)
+                    }
+                    else {
+                    alertDialog.cancel()
+                    }
+                }
+
+
+            }
+
+            override fun onFailure(call: Call<JsonObject?>, t: Throwable?) {
+                generalClassObject?.checkInternet()
+                alertClass?.hideAlert()
+                alertDialog.cancel()// check internet connection
+                call.cancel()
+            }
+        })
+    }
 }

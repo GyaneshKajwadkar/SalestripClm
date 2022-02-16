@@ -2,7 +2,6 @@ package `in`.processmaster.salestripclm.networkUtils
 
 import `in`.processmaster.salestripclm.models.*
 import com.google.gson.JsonObject
-import io.reactivex.Observable
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import org.json.JSONObject
@@ -198,4 +197,10 @@ interface APIInterface
         @Path("empId") empId: Int?,
         @Query("date") date:String?
     ): Call<JsonObject>
+
+    @POST("api/dcr")
+    fun saveDCS(
+        @Header("Authorization") authorization: String?,
+        @Body arrayVisual: CommonModel.SaveDcrModel
+    ): Call<JsonObject?>?
 }

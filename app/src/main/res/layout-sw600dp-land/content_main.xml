@@ -137,8 +137,4 @@
     </RelativeLayout>
 
 
-    <include layout="@layout/progress_view" />
-
-
-
 </RelativeLayout>

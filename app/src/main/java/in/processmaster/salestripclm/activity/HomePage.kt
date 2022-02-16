@@ -2,12 +2,16 @@ package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.staticSyncData
+import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.fragments.*
 import `in`.processmaster.salestripclm.models.DevisionModel
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.models.SyncModel
+import `in`.processmaster.salestripclm.networkUtils.APIClient
 import `in`.processmaster.salestripclm.networkUtils.APIClientKot
+import `in`.processmaster.salestripclm.networkUtils.APIInterface
+import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -51,18 +55,32 @@ import com.bumptech.glide.request.RequestOptions
 class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/*, UserLoginCallback.ZoomDemoAuthenticationListener , MeetingServiceListener, InitAuthSDKCallback*/
 {
     var drawer_layout : DrawerLayout?=null
-    //  private var mZoomSDK: ZoomSDK? = null
     var drawerProfileIv: ImageView?=null
     var bottomNavigation: BottomNavigationView? = null
     var openFragmentStr=""
     val generalClass= GeneralClass(this)
+    val alertClass=AlertClass(this)
+    companion object {
+        var loginModelHomePage= LoginModel()
+        var apiInterface: APIInterface? = null
+    }
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_page)
 
-        //  mZoomSDK = ZoomSDK.getInstance()
+
+        val sharePreferance = PreferenceClass(this)
+
+        var profileData = sharePreferance.getPref("profileData")
+
+         loginModelHomePage = Gson().fromJson(profileData, LoginModel::class.java)
+
+        apiInterface = APIClient.getClient(2, sharePreferance?.getPref("secondaryUrl")).create(
+            APIInterface::class.java)
+
         initView()
 
         if(generalClass.isInternetAvailable())
@@ -101,7 +119,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         //Retrive user data
         //       var profileData =sharePreferance?.getPref("profileData")
 //        loginModel= Gson().fromJson(profileData, LoginModel::class.java)
-        userName_tv?.setText(loginModelBase?.userName)
+        userName_tv?.setText(loginModelHomePage.userName)
 
         //change status bar colour
         changeStatusBar()
@@ -178,7 +196,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         var drawerTv=  headerView.findViewById(R.id.profileName_tv_drawer) as TextView
         drawerProfileIv=  headerView.findViewById(R.id.profile_iv_drawer) as ImageView
 
-        drawerTv?.setText(loginModelBase?.userName)
+        drawerTv?.setText(loginModelHomePage.userName)
         /* if(!profilePicPath?.isEmpty()!!)
          {
              var options = BitmapFactory.Options()
@@ -215,7 +233,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         progressMessage_tv?.setText("Sync in progress")
         generalClass.enableProgress(progressView_parentRv!!)
 
-        var call: Call<SyncModel> = getSecondaryApiInterface().syncApi("bearer " + loginModelBase?.accessToken) as Call<SyncModel>
+        var call: Call<SyncModel> = apiInterface?.syncApi("bearer " + loginModelHomePage?.accessToken) as Call<SyncModel>
         call.enqueue(object : Callback<SyncModel?> {
             override fun onResponse(call: Call<SyncModel?>?, response: Response<SyncModel?>) {
                 Log.e("sync_api", response.code().toString() + "")
@@ -252,10 +270,10 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     private fun division_api()
     {
 
-        val jsonObject = JSONObject(loginModelBase?.getEmployeeObj().toString())
+        val jsonObject = JSONObject(loginModelHomePage.getEmployeeObj().toString())
 
-        var call: Call<DevisionModel> = getSecondaryApiInterface().detailingApi(
-            "bearer " + loginModelBase?.accessToken, jsonObject.getString(
+        var call: Call<DevisionModel> = apiInterface?.detailingApi(
+            "bearer " + loginModelHomePage.accessToken, jsonObject.getString(
                 "Division"
             )
         ) as Call<DevisionModel>
@@ -520,9 +538,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
         }
 
-        var profileData =sharePreferanceBase?.getPref("profileData")
-        loginModelBase = Gson().fromJson(profileData, LoginModel::class.java)
-
         setImages()
 
     }
@@ -535,7 +550,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     fun callingMultipleAPI()
     {
         //   progressMessage_tv?.setText("Please wait....")
-        generalClass.enableProgress(progressView_parentRv!!)
+        alertClass.showAlert("")
 
         val coroutineScope= CoroutineScope(IO).launch {
             val ans= async {
@@ -566,7 +581,8 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         }
         coroutineScope.invokeOnCompletion {
             this.runOnUiThread(java.lang.Runnable {
-                generalClass.disableProgress(progressView_parentRv!!)
+                alertClass.hideAlert()
+              //  generalClass.disableProgress(progressView_parentRv!!)
             })
         }
 
@@ -579,17 +595,17 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             .placeholder(android.R.mipmap.sym_def_app_icon)
             .error(android.R.mipmap.sym_def_app_icon)
 
-        Glide.with(this).load(loginModelBase?.imageName).apply(options).into(drawerProfileIv!!)
-        Glide.with(this).load(loginModelBase?.imageName).apply(options).into(profile_image)
+        Glide.with(this).load(loginModelHomePage.imageName).apply(options).into(drawerProfileIv!!)
+        Glide.with(this).load(loginModelHomePage.imageName).apply(options).into(profile_image)
     }
 
 
     suspend fun callingDivisionAPI()
     {
-        val jsonObject = JSONObject(loginModelBase?.getEmployeeObj().toString())
+        val jsonObject = JSONObject(loginModelHomePage.getEmployeeObj().toString())
 
         val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
-        ).detailingApiCoo( "bearer " + loginModelBase?.accessToken, jsonObject.getString(
+        ).detailingApiCoo( "bearer " + loginModelHomePage.accessToken, jsonObject.getString(
             "Division"
         ))
         withContext(Dispatchers.Main) {
@@ -656,7 +672,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     suspend fun callingSyncAPI()
     {
         val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
-        ).syncApiCoo("bearer " + loginModelBase?.accessToken)
+        ).syncApiCoo("bearer " + loginModelHomePage.accessToken)
         withContext(Dispatchers.Main) {
             if (response!!.isSuccessful)
             {

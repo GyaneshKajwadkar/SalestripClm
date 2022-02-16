@@ -1,6 +1,7 @@
 package `in`.processmaster.salestripclm.fragments
 
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.activity.HomePage
 import `in`.processmaster.salestripclm.adapter.Edetailing_Adapter
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.models.DevisionModel
@@ -40,7 +41,6 @@ import java.io.File
 class EdetailingFragment : Fragment() {
 
     var recyclerView:RecyclerView?=null
-    var apiInterface: APIInterface? = null
     var sharePreferance: PreferenceClass?= null
     var loginModel : LoginModel?=null
     var adapter : Edetailing_Adapter?=null
@@ -85,8 +85,6 @@ class EdetailingFragment : Fragment() {
         //activity?.let { enableProgress(progressView_parentRv!!, it) }
         GeneralClass(requireActivity()).enableProgress(progressView_parentRv!!)
 
-        var profileData =sharePreferance?.getPref("profileData")
-        loginModel= Gson().fromJson(profileData, LoginModel::class.java)
 
         calladapter()
 
@@ -139,12 +137,10 @@ class EdetailingFragment : Fragment() {
     private fun division_api()
     {
 
-        apiInterface= APIClient.getClient(2, sharePreferance?.getPref("secondaryUrl")).create(
-            APIInterface::class.java
-        )
+
         val jsonObject = JSONObject(loginModel?.getEmployeeObj().toString())
 
-        var call: Call<DevisionModel> = apiInterface?.detailingApi(
+        var call: Call<DevisionModel> = HomePage.apiInterface?.detailingApi(
             "bearer " + loginModel?.accessToken, jsonObject.getString(
                 "Division"
             )

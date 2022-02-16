@@ -2410,6 +2410,10 @@ class SyncModel {
             @SerializedName("workType")
             @Expose
             var workType: String = ""
+
+            override fun toString(): String {
+                return workType
+            }
         }
         class WorkingWith {
             @SerializedName("empId")

@@ -4,6 +4,7 @@ import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.staticSyncData
 import `in`.processmaster.salestripclm.adapter.CheckboxSpinnerAdapter
 import `in`.processmaster.salestripclm.adapter.TextWithEditAdapter
+import `in`.processmaster.salestripclm.common_classes.CommonListGetClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.interfaceCode.IdNameBoll_interface
 import `in`.processmaster.salestripclm.models.IdNameBoll_model
@@ -52,29 +53,15 @@ class SubmitE_DetailingActivity : AppCompatActivity(), IdNameBoll_interface {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_submit_edetailing)
 
-        var workinWithList= ArrayList<SyncModel.Data.WorkingWith>()
-        var visitPurposeList= ArrayList<SyncModel.Data.WorkType>()
-
-        var workingobj=SyncModel.Data.WorkingWith()
-        var visitobj=SyncModel.Data.WorkType()
-
-        workingobj.fullName="Select"
-        visitobj.workType="Select"
-
-        workinWithList?.add(workingobj)
-        visitPurposeList?.add(visitobj)
-
-        workinWithList?.addAll(staticSyncData?.data?.workingWithList!!)
-        visitPurposeList?.addAll(staticSyncData?.data?.workTypeList!!)
 
         val adapterVisit: ArrayAdapter<SyncModel.Data.WorkType> = ArrayAdapter<SyncModel.Data.WorkType>(this,
-            android.R.layout.simple_spinner_dropdown_item, visitPurposeList!!)
+            android.R.layout.simple_spinner_dropdown_item, CommonListGetClass().getWorkTypeForSpinner())
         visitPurpose_spinner.setAdapter(adapterVisit)
 
         visitPurpose_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
               if(position!=0)
-                selectedPurposeID = visitPurposeList[position].workId
+                selectedPurposeID = CommonListGetClass().getWorkTypeForSpinner()[position].workId
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {

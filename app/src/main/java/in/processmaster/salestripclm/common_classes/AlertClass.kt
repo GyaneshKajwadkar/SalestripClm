@@ -76,6 +76,7 @@ class AlertClass(val context : Context)
         val activity = context as Activity
         val dialogBuilder = AlertDialog.Builder(activity)
         val inflater = activity.layoutInflater
+        dialogBuilder.setCancelable(false)
         val dialogView: View = inflater.inflate(R.layout.progress_view, null)
         dialogBuilder.setView(dialogView)
 

@@ -2,6 +2,8 @@ package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.BuildConfig
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.activity.HomePage.Companion.apiInterface
+import `in`.processmaster.salestripclm.activity.HomePage.Companion.loginModelHomePage
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.models.GenerateOTPModel
 import `in`.processmaster.salestripclm.models.LoginModel
@@ -465,12 +467,11 @@ class ProfileeActivity : BaseActivity() {
 
     fun getProfileDataApi()
     {
-        var  apiInterface= APIClient.getClient(2, sharePreferanceBase?.getPref("secondaryUrl")).create(
-            APIInterface::class.java)
+
 
         var call: Call<ProfileModel> = apiInterface?.getProfileData(
-            "bearer " + loginModelBase?.accessToken,
-            loginModelBase.empId.toString()
+            "bearer " + loginModelHomePage.accessToken,
+            loginModelHomePage.empId.toString()
         ) as Call<ProfileModel>
         call.enqueue(object : Callback<ProfileModel?> {
             @RequiresApi(Build.VERSION_CODES.O)
@@ -555,12 +556,12 @@ class ProfileeActivity : BaseActivity() {
         Log.e("callingApi","ChangePasswordApi")
 
         val paramObject = JSONObject()
-        paramObject.put("empId",       loginModelBase.empId.toString())
+        paramObject.put("empId",       loginModelHomePage.empId.toString())
         paramObject.put("oldPassword", oldPassword.text.toString())
         paramObject.put("newPassword", newPassword.text.toString())
 
-        var call: Call<GenerateOTPModel> = getSecondaryApiInterface().changePassword(
-            "bearer " + loginModelBase?.accessToken,
+        var call: Call<GenerateOTPModel> = apiInterface?.changePassword(
+            "bearer " + loginModelHomePage.accessToken,
             paramObject
         ) as Call<GenerateOTPModel>
         call.enqueue(object : Callback<GenerateOTPModel?> {
@@ -611,7 +612,7 @@ class ProfileeActivity : BaseActivity() {
 
 
         val paramObject = JSONObject()
-        paramObject.put("EmpId",     loginModelBase.empId.toString())
+        paramObject.put("EmpId",     loginModelHomePage.empId.toString())
         paramObject.put("ImageName", mPhotoFile?.getName() )
         paramObject.put("ImagePath", mPhotoFile?.absolutePath.toString())
         paramObject.put("ImageExt",  mPhotoFile?.absolutePath?.substring(mPhotoFile?.absolutePath?.lastIndexOf(".")?.plus(1)!!))
@@ -619,8 +620,8 @@ class ProfileeActivity : BaseActivity() {
 
         var reqBody = RequestBody.create(MediaType.parse("text/plain"), paramObject.toString());
 
-        var call: Call<GenerateOTPModel> = getSecondaryApiInterface().changeProflePic(
-            "bearer " + loginModelBase?.accessToken,
+        var call: Call<GenerateOTPModel> = apiInterface?.changeProflePic(
+            "bearer " + loginModelHomePage.accessToken,
             filePart,reqBody
         ) as Call<GenerateOTPModel>
         call.enqueue(object : Callback<GenerateOTPModel?> {
@@ -633,13 +634,13 @@ class ProfileeActivity : BaseActivity() {
                 if (response.code() == 200 && !response.body().toString().isEmpty())
                 {
                     var getObject=response.body()
-                    loginModelBase.imageName=getObject?.data?.imageName.toString()
+                    loginModelHomePage.imageName=getObject?.data?.imageName.toString()
 
                     val gson = Gson()
-                    sharePreferanceBase?.setPref("profileData", gson.toJson(loginModelBase))
+                    sharePreferanceBase?.setPref("profileData", gson.toJson(loginModelHomePage))
 
                     var profileData =sharePreferanceBase?.getPref("profileData")
-                    loginModelBase = Gson().fromJson(profileData, LoginModel::class.java)
+                    loginModelHomePage = Gson().fromJson(profileData, LoginModel::class.java)
                 }
                 else
                 {

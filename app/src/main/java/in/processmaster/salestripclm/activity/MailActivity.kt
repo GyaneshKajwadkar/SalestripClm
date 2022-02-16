@@ -6,6 +6,8 @@ import IntegerInterface
 import SelectedDocManList_adapter
 import SelectorInterface
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.activity.HomePage.Companion.apiInterface
+import `in`.processmaster.salestripclm.activity.HomePage.Companion.loginModelHomePage
 import `in`.processmaster.salestripclm.adapter.ImageSelectorAdapter
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.models.GenerateOTPModel
@@ -302,7 +304,7 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
         paramObject.put("MailId", "0")
         paramObject.put("EmpId", "0")
         paramObject.put("IsSeen", "false")
-        paramObject.put("entryBy", loginModelBase.empId)
+        paramObject.put("entryBy", loginModelHomePage.empId)
         paramObject.put("mode", "1")
         paramObject.put("mailStatus", "S")
         paramObject.put("isFileAttached", "true")
@@ -311,7 +313,7 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
         for( item in constructorList)
         {
             val arrayObject = JSONObject()
-            arrayObject.put("sendBy",loginModelBase.empId)
+            arrayObject.put("sendBy",loginModelHomePage.empId)
             arrayObject.put("sendTo",item.getId())
             arrayObject.put("sendType","To")
             arrayObject.put("isSeen","false")
@@ -322,7 +324,7 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
         {
             val arrayObject = JSONObject()
 
-            arrayObject.put("sendBy",loginModelBase.empId)
+            arrayObject.put("sendBy",loginModelHomePage.empId)
             arrayObject.put("sendTo",item.getId())
             arrayObject.put("sendType","Cc")
             arrayObject.put("isSeen","false")
@@ -335,8 +337,8 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
 
         var reqBody = RequestBody.create(MediaType.parse("text/plain"), paramObject.toString());
 
-        var call: Call<GenerateOTPModel> = getSecondaryApiInterface().sendEmail(
-            "bearer " + loginModelBase?.accessToken,
+        var call: Call<GenerateOTPModel> = apiInterface?.sendEmail(
+            "bearer " + loginModelHomePage.accessToken,
             surveyImagesParts,reqBody
         ) as Call<GenerateOTPModel>
 

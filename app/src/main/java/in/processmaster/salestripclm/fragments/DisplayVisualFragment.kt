@@ -1,6 +1,7 @@
 package `in`.processmaster.salestripclm.fragments
 
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.activity.HomePage
 import `in`.processmaster.salestripclm.activity.SplashActivity
 import `in`.processmaster.salestripclm.activity.SubmitE_DetailingActivity
 import `in`.processmaster.salestripclm.adapter.VisualFileAdapter
@@ -8,8 +9,6 @@ import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.interfaceCode.ItemClickDisplayVisual
 import `in`.processmaster.salestripclm.interfaceCode.SortingDisplayVisual
 import `in`.processmaster.salestripclm.models.*
-import `in`.processmaster.salestripclm.networkUtils.APIClient
-import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.content.Context
@@ -61,7 +60,6 @@ class DisplayVisualFragment : Fragment(),  SortingDisplayVisual, ItemClickDispla
     var db = DatabaseHandler(activity)
     var adapter: BottomSheetDoctorAdapter? = null
     var adapterVisualFile: VisualFileAdapter? = null
-    var apiInterface: APIInterface? = null
     var sharePreferance: PreferenceClass? = null
     var contextFragment= getContext()
     var edetailingList: ArrayList<DevisionModel.Data.EDetailing>? = null
@@ -284,17 +282,12 @@ class DisplayVisualFragment : Fragment(),  SortingDisplayVisual, ItemClickDispla
         var visualSendModel: ArrayList<VisualAdsModel_Send> = db.getAllSubmitVisual()
         //get all submit visual api
 
-        apiInterface = APIClient.getClient(2, sharePreferance?.getPref("secondaryUrl")).create(
-            APIInterface::class.java
-        )
-        //initilize api interface
-
         var profileData = sharePreferance?.getPref("profileData")           //get profile data from share preferance
         var loginModel = Gson().fromJson(profileData, LoginModel::class.java)    //convert profile data string to model class
         GeneralClass(requireActivity()).enableSimpleProgress(views!!.progressBar!!)                                            //visble progress bar
 
         //call submit visual ads api interfae post method
-        var call: Call<SyncModel> = apiInterface?.submitVisualAds(
+        var call: Call<SyncModel> = HomePage.apiInterface?.submitVisualAds(
             "bearer " + loginModel?.accessToken,
             visualSendModel
         ) as Call<SyncModel>

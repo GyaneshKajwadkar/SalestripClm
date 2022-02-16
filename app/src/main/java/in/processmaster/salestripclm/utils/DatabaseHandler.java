@@ -686,8 +686,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     visualModel.setBrandId(cursor.getString(2));
                     visualModel.setBrandName(cursor.getString(6));
                     visualModel.setMonitorTime(cursor.getInt(7));
-                    visualModel.setBrandWiseStartTime(cursor.getString(8));
-                    visualModel.setBrandWiseStopTime(cursor.getString(9));
+                  //  visualModel.setBrandWiseStartTime(cursor.getString(8));
+                  //  visualModel.setBrandWiseStopTime(cursor.getString(9));
 
                     visualModel.setEnd(true);
                     visualModel.setChildDataArray(getAllChildBy_ID(startTime));
