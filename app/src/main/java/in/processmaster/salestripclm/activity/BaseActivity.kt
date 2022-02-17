@@ -7,6 +7,7 @@ import `in`.processmaster.salestripclm.activity.HomePage.Companion.apiInterface
 import `in`.processmaster.salestripclm.activity.HomePage.Companion.loginModelHomePage
 import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.alertDialogNetwork
 import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.connectivityChangeReceiver
+import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.models.TeamsModel
@@ -55,6 +56,8 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
     var sharePreferanceBase: PreferenceClass?= null
     var dbBase= DatabaseHandler(this)
     var zoomSDKBase: ZoomSDK? = null
+    val generalClass=GeneralClass(this)
+    val alertClass=AlertClass(this)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -22,7 +22,6 @@ import java.io.File
 
 class AllDataSharingActivity : BaseActivity()
 {
-    var db : DatabaseHandler? = null
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -32,13 +31,13 @@ class AllDataSharingActivity : BaseActivity()
     }
     fun initView()
     {
-        db= DatabaseHandler(this)
+        dbBase= DatabaseHandler(this)
 
         dataSelectorback_iv.setOnClickListener({
             onBackPressed()
         })
 
-        var downloadedList = db?.getAllDataUsingType("IMAGE")
+        var downloadedList = dbBase?.getAllDataUsingType("IMAGE")
 
         val mNoOfColumns = this?.let { Utility.calculateNoOfColumns(it, 180F) }
 

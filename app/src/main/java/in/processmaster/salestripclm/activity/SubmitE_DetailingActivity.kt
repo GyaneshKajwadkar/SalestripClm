@@ -1,44 +1,45 @@
 package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.activity.HomePage.Companion.loginModelHomePage
 import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.staticSyncData
 import `in`.processmaster.salestripclm.adapter.CheckboxSpinnerAdapter
 import `in`.processmaster.salestripclm.adapter.TextWithEditAdapter
 import `in`.processmaster.salestripclm.common_classes.CommonListGetClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
+import `in`.processmaster.salestripclm.fragments.DisplayVisualFragment.Companion.doctorIdDisplayVisual
 import `in`.processmaster.salestripclm.interfaceCode.IdNameBoll_interface
-import `in`.processmaster.salestripclm.models.IdNameBoll_model
-import `in`.processmaster.salestripclm.models.SaveEdetailingToDB_Model
-import `in`.processmaster.salestripclm.models.SyncModel
-import `in`.processmaster.salestripclm.models.VisualAdsModel_Send
+import `in`.processmaster.salestripclm.models.*
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
+import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.NonNull
-import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.Gson
+import com.google.gson.JsonObject
 import kotlinx.android.synthetic.main.activity_submit_edetailing.*
 import kotlinx.android.synthetic.main.bottom_sheet_visualads.bottomSheet
 import kotlinx.android.synthetic.main.bottom_sheet_visualads.close_imv
 import kotlinx.android.synthetic.main.checkbox_bottom_sheet.*
 import kotlinx.android.synthetic.main.common_toolbar.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class SubmitE_DetailingActivity : AppCompatActivity(), IdNameBoll_interface {
+class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
 
     var db = DatabaseHandler(this)
     var visualSendModel= ArrayList<VisualAdsModel_Send>()
@@ -46,8 +47,9 @@ class SubmitE_DetailingActivity : AppCompatActivity(), IdNameBoll_interface {
     var workWithArray=ArrayList<IdNameBoll_model>()
     var sampleArray=ArrayList<IdNameBoll_model>()
     var giftArray=ArrayList<IdNameBoll_model>()
-    var selectionType=0;
-    var selectedPurposeID=0;
+    var selectionType=0
+    var selectedPurposeID=0
+    var dcrId=0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,7 +70,7 @@ class SubmitE_DetailingActivity : AppCompatActivity(), IdNameBoll_interface {
 
             }
         }
-
+        dcrId= PreferenceClass(this).getPref("dcrId").toInt()
 
         checkRecyclerView_rv.layoutManager=LinearLayoutManager(this)
         workingWithRv.layoutManager=LinearLayoutManager(this)
@@ -76,6 +78,9 @@ class SubmitE_DetailingActivity : AppCompatActivity(), IdNameBoll_interface {
         gift_rv.layoutManager=LinearLayoutManager(this)
 
         doctorName_tv.setText(intent.getStringExtra("doctorName"))
+
+        if(intent.getIntExtra("doctorID",0)!=0) doctorIdDisplayVisual= intent.getIntExtra("doctorID",0)!!
+
 
         visualSendModel = DatabaseHandler(this).getAllSubmitVisual()
         edetailing_rv.layoutManager=LinearLayoutManager(this)
@@ -126,23 +131,94 @@ class SubmitE_DetailingActivity : AppCompatActivity(), IdNameBoll_interface {
 
 
         submitDetailing_btn.setOnClickListener({
-         //   if(GeneralClass(this).isInternetAvailable())
-            var saveModel= SaveEdetailingToDB_Model()
-            saveModel.remark=remark_Et.text.toString()
-            saveModel.purposeTovisit=selectedPurposeID
-            saveModel.giftList.addAll(giftArray!!.filter { s -> s.isChecked == true })
-            saveModel.sampleList.addAll(sampleArray!!.filter { s -> s.isChecked == true })
-            saveModel.workWithList.addAll(workWithArray!!.filter { s -> s.isChecked == true })
-            saveModel.visualArray.addAll(visualSendModel)
 
-            val time = System.currentTimeMillis()
-            db.insertOrUpdateAPI(time.toInt(), Gson().toJson(saveModel))
+            val saveModel=getSaveData()
 
-            db.deleteAllVisualAds()
-            db.deleteAllChildVisual()
-            finish()
+            if(!GeneralClass(this).isInternetAvailable())
+            {   db.insertOrUpdateAPI(dcrId, Gson().toJson(saveModel))
+                db.deleteAllVisualAds()
+                db.deleteAllChildVisual()
+                setResult(2)
+                finish()
+
+            }
+            else{
+                submitDcr(saveModel)
+            }
 
         })
+    }
+
+    fun getSaveData():Send_EDetailingModel
+    {
+        var saveModel= Send_EDetailingModel()
+        val c = Calendar.getInstance()
+        val year = c[Calendar.YEAR]
+        val month = c[Calendar.MONTH]
+
+        saveModel.dcrId=dcrId
+        saveModel.doctorId=doctorIdDisplayVisual
+        saveModel.remark=remark_Et.text.toString()
+        saveModel.followUpRemark=remark_Et.text.toString()
+        saveModel.addedThrough="W"
+        saveModel.visitPurpose=selectedPurposeID
+        saveModel.productDetailCount=visualSendModel.size
+        saveModel.empId=loginModelHomePage.empId
+        saveModel.mode=1
+        saveModel.dcrYear=year
+        saveModel.dcrMonth=month
+        saveModel.callTiming= if (c.get(Calendar.AM_PM)==Calendar.AM) "M" else "E"
+
+        val workWithTemp=workWithArray!!.filter { s -> s.isChecked == true }
+        var workWithStr=""
+        for (data in workWithTemp)
+        {    if(workWithStr!="") workWithStr=workWithStr.plus(",")
+            workWithStr=workWithStr.plus(data.id)
+        }
+        saveModel.workWith=workWithStr
+
+        val tempGiftList=giftArray!!.filter { s -> s.isChecked == true }
+        var giftList=ArrayList<Send_EDetailingModel.GiftList>()
+        for(data in tempGiftList)
+        {
+            var giftModel=Send_EDetailingModel.GiftList()
+            giftModel.dcrId=dcrId
+            giftModel.empId=loginModelHomePage.empId
+            giftModel.qty=data.qty
+            giftModel.productId=data.id.toInt()
+            giftModel.type="GIFT"
+            giftList.add(giftModel)
+        }
+
+        val tempSampleList=sampleArray!!.filter { s -> s.isChecked == true }
+        var sampleList=ArrayList<Send_EDetailingModel.SampleList>()
+        for(data in tempSampleList)
+        {
+            var sampleModel=Send_EDetailingModel.SampleList()
+            sampleModel.dcrId=dcrId
+            sampleModel.empId=loginModelHomePage.empId
+            sampleModel.qty=data.qty
+            sampleModel.productId=data.id.toInt()
+            sampleList.add(sampleModel)
+        }
+
+        var productList=ArrayList<Send_EDetailingModel.ProductList>()
+        for(data in visualSendModel)
+        {
+            var productModel=Send_EDetailingModel.ProductList()
+            productModel.dcrId=dcrId
+            productModel.doctorId=data.doctorId?.toInt()
+            productModel.productId=data.brandId?.toInt()
+            productModel.remark=data.feedback
+            productList.add(productModel)
+        }
+
+        saveModel.giftList.addAll(giftList)
+        saveModel.sampleList.addAll(sampleList)
+        saveModel.productList.addAll(productList)
+        saveModel.eDetailList.addAll(visualSendModel)
+        saveModel.dcrDate=generalClass.getCurrentDateTimeApiForamt()
+        return saveModel
     }
 
     fun openCloseModel(type:Int)
@@ -162,6 +238,39 @@ class SubmitE_DetailingActivity : AppCompatActivity(), IdNameBoll_interface {
             else
                 BottomSheetBehavior.STATE_EXPANDED
         bottomSheetBehavior.state = state
+    }
+
+
+    fun submitDcr(saveModel: Send_EDetailingModel) {
+        alertClass?.showAlert("")
+        var call: Call<JsonObject> = HomePage.apiInterface?.submitEdetailingApi("bearer " + loginModelHomePage.accessToken,saveModel) as Call<JsonObject>
+        call.enqueue(object : Callback<JsonObject?> {
+            override fun onResponse(call: Call<JsonObject?>?, response: Response<JsonObject?>) {
+                alertClass?.hideAlert()
+
+                if (response.code() == 200 && !response.body().toString().isEmpty()) {
+                    val jsonObjError: JsonObject = response.body()?.get("errorObj") as JsonObject
+                    if(!jsonObjError.get("errorMessage").asString.isEmpty())
+                    {
+                        alertClass?.commonAlert("",jsonObjError.get("errorMessage").asString)
+                    }
+                    else {
+                        db.deleteAllVisualAds()
+                        db.deleteAllChildVisual()
+                        val jsonObjData:JsonObject = response.body()?.get("data") as JsonObject
+                        generalClass.showSnackbar(window.decorView.rootView, jsonObjData.get("message").asString)
+                        setResult(2)
+                        finish()
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<JsonObject?>, t: Throwable?) {
+                generalClass?.checkInternet()
+                alertClass?.hideAlert()
+                call.cancel()
+            }
+        })
     }
 
 //----------------------------------Show edetailing inner adapter------------------------------------

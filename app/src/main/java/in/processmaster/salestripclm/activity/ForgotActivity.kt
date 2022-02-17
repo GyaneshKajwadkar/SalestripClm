@@ -25,7 +25,6 @@ class ForgotActivity : BaseActivity() {
 
     var apiInterface: APIInterface? = null
     var generateModel: GenerateOTPModel?=null
-    val generalClass=GeneralClass(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         getSupportActionBar()?.hide()   //Hiding Toolbar

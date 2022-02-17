@@ -72,8 +72,6 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
     var selectedAdapeterTeams :SelectedDocManList_adapter? = null
     var constructorList: ArrayList<DocManagerModel> = ArrayList()
     var constructorListTeam: ArrayList<DocManagerModel> = ArrayList()
-    val generalClass= GeneralClass(this)
-
 
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?)

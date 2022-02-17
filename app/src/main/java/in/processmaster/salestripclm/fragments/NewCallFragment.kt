@@ -4,6 +4,7 @@ import `in`.processmaster.salestripclm.activity.HomePage.Companion.apiInterface
 import `in`.processmaster.salestripclm.activity.HomePage.Companion.loginModelHomePage
 import `in`.processmaster.salestripclm.activity.OnlinePresentationActivity
 import `in`.processmaster.salestripclm.activity.SplashActivity
+import `in`.processmaster.salestripclm.activity.SubmitE_DetailingActivity
 import `in`.processmaster.salestripclm.adapter.SimpleListAdapter
 import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.common_classes.CommonListGetClass
@@ -51,6 +52,7 @@ import kotlinx.android.synthetic.main.progress_view.view.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -124,6 +126,13 @@ class NewCallFragment : Fragment() {
             startActivity(intent)
         })
 
+        views!!.skipDetailing_btn.setOnClickListener({
+            val intent = Intent(activity, SubmitE_DetailingActivity::class.java)
+            intent.putExtra("doctorID", selectedDocID)
+            intent.putExtra("doctorName", selectedDocName)
+            startActivity(intent)
+        })
+
         routeList = routeList?.filter { s -> s.headQuaterName !=""} as java.util.ArrayList<SyncModel.Data.Route>
         checkDCRusingShareP()
 
@@ -132,7 +141,7 @@ class NewCallFragment : Fragment() {
 
     fun checkDCRusingShareP():Boolean
     {
-        if( sharePreferance?.getPref("todayDate") != generalClassObject?.getCurrentDate() || sharePreferance?.getPref("dcrId")!="0") {
+        if( sharePreferance?.getPref("todayDate") != generalClassObject?.currentDateMMDDYY() || sharePreferance?.getPref("dcrId")=="0") {
             checkCurrentDCR_API()
             return false }
         else return true
@@ -468,7 +477,7 @@ class NewCallFragment : Fragment() {
         })
     }
 
-    fun createDCRAlert()
+    fun createDCRAlert(routeId: String)
     { var activityId=0; var startingStation=0; var endingStation=0;
 
         val dialogBuilder = AlertDialog.Builder(requireActivity()); val inflater = requireActivity().layoutInflater
@@ -548,17 +557,26 @@ class NewCallFragment : Fragment() {
             if(dialogView.remarkEt.text.isEmpty()) {generalClassObject?.showSnackbar(it,"Remark is empty"); return@setOnClickListener}
             val i: Int = workAreaSeletd.indexOf(' ')
 
+            val c = Calendar.getInstance()
+            val year = c[Calendar.YEAR]
+            val month = c[Calendar.MONTH]
+
             val commonSaveDcrModel=CommonModel.SaveDcrModel()
-            commonSaveDcrModel.dcrDate= generalClassObject?.getCurrentDate()!!
+            commonSaveDcrModel.dcrDate= generalClassObject!!.currentDateMMDDYY()
             commonSaveDcrModel.empId= loginModelHomePage.empId
             commonSaveDcrModel.employeeId= loginModelHomePage.empId
             commonSaveDcrModel.workingType=workAreaSeletd.substring(0, i)
+            commonSaveDcrModel.remark=dialogView.remarkEt.text.toString()
+            commonSaveDcrModel.routeId=routeId
+            commonSaveDcrModel.monthNo=month+1
+            commonSaveDcrModel.year=year
+            commonSaveDcrModel.dayCount="0"
+
             if(dialogView.startEndParent.visibility==View.VISIBLE)
             {
                 commonSaveDcrModel.startingStation=startingStation
                 commonSaveDcrModel.endingStation=endingStation
             }
-
 
             saveDCR_API(commonSaveDcrModel,alertDialog)
 
@@ -570,7 +588,7 @@ class NewCallFragment : Fragment() {
     fun checkCurrentDCR_API(){
         alertClass?.showAlert("")
 
-        var call: Call<JsonObject> = apiInterface?.checkDCR_API("bearer " + loginModelHomePage.accessToken, loginModelHomePage.empId,generalClassObject?.getCurrentDate()) as Call<JsonObject>
+        var call: Call<JsonObject> = apiInterface?.checkDCR_API("bearer " + loginModelHomePage.accessToken, loginModelHomePage.empId,generalClassObject!!.currentDateMMDDYY()) as Call<JsonObject>
         call.enqueue(object : Callback<JsonObject?> {
             override fun onResponse(call: Call<JsonObject?>?, response: Response<JsonObject?>) {
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
@@ -580,19 +598,19 @@ class NewCallFragment : Fragment() {
                   {
                       val data:JsonObject = response.body()?.get("data") as JsonObject
                       val dcrData:JsonObject = data?.get("dcrData") as JsonObject
-//                      if(dcrData.get("routeId").asString.isEmpty())
-//                      {
-//                          alertClass?.commonAlert("Alert!","Please submit tour program first")
-//                          alertClass?.hideAlert()
-//                          return
-//                      }
+                     if(dcrData.get("routeId").asString.isEmpty())
+                     {
+                         alertClass?.commonAlert("Alert!","Please submit tour program first")
+                         alertClass?.hideAlert()
+                         return
+                     }
 
                     routeIdGetDCR=dcrData.get("routeId").asString
                       if(dcrData.get("dcrId").asInt==0) {
-                          createDCRAlert()
+                          createDCRAlert(dcrData.get("routeId").asString)
                           sharePreferance?.setPref("dcrId", dcrData.get("dcrId").asString) }
                       else
-                      sharePreferance?.setPref("todayDate",generalClassObject?.getCurrentDate())
+                      sharePreferance?.setPref("todayDate",generalClassObject?.currentDateMMDDYY())
                       sharePreferance?.setPref("dcrId",dcrData.get("dcrId").asString)
                   }
                 }
@@ -609,12 +627,10 @@ class NewCallFragment : Fragment() {
 
     fun saveDCR_API(dcrObject: CommonModel.SaveDcrModel, alertDialog: AlertDialog) {
         alertClass?.showAlert("")
-
         var call: Call<JsonObject> = apiInterface?.saveDCS("bearer " + loginModelHomePage.accessToken,dcrObject) as Call<JsonObject>
         call.enqueue(object : Callback<JsonObject?> {
             override fun onResponse(call: Call<JsonObject?>?, response: Response<JsonObject?>) {
                 alertClass?.hideAlert()
-
 
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
                     val jsonObjError:JsonObject = response.body()?.get("errorObj") as JsonObject
@@ -623,11 +639,14 @@ class NewCallFragment : Fragment() {
                     alertClass?.commonAlert("",jsonObjError.get("errorMessage").asString)
                     }
                     else {
+                    val jsonObjData:JsonObject = response.body()?.get("data") as JsonObject
+
+                    alertClass?.commonAlert("",jsonObjData.get("message").asString)
+                    sharePreferance?.setPref("todayDate",generalClassObject?.currentDateMMDDYY())
+                    sharePreferance?.setPref("dcrId",jsonObjData.get("dcrId").asString)
                     alertDialog.cancel()
                     }
                 }
-
-
             }
 
             override fun onFailure(call: Call<JsonObject?>, t: Throwable?) {

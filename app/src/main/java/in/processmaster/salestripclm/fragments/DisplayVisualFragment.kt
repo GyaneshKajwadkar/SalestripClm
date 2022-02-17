@@ -103,7 +103,7 @@ class DisplayVisualFragment : Fragment(),  SortingDisplayVisual, ItemClickDispla
             val intent = Intent(activity, SubmitE_DetailingActivity::class.java)
             intent.putExtra("doctorID", doctorIdDisplayVisual)
             intent.putExtra("doctorName", doctorName)
-            startActivity(intent)
+            startActivityForResult(intent,2)
             //  if (!GeneralClass(requireActivity()).isInternetAvailable())
             //  {
             //      AlertClass(requireActivity()).networkAlert()

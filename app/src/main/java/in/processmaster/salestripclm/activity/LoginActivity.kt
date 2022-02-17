@@ -35,9 +35,6 @@ class LoginActivity : BaseActivity() {
 
     var apiInterface: APIInterface? = null
     var sharePreferance: PreferenceClass?= null
-    val alertClass= AlertClass(this)
-    val generalClass= GeneralClass(this)
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         getSupportActionBar()?.hide()   //Hiding Toolbar

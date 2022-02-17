@@ -509,6 +509,11 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
     }
 
 
-
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(resultCode==2){
+            finish();
+        }
+    }
 }
 

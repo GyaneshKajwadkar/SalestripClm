@@ -58,8 +58,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     var drawerProfileIv: ImageView?=null
     var bottomNavigation: BottomNavigationView? = null
     var openFragmentStr=""
-    val generalClass= GeneralClass(this)
-    val alertClass=AlertClass(this)
+
     companion object {
         var loginModelHomePage= LoginModel()
         var apiInterface: APIInterface? = null

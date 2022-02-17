@@ -27,7 +27,6 @@ import retrofit2.Response
 
 class SplashActivity : BaseActivity()
 {
-    val generalClass= GeneralClass(this)
 
     companion object {
         var connectivityChangeReceiver=

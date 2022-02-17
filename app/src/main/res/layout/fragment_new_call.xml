@@ -350,6 +350,7 @@
                             android:padding="10dp"
                             android:textColor="@color/white"
                             android:text="Skip detailing"
+                            android:id="@+id/skipDetailing_btn"
                             android:backgroundTint="#CC5500"
                             android:textAllCaps="false"/>
 

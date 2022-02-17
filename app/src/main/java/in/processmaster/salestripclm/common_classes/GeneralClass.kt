@@ -15,6 +15,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import com.google.android.material.snackbar.Snackbar
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -119,6 +120,18 @@ class GeneralClass(val activity: Activity) {
     fun getCurrentDate():String{
         val c: Date = Calendar.getInstance().getTime()
         val df = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        return df.format(c)
+    }
+
+    fun getCurrentDateTimeApiForamt():String
+    {
+        val df: DateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+        return df.format(Calendar.getInstance().time)
+    }
+
+    fun currentDateMMDDYY():String{
+        val c: Date = Calendar.getInstance().getTime()
+        val df = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
         return df.format(c)
     }
 

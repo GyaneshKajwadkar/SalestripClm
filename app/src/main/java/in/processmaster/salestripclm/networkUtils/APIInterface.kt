@@ -203,4 +203,10 @@ interface APIInterface
         @Header("Authorization") authorization: String?,
         @Body arrayVisual: CommonModel.SaveDcrModel
     ): Call<JsonObject?>?
+
+    @POST("api/dcr/doctor/v2")
+    fun submitEdetailingApi(
+        @Header("Authorization") authorization: String?,
+        @Body arrayVisual: Send_EDetailingModel
+    ): Call<JsonObject?>?
 }

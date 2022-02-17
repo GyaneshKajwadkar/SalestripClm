@@ -26,9 +26,19 @@ class CommonModel {
             get() = field
             set(value) { field = value }
          val mode=1
-         var routeId=1
+        var monthNo=0
             get() = field
             set(value) { field = value }
+        var year=0
+            get() = field
+            set(value) { field = value }
+        var routeId=""
+            get() = field
+            set(value) { field = value }
+        var dayCount=""
+            get() = field
+            set(value) { field = value }
+
 
 
 

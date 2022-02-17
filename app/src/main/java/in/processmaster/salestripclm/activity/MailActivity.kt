@@ -50,7 +50,6 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
     var selectedAdapeterTeams :SelectedDocManList_adapter? = null
     var constructorList: ArrayList<DocManagerModel> = ArrayList()
     var constructorListTeam: ArrayList<DocManagerModel> = ArrayList()
-    var generalClass=GeneralClass(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -15,6 +15,7 @@
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/edittext_capsul.xml" value="0.171875" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_launcher_foreground.xml" value="0.17135416666666667" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-sw600dp-land/activity_display_visual.xml" value="0.111328125" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-sw600dp-land/activity_downloaded_activtiy.xml" value="0.1181392235609103" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-sw600dp-land/activity_edetailing_.xml" value="0.1" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-sw600dp-land/activity_home_page.xml" value="0.10240963855421686" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-sw600dp-land/activity_image_selecror.xml" value="0.18" />
@@ -28,6 +29,7 @@
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-xlarge-land/activity_image_selecror.xml" value="0.10405643738977072" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-xlarge-land/content_main.xml" value="0.1" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-xlarge-land/nav_header_main.xml" value="0.1" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout/activity_all_data_sharing.xml" value="0.13451086956521738" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout/activity_base.xml" value="0.1" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout/activity_experimental.xml" value="0.16621376811594202" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout/activity_image_selecror.xml" value="0.1" />
@@ -36,6 +38,8 @@
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout/common_toolbar.xml" value="0.12907608695652173" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout/content_main.xml" value="0.10625" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout/dcr_entry.xml" value="0.33" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout/downloadallprogress_alert.xml" value="0.17844202898550723" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout/edetalling_feedback.xml" value="0.17844202898550723" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout/fragment_new_call.xml" value="0.16576086956521738" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout/fragment_new_downloads.xml" value="0.1328125" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout/nav_header_main.xml" value="0.1" />

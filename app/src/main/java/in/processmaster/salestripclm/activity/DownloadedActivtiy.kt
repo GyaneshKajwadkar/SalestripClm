@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
+import kotlinx.android.synthetic.main.activity_downloaded_activtiy.*
 import org.apache.commons.io.FileUtils
 import java.io.*
 import java.net.URL
@@ -38,22 +39,10 @@ class DownloadedActivtiy : BaseActivity() {
     var textViewAlert:TextView?=null
     var downloadItem_tv:TextView?=null
 
-    var recyclerView:RecyclerView?=null
-    var back_imv:ImageView?=null
     var adapter : DownloadAdapter?=null
-    //Database
+
     var db = DatabaseHandler(this)
 
-    var video_rv:RecyclerView?=null
-    var images_rv:RecyclerView?=null
-    var html_rv:RecyclerView?=null
-
-    var videoView_parent: LinearLayout?=null
-    var images_parent: LinearLayout?=null
-    var html_parent: LinearLayout?=null
-    var downloadAll_ll: LinearLayout?=null
-
-    var toolbarText_tv: TextView?=null
     var arrayList: ArrayList<DownloadEdetail_model.Data.EDetailingImages> = ArrayList()
 
     var brandName =""
@@ -62,11 +51,6 @@ class DownloadedActivtiy : BaseActivity() {
     var adapterVideo =DownloadAdapter()
     var adapterImage =DownloadAdapter()
     var adapterWeb =DownloadAdapter()
-
-    //Download all single folders
-    var downloadAllVideos_ll: LinearLayout?=null
-    var downloadAllImages_ll: LinearLayout?=null
-    var downloadAllWeb_ll: LinearLayout?=null
 
     var brandId =0;
 
@@ -78,23 +62,7 @@ class DownloadedActivtiy : BaseActivity() {
 
     fun initView()
     {
-        //recyclerView=findViewById(R.id.recyclerView) as RecyclerView
-        back_imv=findViewById(R.id.back_imv) as ImageView
-        toolbarText_tv=findViewById(R.id.toolbarText_tv) as TextView
 
-        video_rv=findViewById(R.id.video_rv)
-        images_rv=findViewById(R.id.images_rv)
-        html_rv=findViewById(R.id.html_rv)
-
-        videoView_parent=findViewById(R.id.videoView_parent)
-        images_parent=findViewById(R.id.images_parent)
-        html_parent=findViewById(R.id.html_parent)
-
-        downloadAll_ll=findViewById(R.id.downloadAll_ll)
-
-        downloadAllVideos_ll=findViewById(R.id.downloadAllVideos_ll)
-        downloadAllImages_ll=findViewById(R.id.downloadAllImages_ll)
-        downloadAllWeb_ll=findViewById(R.id.downloadAllWeb_ll)
 
         back_imv!!.setOnClickListener {
             onBackPressed()
