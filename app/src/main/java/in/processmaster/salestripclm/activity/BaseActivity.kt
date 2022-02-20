@@ -9,9 +9,7 @@ import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.alertDi
 import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.connectivityChangeReceiver
 import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
-import `in`.processmaster.salestripclm.models.LoginModel
-import `in`.processmaster.salestripclm.models.TeamsModel
-import `in`.processmaster.salestripclm.models.ZoomCredientialModel
+import `in`.processmaster.salestripclm.models.*
 import `in`.processmaster.salestripclm.networkUtils.APIClient
 import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import `in`.processmaster.salestripclm.networkUtils.APIInterface
@@ -34,6 +32,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import com.google.gson.Gson
+import com.google.gson.JsonObject
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -330,7 +329,7 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
                     val gson = Gson()
                     var model = response.body()
-                    dbBase?.insertOrUpdateAPI(-1,gson.toJson(model))
+                    dbBase?.addAPIData(gson.toJson(model),2,)
                     Log.e("theScheduledApiModel",model?.getData()?.meetingList?.size.toString())
 
                 }
@@ -345,6 +344,8 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
         }
 
     }
+
+
 
 
 //     fun getsheduledMeeting_api(): String? {
@@ -426,90 +427,36 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
 
     }
 
+    suspend fun submitDCRCo()
+    {
+        val stringArray=dbBase.getAllSaveSend("feeback")
+        if(stringArray.size<=0 )return
 
-    /*  override fun onZoomSDKLoginResult(result: Long) {
-          if (result == ZoomAuthenticationError.ZOOM_AUTH_ERROR_SUCCESS.toLong())
-          {
-              Log.e("logResult", "loginSuccessoverride")
-              UserLoginCallback.getInstance().removeListener(this)
-          }
-          else
-          {
-              Log.e("logResult", "loginErroroverride")
-          }
-      }
+        val saveModel=Gson().fromJson(stringArray.get(0),Send_EDetailingModel::class.java)
 
-      override fun onZoomSDKLogoutResult(result: Long) {
-          if (result == ZoomAuthenticationError.ZOOM_AUTH_ERROR_SUCCESS.toLong()) {
+        val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
+        ).submitEdetailingApiCoo("bearer " + loginModelHomePage.accessToken,saveModel)
+        withContext(Dispatchers.Main) {
+            Log.e("submitDCRCoAPI",response.toString())
+            if (response!!.isSuccessful)
+            {
+                if (response.code() == 200 && !response.body().toString().isEmpty()) {
+                    val jsonObjError: JsonObject = response.body()?.get("errorObj") as JsonObject
+                    if(!jsonObjError.get("errorMessage").asString.isEmpty())
+                    {
+                        Log.e("errorOnSubmitEDetailing",jsonObjError.get("errorMessage").asString)
+                        //alertClass?.commonAlert("",jsonObjError.get("errorMessage").asString)
+                    }
+                    else {
+                        dbBase.deleteSaveSend(saveModel.dcrId!!)
+                        submitDCRCo();
+                    } }
+                else Log.e("elsesubmitDCRCoAPI", response.code().toString())
+            }
+            else Log.e("submitDCRCoAPIERROR", response.errorBody().toString())
 
-              Toast.makeText(
-                  this,
-                  "Logout successfully",
-                  Toast.LENGTH_SHORT
-              ).show()
-          }
+        }
 
-          else {
-              Toast.makeText(
-                  this,
-                  "Logout failed result code = $result",
-                  Toast.LENGTH_SHORT
-              ).show()
-          }
-      }
+    }
 
-      override fun onZoomIdentityExpired() {
-      }
-
-      override fun onZoomAuthIdentityExpired() {
-      }
-
-      override fun onZoomSDKInitializeResult(errorCode: Int, internalErrorCode: Int) {
-          if (errorCode != ZoomError.ZOOM_ERROR_SUCCESS) {
-              Log.e("zoomErrorLog","error- $errorCode internalErrorcode- $internalErrorCode")
-          }
-          else {
-              if (zoomSDKBase?.tryAutoLoginZoom() == ZoomApiError.ZOOM_API_ERROR_SUCCESS) {
-                  UserLoginCallback.getInstance().addListener(this)
-
-              }
-              else if(!zoomSDKBase?.isLoggedIn!!)
-              {
-                  loginFirstbase()
-                  UserLoginCallback.getInstance().addListener(this)
-              }}
-      }
-
-
-
-      override fun onMeetingStatusChanged(p0: MeetingStatus?, p1: Int, p2: Int) {
-          TODO("Not yet implemented")
-      }
-
-     private fun loginFirstbase(): Unit {
-
-          //  val meetingService: MeetingService? = ZoomSDK.getInstance().getMeetingService()
-
-          val ret: Int = EmailUserLoginHelper.getInstance().login(
-              "kajwadkar13@gmail.com",
-              "13Zoom@003"
-          )
-          if (ret != ZoomApiError.ZOOM_API_ERROR_SUCCESS) {
-              if (ret == ZoomApiError.ZOOM_API_ERROR_EMAIL_LOGIN_IS_DISABLED)
-              {
-                  Log.e("logResult", "loginErrorFirst")
-              }
-
-              else if(ret == ZoomApiError.ZOOM_API_ERROR_SUCCESS)
-              {
-                  Log.e("logResult", "loginSuccessFirst")
-              }
-
-              else
-              {
-                  Log.e("logResult", "login and initilized")
-              }
-          } else {
-          }
-      }*/
 }

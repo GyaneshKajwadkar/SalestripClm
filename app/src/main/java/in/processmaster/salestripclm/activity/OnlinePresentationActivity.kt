@@ -103,11 +103,11 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
 
         }
 
-
+        dbBase.deleteAllVisualAds()
+        dbBase.deleteAllChildVisual()
 
         val fragment = DisplayVisualFragment()
         openFragment(fragment)
-
 
     }
     //Basic coding part

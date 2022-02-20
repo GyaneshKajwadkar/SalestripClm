@@ -180,7 +180,7 @@ class HomeFragment : Fragment(), OnChartGestureListener {
 
     override fun onResume() {
         super.onResume()
-        val responseData=db.getApiDetail(-1)
+        val responseData=db.getApiDetail(2)
         var getScheduleModel=GetScheduleModel()
         if(!responseData.equals(""))
         {
@@ -661,7 +661,7 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         var selectedDate = dialogView.findViewById(R.id.selectedDate) as TextView
         var scheduledMeeting_rv = dialogView.findViewById(R.id.scheduledMeeting_rv) as RecyclerView
 
-        val responseData=db.getApiDetail(-1)
+        val responseData=db.getApiDetail(2)
         if(!responseData.equals(""))
         {
             var getScheduleModel= Gson().fromJson(responseData, GetScheduleModel::class.java)

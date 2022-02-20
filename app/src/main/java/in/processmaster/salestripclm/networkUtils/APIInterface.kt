@@ -43,11 +43,9 @@ interface APIInterface
         @Field("password") password: String?
     ): Response<LoginModel?>?
 
-    @GET("api/common/syncData")
-    suspend fun  //sync api
+    @GET("api/common/syncData") //sync api
+    suspend fun
             syncApiCoo(@Header("Authorization") authorization: String?): Response<SyncModel?>?
-
-
 
     @GET("api/common/syncData")
     fun  //sync api
@@ -94,32 +92,19 @@ interface APIInterface
     ): Response<DevisionModel?>?
 
     @GET("api/e-detailing/documents/{eDetailId}")
-    fun  //download file api
-            downloadUrl(
+    fun downloadUrl(
         @Header("Authorization") authorization: String?,
         @Path("eDetailId") eDetailId: String?
     ): Call<DownloadEdetail_model?>?
 
-    /*  @FormUrlEncoded
-    @POST("api/e-detailing/transaction")    //submit e-detailing api
-    Call<SyncModel> submitVisualAds(@Header("Authorization") String authorization,@Field("startDate") String startDate, @Field("endDate") String endDate, @Field("empId") String empId, @Field("doctorId") String doctorId
-            , @Field("brandId") String brandId);*/
-
-    /*  @FormUrlEncoded
-    @POST("api/e-detailing/transaction")    //submit e-detailing api
-    Call<SyncModel> submitVisualAds(@Header("Authorization") String authorization,@Field("startDate") String startDate, @Field("endDate") String endDate, @Field("empId") String empId, @Field("doctorId") String doctorId
-            , @Field("brandId") String brandId);*/
-
-    @POST("api/e-detailing/transaction")
-    fun  //submit e-detailing api
-            submitVisualAds(
+    @POST("api/e-detailing/transaction")  //submit e-detailing api
+    fun submitVisualAds(
         @Header("Authorization") authorization: String?,
         @Body arrayVisual: ArrayList<VisualAdsModel_Send>
     ): Call<SyncModel?>?
 
-    @GET("api/users/allLevelHierarchyEmp/{empId}")
-    fun  //get teams members
-            getTeamsMember(
+    @GET("api/users/allLevelHierarchyEmp/{empId}") //get teams members
+    fun getTeamsMember(
         @Header("Authorization") authorization: String?,
         @Path("empId") empId: String?
     ): Call<TeamsModel?>?
@@ -209,4 +194,12 @@ interface APIInterface
         @Header("Authorization") authorization: String?,
         @Body arrayVisual: Send_EDetailingModel
     ): Call<JsonObject?>?
+
+    @GET("api/dcr/doctor/v2") //sync api
+    suspend fun submitEdetailingApiCoo(@Header("Authorization") authorization: String,  @Body arrayVisual: Send_EDetailingModel): Response<JsonObject>
+
+
+    @GET("api/gs-receive/employee-sample-balance") //sync api
+    suspend fun getQuantiyApiCoo(@Header("Authorization") authorization: String): Response<CommonModel.QuantityModel>
+
 }

@@ -41,7 +41,6 @@ import kotlin.collections.ArrayList
 
 class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
 
-    var db = DatabaseHandler(this)
     var visualSendModel= ArrayList<VisualAdsModel_Send>()
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     var workWithArray=ArrayList<IdNameBoll_model>()
@@ -99,11 +98,12 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
 
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
 
+         val quantityModel=Gson().fromJson(dbBase.getApiDetail(3),CommonModel.QuantityModel.Data::class.java)
 
-
-        var listSample = staticSyncData?.data?.productList!!.filter { s -> s.allowSample == true}
-        var listGift = staticSyncData?.data?.productList!!.filter { s -> s.productType == 3}
-
+        var Sample = quantityModel.employeeSampleBalanceList!!.filter { s -> s.productType == "Sample"}
+        var listSample = Sample!!.filter { s -> s.actualBalanceQty != 0}
+        var Gift = quantityModel.employeeSampleBalanceList!!.filter { s -> s.productType == "Gift"}
+        var listGift = Gift!!.filter { s -> s.actualBalanceQty != 0}
 
         for(workWith in staticSyncData?.data?.workingWithList!!)
         {
@@ -117,7 +117,8 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
         {
             val data =IdNameBoll_model()
             data.id= sample.productId.toString()
-            data.name=sample.productName
+            data.name=sample?.productName!!
+            data.availableQty=sample?.actualBalanceQty?.toInt()!!
             sampleArray.add(data)
         }
 
@@ -125,32 +126,61 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
         {
             val data =IdNameBoll_model()
             data.id= gift.productId.toString()
-            data.name=gift.productName
+            data.name=gift?.productName!!
+            data.availableQty=gift?.actualBalanceQty?.toInt()!!
             giftArray.add(data)
         }
 
 
         submitDetailing_btn.setOnClickListener({
 
+            var firstSample=sampleArray!!.filter { s -> s.isChecked == true }
+            var sampleQTy = firstSample!!.filter { s -> s.qty == 0}
+
+            var firstGift=giftArray!!.filter { s -> s.isChecked == true }
+            var giftyQTy = firstGift!!.filter { s -> s.qty == 0}
+
+            if(sampleQTy.size>0 ||giftyQTy.size>0) {
+                generalClass.showSnackbar(window.decorView.rootView, "Quantity not be zero")
+                return@setOnClickListener
+            }
+
             val saveModel=getSaveData()
 
+            val quantityModel=Gson().fromJson(dbBase.getApiDetail(3),CommonModel.QuantityModel.Data::class.java)
+            var quantityArray=quantityModel.employeeSampleBalanceList!! as ArrayList<CommonModel.QuantityModel.Data.EmployeeSampleBalance>
+
+            for((index, model) in quantityArray!!.withIndex())
+            {
+                for (data in sampleArray)
+                {
+                    if(data.id.toInt()==model.productId && data.isChecked) {
+                        model.actualBalanceQty = model.actualBalanceQty?.minus(data.qty)
+                        quantityArray.set(index, model) }
+                }
+                for (data in giftArray)
+                {
+                    if(data.id.toInt()==model.productId && data.isChecked) {
+                        model.actualBalanceQty = model.actualBalanceQty?.minus(data.qty)
+                        quantityArray.set(index, model) }
+                }
+            }
+
             if(!GeneralClass(this).isInternetAvailable())
-            {   db.insertOrUpdateAPI(dcrId, Gson().toJson(saveModel))
-                db.deleteAllVisualAds()
-                db.deleteAllChildVisual()
+            {   dbBase.insertOrUpdateSaveAPI(dcrId, Gson().toJson(saveModel),"feedback")
+                dbBase.addAPIData(Gson().toJson(quantityArray),3)
+                dbBase.deleteAllVisualAds()
+                dbBase.deleteAllChildVisual()
                 setResult(2)
                 finish()
-
             }
-            else{
-                submitDcr(saveModel)
-            }
-
+            else{ submitDcr(saveModel,quantityArray) }
         })
     }
 
     fun getSaveData():Send_EDetailingModel
     {
+
         var saveModel= Send_EDetailingModel()
         val c = Calendar.getInstance()
         val year = c[Calendar.YEAR]
@@ -231,7 +261,6 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
         if(type==3)
             checkRecyclerView_rv.adapter=CheckboxSpinnerAdapter(giftArray,this)
 
-
         val state =
             if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED)
                 BottomSheetBehavior.STATE_COLLAPSED
@@ -241,7 +270,10 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
     }
 
 
-    fun submitDcr(saveModel: Send_EDetailingModel) {
+    fun submitDcr(
+        saveModel: Send_EDetailingModel,
+        quantityArray: ArrayList<CommonModel.QuantityModel.Data.EmployeeSampleBalance>
+    ) {
         alertClass?.showAlert("")
         var call: Call<JsonObject> = HomePage.apiInterface?.submitEdetailingApi("bearer " + loginModelHomePage.accessToken,saveModel) as Call<JsonObject>
         call.enqueue(object : Callback<JsonObject?> {
@@ -255,23 +287,20 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
                         alertClass?.commonAlert("",jsonObjError.get("errorMessage").asString)
                     }
                     else {
-                        db.deleteAllVisualAds()
-                        db.deleteAllChildVisual()
+                        dbBase.addAPIData(Gson().toJson(quantityArray),3)
+                        dbBase.deleteAllVisualAds()
+                        dbBase.deleteAllChildVisual()
                         val jsonObjData:JsonObject = response.body()?.get("data") as JsonObject
                         generalClass.showSnackbar(window.decorView.rootView, jsonObjData.get("message").asString)
                         setResult(2)
                         finish()
-                    }
-                }
-            }
+                    } } }
 
             override fun onFailure(call: Call<JsonObject?>, t: Throwable?) {
                 generalClass?.checkInternet()
                 alertClass?.hideAlert()
                 call.cancel()
-            }
-        })
-    }
+            } }) }
 
 //----------------------------------Show edetailing inner adapter------------------------------------
     inner class EdetallingAdapter() :
@@ -342,7 +371,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
             if(isUpdate) {
                 var sendingList = workWithArray!!.filter { s -> s.isChecked == true }
                 workingWithRv.adapter =
-                    TextWithEditAdapter(sendingList as ArrayList<IdNameBoll_model>, this,0)
+                    TextWithEditAdapter(sendingList as ArrayList<IdNameBoll_model>, this,0,this)
             }
         }
         if(selectionType==2)
@@ -351,7 +380,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
             if(isUpdate) {
                 var sendingList = sampleArray!!.filter { s -> s.isChecked == true }
                 sample_rv.adapter =
-                    TextWithEditAdapter(sendingList as ArrayList<IdNameBoll_model>, this,1)
+                    TextWithEditAdapter(sendingList as ArrayList<IdNameBoll_model>, this, 1, this)
             }
         }
         if(selectionType==3)
@@ -360,7 +389,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
             if(isUpdate) {
                 var sendingList = giftArray!!.filter { s -> s.isChecked == true }
                 gift_rv.adapter =
-                    TextWithEditAdapter(sendingList as ArrayList<IdNameBoll_model>, this,1)
+                    TextWithEditAdapter(sendingList as ArrayList<IdNameBoll_model>, this, 1, this)
             }
         }
 

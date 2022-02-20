@@ -1,4 +1,6 @@
 package `in`.processmaster.salestripclm.models
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
 
 class CommonModel {
 
@@ -41,6 +43,74 @@ class CommonModel {
 
 
 
+
+    }
+
+    class QuantityModel{
+        @SerializedName("responseCode")
+        @Expose
+        private var responseCode: Int? = null
+        @SerializedName("errorObj")
+        @Expose
+        private var errorObj: ErrorObj? = null
+        @SerializedName("data")
+        @Expose
+        private var data: Data? = null
+        fun getResponseCode(): Int? {
+            return responseCode
+        }
+        fun setResponseCode(responseCode: Int?) {
+            this.responseCode = responseCode
+        }
+        fun getErrorObj(): ErrorObj? {
+            return errorObj
+        }
+        fun setErrorObj(errorObj: ErrorObj?) {
+            this.errorObj = errorObj
+        }
+        fun getData(): Data? {
+            return data
+        }
+        fun setData(data: Data?) {
+            this.data = data
+        }
+
+        class ErrorObj {
+            @SerializedName("errorMessage")
+            @Expose
+            var errorMessage: String? = null
+
+            @SerializedName("fldErrors")
+            @Expose
+            var fldErrors: Any? = null
+        }
+        class Data {
+            @SerializedName("employeeSampleBalanceList")
+            @Expose
+            var employeeSampleBalanceList: List<EmployeeSampleBalance>? = null
+
+            class EmployeeSampleBalance {
+                @SerializedName("productId")
+                @Expose
+                var productId: Int? = null
+
+                @SerializedName("actualBalanceQty")
+                @Expose
+                var actualBalanceQty: Int? = null
+
+                @SerializedName("newBalanceQty")
+                @Expose
+                var newBalanceQty: Int? = null
+
+                @SerializedName("productName")
+                @Expose
+                var productName: String? = null
+
+                @SerializedName("productType")
+                @Expose
+                var productType: String? = null
+            }
+        }
 
     }
 }

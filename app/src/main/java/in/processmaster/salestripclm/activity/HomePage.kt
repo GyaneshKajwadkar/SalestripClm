@@ -64,19 +64,14 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         var apiInterface: APIInterface? = null
     }
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_page)
 
-
         val sharePreferance = PreferenceClass(this)
-
         var profileData = sharePreferance.getPref("profileData")
 
          loginModelHomePage = Gson().fromJson(profileData, LoginModel::class.java)
-
         apiInterface = APIClient.getClient(2, sharePreferance?.getPref("secondaryUrl")).create(
             APIInterface::class.java)
 
@@ -85,9 +80,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         if(generalClass.isInternetAvailable())
             callingMultipleAPI()
         else
-            staticSyncData=Gson().fromJson(dbBase?.getAllDataSync(), SyncModel::class.java)
-
-        // dbBase?.insertOrUpdateAPI(3,"")
+            staticSyncData=Gson().fromJson(dbBase?.getApiDetail(1), SyncModel::class.java)
 
     }
 
@@ -99,38 +92,10 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         bottomNavigation?.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
 
         drawer_layout=findViewById(R.id.drawer_layout) as DrawerLayout
-
-        //Retrive user data
-        //close Navigation drawer
-        //   drawer_layout!!.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-
-        // sharePreferance = PreferenceClass(this)
-        // var profilePicPath =sharePreferance?.getPref("profilePic")
-
-        //retrive profile image
-        /*  if(!profilePicPath?.isEmpty()!!)
-          {
-              var options = BitmapFactory.Options()
-              options.inSampleSize = 2
-              profile_image!!.setImageBitmap(BitmapFactory.decodeFile(profilePicPath, options));
-          }*/
-
-        //Retrive user data
-        //       var profileData =sharePreferance?.getPref("profileData")
-//        loginModel= Gson().fromJson(profileData, LoginModel::class.java)
         userName_tv?.setText(loginModelHomePage.userName)
-
         //change status bar colour
         changeStatusBar()
 
-
-        /* try {
-             val jsonObject = JSONObject(loginModelBase?.getEmployeeObj().toString())
-         } catch (err: JSONException) {
-             Log.d("Error", err.toString())
-         }*/
-
-        //Set app version to text view
         try
         {
             val pInfo: PackageInfo = getPackageManager().getPackageInfo(this.getPackageName(), 0)
@@ -138,28 +103,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             appVersion_tv?.setText("v.${version}")
         }
         catch (e: PackageManager.NameNotFoundException)
-        {
-            e.printStackTrace()
-        }
-
-
-        //call sync api
-        if(generalClass.isInternetAvailable())
-        {
-            // sync_api()
-            // getsheduledMeeting_api()
-
-            /*    GlobalScope.launch(Dispatchers.IO)
-                {
-                    var zoomSDKBase = ZoomSDK.getInstance()
-                    if(!zoomSDKBase.isLoggedIn)
-                    {
-                        getCredientail_api(this@HomePage)
-                    }
-                }*/
-
-
-        }
+        { e.printStackTrace() }
 
         //Logout
         menu_iv?.setOnClickListener({
@@ -176,166 +120,24 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                 override fun onMenuItemSelected(menu: MenuBuilder, item: MenuItem): Boolean {
                     when (item.itemId) {
                         R.id.logout_menu -> {
-                            logoutAppAlert()
-                        }
-                    }
-                    return true
-                }
-
+                            logoutAppAlert() } }
+                    return true }
                 override fun onMenuModeChange(menu: MenuBuilder) {}
             })
             // Display the menu
             optionsMenu.show()
         })
-        menu_img?.setOnClickListener({
-            drawer_layout!!.openDrawer(Gravity.LEFT)
-        })
+        menu_img?.setOnClickListener({ drawer_layout!!.openDrawer(Gravity.LEFT) })
 
         val headerView: View = nav_view?.inflateHeaderView(R.layout.nav_header_main)!!
         var drawerTv=  headerView.findViewById(R.id.profileName_tv_drawer) as TextView
         drawerProfileIv=  headerView.findViewById(R.id.profile_iv_drawer) as ImageView
 
         drawerTv?.setText(loginModelHomePage.userName)
-        /* if(!profilePicPath?.isEmpty()!!)
-         {
-             var options = BitmapFactory.Options()
-             options.inSampleSize = 2
-             drawerProfileIv!!.setImageBitmap(BitmapFactory.decodeFile(profilePicPath, options));
-         }*/
-
 
         setImages()
-
         nav_view?.setNavigationItemSelectedListener(this)
         nav_view?.getMenu()?.getItem(0)?.setChecked(true)
-
-        //   InitAuthSDKHelper.getInstance().initSDK(this, this)
-
-
-        //This is timer for zoom api
-        /* var count=0
-         val T = Timer()
-         T.scheduleAtFixedRate(object : TimerTask() {
-             override fun run() {
-                 runOnUiThread {
-                    Log.e("hfioshfisgfuio",count.toString())
-                     count++
-                 }
-             }
-         }, 1000, 1000)*/
-
-    }
-
-    //sync api
-    private fun sync_api()
-    {
-        progressMessage_tv?.setText("Sync in progress")
-        generalClass.enableProgress(progressView_parentRv!!)
-
-        var call: Call<SyncModel> = apiInterface?.syncApi("bearer " + loginModelHomePage?.accessToken) as Call<SyncModel>
-        call.enqueue(object : Callback<SyncModel?> {
-            override fun onResponse(call: Call<SyncModel?>?, response: Response<SyncModel?>) {
-                Log.e("sync_api", response.code().toString() + "")
-                if (response.code() == 200 && !response.body().toString().isEmpty()) {
-                    if (dbBase.datasCount > 0) {
-                        dbBase.deleteAll()
-                    }
-                    dbBase?.addSyncData(Gson().toJson(response.body()))
-
-                    bottomNavigation?.selectedItemId= R.id.landingPage
-                    division_api()
-                }
-
-                // if token expire go to login page again
-                if (response.code() == 401) {
-                    Log.e("responseCode", "error")
-                    sharePreferanceBase?.setPrefBool("isLogin", false)
-                    val intent = Intent(this@HomePage, LoginActivity::class.java)
-                    startActivity(intent)
-                    finish()
-                    generalClass.disableProgress(progressView_parentRv!!)
-                }
-            }
-
-            override fun onFailure(call: Call<SyncModel?>, t: Throwable?) {
-                generalClass.checkInternet()
-                call.cancel()
-                generalClass.disableProgress(progressView_parentRv!!)
-
-            }
-        })
-    }
-
-    private fun division_api()
-    {
-
-        val jsonObject = JSONObject(loginModelHomePage.getEmployeeObj().toString())
-
-        var call: Call<DevisionModel> = apiInterface?.detailingApi(
-            "bearer " + loginModelHomePage.accessToken, jsonObject.getString(
-                "Division"
-            )
-        ) as Call<DevisionModel>
-        call.enqueue(object : Callback<DevisionModel?> {
-            override fun onResponse(
-                call: Call<DevisionModel?>?,
-                response: Response<DevisionModel?>
-            ) {
-                Log.e("division_api", response.code().toString() + "")
-
-                if (response.code() == 200 && !response.body().toString().isEmpty()) {
-
-                    for ((index, value) in response.body()?.data?.geteDetailingList()
-                        ?.withIndex()!!) {
-                        //store edetailing data to db
-                        val gson = Gson()
-                        dbBase.insertOrUpdateEDetail(
-                            value.geteDetailId().toString(),
-                            gson.toJson(value)
-                        )
-                    }
-
-                    // clear database
-                    for (dbList in dbBase.getAlleDetail()) {
-                        var isSet = false
-                        for (mainList in response.body()?.data?.geteDetailingList()!!) {
-                            if (mainList.geteDetailId() == dbList.geteDetailId()) {
-                                isSet = true
-                            }
-                        }
-
-                        //this clear database and files from device which is not in used
-                        if (!isSet) {
-                            dbBase.deleteEdetailingData(dbList.geteDetailId().toString())
-
-                            var downloadModelArrayList =
-                                dbBase.getAllDownloadedData(dbList.geteDetailId())
-
-                            //Delete files from folder before erase db
-                            for (item in downloadModelArrayList) {
-                                val someDir = File(item.fileDirectoryPath)
-                                someDir.deleteRecursively()
-                            }
-
-                            dbBase.deleteEdetailDownloada(dbList.geteDetailId().toString())
-
-                        }
-                    }
-
-                    //    Log.e("isZoomLogin",mZoomSDK!!.isLoggedIn!!.toString()+" 456")
-
-                }
-                generalClass.disableProgress(progressView_parentRv!!)
-
-            }
-
-            override fun onFailure(call: Call<DevisionModel?>, t: Throwable?) {
-                generalClass.checkInternet()
-                call.cancel()
-                generalClass.disableProgress(progressView_parentRv!!)
-
-            }
-        })
     }
 
     //change status bar color
@@ -401,16 +203,8 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     //on back button press open exit alert
     override fun onBackPressed()
     {
-       // val openFragment: DoctorDetailFragment? = supportFragmentManager.findFragmentByTag("detailDoctor") as DoctorDetailFragment?
-       // if (openFragment != null && openFragment.isVisible()) {
-       //     if(getSupportFragmentManager().getBackStackEntryCount() > 0)
-       //         getSupportFragmentManager().popBackStack()
-       //     return
-       // }
-
-        exitAppAlert(this)
+      exitAppAlert(this)
     }
-
 
     //exit app alert
     fun logoutAppAlert()
@@ -455,9 +249,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         drawer_layout!!.closeDrawers()
         when (item.itemId) {
 
-            R.id.nav_home -> {
-
-            }
+            R.id.nav_home -> { }
 
             R.id.nav_profile -> {
                 var intent = Intent(this, ProfileeActivity::class.java)
@@ -482,7 +274,8 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             R.id.sync_menu -> {
                 //call sync api
                 if (generalClass.isInternetAvailable()) {
-                    sync_api()
+                  //  sync_api()
+                      callingMultipleAPI()
                 }
             }
 
@@ -530,7 +323,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                 if(generalClass.isInternetAvailable())
                     callingMultipleAPI()
                 else
-                    staticSyncData=Gson().fromJson(dbBase?.getAllDataSync(), SyncModel::class.java)
+                    staticSyncData=Gson().fromJson(dbBase?.getApiDetail(1), SyncModel::class.java)
 
                 sharePreferanceBase?.setPref("SyncDate", formattedDate)
             }
@@ -548,21 +341,22 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
     fun callingMultipleAPI()
     {
-        //   progressMessage_tv?.setText("Please wait....")
         alertClass.showAlert("")
 
+        if (dbBase.datasCount > 0) {
+            dbBase.deleteAll()
+        }
+
         val coroutineScope= CoroutineScope(IO).launch {
-            val ans= async {
-                callingSyncAPI()
-            }
+            val sync= async { callingSyncAPI() }
 
-            val divisionApi =async {
-                callingDivisionAPI()
-            }
+            val divisionApi =async { callingDivisionAPI() }
 
-            val credientialApi= async {
-                getSheduleMeetingAPI()
-            }
+            val credientialApi= async { getSheduleMeetingAPI() }
+
+            val quantityApi= async { getQuantityAPI() }
+
+            val sendEdetailing= async { submitDCRCo() }
 
             val initilizeZoom= async {
                 var zoomSDKBase = ZoomSDK.getInstance()
@@ -571,11 +365,12 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                     getCredientailAPI(this@HomePage)
                 }
             }
-
-            ans.await()
+            sync.await()
             divisionApi.await()
             credientialApi.await()
+            quantityApi.await()
             initilizeZoom.await()
+            sendEdetailing.await()
 
         }
         coroutineScope.invokeOnCompletion {
@@ -584,7 +379,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
               //  generalClass.disableProgress(progressView_parentRv!!)
             })
         }
-
     }
 
     fun setImages()
@@ -620,7 +414,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                             value.geteDetailId().toString(),
                             gson.toJson(value)
                         )
-
                     }
 
                     // clear database
@@ -677,12 +470,9 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             {
                 if (response.code() == 200 && !response.body().toString().isEmpty())
                 {
-                    if (dbBase.datasCount > 0) {
-                        dbBase.deleteAll()
-                    }
-                    dbBase?.addSyncData(Gson().toJson(response.body()))
+                    dbBase?.addAPIData(Gson().toJson(response.body()),1)
                     bottomNavigation?.selectedItemId= R.id.landingPage
-                    staticSyncData=response.body();
+                    staticSyncData=response.body()
                 }
 
                 // if token expire go to login page again
@@ -698,6 +488,30 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             {   Log.e("responseERROR", response.errorBody().toString())
                 generalClass.checkInternet()
             }
+        }
+
+    }
+
+    suspend fun getQuantityAPI()
+    {
+        val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
+        ).getQuantiyApiCoo("bearer " + loginModelHomePage.accessToken)
+        withContext(Dispatchers.Main) {
+            Log.e("quantitiveAPI",response.toString())
+            if (response!!.isSuccessful)
+            {
+                if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage?.isEmpty()!!) {
+                    val gson = Gson()
+                    var model = response.body()
+
+                    dbBase?.addAPIData(gson.toJson(model?.getData()),3,)
+                    Log.e("elsequantitiveAPI", dbBase.getApiDetail(3))
+
+                }
+                else Log.e("elsequantitiveAPI", response.code().toString())
+            }
+            else Log.e("quantitiveAPIERROR", response.errorBody().toString())
+
         }
 
     }

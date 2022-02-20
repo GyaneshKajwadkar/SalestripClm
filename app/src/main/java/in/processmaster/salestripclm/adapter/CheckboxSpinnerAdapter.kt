@@ -32,7 +32,6 @@ class CheckboxSpinnerAdapter(var adapterList:ArrayList<IdNameBoll_model>, var ca
 
         holder.checkBox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener {
             override fun onCheckedChanged(p0: CompoundButton?, p1: Boolean) {
-                Log.e("uisCheckjdhs",p1.toString())
                 adapterList.get(position).isChecked=p1
                 callback.onChangeArray(adapterList,true)
             }}

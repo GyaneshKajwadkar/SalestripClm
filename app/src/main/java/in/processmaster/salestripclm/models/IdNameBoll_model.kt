@@ -28,4 +28,11 @@ class IdNameBoll_model {
         set(value) {
             field = value
         }
+
+    var availableQty=0
+        get() = field
+        // setter
+        set(value) {
+            field = value
+        }
 }

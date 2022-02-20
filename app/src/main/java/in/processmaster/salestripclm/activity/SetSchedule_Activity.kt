@@ -182,7 +182,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
     fun setScheduleAdapter()
     {
 
-        val responseData=dbBase.getApiDetail(-1)
+        val responseData=dbBase.getApiDetail(2)
 
         if(!responseData.equals(""))
         {
@@ -1101,7 +1101,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
                 {
                     val gson = Gson()
                     var model = response.body()
-                    dbBase?.insertOrUpdateAPI(-1,gson.toJson(model))
+                    dbBase?.addAPIData(gson.toJson(model),2)
                     setScheduleAdapter()
                 }
                 else

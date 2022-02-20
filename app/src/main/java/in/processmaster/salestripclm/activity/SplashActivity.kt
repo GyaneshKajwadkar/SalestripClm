@@ -6,6 +6,7 @@ import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.models.SyncModel
 import `in`.processmaster.salestripclm.networkUtils.APIClient
+import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
@@ -19,6 +20,10 @@ import androidx.appcompat.app.AlertDialog
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 import retrofit2.Call
 import retrofit2.Callback
@@ -27,20 +32,17 @@ import retrofit2.Response
 
 class SplashActivity : BaseActivity()
 {
-
     companion object {
         var connectivityChangeReceiver=
             ConnectivityChangeReceiver()
         var alertDialogNetwork: AlertDialog? = null
         var staticSyncData: SyncModel? =null
     }
-
     var sharePreferance: PreferenceClass?= null
     var progressBar: ProgressBar?=null
     var apiInterface: APIInterface? = null
     //Database
     var db = DatabaseHandler(this)
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -55,14 +57,10 @@ class SplashActivity : BaseActivity()
         FirebaseMessaging.getInstance().token
             .addOnCompleteListener(OnCompleteListener { task ->
                 if (!task.isSuccessful) {
-
                     return@OnCompleteListener
                 }
-
-                // Get new FCM registration token
                 val token: String = task.getResult().toString()
                 Log.e("TOKEN",token)
-
             })
 
         if(sharePreferance!!.getPrefBool("isLogin"))
@@ -78,14 +76,14 @@ class SplashActivity : BaseActivity()
             }
             else
             {
-                //call sync api for token check
-                sync_api()
-            }
-//            //login_api()
+                generalClass.enableSimpleProgress(progressBar!!)
+                val scope= GlobalScope.launch {
+                    callingSyncAPI()
+                }
+                scope.invokeOnCompletion {
+                    this.runOnUiThread(java.lang.Runnable { generalClass.disableSimpleProgress(progressBar!!) })
+                } }}
 
-            // sync_api()
-        }
-        //call login screen
         else
         {
             Handler(Looper.getMainLooper()).postDelayed({
@@ -96,44 +94,76 @@ class SplashActivity : BaseActivity()
         }
 
     }
-
-    private fun sync_api()
+    suspend fun callingSyncAPI()
     {
-
         var profileData =sharePreferance?.getPref("profileData")
         val loginModel= Gson().fromJson(profileData, LoginModel::class.java)
 
-        generalClass.enableSimpleProgress(progressBar!!)
-        apiInterface= APIClient.getClient(2, sharePreferance?.getPref("secondaryUrl")).create(APIInterface::class.java)
-
-        var call: Call<SyncModel> = apiInterface?.syncApi("bearer " + loginModel?.accessToken) as Call<SyncModel>
-        call.enqueue(object : Callback<SyncModel?> {
-            override fun onResponse(call: Call<SyncModel?>?, response: Response<SyncModel?>) {
-                Log.e("sync_api", response.code().toString() + "")
-
+        val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
+        ).syncApiCoo("bearer " + loginModel?.accessToken)
+        withContext(Dispatchers.Main) {
+            if (response!!.isSuccessful)
+            {
+                var intent=Intent()
                 if (response.code() == 200 && !response.body().toString().isEmpty())
                 {
                     staticSyncData = response.body()
-                    val intent = Intent(this@SplashActivity, HomePage::class.java)
-                    startActivity(intent)
-                    finish()
+                    intent = Intent(this@SplashActivity, HomePage::class.java)
                 }
-                else if (response.code() == 401) {
+                else {
                     sharePreferance?.setPrefBool("isLogin", false)
-                    val intent = Intent(this@SplashActivity, LoginActivity::class.java)
-                    startActivity(intent)
-                    finish()
+                    intent= Intent(this@SplashActivity, LoginActivity::class.java)
                 }
+                startActivity(intent)
+                finish()
             }
-
-            override fun onFailure(call: Call<SyncModel?>, t: Throwable?) {
-                Log.e("syncApiError", t?.message.toString())
+            else
+            {   Log.e("responseERROR", response.errorBody().toString())
                 generalClass.checkInternet()
-                call.cancel()
-                generalClass.disableSimpleProgress(progressBar!!)
             }
-        })
+        }
+
     }
+
+
+
+//    private fun sync_api()
+//    {
+//
+//        var profileData =sharePreferance?.getPref("profileData")
+//        val loginModel= Gson().fromJson(profileData, LoginModel::class.java)
+//
+//        generalClass.enableSimpleProgress(progressBar!!)
+//        apiInterface= APIClient.getClient(2, sharePreferance?.getPref("secondaryUrl")).create(APIInterface::class.java)
+//
+//        var call: Call<SyncModel> = apiInterface?.syncApi("bearer " + loginModel?.accessToken) as Call<SyncModel>
+//        call.enqueue(object : Callback<SyncModel?> {
+//            override fun onResponse(call: Call<SyncModel?>?, response: Response<SyncModel?>) {
+//                Log.e("sync_api", response.code().toString() + "")
+//
+//                if (response.code() == 200 && !response.body().toString().isEmpty())
+//                {
+//                    staticSyncData = response.body()
+//                    val intent = Intent(this@SplashActivity, HomePage::class.java)
+//                    startActivity(intent)
+//                    finish()
+//                }
+//                else if (response.code() == 401) {
+//                    sharePreferance?.setPrefBool("isLogin", false)
+//                    val intent = Intent(this@SplashActivity, LoginActivity::class.java)
+//                    startActivity(intent)
+//                    finish()
+//                }
+//            }
+//
+//            override fun onFailure(call: Call<SyncModel?>, t: Throwable?) {
+//                Log.e("syncApiError", t?.message.toString())
+//                generalClass.checkInternet()
+//                call.cancel()
+//                generalClass.disableSimpleProgress(progressBar!!)
+//            }
+//        })
+//    }
 
     override fun onDestroy() {
         super.onDestroy()

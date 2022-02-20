@@ -215,7 +215,7 @@ public class JoinMeetingActivity extends BaseActivity implements MeetingServiceL
     public void setScheduleAdapter( )
     {
 
-        String responseData= new DatabaseHandler(this).getApiDetail(-1);
+        String responseData= new DatabaseHandler(this).getApiDetail(2);
 
         if(!responseData.equals(""))
         {

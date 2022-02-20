@@ -20,12 +20,13 @@ import java.util.ArrayList;
 public class DatabaseHandler extends SQLiteOpenHelper {
 
     Context context;
-
-    //=========================================hold SyncData===============================================
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "SalesTrip_CLM_db";
-    private static final String TABLE_DATA = "SyncData";
     private static final String KEY_ID = "id";
+
+    //=========================================hold SyncData===============================================
+
+    private static final String TABLE_SAVE_API = "apiData";
     private static final String KEY_DATA = "data";
 
     //=========================================hold eDetailingDataParent===================================
@@ -65,8 +66,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String FILE_ID = "file_id";
 
     //=========================================hold StoreApi===============================================
-    private static final String TABLE_API_DATA = "APIData";
-    private static final String APIKEY_ID = "id";
+    private static final String TABLE_SAVE_SEND_API = "APIDataSave";
+    private static final String API_TYPE = "apiType";
     private static final String APIKEY_DATA = "data";
 
     public DatabaseHandler(Context context) {
@@ -78,7 +79,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         //Sync database
-        String CREATE_SYNC_TABLE = "CREATE TABLE " + TABLE_DATA + "("
+        String CREATE_SYNC_TABLE = "CREATE TABLE " + TABLE_SAVE_API + "("
                 + KEY_ID + " INTEGER PRIMARY KEY," + KEY_DATA + " TEXT" + ")";
         db.execSQL(CREATE_SYNC_TABLE);
 
@@ -110,8 +111,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(CREATE_VISUALADS_CHILD_TABLE);
 
         //api store database
-        String CREATE_API_TABLE = "CREATE TABLE " + TABLE_API_DATA + "("
-                + APIKEY_ID + " INTEGER,"
+        String CREATE_API_TABLE = "CREATE TABLE " + TABLE_SAVE_SEND_API + "("
+                + KEY_ID + " INTEGER,"
+                +  API_TYPE + " TEXT,"
                 +  APIKEY_DATA + " TEXT"
                 + ")";
         db.execSQL(CREATE_API_TABLE);
@@ -122,29 +124,34 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
     {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_DATA);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SAVE_API);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_EDETAILING);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_SENDVISUALADS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_EDETAILINGDOWNLOAD);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHILD_VISUAL_ADS);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_API_DATA);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SAVE_SEND_API);
         onCreate(db);
     }
 
     //=====================================Sync DataBase method=====================================
     //add data to database as a string.
-    public void addSyncData(String data) {
+    public void addAPIData(String data,int id) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_DATA, data);
-        db.insert(TABLE_DATA, null, values);
+        int u = db.update(TABLE_SAVE_API, values, "id=?", new String[]{String.valueOf(id)});
+        if (u == 0) {
+            values.put(KEY_ID, id);
+            db.insert(TABLE_SAVE_API, null, values);
+        }
         db.close();
+
     }
 
     // Getting sync data Count
     public int getDatasCount() {
         int countCursor=0;
-        String countQuery = "SELECT  * FROM " + TABLE_DATA;
+        String countQuery = "SELECT  * FROM " + TABLE_SAVE_API;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(countQuery, null);
         countCursor=cursor.getCount();
@@ -155,22 +162,40 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     // delete all data
     public void deleteAll()
     {  SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("delete from "+ TABLE_DATA);
+        db.execSQL("delete from "+ TABLE_SAVE_API);
     }
 
-    // code to get all data in a list view
-    public String getAllDataSync() {
+//    // code to get all data in a list view
+//    public String getAllDataSync() {
+//        String strData = "";
+//        String selectQuery = "SELECT  * FROM " + TABLE_SAVE_API;
+//        SQLiteDatabase db = this.getWritableDatabase();
+//        Cursor cursor = db.rawQuery(selectQuery, null);
+//        if (cursor.moveToFirst()) {
+//            do {
+//                strData=cursor.getString(1);
+//            } while (cursor.moveToNext());
+//        }
+//        return strData;
+//    }
+
+    @SuppressLint("Range")
+    public String getApiDetail(int id)
+    {
         String strData = "";
-        String selectQuery = "SELECT  * FROM " + TABLE_DATA;
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_SAVE_API, new String[] {
+                        KEY_DATA }, KEY_ID + "=?",
+                new String[] { String.valueOf(id) }, null, null, null, null);
         if (cursor.moveToFirst()) {
             do {
-                strData=cursor.getString(1);
+               // strData=cursor.getString(1);
+                strData=cursor.getString(cursor.getColumnIndex(KEY_DATA));
             } while (cursor.moveToNext());
         }
         return strData;
     }
+
 
     //=======================================EDetailing table============================================
 
@@ -988,58 +1013,59 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     // =======================================api storage table================================================
 
-    public void insertOrUpdateAPI(int id,String data) {
+    public void insertOrUpdateSaveAPI(int id,String data,String apiType) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues initialValues = new ContentValues();
-        initialValues.put(APIKEY_ID, id);
+        initialValues.put(KEY_ID, id);
+        initialValues.put(API_TYPE,apiType);
         initialValues.put(APIKEY_DATA, data);
 
-        int u = db.update(TABLE_API_DATA, initialValues, "id=?", new String[]{String.valueOf(id)});
+        int u = db.update(TABLE_SAVE_SEND_API, initialValues, "id=?", new String[]{String.valueOf(id)});
 
         if (u == 0) {
-            db.insert(TABLE_API_DATA, null, initialValues);
+            db.insert(TABLE_SAVE_SEND_API, null, initialValues);
         }
-
-//        if(CheckDataAPIStorage(String.valueOf(id)))
-//        {
-//            db.update(TABLE_API_DATA, initialValues, "id=?", new String[] {String.valueOf(id)});
-//            db.close();
-//        }
-//        else
-//        {
-//            db.insert(TABLE_API_DATA, null, initialValues);
-//            db.close();
-//        }
 
     }
 
-    public boolean CheckDataAPIStorage(String apiId) {
-        SQLiteDatabase sqldb = this.getReadableDatabase();
-        String Query = "Select * from " + TABLE_API_DATA + " where " + APIKEY_ID + " = " + apiId;
-        Cursor cursor = sqldb.rawQuery(Query, null);
-        if(cursor.getCount() <= 0){
-            cursor.close();
-            return false;
-        }
-        cursor.close();
-        return true;
-    }
-
-    public String getApiDetail(int id)
+    @SuppressLint("Range")
+    public ArrayList<String>getAllSaveSend(String type)
     {
-        String strData = "";
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        Cursor cursor = db.query(TABLE_API_DATA, new String[] { APIKEY_ID,
-                        APIKEY_DATA }, APIKEY_ID + "=?",
-                new String[] { String.valueOf(id) }, null, null, null, null);
+        ArrayList<String> saveStringList=new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_SAVE_SEND_API, new String[] { APIKEY_DATA}, API_TYPE + "=?",
+                new String[] {type }, null, null, null, null);
         if (cursor.moveToFirst()) {
             do {
-                strData=cursor.getString(1);
-            } while (cursor.moveToNext());
+                 String data=cursor.getString(cursor.getColumnIndex(APIKEY_DATA));
+                 saveStringList.add(data);
+            }
+            while (cursor.moveToNext());
         }
-
-        return strData;
+        return saveStringList;
     }
+
+    public boolean  deleteSaveSend(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return  db.delete(TABLE_SAVE_SEND_API, KEY_ID + " = ?",
+                new String[] { String.valueOf(id) }) > 0;
+    }
+
+
+//    public String getApiDetail(int id)
+//    {
+//        String strData = "";
+//        SQLiteDatabase db = this.getWritableDatabase();
+//
+//        Cursor cursor = db.query(TABLE_SAVE_SEND_API, new String[] { KEY_ID,
+//                        APIKEY_DATA }, KEY_ID + "=?",
+//                new String[] { String.valueOf(id) }, null, null, null, null);
+//        if (cursor.moveToFirst()) {
+//            do {
+//                strData=cursor.getString(1);
+//            } while (cursor.moveToNext());
+//        }
+//        return strData;
+//    }
 
 }
