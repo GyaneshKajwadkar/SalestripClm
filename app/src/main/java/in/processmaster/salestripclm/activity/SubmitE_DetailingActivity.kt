@@ -5,6 +5,7 @@ import `in`.processmaster.salestripclm.activity.HomePage.Companion.loginModelHom
 import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.staticSyncData
 import `in`.processmaster.salestripclm.adapter.CheckboxSpinnerAdapter
 import `in`.processmaster.salestripclm.adapter.TextWithEditAdapter
+import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.common_classes.CommonListGetClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.fragments.DisplayVisualFragment.Companion.doctorIdDisplayVisual
@@ -13,6 +14,7 @@ import `in`.processmaster.salestripclm.models.*
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -35,6 +37,7 @@ import kotlinx.android.synthetic.main.common_toolbar.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.Serializable
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -80,10 +83,19 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
 
         if(intent.getIntExtra("doctorID",0)!=0) doctorIdDisplayVisual= intent.getIntExtra("doctorID",0)!!
 
+        if(intent.getBooleanExtra("skip",false))
+        {
+            dbBase.deleteAllVisualAds()
+            dbBase.deleteAllChildVisual()
+        }
+
+
 
         visualSendModel = DatabaseHandler(this).getAllSubmitVisual()
         edetailing_rv.layoutManager=LinearLayoutManager(this)
         edetailing_rv.adapter=EdetallingAdapter()
+
+        if(visualSendModel.size==0)notData_tv.visibility=View.VISIBLE
 
         back_iv.setOnClickListener({onBackPressed()})
         workingWith_tv.setOnClickListener({openCloseModel(1)
@@ -100,8 +112,8 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
 
          val quantityModel=Gson().fromJson(dbBase.getApiDetail(3),CommonModel.QuantityModel.Data::class.java)
 
-        var Sample = quantityModel.employeeSampleBalanceList!!.filter { s -> s.productType == "Sample"}
-        var listSample = Sample!!.filter { s -> s.actualBalanceQty != 0}
+        var listSample = quantityModel.employeeSampleBalanceList!!.filter { s -> s.productType == "Sample"}
+      //  var listSample = Sample!!.filter { s -> s.actualBalanceQty != 0}
         var Gift = quantityModel.employeeSampleBalanceList!!.filter { s -> s.productType == "Gift"}
         var listGift = Gift!!.filter { s -> s.actualBalanceQty != 0}
 
@@ -140,8 +152,12 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
             var firstGift=giftArray!!.filter { s -> s.isChecked == true }
             var giftyQTy = firstGift!!.filter { s -> s.qty == 0}
 
-            if(sampleQTy.size>0 ||giftyQTy.size>0) {
-                generalClass.showSnackbar(window.decorView.rootView, "Quantity not be zero")
+//            if(sampleQTy.size>0 ) {
+//                alertClass.commonAlert("","Sample quantity not be zero")
+//                return@setOnClickListener
+//            }
+            if(giftyQTy.size>0) {
+                alertClass.commonAlert("","Gift quantity not be zero")
                 return@setOnClickListener
             }
 
@@ -168,11 +184,11 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
 
             if(!GeneralClass(this).isInternetAvailable())
             {   dbBase.insertOrUpdateSaveAPI(dcrId, Gson().toJson(saveModel),"feedback")
-                dbBase.addAPIData(Gson().toJson(quantityArray),3)
-                dbBase.deleteAllVisualAds()
-                dbBase.deleteAllChildVisual()
-                setResult(2)
-                finish()
+                val commonModel=CommonModel.QuantityModel.Data()
+                commonModel.employeeSampleBalanceList=quantityArray
+                dbBase.addAPIData(Gson().toJson(commonModel),3)
+
+                callRunnableAlert("Data save successfully")
             }
             else{ submitDcr(saveModel,quantityArray) }
         })
@@ -254,12 +270,19 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
     fun openCloseModel(type:Int)
     {   selectionType=type
 
-        if(type==1)
-            checkRecyclerView_rv.adapter=CheckboxSpinnerAdapter(workWithArray,this)
-        if(type==2)
-            checkRecyclerView_rv.adapter=CheckboxSpinnerAdapter(sampleArray,this)
-        if(type==3)
-            checkRecyclerView_rv.adapter=CheckboxSpinnerAdapter(giftArray,this)
+        if(type==1) {
+            if (workWithArray.size == 0) noDataCheckAdapter_tv.visibility = View.VISIBLE else noDataCheckAdapter_tv.visibility = View.GONE
+            checkRecyclerView_rv.adapter = CheckboxSpinnerAdapter(workWithArray, this)
+        }
+        if(type==2) {
+            if (sampleArray.size == 0) noDataCheckAdapter_tv.visibility = View.VISIBLE else noDataCheckAdapter_tv.visibility = View.GONE
+            checkRecyclerView_rv.adapter = CheckboxSpinnerAdapter(sampleArray, this)
+
+        }
+        if(type==3) {
+            if (giftArray.size == 0) noDataCheckAdapter_tv.visibility = View.VISIBLE else noDataCheckAdapter_tv.visibility = View.GONE
+            checkRecyclerView_rv.adapter = CheckboxSpinnerAdapter(giftArray, this)
+        }
 
         val state =
             if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED)
@@ -287,13 +310,11 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
                         alertClass?.commonAlert("",jsonObjError.get("errorMessage").asString)
                     }
                     else {
-                        dbBase.addAPIData(Gson().toJson(quantityArray),3)
-                        dbBase.deleteAllVisualAds()
-                        dbBase.deleteAllChildVisual()
+                        val commonModel=CommonModel.QuantityModel.Data()
+                        commonModel.employeeSampleBalanceList=quantityArray
+                        dbBase.addAPIData(Gson().toJson(commonModel),3)
                         val jsonObjData:JsonObject = response.body()?.get("data") as JsonObject
-                        generalClass.showSnackbar(window.decorView.rootView, jsonObjData.get("message").asString)
-                        setResult(2)
-                        finish()
+                        callRunnableAlert(jsonObjData.get("message").asString)
                     } } }
 
             override fun onFailure(call: Call<JsonObject?>, t: Throwable?) {
@@ -301,6 +322,23 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
                 alertClass?.hideAlert()
                 call.cancel()
             } }) }
+
+    fun callRunnableAlert(message:String)
+    {
+        if(!intent.getBooleanExtra("skip",false)) dbBase.insertdoctorData(doctorIdDisplayVisual,generalClass.getCurrentDate())
+        dbBase.deleteAllVisualAds()
+        dbBase.deleteAllChildVisual()
+
+        val r: Runnable = object : Runnable {
+            override fun run() {
+                if(AlertClass.retunDialog) {
+                   if(intent.getBooleanExtra("skip",false))setResult(3)
+                    else setResult(2)
+
+                    finish()
+                }}}
+        alertClass.commonAlertWithRunnable("",message,r)
+    }
 
 //----------------------------------Show edetailing inner adapter------------------------------------
     inner class EdetallingAdapter() :

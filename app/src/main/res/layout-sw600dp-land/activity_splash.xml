@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="in.processmaster.salestripclm.activity.SplashActivity">
+    tools:context="in.processmaster.salestripclm.activity.SplashActivity"
+    tools:ignore="MissingDefaultResource">
 
     <LinearLayout
         android:layout_centerInParent="true"

@@ -161,5 +161,35 @@ class AlertClass(val context : Context)
     }
 
 
+    fun commonAlertWithRunnable(headerString: String, message: String,r: Runnable) {
+        context as Activity
+        val dialogBuilder = AlertDialog.Builder(context)
+        val inflater = context.layoutInflater
+        val dialogView: View = inflater.inflate(R.layout.common_alert, null)
+        dialogBuilder.setView(dialogView)
+
+        val alertDialog: AlertDialog = dialogBuilder.create()
+        alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+
+        val okBtn_rl =
+            dialogView.findViewById<View>(R.id.ok_btn) as AppCompatButton
+
+        var headerTv =
+            dialogView.findViewById<View>(R.id.header_tv) as TextView
+        var messageTv =
+            dialogView.findViewById<View>(R.id.message_tv) as TextView
+
+        headerTv.setText(headerString)
+        messageTv.setText(message)
+
+        okBtn_rl.setOnClickListener {
+            retunDialog=true
+            r.run()
+            alertDialog.dismiss()
+        }
+
+        alertDialog.show()
+    }
+
 
 }

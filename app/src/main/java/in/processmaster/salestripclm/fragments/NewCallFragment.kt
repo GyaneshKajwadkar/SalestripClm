@@ -95,18 +95,18 @@ class NewCallFragment : Fragment() {
 
 
         views!!.selectTeamsCv.setOnClickListener({
-            views!!.selectHeader_tv?.setText("Select Team")
+            views!!.bottomSheetTitle_tv?.setText("Select Team")
             selectionType=0
             openCloseModel() })
 
         views!!.selectRoutesCv.setOnClickListener({
             if(!checkDCRusingShareP()) return@setOnClickListener
-            views!!.selectHeader_tv?.setText("Select route")
+            views!!.bottomSheetTitle_tv?.setText("Select route")
             selectionType=1
             openCloseModel()})
 
         views!!.selectDoctorsCv.setOnClickListener({
-            views!!.selectHeader_tv?.setText("Select Doctor")
+            views!!.bottomSheetTitle_tv?.setText("Select Doctor")
             selectionType=2
             if(doctorList.size<=0)
             {   GeneralClass(requireActivity()).showSnackbar(it,"This route has no doctor")
@@ -120,17 +120,26 @@ class NewCallFragment : Fragment() {
         views!!.doctorSearch_et!!.addTextChangedListener(filterTextWatcher)
 
         views!!.startDetailing_btn.setOnClickListener({
+
+            if(views?.lastVisitDate_tv?.text?.equals(generalClassObject!!.getCurrentDate())!! || dataBase.isEDetailingAvailable(selectedDocID,generalClassObject?.getCurrentDate()))
+            {
+                alertClass?.commonAlert("Alert!","Doctor e-detailing already done for today")
+                return@setOnClickListener
+            }
+
+
             val intent = Intent(activity, OnlinePresentationActivity::class.java)
             intent.putExtra("doctorID", selectedDocID)
             intent.putExtra("doctorName", selectedDocName)
-            startActivity(intent)
+            startActivityForResult(intent,3)
         })
 
         views!!.skipDetailing_btn.setOnClickListener({
             val intent = Intent(activity, SubmitE_DetailingActivity::class.java)
             intent.putExtra("doctorID", selectedDocID)
             intent.putExtra("doctorName", selectedDocName)
-            startActivity(intent)
+            intent.putExtra("skip", true)
+            startActivityForResult(intent,3)
         })
 
         routeList = routeList?.filter { s -> s.headQuaterName !=""} as java.util.ArrayList<SyncModel.Data.Route>
@@ -204,6 +213,7 @@ class NewCallFragment : Fragment() {
                 holder.headerDoctor_tv.setText(modeldata?.routeName)
                 holder.route_tv.setText("Head Quater Name- " + modeldata?.headQuaterName)
                 holder.speciality_tv.visibility=View.GONE
+
 
                 holder.parent_cv.setOnClickListener({
                     views!!.selectTeam_tv.setText((modeldata?.routeName))
@@ -330,7 +340,7 @@ class NewCallFragment : Fragment() {
         views?.qualifiction_tv?.setText(doctorDetailModel.qualificationName)
         selectedDocID=doctorDetailModel.doctorId
         selectedDocName=doctorDetailModel.doctorName
-        preCallAnalysisApi()
+
 
         if(doctorDetailModel.mobileNo.isEmpty())
             views?.mobileNumberParent?.visibility=View.GONE
@@ -338,6 +348,13 @@ class NewCallFragment : Fragment() {
             views?.emailParent?.visibility=View.GONE
         if(doctorDetailModel.cityName.isEmpty())
             views?.cityParent?.visibility=View.GONE
+
+        if(generalClassObject!!.isInternetAvailable()) {
+            noInternet_tv.visibility = View.GONE
+            preCallAnalysisApi()
+        }
+        else noInternet_tv.visibility=View.VISIBLE; views?.parentButton?.visibility=View.VISIBLE
+
 
     }
 
@@ -348,6 +365,7 @@ class NewCallFragment : Fragment() {
      if(selectionType==0)
      {   views?.doctorDetail_parent?.visibility=View.GONE
          views?.precall_parent?.visibility=View.GONE
+         views?.parentButton?.visibility=View.GONE
          views?.noData_gif?.visibility=View.VISIBLE
          views!!.selectTeam_tv.setBackgroundColor(Color.parseColor("#3CB371"))
          views!!.selectRoute_tv.setBackgroundColor(Color.parseColor("#FA8072"))
@@ -361,6 +379,7 @@ class NewCallFragment : Fragment() {
      {
          views?.doctorDetail_parent?.visibility=View.GONE
          views?.precall_parent?.visibility=View.GONE
+         views?.parentButton?.visibility=View.GONE
          views?.noData_gif?.visibility=View.VISIBLE
          views!!.selectRoute_tv.setBackgroundColor(Color.parseColor("#3CB371"))
          views!!.selectDoctor_tv.setBackgroundColor(Color.parseColor("#FA8072"))
@@ -400,6 +419,7 @@ class NewCallFragment : Fragment() {
                 if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage?.isEmpty()!!) {
                     val analysisModel=response.body()?.getData()?.lastVisitSummary
                     views?.precall_parent?.visibility=View.VISIBLE
+                    views?.parentButton?.visibility=View.VISIBLE
 
                     views?.lastVisitDate_tv?.setText(analysisModel?.strDcrDate)
                     views?.reportedTime_tv?.setText(analysisModel?.strReportedTime)
@@ -418,16 +438,20 @@ class NewCallFragment : Fragment() {
 
                     if( analysisModel?.productList!=null)
                     {
+                        view!!.noDataBrand.visibility=View.GONE
                         for( data in analysisModel?.productList!!)
                         {
                             mainList.add(data.productName)
                         }
                         var adapterProduct=SimpleListAdapter(mainList,subList)
                         views!!.brandList_rv.adapter=adapterProduct
+                        if(mainList.size==0)view!!.noDataBrand.visibility=View.VISIBLE
                     }
+                    else view!!.noDataBrand.visibility=View.VISIBLE
 
                     if( analysisModel?.sampleList!=null)
                     {
+                        view!!.noDataSample.visibility=View.GONE
                         mainList= ArrayList<String>()
                         subList= ArrayList<Int>()
                         for( data in analysisModel?.sampleList!!) {
@@ -436,10 +460,13 @@ class NewCallFragment : Fragment() {
 
                         var adapterSampleGiven=SimpleListAdapter(mainList,subList)
                         views!!.sampleGiven_rv.adapter=adapterSampleGiven
+                        if(mainList.size==0)view!!.noDataSample.visibility=View.VISIBLE
                     }
+                    else view!!.noDataSample.visibility=View.VISIBLE
 
                     if( analysisModel?.giftList!=null)
                     {
+                        view!!.noDataGift.visibility=View.GONE
                         mainList= ArrayList<String>()
                         subList= ArrayList<Int>()
                         for( data in analysisModel?.giftList!!)
@@ -449,7 +476,9 @@ class NewCallFragment : Fragment() {
                         }
                         var adapterGift=SimpleListAdapter(mainList,subList)
                         views!!.giftGiven_rv.adapter=adapterGift
+                        if(mainList.size==0)view!!.noDataGift.visibility=View.VISIBLE
                     }
+                    else view!!.noDataGift.visibility=View.VISIBLE
 
                     views!!.total_tv.setText("Total: "+analysisModel?.lastPOBDetails?.totalPOB)
 

@@ -70,6 +70,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String API_TYPE = "apiType";
     private static final String APIKEY_DATA = "data";
 
+    //==========================================Save doctor edeailing date wise=============================
+    private static final String TABLE_SAVE_DOCTOR_EDETAIL = "save_doctor_eDetail";
+    private static final String DETAILING_DATE = "detailingDate";
+
+
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context = context;
@@ -118,6 +123,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + ")";
         db.execSQL(CREATE_API_TABLE);
 
+        //store edetailing doctor wise
+        String CREATE_DOCTOR_EDETAIL = "CREATE TABLE " + TABLE_SAVE_DOCTOR_EDETAIL + "("
+                + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                +  DOCTOR_ID + " INTEGER,"
+                +  DETAILING_DATE + " TEXT"
+                + ")";
+        db.execSQL(CREATE_DOCTOR_EDETAIL);
+
     }
 
     // Upgrading database
@@ -130,6 +143,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_EDETAILINGDOWNLOAD);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHILD_VISUAL_ADS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_SAVE_SEND_API);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SAVE_DOCTOR_EDETAIL);
         onCreate(db);
     }
 
@@ -189,7 +203,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 new String[] { String.valueOf(id) }, null, null, null, null);
         if (cursor.moveToFirst()) {
             do {
-               // strData=cursor.getString(1);
+                // strData=cursor.getString(1);
                 strData=cursor.getString(cursor.getColumnIndex(KEY_DATA));
             } while (cursor.moveToNext());
         }
@@ -711,8 +725,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     visualModel.setBrandId(cursor.getString(2));
                     visualModel.setBrandName(cursor.getString(6));
                     visualModel.setMonitorTime(cursor.getInt(7));
-                  //  visualModel.setBrandWiseStartTime(cursor.getString(8));
-                  //  visualModel.setBrandWiseStopTime(cursor.getString(9));
+                    //  visualModel.setBrandWiseStartTime(cursor.getString(8));
+                    //  visualModel.setBrandWiseStopTime(cursor.getString(9));
 
                     visualModel.setEnd(true);
                     visualModel.setChildDataArray(getAllChildBy_ID(startTime));
@@ -818,9 +832,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         initialValues.put(FILE_ID, setfileId);
 
         if(ChecktimeandFileIdExist(String.valueOf(setfileId),startTime))
-        {
-
-        }
+        { }
         else
         {
             db.insert(TABLE_CHILD_VISUAL_ADS, null, initialValues);
@@ -1037,8 +1049,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 new String[] {type }, null, null, null, null);
         if (cursor.moveToFirst()) {
             do {
-                 String data=cursor.getString(cursor.getColumnIndex(APIKEY_DATA));
-                 saveStringList.add(data);
+                String data=cursor.getString(cursor.getColumnIndex(APIKEY_DATA));
+                saveStringList.add(data);
             }
             while (cursor.moveToNext());
         }
@@ -1051,6 +1063,30 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 new String[] { String.valueOf(id) }) > 0;
     }
 
+//=============================================Doctor e detailing table===================================
+
+    public void insertdoctorData(int doctorID,String date)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues initialValues = new ContentValues();
+        initialValues.put(DOCTOR_ID, doctorID);
+        initialValues.put(DETAILING_DATE, date);
+        db.insert(TABLE_SAVE_DOCTOR_EDETAIL, null, initialValues);
+        db.close();
+    }
+
+    public boolean isEDetailingAvailable(int doctorId, String detailingDate)
+    {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_SAVE_DOCTOR_EDETAIL, new String[] {DOCTOR_ID,DETAILING_DATE}, DOCTOR_ID + "=? AND "+DETAILING_DATE + "=?",
+                new String[] { String.valueOf(doctorId), detailingDate}, null, null, null, null);
+        if (cursor.moveToFirst())
+        {
+            do { return true; }
+            while (cursor.moveToNext());
+        }
+        return false;
+    }
 
 //    public String getApiDetail(int id)
 //    {

@@ -331,45 +331,50 @@
                 android:layout_width="0dp"
                 android:layout_weight="1.5"
                 android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:visibility="gone"
+                    android:id="@+id/parentButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_alignParentRight="true">
+
+                    <Button
+                        android:layout_margin="3dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="10dp"
+                        android:textColor="@color/white"
+                        android:text="Skip detailing"
+                        android:id="@+id/skipDetailing_btn"
+                        android:backgroundTint="#CC5500"
+                        android:textAllCaps="false"/>
+
+                    <Button
+                        android:layout_margin="3dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="10dp"
+                        android:textColor="@color/white"
+                        android:text="Start detailing"
+                        android:id="@+id/startDetailing_btn"
+                        android:backgroundTint="@color/appDarkColor"
+                        android:textAllCaps="false"/>
+
+                </LinearLayout>
+
                 <RelativeLayout
+                    android:layout_below="@+id/parentButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:visibility="gone"
                     android:id="@+id/precall_parent">
-                    <LinearLayout
-                        android:id="@+id/parentButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_alignParentRight="true">
 
-                        <Button
-                            android:layout_margin="3dp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:padding="10dp"
-                            android:textColor="@color/white"
-                            android:text="Skip detailing"
-                            android:id="@+id/skipDetailing_btn"
-                            android:backgroundTint="#CC5500"
-                            android:textAllCaps="false"/>
-
-                        <Button
-                            android:layout_margin="3dp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:padding="10dp"
-                            android:textColor="@color/white"
-                            android:text="Start detailing"
-                            android:id="@+id/startDetailing_btn"
-                            android:backgroundTint="@color/appDarkColor"
-                            android:textAllCaps="false"/>
-
-                    </LinearLayout>
                     <ScrollView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/parentButton">
+                        >
                         <LinearLayout
 
                             android:layout_width="match_parent"
@@ -630,6 +635,16 @@
                                             android:padding="2dp"
                                             />
 
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:id="@+id/noDataBrand"
+                                            android:textSize="16sp"
+                                            android:textAlignment="center"
+                                            android:text="No data available"
+                                            android:visibility="gone"
+                                            />
+
                                         <androidx.recyclerview.widget.RecyclerView
                                             android:layout_weight="0.9"
                                             android:padding="3dp"
@@ -638,6 +653,8 @@
                                             android:nestedScrollingEnabled="false"
                                             android:id="@+id/brandList_rv"
                                             android:clipToPadding="true" />
+
+
                                     </LinearLayout>
 
                                     <LinearLayout
@@ -658,6 +675,16 @@
                                             android:padding="2dp"
                                             />
 
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:id="@+id/noDataSample"
+                                            android:textSize="16sp"
+                                            android:textAlignment="center"
+                                            android:text="No data available"
+                                            android:visibility="gone"
+                                            />
+
                                         <androidx.recyclerview.widget.RecyclerView
                                             android:layout_weight="0.9"
                                             android:layout_width="match_parent"
@@ -666,6 +693,8 @@
                                             android:id="@+id/sampleGiven_rv"
                                             android:padding="3dp"
                                             android:clipToPadding="true" />
+
+
                                     </LinearLayout>
 
                                     <LinearLayout
@@ -686,6 +715,16 @@
                                             android:padding="2dp"
                                             />
 
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:id="@+id/noDataGift"
+                                            android:textSize="16sp"
+                                            android:textAlignment="center"
+                                            android:text="No data available"
+                                            android:visibility="gone"
+                                            />
+
                                         <androidx.recyclerview.widget.RecyclerView
                                             android:layout_weight="0.9"
                                             android:padding="3dp"
@@ -694,6 +733,7 @@
                                             android:nestedScrollingEnabled="false"
                                             android:id="@+id/giftGiven_rv"
                                             android:clipToPadding="true" />
+
                                     </LinearLayout>
 
                                 </LinearLayout>
@@ -711,6 +751,19 @@
                     android:layout_height="250dp"
                     android:layout_centerInParent="true"
                     android:src="@drawable/nodata_gif" />
+
+                    <TextView
+                        android:layout_below="@+id/noData_gif"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:id="@+id/noInternet_tv"
+                        android:text="No Internet connection"
+                        android:textSize="22sp"
+                        android:textAlignment="center"
+                        android:textColor="@color/zm_red"
+                        android:visibility="gone"/>
+
 
                 <ProgressBar
                     android:visibility="gone"

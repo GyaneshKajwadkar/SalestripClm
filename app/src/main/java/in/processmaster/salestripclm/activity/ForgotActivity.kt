@@ -45,7 +45,6 @@ class ForgotActivity : BaseActivity() {
 
             generalClass.HideKeyboard(currentFocus ?: View(this))
 
-
             if(sendOtp_btn?.getText().toString().equals("Change password"))
             {
                 if(password_et?.getText().toString().isEmpty())
@@ -129,14 +128,11 @@ class ForgotActivity : BaseActivity() {
             }
             //call verify otp api
             verifyOTP_api(progressBar,verify_et.getText().toString(),empId,verify_et,alertDialog)
-
-
         }
 
         cancel_btn.setOnClickListener{
             alertDialog.dismiss()
         }
-
         alertDialog.show()
     }
 
@@ -144,9 +140,7 @@ class ForgotActivity : BaseActivity() {
     private fun generateOTP_api()
     {
         apiInterface= APIClient.getClient(1, "").create(APIInterface::class.java)
-
-        generalClass.enableProgress(progressView_parentRv)
-
+        alertClass.showAlert("")
         var call: Call<GenerateOTPModel> = apiInterface?.generateOtpApi(
             companyCode_et?.getText().toString().uppercase(), userName_et?.getText().toString() , "user"
         ) as Call<GenerateOTPModel>
@@ -180,14 +174,13 @@ class ForgotActivity : BaseActivity() {
                 else
                 {
                 }
-                generalClass.disableProgress(progressView_parentRv!!)
-
+                alertClass.hideAlert()
             }
 
             override fun onFailure(call: Call<GenerateOTPModel?>, t: Throwable?) {
                 generalClass.checkInternet()
                 call.cancel()
-                generalClass.disableProgress(progressView_parentRv!!)
+                alertClass.hideAlert()
             }
         })
     }
@@ -197,7 +190,7 @@ class ForgotActivity : BaseActivity() {
     {
         apiInterface= APIClient.getClient(1, "").create(APIInterface::class.java)
 
-        generalClass.enableSimpleProgress(progressBar!!)
+        alertClass.showAlert("")
 
         var call: Call<GenerateOTPModel> = apiInterface?.verifyOtpAPI(
             companyCode_et?.getText().toString().uppercase(), empId , otpString
@@ -225,15 +218,13 @@ class ForgotActivity : BaseActivity() {
                     }
                 }
 
-                generalClass.disableSimpleProgress(progressBar!!)
-
+                alertClass.hideAlert()
             }
 
             override fun onFailure(call: Call<GenerateOTPModel?>, t: Throwable?) {
                 generalClass.checkInternet()
                 call.cancel()
-                generalClass.disableSimpleProgress(progressBar!!)
-            }
+                alertClass.hideAlert()            }
         })
     }
 
@@ -242,7 +233,7 @@ class ForgotActivity : BaseActivity() {
     {
         apiInterface= APIClient.getClient(1, "").create(APIInterface::class.java)
 
-        generalClass.enableProgress(progressView_parentRv!!)
+        alertClass.showAlert("")
 
         var call: Call<GenerateOTPModel> = apiInterface?.changePassAPI(
             companyCode_et?.getText().toString().uppercase(), generateModel?.data?.userData?.empId.toString() , conPass_et?.getText().toString()
@@ -271,13 +262,12 @@ class ForgotActivity : BaseActivity() {
                 {
                 }
 
-                generalClass.disableProgress(progressView_parentRv!!)
-            }
+                alertClass.hideAlert()             }
 
             override fun onFailure(call: Call<GenerateOTPModel?>, t: Throwable?) {
                 generalClass.checkInternet()
                 call.cancel()
-                generalClass.disableProgress(progressView_parentRv!!)
+                alertClass.hideAlert()
             }
         })
     }

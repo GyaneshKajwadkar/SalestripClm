@@ -73,6 +73,15 @@
 
                 </LinearLayout>
 
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/notData_tv"
+                    android:textSize="18sp"
+                    android:textAlignment="center"
+                    android:text="No data available"
+                    android:visibility="gone"/>
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:background="@color/white"
                     android:layout_width="match_parent"
@@ -81,6 +90,8 @@
                     android:id="@+id/edetailing_rv"
                     android:layout_marginBottom="2dp"
                     android:padding="5dp" />
+
+
 
             </LinearLayout>
 
@@ -126,7 +137,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:background="@color/appDarkColor"
-                            android:text="Working with"
+                            android:text="Select Working with"
                             android:id="@+id/workingWith_tv"
                             android:textColor="@color/white" />
 
@@ -153,7 +164,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:background="@color/appDarkColor"
-                            android:text="Samples"
+                            android:text="Select Samples"
                             android:id="@+id/clickSample_tv"
                             android:textColor="@color/white" />
 
@@ -179,7 +190,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:background="@color/appDarkColor"
-                            android:text="Gifts"
+                            android:text="Select Gifts"
                             android:id="@+id/giftClick_tv"
                             android:textColor="@color/white" />
 
@@ -221,6 +232,7 @@
                                 android:textSize="18sp"
                                 android:textColor="@color/white"
                                 android:padding="5dp"
+                                android:text="0-0"
                                 android:id="@+id/detailingMainDateTime_tv"/>
 
 

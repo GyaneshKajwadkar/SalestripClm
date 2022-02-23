@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="in.processmaster.salestripclm.activity.HomePage">
+    tools:context="in.processmaster.salestripclm.activity.HomePage"
+    tools:ignore="MissingDefaultResource">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"

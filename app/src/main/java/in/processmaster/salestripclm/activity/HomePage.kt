@@ -505,7 +505,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                     var model = response.body()
 
                     dbBase?.addAPIData(gson.toJson(model?.getData()),3,)
-                    Log.e("elsequantitiveAPI", dbBase.getApiDetail(3))
 
                 }
                 else Log.e("elsequantitiveAPI", response.code().toString())
@@ -542,6 +541,16 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         }
 
         alertDialog.show()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(resultCode==3){
+            toolbarTv?.setText("Create Calls")
+            val fragment = NewCallFragment()
+            openFragment(fragment)
+            openFragmentStr = "CallsFragment"
+        }
     }
 
 }

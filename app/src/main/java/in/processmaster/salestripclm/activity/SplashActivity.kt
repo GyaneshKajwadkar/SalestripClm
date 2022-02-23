@@ -11,11 +11,13 @@ import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
@@ -63,6 +65,8 @@ class SplashActivity : BaseActivity()
                 Log.e("TOKEN",token)
             })
 
+       // launchZoomUrl()
+
         if(sharePreferance!!.getPrefBool("isLogin"))
         {
 //         //if no internet connection and database have sync data then open directly home page
@@ -102,10 +106,8 @@ class SplashActivity : BaseActivity()
         val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
         ).syncApiCoo("bearer " + loginModel?.accessToken)
         withContext(Dispatchers.Main) {
-            if (response!!.isSuccessful)
-            {
-                var intent=Intent()
-                if (response.code() == 200 && !response.body().toString().isEmpty())
+            var intent=Intent()
+                if (response?.code() == 200 && !response.body().toString().isEmpty())
                 {
                     staticSyncData = response.body()
                     intent = Intent(this@SplashActivity, HomePage::class.java)
@@ -116,11 +118,6 @@ class SplashActivity : BaseActivity()
                 }
                 startActivity(intent)
                 finish()
-            }
-            else
-            {   Log.e("responseERROR", response.errorBody().toString())
-                generalClass.checkInternet()
-            }
         }
 
     }
@@ -169,5 +166,40 @@ class SplashActivity : BaseActivity()
         super.onDestroy()
         generalClass.disableSimpleProgress(progressBar!!)
     }
+
+
+    private fun launchZoomUrl() {
+        val str="zoomus://zoom.us/start?browser=chrome&confno=87442731712&zc=0&stype=100&uid=7JxmLMQRRYyEHrJTsduDYQ&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJxMG9iRzFqU1JUYTI3R29DSG8tVlp3IiwiZXhwIjoxODAwMDAwMDAwMH0.KHz1LEHUa6EP3i0ClDlN10G2Ew_1r9OknbBnrCaAcMI&uname=kajwadkar13@gmail.com&password=13Zoom@003"
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(str))
+        if (intent.resolveActivity(packageManager) != null) {
+            startActivity(intent)
+        }
+        else{
+            Toast.makeText(this,"zoom not installed",Toast.LENGTH_SHORT).show()
+        }
+    }
+
+//    iOS/Android client: zoomus://zoom.us/start?browser=chrome&confno=123456789&zc=0&stype=100&sid=lBGPGzGdT8–2Yf3kjDY5gg&uid=lBGPGzGdT8–2Yf3kjDY5gg&token=xxxxxx&uname=Betty
+//    Parameters in zoomus and zoommtg protocol
+//    confno: Meeting ID
+//    zc: Zoom meeting control options
+//    0 — with video and audio
+//    1 — screen share only without video and audio
+//    browser: browser type (optional)
+//    “chrome”
+//    “firefox”
+//    “msie”
+//    “safari”
+//    uname: User name
+//    stype: User’s login type
+//    100 — Work Email user
+//    0 — Facebook user
+//    1 — Google user
+//    101 — SSO user
+//    99 — Cust API user
+//    uid: Host user ID
+//    token: Host user token, does not until user change the password (You can get it from the user GET REST API call)
+//    pwd: Meeting Password
+
 
 }

@@ -100,11 +100,7 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
             meetingShareHelper = MeetingShareHelper(this, shareCallBack)
             registerListener()
             ProcessLifecycleOwner.get().getLifecycle().addObserver(this)
-
         }
-
-        dbBase.deleteAllVisualAds()
-        dbBase.deleteAllChildVisual()
 
         val fragment = DisplayVisualFragment()
         openFragment(fragment)
@@ -512,6 +508,7 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if(resultCode==2){
+            setResult(3)
             finish();
         }
     }

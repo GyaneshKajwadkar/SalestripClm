@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/parentRl"
-    tools:context="in.processmaster.salestripclm.activity.LoginActivity">
+    tools:context="in.processmaster.salestripclm.activity.LoginActivity"
+    tools:ignore="MissingDefaultResource">
 
 <ScrollView
     android:layout_centerInParent="true"
@@ -46,8 +47,6 @@
 
                 <LinearLayout
                     android:orientation="horizontal"
-                    android:layout_marginRight="20dp"
-                    android:layout_marginLeft="20dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
@@ -77,28 +76,20 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="Company code *"
-                            android:drawablePadding="10dp"
                             android:singleLine="true"
-                            android:drawableTint="@color/appDarkColor"
                             />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
-
                 </LinearLayout>
-
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/verifyCompany_btn"
-                    android:layout_marginTop="5dp"
                     android:layout_width="match_parent"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
-                    android:layout_height="55dp"
-                    android:backgroundTint="@color/appDarkColor"
+                    android:layout_height="wrap_content"
+                    style="@style/simpleBtnWith20LF"
                     app:cornerRadius="20dp"
-                    android:text="Verify"
-                    android:textAllCaps="false" />
+                    android:text="Verify" />
 
             </LinearLayout>
 
@@ -112,10 +103,7 @@
                 android:orientation="vertical">
 
                 <LinearLayout
-                    android:layout_marginTop="30dp"
                     android:orientation="horizontal"
-                    android:layout_marginRight="20dp"
-                    android:layout_marginLeft="20dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
@@ -145,9 +133,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="User name *"
-                            android:drawablePadding="10dp"
                             android:singleLine="true"
-                            android:drawableTint="@color/appDarkColor"
                             />
 
                     </com.google.android.material.textfield.TextInputLayout>
@@ -159,8 +145,6 @@
 
                 <LinearLayout
                     android:orientation="horizontal"
-                    android:layout_marginRight="20dp"
-                    android:layout_marginLeft="20dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
@@ -193,41 +177,31 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="Password *"
-                            android:drawablePadding="10dp"
                             android:singleLine="true"
                             android:inputType="textPassword"
-                            android:drawableTint="@color/appDarkColor"
                             />
 
                     </com.google.android.material.textfield.TextInputLayout>
-
-
-
                 </LinearLayout>
 
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/signIn_btn"
-                    android:layout_marginTop="5dp"
                     android:layout_width="match_parent"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
-                    android:layout_height="55dp"
-                    android:backgroundTint="@color/appDarkColor"
+                    android:layout_height="wrap_content"
+                    style="@style/simpleBtnWith20LF"
                     app:cornerRadius="20dp"
-                    android:text="Sign In"
-                    android:textAllCaps="false" />
+                    android:text="Sign In" />
 
                 <RelativeLayout
                     android:layout_marginTop="10dp"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
                     <TextView
                         android:background="?attr/selectableItemBackground"
                         android:clickable="true"
+                        android:visibility="gone"
                         android:id="@+id/mpin_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -262,11 +236,4 @@
     </LinearLayout>
 </ScrollView>
 
-    <include layout="@layout/progress_view" />
-
-    <ImageView
-        android:visibility="gone"
-        android:layout_width="10dp"
-        android:layout_height="10dp"
-        android:id="@+id/picaso_iv"/>
 </RelativeLayout>

@@ -12,6 +12,7 @@ import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -31,6 +32,10 @@ import java.lang.Runnable
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import androidx.core.content.ContextCompat.startActivity
+
+
+
 
 class ScheduleMeetingAdapter(
     var context: Context,
@@ -113,6 +118,16 @@ class ScheduleMeetingAdapter(
 
 
             holder.startmeeting_btn.setOnClickListener({
+
+//                val uri: Uri =
+//                    Uri.parse(filteredData?.get(position).meetingLink) // missing 'http://' will cause crashed
+//
+//                val intent = Intent(Intent.ACTION_VIEW, uri)
+//                context.startActivity(intent)
+//                return@setOnClickListener
+
+
+
                 val zoomSDK = ZoomSDK.getInstance()
                 // val preMeetingService: PreMeetingService = zoomSDK.getPreMeetingService()
                 //val item = preMeetingService.getMeetingItemByUniqueId(meetingList?.get(position)?.zoomMeetingId?.toLong()!!)
@@ -136,8 +151,8 @@ class ScheduleMeetingAdapter(
                     Log.e("sdnuiapiTime",apiTime.toString())
                     val currentTimeInt : Int =currentTime.replace(":","").toInt()
                     val apiTimeInt : Int =apiTime.replace(":","").toInt()
-
-                    onClickBtnStart(filteredData?.get(position)?.zoomMeetingId)
+                    launchZoomUrl(filteredData?.get(position))
+                   // onClickBtnStart(filteredData?.get(position)?.zoomMeetingId)
                     return@setOnClickListener
                     if(apiTimeInt<=currentTimeInt)
                     {
@@ -184,6 +199,17 @@ class ScheduleMeetingAdapter(
                     ZoomMeetingUISettingHelper.getStartMeetingOptions()
                 )
             }
+        }
+    }
+
+    private fun launchZoomUrl(get: GetScheduleModel.Data.Meeting) {
+        val str="zoomus://zoom.us/start?browser=chrome&confno="+get.zoomMeetingId+"&zc=0&stype=100&uid=7JxmLMQRRYyEHrJTsduDYQ&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJxMG9iRzFqU1JUYTI3R29DSG8tVlp3IiwiZXhwIjoxODAwMDAwMDAwMH0.KHz1LEHUa6EP3i0ClDlN10G2Ew_1r9OknbBnrCaAcMI&uname=kajwadkar13@gmail.com"
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(str))
+        if (intent.resolveActivity(context.packageManager) != null) {
+            context.startActivity(intent)
+        }
+        else{
+            Toast.makeText(context,"zoom not installed",Toast.LENGTH_SHORT).show()
         }
     }
 
