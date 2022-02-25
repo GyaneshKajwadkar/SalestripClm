@@ -48,7 +48,7 @@
         	android:progress="3" />
     </LinearLayout>
 
-    <in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.share.ColorTable
+    <in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.share.ColorTable
         android:id="@+id/colorTable"
         android:layout_width="fill_parent"
         android:layout_height="40dp"
@@ -56,6 +56,6 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp" >
 
-    </in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.share.ColorTable>
+    </in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.share.ColorTable>
 
 </LinearLayout>

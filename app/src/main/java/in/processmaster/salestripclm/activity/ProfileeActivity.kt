@@ -92,7 +92,6 @@ class ProfileeActivity : BaseActivity() {
             contact_mb.setTextColor(ContextCompat.getColorStateList(this, R.color.white))
             contact_mb.iconTint=ContextCompat.getColorStateList(this, R.color.white)
             contact_ll.visibility= View.VISIBLE
-
         })
 
         territory_mb.setOnClickListener({

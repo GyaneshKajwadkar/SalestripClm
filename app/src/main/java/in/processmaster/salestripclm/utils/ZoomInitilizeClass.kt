@@ -1,27 +1,18 @@
 package `in`.processmaster.salestripclm.utils
 import `in`.processmaster.salestripclm.R
-import `in`.processmaster.salestripclm.activity.BaseActivity
 import `in`.processmaster.salestripclm.activity.JoinMeetingActivity
 import `in`.processmaster.salestripclm.models.ZoomCredientialModel
-import `in`.processmaster.salestripclm.sdksampleapp.initsdk.InitAuthSDKCallback
-import `in`.processmaster.salestripclm.sdksampleapp.initsdk.InitAuthSDKHelper
-import `in`.processmaster.salestripclm.sdksampleapp.startjoinmeeting.UserLoginCallback
-import `in`.processmaster.salestripclm.sdksampleapp.startjoinmeeting.emailloginuser.EmailUserLoginHelper
+import `in`.processmaster.salestripclm.zoom_sdk_code.initsdk.InitAuthSDKCallback
+import `in`.processmaster.salestripclm.zoom_sdk_code.initsdk.InitAuthSDKHelper
+import `in`.processmaster.salestripclm.zoom_sdk_code.startjoinmeeting.UserLoginCallback
+import `in`.processmaster.salestripclm.zoom_sdk_code.startjoinmeeting.emailloginuser.EmailUserLoginHelper
 import android.app.Activity
-import android.app.AlertDialog
-import android.app.ProgressDialog
 
-import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.widget.LinearLayout
-import android.widget.ProgressBar
 import android.widget.RelativeLayout
-import android.widget.Toast
-import androidx.core.content.ContextCompat
 import us.zoom.sdk.*
 
 class ZoomInitilizeClass() : Activity(), UserLoginCallback.ZoomDemoAuthenticationListener ,
@@ -35,7 +26,7 @@ class ZoomInitilizeClass() : Activity(), UserLoginCallback.ZoomDemoAuthenticatio
     {
          progressAlert(context)
         this.zoomCredientialModel=model
-        InitAuthSDKHelper.getInstance().initSDK(context, this,model)
+        InitAuthSDKHelper.getInstance().initSDK(context, this)
     }
 
     override fun onZoomSDKLoginResult(result: Long)
@@ -44,18 +35,9 @@ class ZoomInitilizeClass() : Activity(), UserLoginCallback.ZoomDemoAuthenticatio
         {
             Log.e("logResult", "loginSuccessoverride")
             UserLoginCallback.getInstance().removeListener(this)
-
         }
         else
-        {
-            Log.e("logResult", "loginErroroverride")
-          /*  Toast.makeText(
-                this,
-                "Zoom error please try again later",
-                Toast.LENGTH_LONG
-            ).show()*/
-
-        }
+        { Log.e("logResult", "loginErroroverride") }
         progressDialog?.dismiss()
     }
 

@@ -64,11 +64,7 @@
                                 app:cardCornerRadius="20dp"
                                 app:cardBackgroundColor="@color/white"
                                 app:cardElevation="0dp">
-                                <com.applandeo.materialcalendarview.CalendarView
-                                    android:visibility="gone"
-                                    android:id="@+id/calendarView"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent" />
+
 
                                 <RelativeLayout
                                     android:layout_width="match_parent"

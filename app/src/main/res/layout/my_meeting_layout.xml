@@ -28,7 +28,7 @@
                 android:layout_height="match_parent"
                 android:visibility="gone" />
 
-            <in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.share.AnnotateToolbar
+            <in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.share.AnnotateToolbar
                 android:id="@+id/drawingView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -37,7 +37,7 @@
         </FrameLayout>
 
 
-        <in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.VideoListLayout
+        <in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.VideoListLayout
             android:id="@+id/videoListLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -60,7 +60,7 @@
                 android:clipChildren="true"
                 android:clipToPadding="true"
                 android:focusable="false" />
-        </in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.VideoListLayout>
+        </in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.VideoListLayout>
 
 
     </RelativeLayout>
@@ -116,12 +116,12 @@
         android:background="#00000000"></FrameLayout>
 
 
-    <in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.MeetingOptionBar
+    <in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.MeetingOptionBar
 
         android:id="@+id/meeting_option_contain"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"></in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.MeetingOptionBar>
+        android:visibility="gone"></in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.MeetingOptionBar>
 
 
     <LinearLayout

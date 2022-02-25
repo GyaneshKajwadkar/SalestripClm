@@ -1,5 +1,4 @@
 include ':MPChart'
-include ':library'
 include ':commonlib'
 include ':mobilertc'
 include ':app'

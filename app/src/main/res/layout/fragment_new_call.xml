@@ -412,6 +412,7 @@
                                         android:layout_height="wrap_content">
 
                                         <TableRow
+                                            android:id="@+id/lastVisit_tr"
                                             android:layout_width="0dp"
                                             android:layout_height="wrap_content"
                                             android:weightSum="1">
@@ -431,6 +432,7 @@
                                                 android:id="@+id/lastVisitDate_tv" />
                                         </TableRow>
                                         <TableRow
+                                            android:id="@+id/workingWith_tr"
                                             android:layout_width="0dp"
                                             android:layout_height="wrap_content"
                                             android:weightSum="1">
@@ -450,6 +452,7 @@
                                                 android:textSize="16sp" />
                                         </TableRow>
                                         <TableRow
+                                            android:id="@+id/reportedTime_tr"
                                             android:layout_width="0dp"
                                             android:layout_height="wrap_content"
                                             android:weightSum="1">
@@ -470,6 +473,7 @@
                                                 android:textSize="16sp" />
                                         </TableRow>
                                         <TableRow
+                                            android:id="@+id/visitPurpose_tr"
                                             android:layout_width="0dp"
                                             android:layout_height="wrap_content"
                                             android:weightSum="1">
@@ -493,6 +497,7 @@
 
 
                                     <LinearLayout
+                                        android:id="@+id/remark_ll"
                                         android:layout_weight="1"
                                         android:layout_width="0dp"
                                         android:layout_height="wrap_content"
@@ -511,9 +516,7 @@
                                             android:text=""
                                             android:textSize="18sp"
                                             android:padding="2dp"
-                                            android:maxLines="5"
                                             android:id="@+id/remark_tv"
-                                            android:lines="5"
                                             />
                                     </LinearLayout>
 

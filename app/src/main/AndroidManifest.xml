@@ -116,18 +116,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".sdksampleapp.ui.LoginUserStartJoinMeetingActivity"
-            android:exported="true"
-            android:launchMode="singleTop"
-            android:screenOrientation="landscape"
-            android:windowSoftInputMode="stateHidden" />
-        <activity
-            android:name=".sdksampleapp.ui.EmailUserLoginActivity"
-            android:exported="true"
-            android:launchMode="singleTop"
-            android:screenOrientation="landscape"
-            android:windowSoftInputMode="stateHidden" />
+
         <activity
             android:name=".activity.JoinMeetingActivity"
             android:exported="true"
@@ -141,40 +130,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".sdksampleapp.otherfeatures.scheduleforloginuser.PreMeetingExampleActivity"
-            android:exported="true"
-            android:hardwareAccelerated="true"
-            android:launchMode="singleTop"
-            android:screenOrientation="landscape"
-            android:theme="@style/ZMTheme.SubWindow"
-            android:windowSoftInputMode="stateHidden">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".sdksampleapp.otherfeatures.scheduleforloginuser.ScheduleMeetingExampleActivity"
-            android:exported="true"
-            android:hardwareAccelerated="true"
-            android:launchMode="singleTop"
-            android:screenOrientation="landscape"
-            android:theme="@style/ZMTheme.SubWindow"
-            android:windowSoftInputMode="stateHidden">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".sdksampleapp.inmeetingfunction.customizedmeetingui.MyMeetingActivity"
-            android:configChanges="screenSize"
-            android:screenOrientation="portrait"
-            android:theme="@style/ZMTheme.SubWindow" />
-        <activity android:name=".sdksampleapp.ui.InitAuthSDKActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

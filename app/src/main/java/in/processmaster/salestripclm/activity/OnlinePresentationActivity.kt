@@ -2,15 +2,15 @@ package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.fragments.DisplayVisualFragment
-import `in`.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.other.MeetingCommonCallback
-import `in`.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.remotecontrol.MeetingRemoteControlHelper
-import `in`.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.share.MeetingShareHelper
-import `in`.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.share.MeetingShareHelper.MeetingShareUICallBack
-import `in`.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.user.MeetingUserCallback
-import `in`.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.MeetingWindowHelper
-import `in`.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.adapter.AttenderVideoAdapter
-import `in`.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.adapter.AttenderVideoAdapter.ItemClickListener
-import `in`.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.share.CustomShareView
+import `in`.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.other.MeetingCommonCallback
+import `in`.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.remotecontrol.MeetingRemoteControlHelper
+import `in`.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.share.MeetingShareHelper
+import `in`.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.share.MeetingShareHelper.MeetingShareUICallBack
+import `in`.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.user.MeetingUserCallback
+import `in`.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.MeetingWindowHelper
+import `in`.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.adapter.AttenderVideoAdapter
+import `in`.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.adapter.AttenderVideoAdapter.ItemClickListener
+import `in`.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.share.CustomShareView
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
@@ -38,46 +38,10 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
     MeetingUserCallback.UserEvent, MeetingCommonCallback.CommonEvent {
 
     private var TAG: String = OnlinePresentationActivity::class.java.getSimpleName()
-
-    private var from = 0
-
-    private var currentLayoutType = -1
-    private var LAYOUT_TYPE_PREVIEW = 0
-    private var LAYOUT_TYPE_WAITHOST = 1
-    private var LAYOUT_TYPE_IN_WAIT_ROOM = 2
-    private var LAYOUT_TYPE_ONLY_MYSELF = 3
-    private var LAYOUT_TYPE_ONETOONE = 4
-    private var LAYOUT_TYPE_LIST_VIDEO = 5
-    private var LAYOUT_TYPE_VIEW_SHARE = 6
-    private var LAYOUT_TYPE_SHARING_VIEW = 7
-    private var LAYOUT_TYPE_WEBINAR_ATTENDEE = 8
-
-    private var videoListLayout: LinearLayout? = null
-
-    private var layout_lans: View? = null
-
     private var mMeetingFailed = false
-
-
-    private var mDefaultVideoView: MobileRTCVideoView? = null
-    private var mDefaultVideoViewMgr: MobileRTCVideoViewManager? = null
-
     private var meetingShareHelper: MeetingShareHelper? = null
-
-    private var remoteControlHelper: MeetingRemoteControlHelper? = null
-
     private var mMeetingService: MeetingService? = null
-
     private var mInMeetingService: InMeetingService? = null
-
-
-    private var customShareView: CustomShareView? = null
-
-    private var mVideoListView: RecyclerView? = null
-
-    private var mAdapter: AttenderVideoAdapter? = null
-
-
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -89,11 +53,7 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
         mMeetingService = ZoomSDK.getInstance().meetingService
         mInMeetingService = ZoomSDK.getInstance().inMeetingService
 
-
-
         if (mMeetingService == null || mInMeetingService == null) {
-           // finish()
-          //  return
         }
         else
         {
@@ -155,30 +115,6 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
         MeetingCommonCallback.getInstance().addListener(this)
     }
 
-    private fun unRegisterListener()
-    {
-        try
-        {
-            MeetingUserCallback.getInstance().removeListener(this)
-            MeetingCommonCallback.getInstance().removeListener(this)
-        }
-        catch (e: Exception)
-        {
-
-        }
-    }
-
-    var pinVideoListener =
-        ItemClickListener { view, position, userId ->
-            if (currentLayoutType == LAYOUT_TYPE_VIEW_SHARE || currentLayoutType == LAYOUT_TYPE_SHARING_VIEW) {
-                return@ItemClickListener
-            }
-            mDefaultVideoViewMgr!!.removeAllVideoUnits()
-            var renderInfo =
-                MobileRTCVideoUnitRenderInfo(0, 0, 100, 100)
-            mDefaultVideoViewMgr!!.addAttendeeVideoUnit(userId, renderInfo)
-        }
-
     override fun onClick(v: View) {
         var id = v.id
         when (id) {
@@ -186,165 +122,18 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
         }
     }
 
-/*    private fun checkShowVideoLayout() {
-
-        mDefaultVideoViewMgr = mDefaultVideoView!!.videoViewManager
-        if (mDefaultVideoViewMgr != null) {
-            var newLayoutType = getNewVideoMeetingLayout()
-            if (currentLayoutType != newLayoutType || newLayoutType == LAYOUT_TYPE_WEBINAR_ATTENDEE) {
-                removeOldLayout(currentLayoutType)
-                currentLayoutType = newLayoutType
-                addNewLayout(newLayoutType)
-            }
-        }
-    }
-
-    private fun getNewVideoMeetingLayout(): Int {
-        var newLayoutType = -1
-        if (mMeetingService!!.meetingStatus == MeetingStatus.MEETING_STATUS_WAITINGFORHOST) {
-            newLayoutType = LAYOUT_TYPE_WAITHOST
-            return newLayoutType
-        }
-        if (mMeetingService!!.meetingStatus == MeetingStatus.MEETING_STATUS_IN_WAITING_ROOM) {
-            newLayoutType = LAYOUT_TYPE_IN_WAIT_ROOM
-            return newLayoutType
-        }
-
-      else {
-            var userlist =
-                mInMeetingService!!.inMeetingUserList
-            var userCount = 0
-            if (userlist != null) {
-                userCount = userlist.size
-            }
-            if (userCount > 1) {
-                var preCount = userCount
-                for (i in 0 until preCount) {
-                    var userInfo =
-                        mInMeetingService!!.getUserInfoById(userlist!![i])
-                    if (mInMeetingService!!.isWebinarMeeting) {
-                        if (userInfo != null && userInfo.inMeetingUserRole == InMeetingUserInfo.InMeetingUserRole.USERROLE_ATTENDEE) {
-                            userCount--
-                        }
-                    }
-                }
-            }
-            newLayoutType = if (userCount == 0) {
-                LAYOUT_TYPE_PREVIEW
-            } else if (userCount == 1) {
-                LAYOUT_TYPE_ONLY_MYSELF
-            } else {
-                LAYOUT_TYPE_LIST_VIDEO
-            }
-        }
-        return newLayoutType
-    }
-
-    private fun removeOldLayout(type: Int) {
-        if (type == LAYOUT_TYPE_WAITHOST) {
-        } else if (type == LAYOUT_TYPE_IN_WAIT_ROOM) {
-        } else if (type == LAYOUT_TYPE_PREVIEW || type == LAYOUT_TYPE_ONLY_MYSELF || type == LAYOUT_TYPE_ONETOONE) {
-            mDefaultVideoViewMgr!!.removeAllVideoUnits()
-        } else if (type == LAYOUT_TYPE_LIST_VIDEO || type == LAYOUT_TYPE_VIEW_SHARE) {
-            mDefaultVideoViewMgr!!.removeAllVideoUnits()
-            mDefaultVideoView!!.setGestureDetectorEnabled(false)
-        } else if (type == LAYOUT_TYPE_SHARING_VIEW) {
-        }
-        if (type != LAYOUT_TYPE_SHARING_VIEW) {
-            if (null != customShareView) {
-                customShareView!!.visibility = View.INVISIBLE
-            }
-        }
-    }*/
-
-/*    private fun addNewLayout(type: Int) {
-        if (type == LAYOUT_TYPE_WAITHOST) {
-        } else if (type == LAYOUT_TYPE_IN_WAIT_ROOM) {
-       //     videoListLayout!!.visibility = View.GONE
-        } else if (type == LAYOUT_TYPE_PREVIEW) {
-            showPreviewLayout()
-        } else if (type == LAYOUT_TYPE_ONLY_MYSELF || type == LAYOUT_TYPE_WEBINAR_ATTENDEE) {
-            showOnlyMeLayout()
-        } else if (type == LAYOUT_TYPE_ONETOONE) {
-            showOne2OneLayout()
-        } else if (type == LAYOUT_TYPE_LIST_VIDEO) {
-            showVideoListLayout()
-        } else if (type == LAYOUT_TYPE_VIEW_SHARE) {
-
-        } else if (type == LAYOUT_TYPE_SHARING_VIEW)
-        {
-        }
-    }
-
-    private fun showPreviewLayout() {
-        var renderInfo1 = MobileRTCVideoUnitRenderInfo(0, 0, 100, 100)
-        mDefaultVideoView!!.visibility = View.VISIBLE
-        mDefaultVideoViewMgr!!.addPreviewVideoUnit(renderInfo1)
-      //  videoListLayout!!.visibility = View.GONE
-    }*/
-
-    /* private fun showOnlyMeLayout() {
-         mDefaultVideoView!!.visibility = View.VISIBLE
-      //   videoListLayout!!.visibility = View.GONE
-         var renderInfo = MobileRTCVideoUnitRenderInfo(0, 0, 100, 100)
-         var myUserInfo = mInMeetingService!!.myUserInfo
-         if (myUserInfo != null) {
-             mDefaultVideoViewMgr!!.removeAllVideoUnits()
-
-             mDefaultVideoViewMgr!!.addAttendeeVideoUnit(myUserInfo.userId, renderInfo)
-         }
-     }
- */
-    /* private fun showOne2OneLayout() {
-         mDefaultVideoView!!.visibility = View.VISIBLE
-         videoListLayout!!.visibility = View.VISIBLE
-         var renderInfo = MobileRTCVideoUnitRenderInfo(0, 0, 100, 100)
-         //options.aspect_mode = MobileRTCVideoUnitAspectMode.VIDEO_ASPECT_PAN_AND_SCAN;
-         mDefaultVideoViewMgr!!.addActiveVideoUnit(renderInfo)
-         mAdapter!!.setUserList(mInMeetingService!!.inMeetingUserList)
-         mAdapter!!.notifyDataSetChanged()
-     }*/
-
-    /*  fun showVideoListLayout()
-      {
-          var renderInfo = MobileRTCVideoUnitRenderInfo(0, 0, 100, 100)
-          //options.aspect_mode = MobileRTCVideoUnitAspectMode.VIDEO_ASPECT_PAN_AND_SCAN;
-          mDefaultVideoViewMgr!!.addActiveVideoUnit(renderInfo)
-        //  videoListLayout?.visibility = View.VISIBLE
-          updateAttendeeVideos(mInMeetingService!!.inMeetingUserList, 0)
-      }*/
-
     fun updateAttendeeVideos(
         userlist: List<Long>,
         action: Int)
     {
         if (action == 0) {
             MeetingWindowHelper.getInstance().showMeetingWindow(this)
-
-            // mAdapter!!.setUserList(userlist)
-            // mAdapter!!.notifyDataSetChanged()
         } else if (action == 1)
         {
             MeetingWindowHelper.getInstance().showMeetingWindow(this)
-
-            //  mAdapter!!.addUserList(userlist)
-            //  mAdapter!!.notifyDataSetChanged()
         }
         else {
             MeetingWindowHelper.getInstance().hiddenMeetingWindow(true)
-
-            //  var userId = mAdapter!!.selectedUserId
-            //  if (userlist.contains(userId)) {
-            //      var inmeetingUserList =
-            //          mInMeetingService!!.inMeetingUserList
-            //      if (inmeetingUserList.size > 0) {
-            //          mDefaultVideoViewMgr!!.removeAllVideoUnits()
-            //          var renderInfo =
-            //              MobileRTCVideoUnitRenderInfo(0, 0, 100, 100)
-            //          mDefaultVideoViewMgr!!.addAttendeeVideoUnit(inmeetingUserList[0], renderInfo)
-            //      }
-            //  }
-            //  mAdapter!!.removeUserList(userlist)
         }
     }
 

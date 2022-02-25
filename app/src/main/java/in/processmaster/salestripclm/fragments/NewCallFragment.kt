@@ -421,12 +421,26 @@ class NewCallFragment : Fragment() {
                     views?.precall_parent?.visibility=View.VISIBLE
                     views?.parentButton?.visibility=View.VISIBLE
 
-                    views?.lastVisitDate_tv?.setText(analysisModel?.strDcrDate)
-                    views?.reportedTime_tv?.setText(analysisModel?.strReportedTime)
+                    //remark_ll
+                    if(generalClassObject?.checkStringNullEmpty(analysisModel?.visitPurpose!!)!!)
+                    { views?.visitPurpose_tr?.visibility=View.GONE }
+                    else{ views?.visitPurpose_tv?.setText(analysisModel?.visitPurpose) }
 
-                    if(analysisModel?.visitPurpose==null) views?.visitPurpose_tv?.setText("-") else views?.visitPurpose_tv?.setText(analysisModel?.visitPurpose)
-                    if(analysisModel?.workWithName==null) views?.workingWith_tv?.setText("-") else views?.workingWith_tv?.setText(analysisModel?.workWithName)
-                    if(analysisModel?.remarks==null) views?.visitPurpose_tv?.visibility=View.INVISIBLE else views?.remark_tv?.setText(analysisModel?.remarks)
+                    if(generalClassObject?.checkStringNullEmpty(analysisModel?.workWithName!!)!!)
+                    { views?.workingWith_tr?.visibility=View.GONE }
+                    else{ views?.workingWith_tv?.setText(analysisModel?.workWithName) }
+
+                    if(generalClassObject?.checkStringNullEmpty(analysisModel?.strDcrDate!!)!!)
+                    { views?.lastVisit_tr?.visibility=View.GONE }
+                    else{ views?.lastVisitDate_tv?.setText(analysisModel?.strDcrDate) }
+
+                    if(generalClassObject?.checkStringNullEmpty(analysisModel?.remarks!!)!!)
+                    { views?.remark_ll?.visibility=View.GONE }
+                    else{ views?.remark_tv?.setText(analysisModel?.remarks) }
+
+                    if(generalClassObject?.checkStringNullEmpty(analysisModel?.strReportedTime!!)!!)
+                    { views?.reportedTime_tr?.visibility=View.GONE }
+                    else{ views?.reportedTime_tv?.setText(analysisModel?.strReportedTime) }
 
 
                     views!!.brandList_rv.layoutManager=LinearLayoutManager(requireActivity())
@@ -487,9 +501,27 @@ class NewCallFragment : Fragment() {
                     views!!.remarkPOB_tv.setText("Remark: "+analysisModel?.lastPOBDetails?.remark)
                     views!!.datePob_tv.setText("Date: "+analysisModel?.lastPOBDetails?.lastPobDate)
 
-                    views!!.demoSales_tv.setText("Sales: "+analysisModel?.docLastRCPADetail?.ownSales)
-                    views!!.dateRCPA_tv.setText("Date: "+analysisModel?.docLastRCPADetail?.strRCPADate)
+                    if(generalClassObject?.checkStringNullEmpty(analysisModel?.lastPOBDetails!!.lastPobDate!!)!!)
+                    { views!!.datePob_tv.setText("Date: --") }
+                    else{
+                        if(generalClassObject!!.checkDateValidation(analysisModel?.lastPOBDetails?.lastPobDate!!))
+                        { views!!.datePob_tv.setText("Date: "+analysisModel?.lastPOBDetails?.lastPobDate) }
+                        else{ views!!.datePob_tv.setText("Date: ----")} }
 
+
+
+
+            //        views!!.demoSales_tv.setText("Sales: "+analysisModel?.docLastRCPADetail?.ownSales)
+            //        views!!.dateRCPA_tv.setText("Date: "+analysisModel?.docLastRCPADetail?.strRCPADate)
+
+                    /*if(generalClassObject?.checkStringNullEmpty(analysisModel?.docLastRCPADetail!!.strRCPADate!!)!!)
+                    { views?.dateRCPA_tv?.setText("Date: --") }
+                    else{ views?.dateRCPA_tv?.setText("Date: "+analysisModel?.docLastRCPADetail?.strRCPADate) }
+
+                    if(generalClassObject?.checkStringNullEmpty(analysisModel?.docLastRCPADetail!!.ownSales!!)!!)
+                    { views!!.demoSales_tv.setText("Sales: --") }
+                    else{ views!!.demoSales_tv.setText("Sales: "+analysisModel?.docLastRCPADetail?.ownSales)}
+*/
                 }
                 else
                     views?.noData_gif?.visibility=View.VISIBLE

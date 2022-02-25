@@ -7,7 +7,7 @@
     android:padding="1dp">
 
 
-    <in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.rawdata.RawDataRender
+    <in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.rawdata.RawDataRender
         android:id="@+id/videoRawdataCanvas"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

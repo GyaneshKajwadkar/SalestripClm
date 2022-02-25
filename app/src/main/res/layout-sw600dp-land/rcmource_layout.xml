@@ -4,13 +4,13 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.share.RCFloatView
+    <in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.share.RCFloatView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/rc_float"
         android:layout_gravity="bottom"/>
 
-    <in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.share.RCMouseView
+    <in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.share.RCMouseView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/rc_mouse"

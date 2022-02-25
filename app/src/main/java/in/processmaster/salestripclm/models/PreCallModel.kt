@@ -71,7 +71,7 @@ class PreCallModel {
 
             @SerializedName("visitPurpose")
             @Expose
-            var visitPurpose: String? = null
+            var visitPurpose: String = ""
 
             @SerializedName("productList")
             @Expose
@@ -265,7 +265,7 @@ class PreCallModel {
 
                 @SerializedName("ownSales")
                 @Expose
-                var ownSales: Int? = null
+                var ownSales: String? = null
 
                 @SerializedName("counterSales")
                 @Expose

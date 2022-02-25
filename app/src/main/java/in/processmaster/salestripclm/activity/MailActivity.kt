@@ -141,7 +141,7 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
         dialogBuilder.setView(dialogView)
 
         alertDialog = dialogBuilder.create()
-        alertDialog?.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+        alertDialog?.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         val list_rv= dialogView.findViewById<View>(R.id.list_rv) as RecyclerView
         val search_et= dialogView.findViewById<View>(R.id.search_et) as EditText

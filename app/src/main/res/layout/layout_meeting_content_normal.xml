@@ -10,11 +10,11 @@
         android:layout_height="match_parent"
         android:focusable="false" />
 
-    <in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.share.CustomShareView
+    <in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.share.CustomShareView
         android:id="@+id/custom_share_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="invisible">
-    </in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.share.CustomShareView>
+    </in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.share.CustomShareView>
 
 </FrameLayout>

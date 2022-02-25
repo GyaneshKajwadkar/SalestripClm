@@ -43,25 +43,24 @@ import java.util.List;
 import in.processmaster.salestripclm.R;
 import in.processmaster.salestripclm.activity.JoinMeetingActivity;
 import in.processmaster.salestripclm.activity.OnlinePresentationActivity;
-import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.SimpleInMeetingBOControllerListener;
-import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.audio.MeetingAudioCallback;
-import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.audio.MeetingAudioHelper;
-import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.bo.BOEventCallback;
-import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.other.MeetingCommonCallback;
-import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.remotecontrol.MeetingRemoteControlHelper;
-import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.share.MeetingShareCallback;
-import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.share.MeetingShareHelper;
-import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.user.MeetingUserCallback;
-import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.video.MeetingVideoCallback;
-import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.video.MeetingVideoHelper;
-import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.MeetingOptionBar;
-import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.MeetingWindowHelper;
-import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.RealNameAuthDialog;
-import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.adapter.AttenderVideoAdapter;
-import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.share.AnnotateToolbar;
-import in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.share.CustomShareView;
-import in.processmaster.salestripclm.sdksampleapp.ui.BreakoutRoomsAdminActivity;
-import in.processmaster.salestripclm.sdksampleapp.ui.UIUtil;
+import in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.SimpleInMeetingBOControllerListener;
+import in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.audio.MeetingAudioCallback;
+import in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.audio.MeetingAudioHelper;
+import in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.bo.BOEventCallback;
+import in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.other.MeetingCommonCallback;
+import in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.remotecontrol.MeetingRemoteControlHelper;
+import in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.share.MeetingShareCallback;
+import in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.share.MeetingShareHelper;
+import in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.user.MeetingUserCallback;
+import in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.video.MeetingVideoCallback;
+import in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.video.MeetingVideoHelper;
+import in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.MeetingOptionBar;
+import in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.MeetingWindowHelper;
+import in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.RealNameAuthDialog;
+import in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.adapter.AttenderVideoAdapter;
+import in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.share.AnnotateToolbar;
+import in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.share.CustomShareView;
+import in.processmaster.salestripclm.zoom_sdk_code.ui.UIUtil;
 import us.zoom.sdk.BOControllerError;
 import us.zoom.sdk.IBOAdmin;
 import us.zoom.sdk.IBOAssistant;
@@ -96,7 +95,7 @@ import static us.zoom.sdk.MobileRTCSDKError.SDKERR_SUCCESS;
 
 public class JoinMeetingFragment extends Fragment  implements View.OnClickListener, MeetingVideoCallback.VideoEvent,
         MeetingAudioCallback.AudioEvent, MeetingShareCallback.ShareEvent,
-        MeetingUserCallback.UserEvent, MeetingCommonCallback.CommonEvent, SmsListener, BOEventCallback.BOEvent
+        MeetingUserCallback.UserEvent, MeetingCommonCallback.CommonEvent, BOEventCallback.BOEvent
 {
     private final static String TAG = "MyMeetingFragment";
 
@@ -114,8 +113,6 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
     protected final static int REQUEST_SYSTEM_ALERT_WINDOW = 1002;
 
     protected final static int REQUEST_SYSTEM_ALERT_WINDOW_FOR_MINIWINDOW = 1003;
-
-    private int from = 0;
 
     private int  currentLayoutType = -1;
     private final int LAYOUT_TYPE_PREVIEW = 0;
@@ -156,8 +153,6 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
 
     private InMeetingService mInMeetingService;
 
-    private SmsService smsService;
-
     private Intent mScreenInfoData;
 
     private MobileRTCShareView mShareView;
@@ -176,10 +171,6 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
 
     private GestureDetector gestureDetector;
 
-    public static final int JOIN_FROM_UNLOGIN=1;
-
-    public static  final int JOIN_FROM_APIUSER=2;
-
     public static  final int JOIN_FROM_LOGIN=3;
 
     private ZoomSDK zoomSDK;
@@ -193,17 +184,11 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-   /*     getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);*/
         getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         mMeetingService = zoomSDK.getMeetingService();
         mInMeetingService = zoomSDK.getInMeetingService();
 
-        from = getArguments().getInt("from");
-        /* if (null != getIntent().getExtras()) {
-            from = getIntent().getExtras().getInt("from");
-        }*/
         meetingAudioHelper = new MeetingAudioHelper(audioCallBack);
         meetingVideoHelper = new MeetingVideoHelper(getActivity(), videoCallBack);
         meetingShareHelper = new MeetingShareHelper(getActivity(), shareCallBack);
@@ -211,7 +196,6 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
         registerListener();
 
         View view= inflater.inflate(R.layout.my_meeting_layout, container, false);
-
 
         gestureDetector = new GestureDetector(new GestureDetectorListener());
         meetingOptionBar = (MeetingOptionBar) view.findViewById(R.id.meeting_option_contain);
@@ -809,8 +793,7 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
 
         @Override
         public void onClickAdminBo() {
-            Intent intent = new Intent(getActivity(), BreakoutRoomsAdminActivity.class);
-            startActivity(intent);
+
         }
 
         @Override
@@ -1293,22 +1276,6 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
         Log.d(TAG, "onFreeMeetingReminder:" + isOrignalHost +" "+ canUpgrade +" "+ isFirstGift);
     }
 
-    @Override
-    public void onNeedRealNameAuthMeetingNotification(List<ZoomSDKCountryCode> supportCountryList, String privacyUrl, IZoomRetrieveSMSVerificationCodeHandler handler) {
-        Log.d(TAG, "onNeedRealNameAuthMeetingNotification:" + privacyUrl);
-        Log.d(TAG, "onNeedRealNameAuthMeetingNotification getRealNameAuthPrivacyURL:" + ZoomSDK.getInstance().getSmsService().getRealNameAuthPrivacyURL());
-        RealNameAuthDialog.show( getActivity(), handler);
-    }
-
-    @Override
-    public void onRetrieveSMSVerificationCodeResultNotification(MobileRTCSMSVerificationError result, IZoomVerifySMSVerificationCodeHandler handler) {
-        Log.d(TAG, "onRetrieveSMSVerificationCodeResultNotification:" + result);
-    }
-
-    @Override
-    public void onVerifySMSVerificationCodeResultNotification(MobileRTCSMSVerificationError result) {
-        Log.d(TAG, "onVerifySMSVerificationCodeResultNotification:" + result);
-    }
 
     @Override
     public void onHelpRequestReceived(final String strUserID) {
@@ -1347,9 +1314,7 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
             MeetingUserCallback.getInstance().removeListener(this);
             MeetingCommonCallback.getInstance().removeListener(this);
             BOEventCallback.getInstance().removeEvent(this);
-            if(null!=smsService){
-                smsService.removeListener(this);
-            }
+
             zoomSDK.getInMeetingService().getInMeetingBOController().removeListener(mBOControllerListener);
         }catch (Exception e){
         }
@@ -1357,10 +1322,7 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
 
 
     private void registerListener() {
-        smsService=zoomSDK.getSmsService();
-        if(null!=smsService){
-            smsService.addListener(this);
-        }
+
         zoomSDK.getInMeetingService().getInMeetingBOController().addListener(mBOControllerListener);
         MeetingAudioCallback.getInstance().addListener(this);
         MeetingVideoCallback.getInstance().addListener(this);

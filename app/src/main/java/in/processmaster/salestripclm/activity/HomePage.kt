@@ -406,8 +406,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             {
                 if (response.code() == 200 && !response.body().toString().isEmpty())
                 {
-                    for ((index, value) in response.body()?.data?.geteDetailingList()
-                        ?.withIndex()!!) {
+                    for ((index, value) in response.body()?.data?.geteDetailingList()?.withIndex()!!) {
                         //store edetailing data to db
                         val gson = Gson()
                         dbBase.insertOrUpdateEDetail(

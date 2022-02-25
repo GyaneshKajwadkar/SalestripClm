@@ -5,7 +5,6 @@ import `in`.processmaster.salestripclm.adapter.*
 import `in`.processmaster.salestripclm.models.GetScheduleModel
 import `in`.processmaster.salestripclm.models.SyncModel
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
-import `in`.processmaster.salestripclm.utils.DrawableUtils.getDayCircle
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -33,9 +32,6 @@ import androidx.fragment.app.FragmentPagerAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
-import com.applandeo.materialcalendarview.CalendarView
-import com.applandeo.materialcalendarview.EventDay
-import com.applandeo.materialcalendarview.listeners.OnDayClickListener
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.AxisBase
@@ -389,56 +385,6 @@ class HomeFragment : Fragment(), OnChartGestureListener {
 
     //============================================Set calendar ==============================================
 
-    fun setCalendar(root: View)
-    {
-        val calendarView = root.findViewById<View>(R.id.calendarView) as CalendarView
-
-        val min = Calendar.getInstance()
-        min.add(Calendar.DATE, -1)
-
-        val max = Calendar.getInstance()
-        max.add(Calendar.MONTH, 2)
-
-        val selectedDays: List<Calendar> = ArrayList()
-
-        calendarView.setMinimumDate(min)
-        calendarView.setMaximumDate(max)
-
-
-        val events: MutableList<EventDay> = ArrayList()
-
-        val calendar = Calendar.getInstance()
-        events.add(
-                EventDay(
-                        calendar, getDayCircle(
-                        requireActivity(),
-                        R.color.black,
-                        R.color.darkYellow
-                )
-                )
-        )
-
-        //    calendarView.setEvents(events);
-
-
-        //   calendarView.setEvents(events);
-        calendarView.setOnDayClickListener(object : OnDayClickListener {
-            override fun onDayClick(eventDay: EventDay) {
-
-                if (!eventDay.isEnabled) {
-                    callMeetingAlert(eventDay.calendar.time.toString())
-                }
-
-                /* Toast.makeText(
-                    requireActivity(),
-                    eventDay.calendar.time.toString() + " "
-                            + eventDay.isEnabled,
-                    Toast.LENGTH_SHORT
-                ).show()*/
-            }
-        })
-
-    }
 
     //=============================================Chart code================================================
     private fun setChart(size: Int) {
@@ -828,7 +774,6 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         charthalf!!.setRotationAngle(180f)
         charthalf!!.setCenterTextOffset(0f, -20f)
 
-        setData(3, 100f)
 
      //  charthalf!!.animateY(1400, Easing.EaseInOutQuad)
 
@@ -848,30 +793,6 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         charthalf!!.setDrawEntryLabels(false)
 
 
-    }
-
-    private fun setData(count: Int, range: Float) {
-        val values = java.util.ArrayList<PieEntry>()
-        for (i in 0 until count) {
-            values.add(
-                    PieEntry(
-                            (Math.random() * range + range / 5).toFloat(),
-                            parties.get(i % parties.size)
-                    )
-            )
-        }
-        val dataSet = PieDataSet(values, "")
-        dataSet.sliceSpace = 3f
-        dataSet.selectionShift = 5f
-        dataSet.setColors(*ColorTemplate.MATERIAL_COLORS)
-        val data = PieData(dataSet)
-        data.setValueFormatter(PercentFormatter())
-        data.setValueTextSize(14f)
-        data.setValueTextColor(Color.WHITE)
-        charthalf!!.setData(data)
-
-        charthalf!!.setExtraOffsets(0f, 0f, 0f, -150f)
-        charthalf!!.invalidate()
     }
 
     private fun generateCenterSpannableText(): SpannableString? {

@@ -1,5 +1,6 @@
 package `in`.processmaster.salestripclm.common_classes
 
+import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.PhotoSlideShowActivity
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import android.app.Activity
@@ -16,6 +17,7 @@ import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import com.google.android.material.snackbar.Snackbar
 import java.text.DateFormat
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -105,9 +107,10 @@ class GeneralClass(val activity: Activity) {
     }
 
     fun showSnackbar(view: View, message: String) {
-        Snackbar.make(view, message, Snackbar.LENGTH_LONG)
+        Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
             .setAction("Close", View.OnClickListener { })
-            .setActionTextColor(Color.YELLOW)
+            .setActionTextColor(Color.WHITE)
+            .setBackgroundTint(Color.RED)
             .show()
     }
 
@@ -133,6 +136,26 @@ class GeneralClass(val activity: Activity) {
         val c: Date = Calendar.getInstance().getTime()
         val df = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
         return df.format(c)
+    }
+
+    fun checkStringNullEmpty(string: String):Boolean{
+        if(string.isEmpty()||string.equals("")||string==null)return true
+        else return false
+    }
+
+    fun checkDateValidation(dateString:String) :Boolean
+    {
+        val format = SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'")
+        try {
+            val date = format.parse(dateString)
+            val c = Calendar.getInstance()
+            c.setTime(date)
+            if(c.get(Calendar.YEAR)<2000) return false
+            else return true
+        } catch (e: ParseException) {
+            e.printStackTrace()
+            return false
+        }
     }
 
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.share.ToolbarDragView
+<in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.share.ToolbarDragView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -83,7 +83,7 @@
                 android:orientation="vertical"
                 android:paddingTop="4dp" >
 
-                <in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.share.ColorSelectedImage
+                <in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.share.ColorSelectedImage
                     android:id="@+id/colorImage"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
@@ -141,4 +141,4 @@
         </LinearLayout>
     </LinearLayout>
 
-</in.processmaster.salestripclm.sdksampleapp.inmeetingfunction.customizedmeetingui.view.share.ToolbarDragView>
+</in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.share.ToolbarDragView>

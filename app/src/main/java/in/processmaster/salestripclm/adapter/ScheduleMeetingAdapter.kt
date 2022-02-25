@@ -6,7 +6,7 @@ import `in`.processmaster.salestripclm.common_classes.AlertClass.Companion.retun
 import `in`.processmaster.salestripclm.models.GetScheduleModel
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.networkUtils.APIClientKot
-import `in`.processmaster.salestripclm.sdksampleapp.inmeetingfunction.zoommeetingui.ZoomMeetingUISettingHelper
+import `in`.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.zoommeetingui.ZoomMeetingUISettingHelper
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.annotation.SuppressLint
@@ -32,9 +32,6 @@ import java.lang.Runnable
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
-import androidx.core.content.ContextCompat.startActivity
-
-
 
 
 class ScheduleMeetingAdapter(
