@@ -3,7 +3,6 @@ import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.SplashActivity
 import `in`.processmaster.salestripclm.adapter.*
 import `in`.processmaster.salestripclm.models.GetScheduleModel
-import `in`.processmaster.salestripclm.models.SyncModel
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.annotation.SuppressLint
@@ -47,7 +46,6 @@ import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 import com.github.mikephil.charting.listener.ChartTouchListener
 import com.github.mikephil.charting.listener.OnChartGestureListener
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
-import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.utils.ViewPortHandler
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -134,26 +132,8 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         chart = root.findViewById(R.id.chart1)
         charthalf = root.findViewById(R.id.charthalf)
 
-        val executorBarChart: ExecutorService = Executors.newSingleThreadExecutor()
         val handler = Handler(Looper.getMainLooper())
-        val executorCalendar: ExecutorService = Executors.newSingleThreadExecutor()
         val executorAdapter: ExecutorService = Executors.newSingleThreadExecutor()
-        val executorPieChart: ExecutorService = Executors.newSingleThreadExecutor()
-
-        executorBarChart.execute(Runnable {
-            //background metoud
-            handler.post(Runnable {
-                //UI Thread work here
-            })
-        })
-
-        executorCalendar.execute(Runnable {
-            //  setCalendar(root)
-            handler.post(Runnable {
-                //UI Thread work here
-            })
-        })
-
 
 
         executorAdapter.execute(Runnable {
@@ -799,58 +779,7 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         val s = SpannableString("Doctors visit")
         s.setSpan(RelativeSizeSpan(1.7f), 0, 13, 0)
         s.setSpan(StyleSpan(Typeface.NORMAL), 0, 13, 0)
-        //   s.setSpan(new ForegroundColorSpan(Color.GRAY), 14, s.length() - 15, 0);
-        //   s.setSpan(new RelativeSizeSpan(.8f), 14, s.length() - 15, 0);
-        //    s.setSpan(new StyleSpan(Typeface.ITALIC), s.length() - 14, s.length(), 0);
-        //  s.setSpan(new ForegroundColorSpan(ColorTemplate.getHoloBlue()), s.length() - 14, s.length(), 0);
-        return s
-    }
-
-    private fun moveOffScreen()
-    {
-        val displayMetrics = DisplayMetrics()
-        requireActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics)
-        val height = displayMetrics.heightPixels
-        val offset = (height * 0.65).toInt() /* percent to move */
-        val rlParams = charthalf!!.layoutParams as LinearLayout.LayoutParams
-        rlParams.setMargins(0, 0, 0, -offset)
-        charthalf!!.layoutParams = rlParams
-    }
-
-
-    class PercentFormatter : IValueFormatter, IAxisValueFormatter {
-        protected var mFormat: DecimalFormat
-
-        constructor() {
-            mFormat = DecimalFormat("###,###,##0.0")
-        }
-
-        /**
-         * Allow a custom decimalformat
-         *
-         * @param format
-         */
-        constructor(format: DecimalFormat) {
-            mFormat = format
-        }
-
-        // IValueFormatter
-        override fun getFormattedValue(
-                value: Float,
-                entry: Entry,
-                dataSetIndex: Int,
-                viewPortHandler: ViewPortHandler
-        ): String {
-            return mFormat.format(value.toDouble()) + " %"
-        }
-
-        // IAxisValueFormatter
-        override fun getFormattedValue(value: Float, axis: AxisBase): String {
-            return mFormat.format(value.toDouble()) + " %"
-        }
-
-        val decimalDigits: Int
-            get() = 1
+          return s
     }
 
 

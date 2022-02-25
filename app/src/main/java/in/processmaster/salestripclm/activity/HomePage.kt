@@ -2,10 +2,7 @@ package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.staticSyncData
-import `in`.processmaster.salestripclm.common_classes.AlertClass
-import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.fragments.*
-import `in`.processmaster.salestripclm.models.DevisionModel
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.models.SyncModel
 import `in`.processmaster.salestripclm.networkUtils.APIClient
@@ -40,15 +37,11 @@ import kotlinx.android.synthetic.main.progress_view.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import org.json.JSONObject
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import us.zoom.sdk.*
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import com.bumptech.glide.Glide
-
 import com.bumptech.glide.request.RequestOptions
 
 
@@ -167,7 +160,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                     return@OnNavigationItemSelectedListener true
                 }
 
-                val fragment = EdetailingFragment()
+                val fragment = EdetailingDownloadFragment()
                 openFragment(fragment)
                 openFragmentStr = "EdetailingFragment"
                 return@OnNavigationItemSelectedListener true
@@ -175,7 +168,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
             R.id.displayVisualPage -> {
                 toolbarTv?.setText("Presentation")
-                val fragment = DisplayVisualFragment()
+                val fragment = PresentEDetailingFrag()
                 openFragment(fragment)
                 openFragmentStr = "DisplayVisualFragment"
                 return@OnNavigationItemSelectedListener true
@@ -280,7 +273,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             }
 
             R.id.nav_scheduled -> {
-                var intent = Intent(this, JoinMeetingActivity::class.java)
+                var intent = Intent(this, MeetingActivity::class.java)
                 startActivity(intent)
                 overridePendingTransition(0, 0)
             }

@@ -20,13 +20,11 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.Toast;
-
 import in.processmaster.salestripclm.R;
-import in.processmaster.salestripclm.activity.JoinMeetingActivity;
+import in.processmaster.salestripclm.activity.MeetingActivity;
 import in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.AndroidAppUtil;
 import in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.adapter.SimpleMenuAdapter;
 import in.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.adapter.SimpleMenuItem;
-
 import in.processmaster.salestripclm.zoom_sdk_code.util.FileUtils;
 import us.zoom.sdk.InMeetingService;
 import us.zoom.sdk.InMeetingShareController;
@@ -218,7 +216,7 @@ public class MeetingShareHelper {
             Intent intent = mgr.createScreenCaptureIntent();
             if (AndroidAppUtil.hasActivityForIntent(activity, intent)) {
                 try {
-                    activity.startActivityForResult(mgr.createScreenCaptureIntent(), JoinMeetingActivity.REQUEST_SHARE_SCREEN_PERMISSION);
+                    activity.startActivityForResult(mgr.createScreenCaptureIntent(), new MeetingActivity().REQUEST_SHARE_SCREEN_PERMISSION);
                 } catch (Exception e) {
                     Log.e(TAG, "askScreenSharePermission failed");
                 }

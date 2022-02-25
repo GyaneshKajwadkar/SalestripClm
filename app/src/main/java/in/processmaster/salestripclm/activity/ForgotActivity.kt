@@ -37,9 +37,7 @@ class ForgotActivity : BaseActivity() {
     fun initView()
     {
 
-        signIn_tv!!.setOnClickListener{
-            onBackPressed()
-        }
+        signIn_tv!!.setOnClickListener{ onBackPressed() }
 
         sendOtp_btn!!.setOnClickListener{
 
@@ -84,8 +82,6 @@ class ForgotActivity : BaseActivity() {
                 }
                 generateOTP_api()
             }
-
-
         }
 
     }
@@ -119,7 +115,6 @@ class ForgotActivity : BaseActivity() {
         }
 
         verify_btn.setOnClickListener{
-            //if verify edit text is empty
             if(verify_et.getText().isEmpty())
             {
                 verify_et.setError("Required")
@@ -189,7 +184,6 @@ class ForgotActivity : BaseActivity() {
     private fun verifyOTP_api(progressBar: ProgressBar, otpString: String, empId: String, editText: EditText, alertDialog: AlertDialog)
     {
         apiInterface= APIClient.getClient(1, "").create(APIInterface::class.java)
-
         alertClass.showAlert("")
 
         var call: Call<GenerateOTPModel> = apiInterface?.verifyOtpAPI(
@@ -209,7 +203,6 @@ class ForgotActivity : BaseActivity() {
                         newPassParent_ll?.visibility = View.VISIBLE
                         sendOtp_btn?.setText("Change password")
                         alertDialog.dismiss()
-
                     }
                     else
                     {
@@ -248,7 +241,6 @@ class ForgotActivity : BaseActivity() {
                     if(generateModel?.data?.message.isNullOrEmpty())
                     {
                         Toast.makeText(this@ForgotActivity,generateModel?.errorObj?.errorMessage,Toast.LENGTH_LONG).show()
-
                     }
                     else
                     {

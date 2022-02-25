@@ -6,8 +6,8 @@ import `in`.processmaster.salestripclm.common_classes.AlertClass.Companion.retun
 import `in`.processmaster.salestripclm.models.GetScheduleModel
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.networkUtils.APIClientKot
-import `in`.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.zoommeetingui.ZoomMeetingUISettingHelper
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
+import `in`.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.zoommeetingui.ZoomMeetingUISettingHelper
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.annotation.SuppressLint
 import android.content.Context
@@ -148,8 +148,8 @@ class ScheduleMeetingAdapter(
                     Log.e("sdnuiapiTime",apiTime.toString())
                     val currentTimeInt : Int =currentTime.replace(":","").toInt()
                     val apiTimeInt : Int =apiTime.replace(":","").toInt()
-                    launchZoomUrl(filteredData?.get(position))
-                   // onClickBtnStart(filteredData?.get(position)?.zoomMeetingId)
+                  //  launchZoomUrl(filteredData?.get(position))
+                    onClickBtnStart(filteredData?.get(position)?.zoomMeetingId)
                     return@setOnClickListener
                     if(apiTimeInt<=currentTimeInt)
                     {

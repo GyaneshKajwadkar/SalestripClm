@@ -8,12 +8,8 @@ import `in`.processmaster.salestripclm.models.DownloadFileModel
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -30,8 +26,7 @@ class Edetailing_Adapter(
     var edetailidList: ArrayList<DevisionModel.Data.EDetailing>?,
     private var sharePreferance: PreferenceClass?,
     var context: Activity,
-    var db: DatabaseHandler,
-    var progressView_parentRv: RelativeLayout?
+    var db: DatabaseHandler
 ) : RecyclerView.Adapter<Edetailing_Adapter.MyViewHolder>(), Filterable
 {
 

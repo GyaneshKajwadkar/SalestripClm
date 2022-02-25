@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
-
+    android:orientation="vertical"
+    tools:ignore="MissingDefaultResource">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -121,23 +121,11 @@
                                 android:textColor="@color/white"
                                 android:textSize="7sp"/>
 
-
                         </LinearLayout>
-
-
                     </LinearLayout>
-
-
-
                 </RelativeLayout>
-
-
-
             </LinearLayout>
-
-
         </RelativeLayout>
-
 
 
         <LinearLayout
@@ -145,8 +133,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-
-
 
             <RelativeLayout
                 android:orientation="vertical"
@@ -157,11 +143,10 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/selectorButton_rv"/>
+                    android:id="@+id/c"/>
 
                 <LinearLayout
                     android:id="@+id/splitViewparent_ll"
-                    android:layout_above="@+id/bottomButton_Parent"
                     android:layout_below="@+id/selectorButton_rv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -252,17 +237,7 @@
                                 </RelativeLayout>
 
                             </RelativeLayout>
-
-
-
-
-
-
-
-
                         </LinearLayout>
-
-
 
                         <Button
                             android:layout_margin="5dp"
@@ -291,8 +266,6 @@
                         android:layout_width="0dp"
                         android:layout_height="match_parent"/>
 
-
-
                 </LinearLayout>
 
                 <TextView
@@ -304,7 +277,6 @@
                     android:textColor="@color/black"
                     android:textSize="20sp"
                     android:text="No data found"
-                    android:layout_above="@+id/bottomButton_Parent"
                     android:layout_below="@+id/selectorButton_rv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -320,9 +292,6 @@
                     android:visibility="gone"/>
 
             </RelativeLayout>
-
-
-
         </LinearLayout>
 
         <FrameLayout
@@ -332,11 +301,8 @@
             android:visibility="gone"
             android:id="@+id/favBrand_frame"/>
 
-
     </LinearLayout>
-
 
     <include layout="@layout/bottom_sheet_visualads" />
 
-    <include layout="@layout/progress_view" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

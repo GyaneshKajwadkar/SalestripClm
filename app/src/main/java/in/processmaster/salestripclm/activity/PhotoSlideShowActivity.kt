@@ -170,7 +170,6 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
                 val currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(
                     Date()
                 )
-                db?.updateBrandEndTime(currentTime.toString(),startDateTime,doctorId,brandId)
                 db?.updateendData(currentDate + " " + currentTime,startDateTime)
                 onBackPressed()
                 finish()
@@ -700,8 +699,6 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
     override fun onClickDisplayVisual(passingInterface: Int, brandIDInterface: Int,selectionType: Int)
     {
-
-        db?.updateBrandEndTime(currentTime.toString(),startDateTime,doctorId,brandId)
 
         arrayImage.clear()
 

@@ -1,7 +1,6 @@
 package `in`.processmaster.salestripclm.adapter
 
 import `in`.processmaster.salestripclm.R
-import `in`.processmaster.salestripclm.fragments.EdetailingFragment
 import `in`.processmaster.salestripclm.models.SyncModel
 import android.content.Context
 import android.view.LayoutInflater
@@ -10,10 +9,7 @@ import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
-import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import java.util.ArrayList
 

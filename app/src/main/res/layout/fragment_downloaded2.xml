@@ -32,7 +32,4 @@
             android:src="@drawable/nodata_gif" />
 
 
-        <include layout="@layout/progress_view" />
-
-
 </RelativeLayout>

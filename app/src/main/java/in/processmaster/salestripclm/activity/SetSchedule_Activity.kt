@@ -8,9 +8,7 @@ import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.HomePage.Companion.apiInterface
 import `in`.processmaster.salestripclm.adapter.ScheduleMeetingAdapter
 import `in`.processmaster.salestripclm.common_classes.AlertClass
-import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.models.*
-import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
@@ -19,8 +17,6 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -55,12 +51,13 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.text.DateFormat
 import okhttp3.RequestBody
+import java.lang.Runnable
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import kotlin.concurrent.schedule
 
 
-class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/*, PreMeetingServiceListener, UserLoginCallback.ZoomDemoAuthenticationListener*/
+class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
 {
     val myCalendar = Calendar.getInstance()
     private var mPreMeetingService: PreMeetingService? = null
@@ -79,26 +76,38 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_set_schedule_)
 
-        getTeamsApi()
-        var zoomSDKBase = ZoomSDK.getInstance()
-
-        if(!zoomSDKBase.isLoggedIn)
+        if(!sharePreferanceBase?.getPrefBool("zoomCrediential")!!)
         {
-            CoroutineScope(IO).launch {
-                async {
-                    getCredientailAPI(this@SetSchedule_Activity)
+            val r: Runnable = object : Runnable {
+                override fun run() {
+                    if(AlertClass.retunDialog) {
+                        finish()
+                    }}}
+            alertClass.commonAlertWithRunnable("Zoom Alert","Zoom account is not created. Contact to your administration for more info",r)
+            return
+        }
+        else{
+            getTeamsApi()
+            var zoomSDKBase = ZoomSDK.getInstance()
+
+            if(!zoomSDKBase.isLoggedIn)
+            {
+                CoroutineScope(IO).launch {
+                    async {
+                        getCredientailAPI(this@SetSchedule_Activity)
+                    }
                 }
             }
-            //  getCredientail_api(this)
+
+            Timer().schedule(50){
+                runOnUiThread(java.lang.Runnable {
+                    init()
+                    setScheduleAdapter()
+                })
+            }
         }
 
-        Timer().schedule(50){
 
-            runOnUiThread(java.lang.Runnable {
-                init()
-                setScheduleAdapter()
-            })
-        }
 
     }
 
@@ -156,9 +165,6 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
                 }
             }
             callSelectedAdapter(1)
-
-            Log.e("theSizeOFTeam",scheduledObject.employeeList?.size.toString())
-            Log.e("theSiz",arrayListSelectorTeams?.size.toString())
 
             for(intentTeamList in scheduledObject.employeeList!!)
             {
@@ -341,13 +347,9 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
                         System.out.println(dateObj)
                         val strDate= SimpleDateFormat("K:mm").format(dateObj)
                         stopTime.setText("$strDate $AM_PM" )
-
                     } catch (e: ParseException) {
                         e.printStackTrace()
                     }
-
-
-
                 }
             }, hour, minute, false) //Yes 24 hour time
 
@@ -355,13 +357,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
             mTimePicker.show()
         })
 
-        val db=DatabaseHandler(this)
-
         var arrayListDoctor: ArrayList<String> = ArrayList()
-
-        // var model = Gson().fromJson(db.getAllData(), SyncModel::class.java)
-
-
         arrayListDoctor.add("Select Doctor")
 
         for(item in SplashActivity.staticSyncData?.data?.doctorList!!)
@@ -377,15 +373,6 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
         radio_meeting.setOnCheckedChangeListener(RadioGroup.OnCheckedChangeListener { group, checkedId ->
             generalClass.HideKeyboard(currentFocus ?: View(this@SetSchedule_Activity))
 
-            /*   when (checkedId) {
-
-                   R.id.radio0 -> {
-                   }
-                   R.id.radio1 -> {
-                   }
-                   R.id.radio2 -> {
-                   }
-               }*/
         })
 
 
@@ -477,56 +464,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
                 remark_et.setError("Required")
                 return@setOnClickListener
             }
-
-            //yyyy-MM-ddTHH:mm:ss
             setSheduleApi()
-
-
-
-
-            /*   if (mPreMeetingService == null)
-               {
-                   return@setOnClickListener
-               }*/
-
-
-
-            /*     val meetingItem = mPreMeetingService!!.createScheduleMeetingItem()
-
-                 meetingItem.meetingTopic = subject_et.text.toString()
-                 meetingItem.startTime =getTimeDate().time
-                 meetingItem.durationInMinutes = getDurationInMinutes()
-                 meetingItem.canJoinBeforeHost = true
-                 meetingItem.password = "zoom"
-                 meetingItem.isHostVideoOff = false
-                 meetingItem.isAttendeeVideoOff = true
-
-                 meetingItem.availableDialinCountry = mCountry
-
-                 meetingItem.isEnableMeetingToPublic = false
-                 meetingItem.isEnableLanguageInterpretation =false
-                 meetingItem.isEnableWaitingRoom = false
-                 meetingItem.isUsePmiAsMeetingID = false
-                 var mTimeZoneId = TimeZone.getDefault().id
-                 meetingItem.audioType = MeetingItem.AudioType.AUDIO_TYPE_VOIP
-
-                 meetingItem.timeZoneId = mTimeZoneId
-
-                 if (mPreMeetingService != null) {
-                    mPreMeetingService!!.addListener(this)
-                     val error = mPreMeetingService!!.scheduleMeeting(meetingItem)
-                     if (error == ScheduleOrEditMeetingError.SUCCESS) {
-                         progressMessage_tv?.setText("Scheduling Meeting")
-                         enableProgress(progressView_parentRv!!)
-                     }
-                     else {
-                         Toast.makeText(this, error.toString(), Toast.LENGTH_LONG).show()
-                     }
-                 } else {
-                     Toast.makeText(this, "User not login.", Toast.LENGTH_LONG).show()
-                    // finish()
-                 }*/
-
         })
 
         doctor_spinner.setOnTouchListener(object : View.OnTouchListener {
@@ -588,124 +526,6 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
         }
     }
 
-    /*   override fun onZoomSDKLoginResult(result: Long) {
-           if (result == ZoomAuthenticationError.ZOOM_AUTH_ERROR_SUCCESS.toLong()) {
-               UserLoginCallback.getInstance().removeListener(this)
-           }
-
-           else {
-               Log.e("errorMessageghfh", result.toString())
-               Toast.makeText(this, "Login failed result code = $result", Toast.LENGTH_SHORT).show()
-           }
-       }
-
-       override fun onZoomIdentityExpired() {
-
-       }
-
-       override fun onZoomSDKLogoutResult(result: Long) {
-
-       }
-
-       override fun onZoomAuthIdentityExpired() {
-
-       }
-
-       override fun onUpdateMeeting(p0: Int, p1: Long) {
-
-       }
-
-       override fun onGetInviteEmailContent(p0: Int, p1: Long, p2: String?) {
-        Log.e("fg8uisdf",p2.toString())
-       }
-
-       override fun onScheduleMeeting(result: Int, meetingNumber: Long) {
-         *//*  if (result == PreMeetingError.PreMeetingError_Success) {
-
-            runOnUiThread {
-                disableProgress(progressView_parentRv!!)
-            }
-
-
-            val zoomSDK = ZoomSDK.getInstance()
-            val preMeetingService = zoomSDK.preMeetingService
-            if (preMeetingService != null) {
-
-                val item = preMeetingService.getMeetingItemByUniqueId(meetingNumber)
-                        if (item != null) {
-                            sendMessage(item.invitationEmailContentWithTime)
-                        }
-            }
-
-        }
-        else {
-            Toast.makeText(
-                this,
-                "Schedule failed result code =$result",
-                Toast.LENGTH_LONG
-            ).show()
-            runOnUiThread {
-                disableProgress(progressView_parentRv!!)
-            }
-        }*//*
-    }
-
-    private fun sendMessage(invitationEmailContentWithTime: String) {
-
-        runOnUiThread {
-            progressMessage_tv?.setText("Sending request")
-            enableProgress(progressView_parentRv!!)
-        }
-
-        progressMessage_tv?.setText("Sending request")
-        enableProgress(progressView_parentRv!!)
-
-        val sender = Thread(Runnable {
-            try {
-
-                val sender = GmailSender("gyaneshk13@gmail.com", "13electronic003")
-                sender.sendMail(
-                        "Sheduled meeting invitation from pms",
-                        invitationEmailContentWithTime,
-                        "gyaneshk13@gmail.com",
-                        //"anilpratapjain@gmail.com"
-                        "kajwadkar13@gmail.com"
-
-                )
-                runOnUiThread {
-                    disableProgress(progressView_parentRv!!)
-                    commonAlert(this,"Request send successfully","")
-
-                    subject_et.setText("")
-                    remark_et.setText("")
-                    selectDate_tv.setText("Select Date")
-                    startTime.setText("Start time")
-                    stopTime.setText("End time")
-                    first.isChecked=true
-
-                }
-
-
-
-            } catch (e: Exception) {
-
-                runOnUiThread {
-                    disableProgress(progressView_parentRv!!)
-                }
-                Log.e("mylog", "Error: " + e.message)
-            }
-
-
-        })
-        sender.start()
-    }
-
-    override fun onListMeeting(result: Int, meetingList: List<Long>?) {
-
-    }
-
-    override fun onDeleteMeeting(p0: Int) {
-    }*/
 
     fun compareTimes() :Boolean
     {
@@ -717,16 +537,6 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
         val startInt : Int =compareStart.toInt()
         val endInt : Int =compareEnd.toInt()
 
-        /*  if (sdf.format(date12Format.parse(startTime.text.toString())).toString() .compareTo(sdf.format(date12Format.parse(stopTime.text.toString())).toString()) < 0)
-        {
-            // Do your staff
-            Log.e("Returndfsdfsdf","getTestTime less than getCurrentTime");
-        }
-        else
-        {
-            Log.e("Returnfdsgrgvdf","getTestTime older than getCurrentTime");
-        }*/
-
         if(startInt==endInt)
         {
             generalClass.showSnackbar(parentSetSchedule,"Meeting start time and end time are equal")
@@ -736,7 +546,6 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
         else if(endInt<startInt)
         {
             //startTime is **Greater** then endTime
-
             if(endInt>1200 && startInt>1200)
             {
                 generalClass.showSnackbar(parentSetSchedule,"Reduce meeting duration and try again")
@@ -785,8 +594,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
                 s: CharSequence, start: Int,
                 count: Int, after: Int
             )
-            {
-            }
+            {}
 
             override fun onTextChanged(
                 s: CharSequence, start: Int,
@@ -892,12 +700,8 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
                 }
             }
         }
-
         callSelectedAdapter(selectionType)
     }
-
-
-
 
     private fun getTeamsApi()
     {
@@ -917,7 +721,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
                 {
                     var getTeamslist=response.body()
 
-                    for(singleItem in getTeamslist?.data?.employeeList!!)
+                    for(singleItem in getTeamslist?.getData()?.employeeList!!)
                     {
                         var selectorModel =DocManagerModel()
                         selectorModel.setName(singleItem.firstName+" "+singleItem.lastName)
@@ -958,11 +762,6 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface/
         val startTimeStr = spf.parse(startTime.text.toString())
         val endTimeStr = spf.parse(stopTime.text.toString())
         spf= SimpleDateFormat("HH:mm:ss")
-
-        val formatabc = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US)
-
-        val dateTimeStart = formatabc.parse(formattedDate+"T"+spf.format(startTimeStr))
-        val dateTimeEnd = formatabc.parse(formattedDate+"T"+spf.format(endTimeStr))
 
 
         val args =intent.getBundleExtra("fillData");

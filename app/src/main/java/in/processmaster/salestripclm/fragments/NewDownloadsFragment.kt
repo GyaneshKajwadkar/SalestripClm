@@ -10,7 +10,6 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,16 +20,12 @@ class NewDownloadsFragment : Fragment() {
     var recyclerView: RecyclerView?=null
     var sharePreferance: PreferenceClass?= null
     var db = DatabaseHandler(activity)
-    var progressView_parentRv: RelativeLayout?= null
     var nodownload_tv: TextView?= null
-    var   getAlleDetailListDb: ArrayList<DevisionModel.Data.EDetailing> = ArrayList()
+    var getAlleDetailListDb: ArrayList<DevisionModel.Data.EDetailing> = ArrayList()
     var isFirstTimeOpen=true
-
-
     companion object {
         var adapter : Edetailing_Adapter?=null
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,7 +37,6 @@ class NewDownloadsFragment : Fragment() {
 
         recyclerView=view.findViewById(R.id.recyclerView)as RecyclerView
         nodownload_tv=view.findViewById(R.id.nodownload_tv)as TextView
-        progressView_parentRv=view.findViewById(R.id.progressView_parentRv)as RelativeLayout
 
         sharePreferance = PreferenceClass(activity)
         db = DatabaseHandler(activity)
@@ -52,19 +46,16 @@ class NewDownloadsFragment : Fragment() {
 
         getAlleDetailListDb= db.getSelectedeDetail(false)
 
-
         adapter =  Edetailing_Adapter(
-            getAlleDetailListDb, sharePreferance, requireActivity(), db,
-            progressView_parentRv
-        )
+            getAlleDetailListDb, sharePreferance, requireActivity(), db)
 
         val layoutManager = LinearLayoutManager(activity)
         recyclerView?.layoutManager = layoutManager
         recyclerView?.adapter = adapter
 
-        if(EdetailingFragment.filter_et?.text?.equals("") == false)
+        if(EdetailingDownloadFragment.filter_et?.text?.equals("") == false)
         {
-            editTextFilter(EdetailingFragment.filter_et?.text.toString())
+            editTextFilter(EdetailingDownloadFragment.filter_et?.text.toString())
         }
 
         isFirstTimeOpen=false
@@ -83,15 +74,12 @@ class NewDownloadsFragment : Fragment() {
             getAlleDetailListDb.clear()
             getAlleDetailListDb.addAll(geteDetail)
             adapter =  Edetailing_Adapter(
-                getAlleDetailListDb, sharePreferance, requireActivity(), db,
-                progressView_parentRv
+                getAlleDetailListDb, sharePreferance, requireActivity(), db
             )
             recyclerView?.adapter = adapter
             adapter?.notifyDataSetChanged()
-
         }
     }
-
 
     fun editTextFilter(string: String)
     {

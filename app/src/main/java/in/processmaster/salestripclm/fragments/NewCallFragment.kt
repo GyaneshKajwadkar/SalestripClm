@@ -52,7 +52,6 @@ import kotlinx.android.synthetic.main.progress_view.view.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 

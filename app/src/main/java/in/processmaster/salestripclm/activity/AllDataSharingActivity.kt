@@ -33,15 +33,11 @@ class AllDataSharingActivity : BaseActivity()
     {
         dbBase= DatabaseHandler(this)
 
-        dataSelectorback_iv.setOnClickListener({
-            onBackPressed()
-        })
+        dataSelectorback_iv.setOnClickListener({ onBackPressed() })
 
         var downloadedList = dbBase?.getAllDataUsingType("IMAGE")
 
-        val mNoOfColumns = this?.let { Utility.calculateNoOfColumns(it, 180F) }
-
-        dataSelector_rv.layoutManager= GridLayoutManager(this, mNoOfColumns)
+        dataSelector_rv.layoutManager= GridLayoutManager(this, 6)
 
         var adapter=SelectorAdapter(downloadedList)
         dataSelector_rv.adapter=adapter
@@ -86,16 +82,12 @@ class AllDataSharingActivity : BaseActivity()
                 val colorId = buttonColor.color
 
                 if (colorId == ContextCompat.getColor(this@AllDataSharingActivity, R.color.gray)) {
-                   // allFiles?.get(position)?.isSend = true
                     holder.parentImage_rl.setBackgroundColor(
                         ContextCompat.getColor(
                             this@AllDataSharingActivity,
                             R.color.appColor
-                        )
-                    )
-                }
+                        )) }
                 else {
-                   // allFiles?.get(position)?.isSend = false
                     holder.parentImage_rl.setBackgroundColor(
                         ContextCompat.getColor(
                             this@AllDataSharingActivity,
@@ -109,19 +101,6 @@ class AllDataSharingActivity : BaseActivity()
         override fun getItemCount(): Int
         {
             return allFiles?.size!!
-        }
-
-        /*  fun getAllWorkRows(): ArrayList<ImageSelectorActivity.SendImage>? {
-            return allFiles
-        }*/
-    }
-
-
-    object Utility {
-        fun calculateNoOfColumns(context: Context, columnWidthDp: Float): Int { // For example columnWidthdp=180
-            val displayMetrics: DisplayMetrics = context.getResources().getDisplayMetrics()
-            val screenWidthDp = displayMetrics.widthPixels / displayMetrics.density
-            return (screenWidthDp / columnWidthDp + 0.5).toInt()
         }
     }
 

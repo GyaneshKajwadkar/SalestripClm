@@ -1,4 +1,3 @@
-
 package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.R
@@ -30,9 +29,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.io.*
 
-
 class LoginActivity : BaseActivity() {
-
     var apiInterface: APIInterface? = null
     var sharePreferance: PreferenceClass?= null
 
@@ -40,49 +37,37 @@ class LoginActivity : BaseActivity() {
         getSupportActionBar()?.hide()   //Hiding Toolbar
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        dexterPermission(this)
-    }
+        dexterPermission(this) }
 
     // initilizeVariables and click
     fun initView()
     {
-
         sharePreferance = PreferenceClass(this)
-
         apiInterface= getClient(1, "").create(APIInterface::class.java)
 
         mpin_tv!!.setOnClickListener(object : View.OnClickListener {
             override fun onClick(p0: View?) {
                 var setText: String = mpin_tv!!.getText().toString()
                 if (setText.equals("Login with MPIN")) {
-                    mpin_tv!!.setText("Login with password");
+                    mpin_tv!!.setText("Login with password")
                     password_et!!.setHint("MPIN *")
                 } else {
                     mpin_tv!!.setText("Login with MPIN")
                     password_et!!.setHint("Password *")
-                }
-            }
-        })
+                } } })
 
         //if user name exist then auto fill user name
         if(!sharePreferance?.getPref("userName_login")?.isEmpty()!!)
-        {
-            userName_et?.setText(sharePreferance?.getPref("userName_login"))
-        }
+        { userName_et?.setText(sharePreferance?.getPref("userName_login")) }
 
         //userName_et?.setText("shubham")
          userName_et?.setText("NILESH")
        // password_et?.setText("jack@321")
          password_et?.setText("NILESH")
-
         companyCode_et.setText("UAT2")
         //forgot click
         forgotPass_tv!!.setOnClickListener {
-            val intent = Intent(
-                this,
-                ForgotActivity::class.java
-            )
+            val intent = Intent(this, ForgotActivity::class.java)
             startActivity(intent)
         }
 
@@ -101,15 +86,10 @@ class LoginActivity : BaseActivity() {
                 password_et!!.requestFocus()
                 return@setOnClickListener
             }
-
             if(generalClass.isInternetAvailable())
-            {
-                login_api()
-            }
+            { login_api() }
             else
-            {
-                alertClass.networkAlert()
-            }
+            { alertClass.networkAlert() }
         }
 
         //Verify Button Check
@@ -121,25 +101,12 @@ class LoginActivity : BaseActivity() {
                 companyCode_et!!.requestFocus()
                 return@setOnClickListener
             }
-
-            try {
-                val imm: InputMethodManager =
-                    getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
-            }
-            catch (e: java.lang.Exception)
-            {
-                // TODO: handle exception
-            }
+            generalClass.hideKeyboard(this,it)
 
             if(generalClass.isInternetAvailable())
-            {
-                checkCC_api()
-            }
+            { checkCC_api() }
             else
-            {
-                alertClass.networkAlert()
-            }
+            { alertClass.networkAlert() }
         }
 
         //enable company code is not null
@@ -168,7 +135,6 @@ class LoginActivity : BaseActivity() {
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
 
                     var loginModel = response.body()
-                    // saveLoginData(loginModel)
 
                     sharePreferance?.setPref("userName_login", userName_et?.getText().toString())
                     sharePreferance?.setPrefBool("isLogin", true)
@@ -219,7 +185,6 @@ class LoginActivity : BaseActivity() {
                 } else {
                     //check and save company code in sp
                     sharePreferance?.setPref("secondaryUrl", response.body().toString())
-                    //  sharePreferance?.setPref("secondaryUrl", "https://app.salestrip.in/")
                     sharePreferance?.setPref(
                         "companyCode",
                         companyCode_et?.getText().toString().uppercase()
@@ -242,9 +207,7 @@ class LoginActivity : BaseActivity() {
     {
         alertClass.showAlert("")
 
-        var call: Call<String> = apiInterface?.checkVersion(
-            /*  companyCode*/
-        ) as Call<String>
+        var call: Call<String> = apiInterface?.checkVersion() as Call<String>
         call.enqueue(object : Callback<String?> {
             override fun onResponse(call: Call<String?>?, response: Response<String?>) {
                 Log.e("checkVersioin_api", response.code().toString() + "")
@@ -266,27 +229,12 @@ class LoginActivity : BaseActivity() {
                         //   var updateLower: Boolean = checkForUpdateLower(version, namesList.get(0))
                         //   var updateHigher: Boolean = checkForUpdateHigher(version, namesList.get(1))
 
-                        //   Log.e("versionCodeiS", version)
-                        //   Log.e("response", response.body().toString())
-                        //   Log.e("updateLower", updateLower.toString())
-                        //   Log.e("updateHigher", updateHigher.toString())
-
                         val verionLower = namesList.get(0).replace(".","").toInt()
                         val versionHigher = namesList.get(1).replace(".","").toInt()
 
-                        Log.e("replacedString",verionLower.toString())
-                        Log.e("replacedHString",versionHigher.toString())
-                        Log.e("replacedCString",versionHigher.toString())
-
                         if(version<verionLower||version>versionHigher)
-                        {
-                            needUpdateAlert()
-
-                        }
-
-
-
-                        /*  if (updateLower) {
+                        { needUpdateAlert() }
+                    /*  if (updateLower) {
                               try {
                                   startActivity(
                                           Intent(
@@ -309,7 +257,6 @@ class LoginActivity : BaseActivity() {
                 }
                 alertClass.hideAlert()
             }
-
             override fun onFailure(call: Call<String?>, t: Throwable?) {
                 generalClass.checkInternet()
                 call.cancel()
@@ -330,13 +277,10 @@ class LoginActivity : BaseActivity() {
         alertDialog.setCancelable(false)
         alertDialog.setCanceledOnTouchOutside(false);
 
-
         val okBtn_rl =
             dialogView.findViewById<View>(R.id.update_btn) as Button
 
-
         okBtn_rl.setOnClickListener {
-
             try {
                 startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")))
             } catch (e: ActivityNotFoundException) {
@@ -375,121 +319,9 @@ class LoginActivity : BaseActivity() {
 
         okBtn_rl.setOnClickListener{
             alertDialog.dismiss()
-
             val intent= Intent(this, HomePage::class.java)
             startActivity(intent)
         }
-
         alertDialog.show()
     }
-
-    /*   fun saveLoginData(loginModel: LoginModel?)
-       {
-           //check is image name is empty or not
-           if(!loginModel?.imageName?.isEmpty()!!)
-           {
-               //save user data to shareprefrance
-               val gson = Gson()
-               sharePreferance?.setPref("profileData", gson.toJson(loginModel))
-               //save profile image to local storage
-               saveImageTofolder(loginModel.imageName, "profilePic")
-              // loginModel?.imageName?.let { saveImageTofolder(it, "profilePic") }
-           }
-           else
-           {
-               val gson = Gson()
-               sharePreferance?.setPref("profileData", gson.toJson(loginModel))
-               callHomePage()
-           }
-       }*/
-
-
-    /* //download profile pic from url and save to local storage
-       fun saveImageTofolder(uRl: String, picName: String)
-       {
-
-           Log.e("uRlyes", uRl)
-
-               Picasso.get().load(uRl).
-               into(object : com.squareup.picasso.Target {
-                   override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                       Log.e("exception", e.toString())
-                       disableProgress(progressBar!!)
-                   }
-
-                   override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-
-                       val file: File =
-                               File(getFilesDir()?.getAbsolutePath() + "/" + picName + ".jpg")
-                       if (file.exists()) {
-                           file.delete()
-                       }
-                       file.createNewFile()
-                       val bitmap12 = bitmap
-                       try {
-                           val out = FileOutputStream(file)
-                           bitmap12?.compress(Bitmap.CompressFormat.JPEG, 100, out)
-                           out.flush()
-                           out.close()
-
-                           Log.e("uuyes", "gsefgwesf")
-
-                           sharePreferance?.setPref(picName, file.absolutePath)
-                           callHomePage()
-                           getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-
-                       } catch (e: java.lang.Exception) {
-                           Log.e("exceptionProfileSave", e.message.toString())
-                           e.printStackTrace()
-                           disableProgress(progressBar!!)
-                       }
-                   }
-
-                   override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-                       Log.e("placeHolderDrawable", "placeHolderDrawable")
-                   }
-
-               })
-    }*/
-
-    /*  fun saveImageTofolder(uRl: String, picName: String)
-      {
-          Glide.with(this)
-                  .asBitmap()
-                  .load(uRl)
-                  .into(object : CustomTarget<Bitmap>(){
-                      override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                          val file: File =
-                                  File(getFilesDir()?.getAbsolutePath() + "/" + picName + ".jpg")
-                          if (file.exists()) {
-                              file.delete()
-                          }
-                          file.createNewFile()
-                          val bitmap12 = resource
-                          try {
-                              val out = FileOutputStream(file)
-                              bitmap12?.compress(Bitmap.CompressFormat.JPEG, 100, out)
-                              out.flush()
-                              out.close()
-
-                              sharePreferance?.setPref(picName, file.absolutePath)
-                              callHomePage()
-                              getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-
-                          } catch (e: java.lang.Exception) {
-                              Log.e("exceptionProfileSave", e.message.toString())
-                              e.printStackTrace()
-                             // disableProgress(progressView_parentRv!!)
-                          }  }
-                      override fun onLoadCleared(placeholder: Drawable?) {
-                          // this is called when imageView is cleared on lifecycle call or for
-                          // some other reason.
-                          // if you are referencing the bitmap somewhere else too other than this imageView
-                          // clear it here as you can no longer have the bitmap
-                      }
-                  })
-      }
-  */
-
-
 }

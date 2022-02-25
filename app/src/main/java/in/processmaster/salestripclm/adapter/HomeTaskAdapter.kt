@@ -3,7 +3,6 @@ package `in`.processmaster.salestripclm.adapter
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.SplashActivity
 import `in`.processmaster.salestripclm.fragments.ToadyTaskFragment
-import `in`.processmaster.salestripclm.models.SyncModel
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
@@ -17,7 +16,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
-import com.google.gson.Gson
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*

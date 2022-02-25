@@ -1,16 +1,12 @@
 package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.R
-import `in`.processmaster.salestripclm.fragments.DisplayVisualFragment
+import `in`.processmaster.salestripclm.fragments.PresentEDetailingFrag
 import `in`.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.other.MeetingCommonCallback
-import `in`.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.remotecontrol.MeetingRemoteControlHelper
 import `in`.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.share.MeetingShareHelper
 import `in`.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.share.MeetingShareHelper.MeetingShareUICallBack
 import `in`.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.user.MeetingUserCallback
 import `in`.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.MeetingWindowHelper
-import `in`.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.adapter.AttenderVideoAdapter
-import `in`.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.adapter.AttenderVideoAdapter.ItemClickListener
-import `in`.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.share.CustomShareView
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
@@ -19,7 +15,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
-import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -28,9 +23,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
-import kotlinx.android.synthetic.main.activity_online_presentation.*
 import kotlinx.android.synthetic.main.common_toolbar.*
 import us.zoom.sdk.*
 
@@ -62,7 +55,7 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
             ProcessLifecycleOwner.get().getLifecycle().addObserver(this)
         }
 
-        val fragment = DisplayVisualFragment()
+        val fragment = PresentEDetailingFrag()
         openFragment(fragment)
 
     }

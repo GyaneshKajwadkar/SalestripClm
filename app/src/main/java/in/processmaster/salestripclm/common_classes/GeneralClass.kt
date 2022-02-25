@@ -1,15 +1,11 @@
 package `in`.processmaster.salestripclm.common_classes
 
-import `in`.processmaster.salestripclm.R
-import `in`.processmaster.salestripclm.activity.PhotoSlideShowActivity
-import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import android.app.Activity
 import android.content.Context
 import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
-import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager

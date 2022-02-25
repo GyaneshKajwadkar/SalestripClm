@@ -159,15 +159,11 @@
                         app:tabMode="fixed"/>
                 </com.google.android.material.appbar.AppBarLayout>
 
-                <view class="in.processmaster.salestripclm.fragments.EdetailingFragment$CustomViewPager"
+                <view class="in.processmaster.salestripclm.fragments.EdetailingDownloadFragment$CustomViewPager"
                     android:id="@+id/viewpager"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
-
-
             </LinearLayout>
-
-
 
             <LinearLayout
                 android:visibility="gone"
@@ -191,18 +187,7 @@
                 android:layout_weight="0.5"
                 android:layout_width="0dp"
                 android:layout_height="match_parent">
-
-
             </RelativeLayout>
-
-
-
         </LinearLayout>
-
-
-
     </LinearLayout>
-
-    <include layout="@layout/progress_view" />
-
 </RelativeLayout>

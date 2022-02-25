@@ -48,7 +48,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class DisplayVisualFragment : Fragment(),  SortingDisplayVisual, ItemClickDisplayVisual {
+class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDisplayVisual {
 
     companion object
     {
@@ -66,7 +66,6 @@ class DisplayVisualFragment : Fragment(),  SortingDisplayVisual, ItemClickDispla
     var edetailingFavList: ArrayList<DevisionModel.Data.EDetailing>? = null
     var downloadFilePathList: ArrayList<DownloadFileModel> = ArrayList()
     var storedDownloadedList: ArrayList<DownloadFileModel> = ArrayList()
-   // var favProductDoctorList: ArrayList<SyncModel.Data.Doctor.LinkedBrand> = ArrayList()
     var views:View?=null
     var doctorName=""
 
@@ -101,50 +100,37 @@ class DisplayVisualFragment : Fragment(),  SortingDisplayVisual, ItemClickDispla
 
         views!!.submitBtn?.setOnClickListener({
 
-
             val bundle = arguments
-
             if(bundle !=null)
             {
                   val intent = Intent(activity, SubmitE_DetailingActivity::class.java)
                   intent.putExtra("doctorID", doctorIdDisplayVisual)
                   intent.putExtra("doctorName", doctorName)
                   startActivityForResult(intent,2)
-
             }
             else{
                 Toast.makeText(context,"Data save successfully",Toast.LENGTH_LONG).show()
                 views!!.submitBtn?.visibility=View.INVISIBLE
             }
-
-
-
-
-
-
-            //  if (!GeneralClass(requireActivity()).isInternetAvailable())
-            //  {
-            //      AlertClass(requireActivity()).networkAlert()
-            //  }
-            //  else
-            //  {
-            //      sendVisual_api()
-            //  }
         })
 
-        views!!.progressMessage_tv?.setText("Loading e-Detailing")
+        setDoctorList()
+        setAdapter()
+        setSelectorAdapter(downloadFilePathList)
+        setUserFavAdapter()
+
+ /*       views!!.progressMessage_tv?.setText("Loading e-Detailing")
         GeneralClass(requireActivity()).enableProgress(views!!.progressView_parentRv!!)
-        //  activity?.let { GeneralClass(requireActivity()).enableProgress(progressView_parentRv!!) }
+
 
         Handler(Looper.getMainLooper()).postDelayed({
-
             setDoctorList()
             setAdapter()
             setSelectorAdapter(downloadFilePathList)
             setUserFavAdapter()
             GeneralClass(requireActivity()).disableProgress(views!!.progressView_parentRv!!)
             //  activity?.let { disableProgress(progressView_parentRv!!, it) }
-        }, 50)
+        }, 50)*/
 
         callDownloadFragment()
 
@@ -195,7 +181,6 @@ class DisplayVisualFragment : Fragment(),  SortingDisplayVisual, ItemClickDispla
 
     fun setDoctorList()
     {
-        //  var model = Gson().fromJson(db.getAllData(), SyncModel::class.java)      //get doctor list from db and convert it string to model class
         adapter = BottomSheetDoctorAdapter(
             SplashActivity.staticSyncData?.data?.doctorList as ArrayList<SyncModel.Data.Doctor>,
             doctor_et!!,
@@ -210,10 +195,8 @@ class DisplayVisualFragment : Fragment(),  SortingDisplayVisual, ItemClickDispla
     {
         var downloadTypeList: ArrayList<String> = ArrayList()
         downloadTypeList.add("All")
-        for ((index, valueDownload) in list?.withIndex()!!)
-        {
-            downloadTypeList.add(valueDownload.downloadType)
-        }
+        for ( valueDownload in list!!)
+        { downloadTypeList.add(valueDownload.downloadType) }
         val hashSet: Set<String> = LinkedHashSet(downloadTypeList)
         downloadTypeList.clear()
         downloadTypeList.addAll(hashSet)
@@ -241,7 +224,7 @@ class DisplayVisualFragment : Fragment(),  SortingDisplayVisual, ItemClickDispla
 
                     var filterList: ArrayList<DownloadFileModel> = ArrayList()
 
-                    for ((index, valueDownload) in downloadFilePathList?.withIndex()!!) {
+                    for ( valueDownload in downloadFilePathList!!) {
 
                         if (valueDownload.downloadType.equals(item)) {
                             filterList?.add(valueDownload)
@@ -275,9 +258,7 @@ class DisplayVisualFragment : Fragment(),  SortingDisplayVisual, ItemClickDispla
             adapter?.getFilter()?.filter(s.toString());
         }
 
-        override fun afterTextChanged(s: Editable) {
-            // TODO Auto-generated method stub
-        }
+        override fun afterTextChanged(s: Editable) {}
     }
 
     //-------------------------------------check end page of web view and enable submit button according to it
@@ -295,7 +276,7 @@ class DisplayVisualFragment : Fragment(),  SortingDisplayVisual, ItemClickDispla
         }
     }
 
-    //-------------------------------------submit Visual api
+   /* //-------------------------------------submit Visual api
     private fun sendVisual_api() {
         var visualSendModel: ArrayList<VisualAdsModel_Send> = db.getAllSubmitVisual()
         //get all submit visual api
@@ -335,7 +316,7 @@ class DisplayVisualFragment : Fragment(),  SortingDisplayVisual, ItemClickDispla
             }
         })
     }
-
+*/
     //-------------------------------------set download array list. It call  only when activity open
     fun setAdapter() {
         edetailingList = db.getAlleDetail()   //fetch edetailing list from db
@@ -347,15 +328,12 @@ class DisplayVisualFragment : Fragment(),  SortingDisplayVisual, ItemClickDispla
                     value.filePath,
                     object : TypeToken<DownloadFileModel?>() {}.type
                 )
-                //get and convert save file string to array list
-
                 downloadFilePathLocal.setDownloadType(value.divisionName) //set division name
                 downloadFilePathLocal.setBrandId(value.brandId)
                 downloadFilePathLocal.setBrandName(value.brandName)
                 downloadFilePathLocal.seteDetailingId(value.geteDetailId())
                 downloadFilePathList.add(downloadFilePathLocal)
                 storedDownloadedList.add(downloadFilePathLocal)
-
             }
 
             if (index == edetailingList?.size!! - 1) {
@@ -464,20 +442,6 @@ class DisplayVisualFragment : Fragment(),  SortingDisplayVisual, ItemClickDispla
 //        }
     }
 
-    //-------------------------------------interface override method to get doctor id from bottom sheet adapter
-//    override fun onClickString(passingInterface: String) {
-//        doctorIdDisplayVisual= passingInterface?.toInt()!!
-//
-//        callDownloadFragment()
-//    }
-    //-------------------------------------interface override method to get doctor linkedBrandList from bottom sheet adapter
-//    override fun onClickDoctor(passingInterfaceList: java.util.ArrayList<SyncModel.Data.Doctor.LinkedBrand>)
-//    {
-//        favProductDoctorList.addAll(passingInterfaceList!!)
-//        //call rearrange linkedBrandList to set priority
-//        rearrangeDownloadedList()
-//    }
-
     //-------------------------------------initilize Visual file recycler view
     fun setDownloadListAdapter(list: ArrayList<DownloadFileModel>)
     {
@@ -522,42 +486,31 @@ class DisplayVisualFragment : Fragment(),  SortingDisplayVisual, ItemClickDispla
 
             //click event of parent layout
             holder.parent_cv.setOnClickListener({
-
-                //set doctor name to parent edit text
                 doctor_et?.setText((modeldata?.doctorName))
-
-                //close bottom sheet
                 bottomSheet.setState(BottomSheetBehavior.STATE_COLLAPSED)
-
                 doctorIdDisplayVisual= modeldata?.doctorId!!
-              //  favProductDoctorList.addAll(modeldata?.linkedBrandList)
                 rearrangeDownloadedList()
                 callDownloadFragment()
 
             })
         }
         override fun getItemCount(): Int
-        {
-            return filteredData?.size!!
-        }
+        { return filteredData?.size!! }
 
 
         //-------------------------------------filter list using text input from edit text
         override fun getFilter(): Filter? {
             return object : Filter() {
-                // publis result when text editing complete
                 override fun publishResults(constraint: CharSequence?, results: FilterResults) {
                     filteredData = results.values as ArrayList<SyncModel.Data.Doctor>?
                     notifyDataSetChanged()
                 }
-                //filter list from parent list = doctor list
-                // and add filter data to = filteredData list
+
                 override fun performFiltering(constraint: CharSequence): FilterResults? {
                     var constraint = constraint
                     val results = FilterResults()
                     val FilteredArrayNames: ArrayList<SyncModel.Data.Doctor> = ArrayList()
 
-                    // perform your search here using the searchConstraint String.
                     constraint = constraint.toString().toLowerCase()
                     for (i in 0 until doctorList?.size!!) {
                         val dataNames: SyncModel.Data.Doctor = doctorList?.get(i)!!
@@ -578,7 +531,6 @@ class DisplayVisualFragment : Fragment(),  SortingDisplayVisual, ItemClickDispla
 
     override fun onClickDisplayVisual(eDetailinId: Int,brandID: Int,selectionType: Int)
     {
-
         val args = Bundle()
         args.putInt("eDetailingID", eDetailinId)
         args.putInt("brandId", brandID)
@@ -589,7 +541,6 @@ class DisplayVisualFragment : Fragment(),  SortingDisplayVisual, ItemClickDispla
 
         val transaction: FragmentTransaction = childFragmentManager.beginTransaction()
         transaction.replace(R.id.child_fragment_container, childFragment).commit()
-
     }
 
     fun onClickFavButton()
@@ -608,9 +559,7 @@ class DisplayVisualFragment : Fragment(),  SortingDisplayVisual, ItemClickDispla
     fun callDownloadFragment()
     {
         if(views!!.favBrand_frame?.visibility==View.VISIBLE)
-        {
-            onClickFavButton()
-        }
+        { onClickFavButton() }
         else
         {
             val childFragment: Fragment = ShowDownloadedFragment()

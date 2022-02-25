@@ -10,9 +10,7 @@ import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.connect
 import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.models.*
-import `in`.processmaster.salestripclm.networkUtils.APIClient
 import `in`.processmaster.salestripclm.networkUtils.APIClientKot
-import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import `in`.processmaster.salestripclm.utils.ZoomInitilizeClass
@@ -48,8 +46,7 @@ import us.zoom.sdk.*
 import java.lang.Exception
 import java.lang.ref.WeakReference
 
-open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthenticationListener ,
-    MeetingServiceListener, InitAuthSDKCallback*/ {
+open class BaseActivity : AppCompatActivity(){
 
     var alertDialog: AlertDialog? = null
     var sharePreferanceBase: PreferenceClass?= null
@@ -58,17 +55,13 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
     val generalClass=GeneralClass(this)
     val alertClass=AlertClass(this)
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_base)
 
-        connectivityChangeReceiver=
-            ConnectivityChangeReceiver()
-
+        connectivityChangeReceiver= ConnectivityChangeReceiver()
         zoomSDKBase = ZoomSDK.getInstance()
         sharePreferanceBase = PreferenceClass(this)
-
     }
 
 
@@ -102,16 +95,10 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
 
             alertDialogNetwork?.show()
         }
-
-
     }
 
     fun disableNetworkAlert() {
-        if (alertDialogNetwork != null) {
-
-            alertDialogNetwork?.dismiss()
-        }
-
+        if (alertDialogNetwork != null) { alertDialogNetwork?.dismiss() }
     }
 
     //check permission
@@ -125,27 +112,18 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
             .withListener(object : MultiplePermissionsListener {
                 override fun onPermissionsChecked(report: MultiplePermissionsReport) {
                     // check if all permissions are granted
-                    if (report.areAllPermissionsGranted()) {
-
-                    } else {
-                        permissionDenied_Dialog(context, false)
-                    }
-
+                    if (report.areAllPermissionsGranted()) { }
+                    else { permissionDenied_Dialog(context, false) }
 
                     if (report.isAnyPermissionPermanentlyDenied()) {
                         // permission is denied permenantly, navigate user to app settings
-                        permissionDenied_Dialog(context, true)
-                    }
-
-
+                        permissionDenied_Dialog(context, true) }
                 }
 
                 override fun onPermissionRationaleShouldBeShown(
                     permissions: List<PermissionRequest?>?,
                     token: PermissionToken
-                ) {
-                    token.continuePermissionRequest()
-                }
+                ) { token.continuePermissionRequest() }
             })
             .onSameThread()
             .check()
@@ -167,32 +145,23 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
         alertDialog!!.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         alertDialog!!.setCanceledOnTouchOutside(false)
 
-        val ok_btn =
-            dialogView.findViewById<View>(R.id.ok_btn) as AppCompatButton
-        val retry_btn =
-            dialogView.findViewById<View>(R.id.retry_btn) as AppCompatButton
+        val ok_btn = dialogView.findViewById<View>(R.id.ok_btn) as AppCompatButton
+        val retry_btn = dialogView.findViewById<View>(R.id.retry_btn) as AppCompatButton
 
         if (setButtonText) {
             retry_btn.setText("Setting")
         }
 
         retry_btn.setOnClickListener {
-
             if (setButtonText) {
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                 val uri: Uri = Uri.fromParts("package", packageName, null)
                 intent.data = uri
                 startActivity(intent)
-            } else {
-                dexterPermission(context)
-            }
-
+            } else { dexterPermission(context) }
             alertDialog!!.dismiss()
         }
-        ok_btn.setOnClickListener {
-            alertDialog!!.dismiss()
-        }
-
+        ok_btn.setOnClickListener { alertDialog!!.dismiss() }
         alertDialog!!.show()
     }
 
@@ -221,8 +190,6 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
             }
             lowerVersion = versionBuilder.toString()
         }
-
-
         //if lowerVersion is greater give true
         return lowerVersion.toInt() >= existingVersion.toInt()
     }
@@ -251,7 +218,6 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
             }
             higherVersion = versionBuilder.toString()
         }
-
         return higherVersion.toInt() <= existingVersion.toInt()
     }
 
@@ -265,7 +231,6 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
     }
 
     //=========================================API Calling Section===========================================
-
 
     //Get teams api
     fun getTeamsApi( context:Activity, progressmessage:String) : ArrayList<DocManagerModel>
@@ -287,7 +252,7 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
                 if (response.code() == 200 && !response.body().toString().isEmpty())
                 {
                     var getTeamslist=response.body()
-                    for(singleItem in getTeamslist?.data?.employeeList!!)
+                    for(singleItem in getTeamslist?.getData()?.employeeList!!)
                     {
                         var selectorModel =DocManagerModel()
                         selectorModel.setName(singleItem.firstName+" "+singleItem.lastName)
@@ -295,8 +260,6 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
                         selectorModel.setSpeciality(singleItem.divisionName)
                         selectorModel.setId(singleItem.empId)
                         selectorModel.setMailId(singleItem.emailId)
-
-
                         getResponseList.add(selectorModel)
                     }
                 }
@@ -306,13 +269,11 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
                     return
                 }
                 GeneralClass(context).disableProgress(progressView_parentRv!!)
-
             }
 
             override fun onFailure(call: Call<TeamsModel?>, t: Throwable?) {
                 call.cancel()
                 GeneralClass(context).disableProgress(progressView_parentRv!!)
-
             }
         })
         return getResponseList
@@ -329,52 +290,15 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
                     val gson = Gson()
                     var model = response.body()
-                    dbBase?.addAPIData(gson.toJson(model),2,)
-                    Log.e("theScheduledApiModel",model?.getData()?.meetingList?.size.toString())
-
-                }
+                    dbBase?.addAPIData(gson.toJson(model),2,) }
                 else
-                {
-                    Log.e("elseGetScheduled", response.code().toString())
-                }
+                { Log.e("elseGetScheduled", response.code().toString()) }
             }
             else
-            {   Log.e("scheduleERROR", response.errorBody().toString())
-            }
+            {   Log.e("scheduleERROR", response.errorBody().toString()) }
         }
 
     }
-
-
-
-
-//     fun getsheduledMeeting_api(): String? {
-//
-//        progressMessage_tv?.setText("Please wait")
-//
-//
-//        var call: Call<GetScheduleModel> = getSecondaryApiInterface().getScheduledMeeting("bearer " + loginModelBase?.accessToken,loginModelBase.empId.toString()) as Call<GetScheduleModel>
-//        call.enqueue(object : Callback<GetScheduleModel?> {
-//            override fun onResponse(call: Call<GetScheduleModel?>?, response: Response<GetScheduleModel?>) {
-//                Log.e("getscheduled_api", response.code().toString() + "")
-//                if (response.code() == 200 && !response.body().toString().isEmpty()) {
-//                    val gson = Gson()
-//                    var model = response.body()
-//                    dbBase?.insertOrUpdateAPI("1",gson.toJson(model))
-//                }
-//                else
-//                {
-//                    Log.e("elseGetScheduled", response.code().toString())
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<GetScheduleModel?>, t: Throwable?) {
-//                call.cancel()
-//            }
-//        })
-//
-//        return dbBase.getApiDetail(1)
-//    }
 
     suspend fun getCredientailAPI(context: Activity)
     {
@@ -390,42 +314,36 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
                     ZoomInitilizeClass().initilizeZoom(context as Activity,model)
                 }
                 else
-                {
-                    Log.e("elseGetCrediential", response.code().toString())
-                }
+                { Log.e("elseGetCrediential", response.code().toString()) }
             }
             else
-            {
-                Log.e("scheduleERROR", response.errorBody().toString())
-            }
-        }
-    }
-
+            { Log.e("scheduleERROR", response.errorBody().toString()) }
+        } }
 
     fun getCredientail_api(context: Activity) {
 
-        var call: Call<ZoomCredientialModel> = apiInterface?.getZoomCredientail("bearer " + loginModelHomePage.accessToken,loginModelHomePage.empId.toString()) as Call<ZoomCredientialModel>
+        var call: Call<ZoomCredientialModel> = apiInterface?.getZoomCredientail("bearer " + loginModelHomePage.accessToken,"389") as Call<ZoomCredientialModel>
         call.enqueue(object : Callback<ZoomCredientialModel?> {
             override fun onResponse(call: Call<ZoomCredientialModel?>?, response: Response<ZoomCredientialModel?>) {
                 Log.e("getcrediential_api", response.code().toString() + "")
                 if (response.code() == 200 && !response.body().toString().isEmpty())
                 {
                     var model = response.body()
+                    sharePreferanceBase?.setPrefBool("zoomCrediential", true)
                     ZoomInitilizeClass().initilizeZoom(context as Activity,model)
                 }
                 else
-                {
-                    Log.e("elseGetCrediential", response.code().toString())
+                { Log.e("elseGetCrediential", response.code().toString())
+                    sharePreferanceBase?.setPrefBool("zoomCrediential", false)
                 }
             }
 
             override fun onFailure(call: Call<ZoomCredientialModel?>, t: Throwable?) {
                 Log.e("failGetCrediential",t?.message.toString())
-                call.cancel()
-            }
-        })
+                sharePreferanceBase?.setPrefBool("zoomCrediential", false)
 
-    }
+                call.cancel()
+            } }) }
 
     suspend fun submitDCRCo()
     {
@@ -445,7 +363,6 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
                     if(!jsonObjError.get("errorMessage").asString.isEmpty())
                     {
                         Log.e("errorOnSubmitEDetailing",jsonObjError.get("errorMessage").asString)
-                        //alertClass?.commonAlert("",jsonObjError.get("errorMessage").asString)
                     }
                     else {
                         dbBase.deleteSaveSend(saveModel.dcrId!!)
@@ -454,9 +371,6 @@ open class BaseActivity : AppCompatActivity()/*, UserLoginCallback.ZoomDemoAuthe
                 else Log.e("elsesubmitDCRCoAPI", response.code().toString())
             }
             else Log.e("submitDCRCoAPIERROR", response.errorBody().toString())
-
         }
-
     }
-
 }

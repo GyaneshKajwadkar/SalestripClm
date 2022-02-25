@@ -1,6 +1,6 @@
 package `in`.processmaster.salestripclm.utils
 import `in`.processmaster.salestripclm.R
-import `in`.processmaster.salestripclm.activity.JoinMeetingActivity
+import `in`.processmaster.salestripclm.activity.MeetingActivity
 import `in`.processmaster.salestripclm.models.ZoomCredientialModel
 import `in`.processmaster.salestripclm.zoom_sdk_code.initsdk.InitAuthSDKCallback
 import `in`.processmaster.salestripclm.zoom_sdk_code.initsdk.InitAuthSDKHelper
@@ -13,6 +13,7 @@ import android.graphics.drawable.ColorDrawable
 import android.util.Log
 import android.view.View
 import android.widget.RelativeLayout
+import android.widget.TextView
 import us.zoom.sdk.*
 
 class ZoomInitilizeClass() : Activity(), UserLoginCallback.ZoomDemoAuthenticationListener ,
@@ -113,13 +114,13 @@ class ZoomInitilizeClass() : Activity(), UserLoginCallback.ZoomDemoAuthenticatio
             else if(ret == ZoomApiError.ZOOM_API_ERROR_SUCCESS)
             {
                 Log.e("logResult", "loginSuccessFirst")
-                JoinMeetingActivity().initilizeZoom()
+                MeetingActivity().initilizeZoom()
             }
 
             else
             {
                 Log.e("logResult", "login and initilized")
-                JoinMeetingActivity().initilizeZoom()
+                MeetingActivity().initilizeZoom()
             }
         }
         else
@@ -146,9 +147,10 @@ class ZoomInitilizeClass() : Activity(), UserLoginCallback.ZoomDemoAuthenticatio
         progressDialog?.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
 
-        val progressbarRelative =
-            dialogView.findViewById<View>(R.id.progressView_parentRv) as RelativeLayout
+        val progressbarRelative = dialogView.findViewById<View>(R.id.progressView_parentRv) as RelativeLayout
+        val mainTitle = dialogView.findViewById<View>(R.id.progressMessage_tv) as TextView
         progressbarRelative.visibility=View.VISIBLE
+        mainTitle.setText("Initilize Zoom")
         progressbarRelative.setBackgroundColor(Color.TRANSPARENT)
         progressDialog?.show()
     }

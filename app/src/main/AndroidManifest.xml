@@ -4,8 +4,8 @@
 
     <supports-screens
         android:anyDensity="true"
-        android:resizeable="true"
-        android:largeScreens="true" />
+        android:largeScreens="true"
+        android:resizeable="true" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -13,6 +13,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.CAMERA" />
+
     <uses-feature android:name="android.hardware.camera" />
 
     <application
@@ -26,33 +27,33 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Salestrip"
         android:usesCleartextTraffic="true">
-
+        <activity
+            android:name=".activity.MeetingActivity"
+            android:screenOrientation="landscape"
+            android:exported="true"
+            android:hardwareAccelerated="true"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".activity.SubmitE_DetailingActivity"
-            android:exported="true"
             android:screenOrientation="landscape"
-            android:windowSoftInputMode="adjustPan"/>
-
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".activity.MailActivity"
-            android:exported="true"
             android:launchMode="singleTop"
             android:screenOrientation="landscape"
             android:windowSoftInputMode="stateHidden" />
-
         <activity
             android:name=".activity.OnlinePresentationActivity"
             android:launchMode="singleTop"
             android:screenOrientation="landscape"
             android:windowSoftInputMode="stateHidden" />
         <activity android:name=".activity.AllDataSharingActivity" />
-
         <activity
             android:name=".activity.ProfileeActivity"
             android:launchMode="singleTop"
             android:screenOrientation="landscape"
             android:windowSoftInputMode="stateHidden" />
-
         <activity
             android:name=".activity.SetSchedule_Activity"
             android:launchMode="singleTop"
@@ -63,7 +64,6 @@
             android:launchMode="singleTop"
             android:screenOrientation="landscape"
             android:windowSoftInputMode="stateHidden" />
-
         <activity
             android:name=".activity.VideoPlayerActivity"
             android:launchMode="singleTop"
@@ -72,7 +72,6 @@
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activity.ImageSelectorActivity"
-            android:exported="true"
             android:launchMode="singleTop"
             android:screenOrientation="landscape"
             android:windowSoftInputMode="stateHidden" />
@@ -116,7 +115,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activity.JoinMeetingActivity"
             android:exported="true"

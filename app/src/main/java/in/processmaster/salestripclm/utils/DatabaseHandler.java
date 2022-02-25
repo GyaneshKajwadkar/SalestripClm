@@ -178,21 +178,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     {  SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("delete from "+ TABLE_SAVE_API);
     }
-
-//    // code to get all data in a list view
-//    public String getAllDataSync() {
-//        String strData = "";
-//        String selectQuery = "SELECT  * FROM " + TABLE_SAVE_API;
-//        SQLiteDatabase db = this.getWritableDatabase();
-//        Cursor cursor = db.rawQuery(selectQuery, null);
-//        if (cursor.moveToFirst()) {
-//            do {
-//                strData=cursor.getString(1);
-//            } while (cursor.moveToNext());
-//        }
-//        return strData;
-//    }
-
     @SuppressLint("Range")
     public String getApiDetail(int id)
     {
@@ -203,7 +188,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 new String[] { String.valueOf(id) }, null, null, null, null);
         if (cursor.moveToFirst()) {
             do {
-                // strData=cursor.getString(1);
                 strData=cursor.getString(cursor.getColumnIndex(KEY_DATA));
             } while (cursor.moveToNext());
         }
@@ -215,29 +199,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     //insert or update edetailing table
     public void insertOrUpdateEDetail(String idModel,String data) {
-
         SQLiteDatabase db = getWritableDatabase();
         ContentValues initialValues = new ContentValues();
         initialValues.put(KEY_ID, idModel);
         initialValues.put(EDETAILING_DATA, data);
-
         //first check is data available if yes then update if no then insert
         int u = db.update(TABLE_EDETAILING, initialValues, "id=?", new String[]{String.valueOf(idModel)});
-
         if (u == 0) {
             db.insert(TABLE_EDETAILING, null, initialValues);
         }
-
-//        if(CheckIsDataAlreadyInDBorNot(String.valueOf(idModel)))
-//        {
-//            db.update(TABLE_EDETAILING, initialValues, "id=?", new String[] {String.valueOf(idModel)});
-//
-//        }
-//        else
-//        {
-//            db.insert(TABLE_EDETAILING, null, initialValues);
-//
-//        }
         db.close();
     }
 
@@ -246,31 +216,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues initialValues = new ContentValues();
         initialValues.put(ISFAV, isFavInt);
-
         db.update(TABLE_EDETAILING, initialValues, "id=?", new String[] {String.valueOf(idModel)});
         db.close();
     }
-
-    // check data is already exist.
-    public boolean CheckIsDataAlreadyInDBorNot(String fieldValue) {
-        SQLiteDatabase sqldb = this.getReadableDatabase();
-        String Query = "Select * from " + TABLE_EDETAILING + " where " + KEY_ID + " = " + fieldValue;
-        Cursor cursor = sqldb.rawQuery(Query, null);
-        if(cursor.getCount() <= 0){
-            cursor.close();
-            return false;
-        }
-        cursor.close();
-        return true;
-    }
-
     //insert file path using id
     public void insertFilePath(int isDownloaded,String filePath,String idModel) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues initialValues = new ContentValues();
         initialValues.put(IS_DOWNLOADED, isDownloaded);
         initialValues.put(FILEPATh, filePath);
-
         db.update(TABLE_EDETAILING, initialValues, "id=?", new String[] {String.valueOf(idModel)});  // number 1 is the _id here, update to variable for your code
         db.close();
     }
@@ -347,16 +301,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         {
             DownloadFileModel returnData= getSingleDownloadedData(eretailDetailList.get(i).getFileId());
             if(returnData.getFileName()!=null)
-            {
-                returnValue=true;
-            }
+            { returnValue=true; }
             else
-            {
-                returnValue=false;
-                break;
-            }
+            { returnValue=false; break; }
         }
-
         return returnValue;
     }
 
@@ -374,14 +322,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 new String[] { String.valueOf(id) }, null, null, null, null);
         if (cursor.moveToFirst()) {
             do {
-                data=cursor.getString(cursor.getColumnIndex("e_data"));
+                data=cursor.getString(cursor.getColumnIndex(EDETAILING_DATA));
                 Gson gson = new Gson();
                 DevisionModel.Data.EDetailing contact  = gson.fromJson(data, DevisionModel.Data.EDetailing.class);
 
-                if(cursor.getString(cursor.getColumnIndex("filePath"))!=null)
+                if(cursor.getString(cursor.getColumnIndex(FILEPATh))!=null)
                 {
-                    contact.setFilePath(cursor.getString(cursor.getColumnIndex("filePath")));
-                    contact.setIsSaved(cursor.getInt(cursor.getColumnIndex("isDownloaded")));
+                    contact.setFilePath(cursor.getString(cursor.getColumnIndex(FILEPATh)));
+                    contact.setIsSaved(cursor.getInt(cursor.getColumnIndex(IS_DOWNLOADED)));
                 }
                 downloadFileList.add(contact);
 
@@ -391,30 +339,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return downloadFileList;
     }
 
-    //get single file path using id
-    @SuppressLint("Range")
-    public  String getDownloadedSingleData(String id)
-    {
-        String data="";
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        Cursor cursor = db.query(TABLE_EDETAILING, new String[] { KEY_ID,
-                        FILEPATh }, KEY_ID + "=?",
-                new String[] { String.valueOf(id) }, null, null, null, null);
-        if (cursor.moveToFirst()) {
-            do {
-                data=cursor.getString(cursor.getColumnIndex("filePath"));
-            } while (cursor.moveToNext());
-        }
-        return data;
-    }
-
     public void deleteEdetailingData(String id)
     {
         SQLiteDatabase db = getWritableDatabase();
         db.delete(TABLE_EDETAILING, KEY_ID+" = ?", new String[]{id});
         db.close();
-
     }
 
     //=======================================EDetailingDownload table============================================
@@ -481,16 +410,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         {
             do
             {
-                data=cursor.getString(cursor.getColumnIndex("e_detailData"));
-                int getFav=cursor.getInt(cursor.getColumnIndex("is_favItem"));
+                data=cursor.getString(cursor.getColumnIndex(EDETALING_DOWNLOAD_DATA));
+                int getFav=cursor.getInt(cursor.getColumnIndex(ISFAVITEM));
                 Gson gson = new Gson();
                 downloadFileModel  = gson.fromJson(data, DownloadFileModel.class);
                 if(getFav==1)
-                {
-                    downloadFileModel.setFavFile(true);
-                }
-
-
+                { downloadFileModel.setFavFile(true); }
             }
             while (cursor.moveToNext());
         }
@@ -512,8 +437,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             do {
                 DownloadFileModel downloadFileModel=new DownloadFileModel();
 
-                data=cursor.getString(cursor.getColumnIndex("e_detailData"));
-                int getFav=cursor.getInt(cursor.getColumnIndex("is_favItem"));
+                data=cursor.getString(cursor.getColumnIndex(EDETALING_DOWNLOAD_DATA));
+                int getFav=cursor.getInt(cursor.getColumnIndex(ISFAVITEM));
 
                 Gson gson = new Gson();
                 downloadFileModel  = gson.fromJson(data, DownloadFileModel.class);
@@ -531,39 +456,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return downloadFileList;
     }
 
-    //get all file path using id
-    @SuppressLint("Range")
-    public  ArrayList<DownloadFileModel> getAllFavListChild(int id)
-    {
-        ArrayList<DownloadFileModel> downloadFileList=new ArrayList<>();
-        String data="";
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        Cursor cursor = db.query(TABLE_EDETAILINGDOWNLOAD, new String[] { KEY_IDParent,
-                        EDETALING_DOWNLOAD_DATA,ISFAVITEM }, KEY_IDParent + "=?",
-                new String[] { String.valueOf(id) }, null, null, null, null);
-        if (cursor.moveToFirst()) {
-            do {
-                DownloadFileModel downloadFileModel=new DownloadFileModel();
-
-                data=cursor.getString(cursor.getColumnIndex("e_detailData"));
-                int getFav=cursor.getInt(cursor.getColumnIndex("is_favItem"));
-
-                if(getFav==1)
-                {
-                    Gson gson = new Gson();
-                    downloadFileModel  = gson.fromJson(data, DownloadFileModel.class);
-                    downloadFileModel.setFavFile(true);
-
-                    downloadFileList.add(downloadFileModel);
-                }
-
-            }
-            while (cursor.moveToNext());
-        }
-        return downloadFileList;
-    }
-
     public void deleteEdetailDownloada(String id)
     {
         SQLiteDatabase db = getWritableDatabase();
@@ -572,11 +464,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             db.delete(
                     TABLE_EDETAILINGDOWNLOAD,  // Where to delete
                     KEY_IDParent+" = ?",
-                    new String[]{id}
-            );
+                    new String[]{id});
         }
         db.close();
-
     }
 
     @SuppressLint("Range")
@@ -591,10 +481,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 new String[] { type }, null, null, null, null);
         if (cursor.moveToFirst()) {
             do {
-                data=cursor.getString(cursor.getColumnIndex("e_detailData"));
+                data=cursor.getString(cursor.getColumnIndex(EDETALING_DOWNLOAD_DATA));
                 Gson gson = new Gson();
                 downloadFileList.add(gson.fromJson(data, DownloadFileModel.class));
-
             }
             while (cursor.moveToNext());
         }
@@ -613,7 +502,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 new String[] { "1" }, null, null, null, null);
         if (cursor.moveToFirst()) {
             do {
-                data=cursor.getString(cursor.getColumnIndex("e_detailData"));
+                data=cursor.getString(cursor.getColumnIndex(EDETALING_DOWNLOAD_DATA));
                 Gson gson = new Gson();
                 DownloadFileModel model=new DownloadFileModel();
                 model=gson.fromJson(data, DownloadFileModel.class);
@@ -661,33 +550,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         initialValues.put(START_TIME_BRANDS, startTime);
 
         if(CheckVisualAds(currentTime,addBrandId))
-        {
-//           String brandingStartTime=getBrandStartTime(String.valueOf(addBrandId),currentTime);
-//           Log.e("hfisdhfuisgf",brandingStartTime);
-//           ContentValues initialValues2 = new ContentValues();
-//           initialValues2.put(START_TIME_BRANDS, brandingStartTime+startTime);
-//
-//           db.update(TABLE_SENDVISUALADS, initialValues2, "set_timeslide=? AND brand_id= ? AND doctor_id= ?", new String[] {String.valueOf(startTime), String.valueOf(addBrandId), String.valueOf(addDoctorId)});  // number 1 is the _id here, update to variable for your code
-//
-//           Log.e("insertStartTimeSlide","update");
-        }
+        { }
         else
         {
             Log.e("insertStartTimeSlide","insert");
             db.insert(TABLE_SENDVISUALADS, null, initialValues);
         }
         db.close();
-    }
-
-    public void updateBrandEndTime(String endTime, String startTime, int doctorID, int brandID)
-    {
-        //  String brandingStartTime=getBrandStartTime(String.valueOf(brandID),startTime);
-//
-        //  SQLiteDatabase db = this.getWritableDatabase();
-        //  ContentValues initialValues = new ContentValues();
-        //  initialValues.put(START_TIME_BRANDS, brandingStartTime+"-"+endTime+", ");
-        //  db.update(TABLE_SENDVISUALADS, initialValues, "set_timeslide=? AND brand_id= ? AND doctor_id= ?", new String[] {String.valueOf(startTime), String.valueOf(brandID), String.valueOf(doctorID)});  // number 1 is the _id here, update to variable for your code
-        //  db.close();
     }
 
     //Add end time
@@ -725,13 +594,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     visualModel.setBrandId(cursor.getString(2));
                     visualModel.setBrandName(cursor.getString(6));
                     visualModel.setMonitorTime(cursor.getInt(7));
-                    //  visualModel.setBrandWiseStartTime(cursor.getString(8));
-                    //  visualModel.setBrandWiseStopTime(cursor.getString(9));
 
                     visualModel.setEnd(true);
                     visualModel.setChildDataArray(getAllChildBy_ID(startTime));
                     edetailList.add(visualModel);
-
                 }
                 else{
                     deleteVisualAds(String.valueOf(id));
@@ -780,23 +646,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         return getDbTimer;
     }
-
-    @SuppressLint("Range")
-    public String getBrandStartTime(String brandId, String mainTime)
-    {
-        String getSingleStartTime="";
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_SENDVISUALADS, new String[] {START_TIME_BRANDS}, SLIDE_START_TIME+" = ? AND "+BRAND_ID+" = ? ",
-                new String[] {mainTime,brandId}, null, null, null, null);
-        if (cursor.moveToFirst())
-        {
-            do { getSingleStartTime=cursor.getString(cursor.getColumnIndex(START_TIME_BRANDS));
-            }
-            while (cursor.moveToNext());
-        }
-        return getSingleStartTime;
-    }
-
 
     @SuppressLint("Range")
     // check visual ads is already exist.
@@ -1012,11 +861,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         {
             do {
                 int dbFileID =cursor.getInt(cursor.getColumnIndex("file_id"));
-
                 if(dbFileID==Integer.parseInt(fileIdCheck))
-                {
-                    return true;
-                }
+                { return true; }
             }
             while (cursor.moveToNext());
         }
@@ -1087,21 +933,5 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         return false;
     }
-
-//    public String getApiDetail(int id)
-//    {
-//        String strData = "";
-//        SQLiteDatabase db = this.getWritableDatabase();
-//
-//        Cursor cursor = db.query(TABLE_SAVE_SEND_API, new String[] { KEY_ID,
-//                        APIKEY_DATA }, KEY_ID + "=?",
-//                new String[] { String.valueOf(id) }, null, null, null, null);
-//        if (cursor.moveToFirst()) {
-//            do {
-//                strData=cursor.getString(1);
-//            } while (cursor.moveToNext());
-//        }
-//        return strData;
-//    }
-
+    
 }

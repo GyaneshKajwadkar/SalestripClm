@@ -1,7 +1,7 @@
 package `in`.processmaster.salestripclm.fragments
 
-import `in`.processmaster.salestripclm.fragments.DisplayVisualFragment.Companion.doctorIdDisplayVisual
-import `in`.processmaster.salestripclm.fragments.DisplayVisualFragment.Companion.doctor_et
+import `in`.processmaster.salestripclm.fragments.PresentEDetailingFrag.Companion.doctorIdDisplayVisual
+import `in`.processmaster.salestripclm.fragments.PresentEDetailingFrag.Companion.doctor_et
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.adapter.DownloadedFolderAdapter
 import `in`.processmaster.salestripclm.models.DownloadFileModel
@@ -96,7 +96,6 @@ class ShowDownloadedFragment : Fragment() {
             nodata_gif?.visibility=View.GONE
             selection_tv?.setText("Please wait...")
 
-            val mNoOfColumns = activity?.let { Utility.calculateNoOfColumns(it, 200F) }
 
             val value = requireArguments().getInt("eDetailingID")
             val brandID = requireArguments().getInt("brandId")
@@ -161,17 +160,17 @@ class ShowDownloadedFragment : Fragment() {
             val sendtext = requireArguments().getString("type")
 
              adapterVideo= DownloadedFolderAdapter(sendtext,"VIDEO",arraylistVideo, requireActivity(),doctorIdDisplayVisual,brandID)
-            video_rv!!.layoutManager = GridLayoutManager(activity, mNoOfColumns!!)
+            video_rv!!.layoutManager = GridLayoutManager(activity, 4)
             video_rv?.itemAnimator = DefaultItemAnimator()
             video_rv?.adapter = adapterVideo
 
              adapterImage= DownloadedFolderAdapter(sendtext,"IMAGE", arraylistImages, requireActivity(), doctorIdDisplayVisual, brandID)
-            images_rv!!.layoutManager = GridLayoutManager(activity, mNoOfColumns!!)
+            images_rv!!.layoutManager = GridLayoutManager(activity, 4)
             images_rv?.itemAnimator = DefaultItemAnimator()
             images_rv?.adapter = adapterImage
 
              adapterWeb= DownloadedFolderAdapter(sendtext,"ZIP", arraylistZip, requireActivity(), doctorIdDisplayVisual, brandID)
-            html_rv!!.layoutManager = GridLayoutManager(activity, mNoOfColumns!!)
+            html_rv!!.layoutManager = GridLayoutManager(activity, 4)
             html_rv?.itemAnimator = DefaultItemAnimator()
             html_rv?.adapter = adapterWeb
 
@@ -182,14 +181,6 @@ class ShowDownloadedFragment : Fragment() {
         filterFavList_et?.addTextChangedListener(filterTextWatcher)
 
         return view
-    }
-
-    object Utility {
-        fun calculateNoOfColumns(context: Context, columnWidthDp: Float): Int { // For example columnWidthdp=180
-            val displayMetrics: DisplayMetrics = context.getResources().getDisplayMetrics()
-            val screenWidthDp = displayMetrics.widthPixels / displayMetrics.density
-            return (screenWidthDp / columnWidthDp + 0.5).toInt()
-        }
     }
 
     //FilterUsingEdit

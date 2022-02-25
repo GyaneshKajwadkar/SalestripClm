@@ -348,11 +348,6 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
         }
     }
 
-
-
-
-
-
     class GestureDetectorListener extends GestureDetector.SimpleOnGestureListener {
 
         public GestureDetectorListener() {
@@ -384,7 +379,6 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
     }
 
 
-
     private void refreshToolbar() {
         if (mMeetingService.getMeetingStatus() == MeetingStatus.MEETING_STATUS_INMEETING) {
             mConnectingText.setVisibility(View.GONE);
@@ -400,7 +394,6 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
             meetingOptionBar.hideOrShowToolbar(true);
         }
     }
-
 
     private void updateAnnotationBar() {
         if (mCurShareUserId > 0 && !isMySelfWebinarAttendee()) {
@@ -596,7 +589,6 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
 
     private void showVideoListLayout() {
         MobileRTCVideoUnitRenderInfo renderInfo = new MobileRTCVideoUnitRenderInfo(0, 0, 100, 100);
-        //options.aspect_mode = MobileRTCVideoUnitAspectMode.VIDEO_ASPECT_PAN_AND_SCAN;
         mDefaultVideoViewMgr.addActiveVideoUnit(renderInfo);
         videoListLayout.setVisibility(View.VISIBLE);
         updateAttendeeVideos(mInMeetingService.getInMeetingUserList(), 0);
@@ -825,15 +817,8 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
         if (mMeetingService.getMeetingStatus() == MeetingStatus.MEETING_STATUS_INMEETING) {
             //stop share
             if (currentLayoutType == LAYOUT_TYPE_VIEW_SHARE) {
-              //  mDefaultVideoViewMgr.removeShareVideoUnit();
-              //  currentLayoutType = -1;
-            }
 
-          /*  List<Long> userList = ZoomSDK.getInstance().getInMeetingService().getInMeetingUserList();
-            if (null == userList || userList.size()<2) {
-                showLeaveMeetingDialog();
-                return;
-            }*/
+            }
 
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && ! Settings.canDrawOverlays(getActivity())){
                 Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
@@ -863,11 +848,7 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
         MeetingWindowHelper.getInstance().showMeetingWindow(getActivity());
 
         Class clz = OnlinePresentationActivity.class;
-   /*     if (from == JOIN_FROM_UNLOGIN) {
-            clz = InitAuthSDKActivity.class;
-        } else if (from == JOIN_FROM_APIUSER) {
-            clz = APIUserStartJoinMeetingActivity.class;
-        }*/
+
         Intent intent = new Intent(getActivity(), clz);
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         startActivity(intent);
@@ -927,11 +908,6 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-
-        Log.e("dgfidsfgusdf",requestCode+"");
-
-
-      //  super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case REQUEST_SHARE_SCREEN_PERMISSION:
                 if (resultCode != RESULT_OK) {
@@ -965,8 +941,6 @@ public class JoinMeetingFragment extends Fragment  implements View.OnClickListen
 
                 meetingShareHelper.onActivityResult(requestCode, resultCode, data);
                 break;
-
-
 
         }
     }

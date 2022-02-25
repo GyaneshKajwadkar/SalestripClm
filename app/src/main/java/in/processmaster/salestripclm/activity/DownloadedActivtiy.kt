@@ -14,14 +14,11 @@ import android.os.Looper
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.View
-import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_downloaded_activtiy.*
 import org.apache.commons.io.FileUtils
@@ -62,8 +59,6 @@ class DownloadedActivtiy : BaseActivity() {
 
     fun initView()
     {
-
-
         back_imv!!.setOnClickListener {
             onBackPressed()
         }
@@ -113,7 +108,6 @@ class DownloadedActivtiy : BaseActivity() {
             progressDialog()
             progressBarAlert?.setIndeterminate(true)
             downloadSingleFolders(0,arraylistImages)
-
         })
         downloadAllWeb_ll?.setOnClickListener({
             progressDialog()

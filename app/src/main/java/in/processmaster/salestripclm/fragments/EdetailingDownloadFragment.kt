@@ -2,12 +2,12 @@ package `in`.processmaster.salestripclm.fragments
 
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.HomePage
+import `in`.processmaster.salestripclm.activity.HomePage.Companion.loginModelHomePage
 import `in`.processmaster.salestripclm.adapter.Edetailing_Adapter
+import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.models.DevisionModel
 import `in`.processmaster.salestripclm.models.LoginModel
-import `in`.processmaster.salestripclm.networkUtils.APIClient
-import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.annotation.SuppressLint
@@ -38,15 +38,12 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
 
-class EdetailingFragment : Fragment() {
+class EdetailingDownloadFragment : Fragment() {
 
     var recyclerView:RecyclerView?=null
     var sharePreferance: PreferenceClass?= null
-    var loginModel : LoginModel?=null
     var adapter : Edetailing_Adapter?=null
     var position:Int=0
-    var progressView_parentRv: RelativeLayout?=null
-    var progressMessage_tv: TextView? =null
     var viewPager: ViewPager?=null
     var tabs: TabLayout? = null
     var syncData_ll: LinearLayout?=null
@@ -55,93 +52,50 @@ class EdetailingFragment : Fragment() {
         var filter_et : EditText?=null
     }
 
-    //Database
     var db = DatabaseHandler(activity)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         var view= inflater.inflate(R.layout.activity_edetailing_, container, false)
         initView(view)
-        return view
-    }
+        return view }
 
     fun initView(view: View)
     {
         recyclerView=view.findViewById(R.id.recyclerView)as RecyclerView
-        progressView_parentRv=view.findViewById(R.id.progressView_parentRv) as RelativeLayout
-        progressMessage_tv=view.findViewById(R.id.progressMessage_tv) as TextView
         filter_et=view.findViewById(R.id.filter_et)as EditText
         syncData_ll=view.findViewById(R.id.syncData_ll)as LinearLayout
         sharePreferance = PreferenceClass(activity)
         db = DatabaseHandler(activity)
-        // Setting ViewPager for each Tabs
         viewPager = view.findViewById<View>(R.id.viewpager) as ViewPager
-        // Set Tabs inside Toolbar
         tabs = view.findViewById<View>(R.id.result_tabs) as TabLayout
-        progressMessage_tv?.setText("Loading e-Detailing")
-        //activity?.let { enableProgress(progressView_parentRv!!, it) }
-        GeneralClass(requireActivity()).enableProgress(progressView_parentRv!!)
-
 
         calladapter()
-
         filter_et!!.addTextChangedListener(filterTextWatcher)
 
-        changeStatusBar()
-
-        Handler(Looper.getMainLooper())
-            .postDelayed({
-              //  activity?.let { disableProgress(progressView_parentRv!!, it)}
-                GeneralClass(requireActivity()).disableProgress(progressView_parentRv!!)
-
-            }, 200)
-
-
-        syncData_ll?.setOnClickListener({
-
-            progressMessage_tv?.setText("Loading e-Detailing")
-           // activity?.let { enableProgress(progressView_parentRv!!, it) }
-            GeneralClass(requireActivity()).enableProgress(progressView_parentRv!!)
-
-            division_api()
-        })
+        syncData_ll?.setOnClickListener({ division_api()})
 
     }
 
-    //change status bar color
-    fun changeStatusBar()
-    {
-        val window: Window = activity?.getWindow()!!
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        window.setStatusBarColor(ContextCompat.getColor(requireActivity(), R.color.appColor))
-    }
-
-    //FilterUsingEdit
     val filterTextWatcher: TextWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
         override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
             DownloadedFragment().editTextFilter(s.toString())
             NewDownloadsFragment().editTextFilter(s.toString())
-          //  adapter?.getFilter()?.filter(s.toString());
         }
-
-        override fun afterTextChanged(s: Editable) {
-            // TODO Auto-generated method stub
-        }
+        override fun afterTextChanged(s: Editable) {}
     }
 
     //call_divisioinApi
     private fun division_api()
     {
-
-
-        val jsonObject = JSONObject(loginModel?.getEmployeeObj().toString())
+        AlertClass(requireActivity()).showAlert("Sync data")
+        val jsonObject = JSONObject(loginModelHomePage?.getEmployeeObj().toString())
 
         var call: Call<DevisionModel> = HomePage.apiInterface?.detailingApi(
-            "bearer " + loginModel?.accessToken, jsonObject.getString(
+            "bearer " + loginModelHomePage?.accessToken, jsonObject.getString(
                 "Division"
             )
         ) as Call<DevisionModel>
@@ -154,20 +108,12 @@ class EdetailingFragment : Fragment() {
                 Log.e("division_api", response.code().toString() + "")
                 if (response.code() == 200 && !response.body().toString().isEmpty())
                 {
-
-                    for ((index, value) in db.alleDetail
-                        ?.withIndex()!!) {
-
-                        //store edetailing data to db
+                    for ((index, value) in db.alleDetail?.withIndex()!!) {
                         val gson = Gson()
-                        db.insertOrUpdateEDetail(
-                            value.geteDetailId().toString(),
-                            gson.toJson(value)
-                        )
+                        db.insertOrUpdateEDetail(value.geteDetailId().toString(), gson.toJson(value))
 
-                        if (index == response.body()?.data?.geteDetailingList()!!.size - 1) {
-                            calladapter()
-                        }
+                        if (index == response.body()?.data?.geteDetailingList()!!.size - 1)
+                        { calladapter() }
                     }
 
                     // clear database
@@ -177,42 +123,29 @@ class EdetailingFragment : Fragment() {
                         for (mainList in response.body()?.data?.geteDetailingList()!!)
                         {
                             if (mainList.geteDetailId() == dbList.geteDetailId())
-                            {
-                                isSet = true
-                            }
+                            { isSet = true }
                         }
 
                         //this clear database and files from device which is not in used
                         if(!isSet)
                         {
                            db.deleteEdetailingData(dbList.geteDetailId().toString())
-
                             var downloadModelArrayList=db.getAllDownloadedData(dbList.geteDetailId())
-
-                            //Delete files from folder before erase db
                             for(item in downloadModelArrayList)
                             {
                                 val someDir = File(item.fileDirectoryPath)
                                 someDir.deleteRecursively()
                             }
-
                             db.deleteEdetailDownloada(dbList.geteDetailId().toString())
 
-                        }
-                    }
-                }
-
-              //  activity?.let { disableProgress(progressView_parentRv!!, it) }
-                GeneralClass(requireActivity()).disableProgress(progressView_parentRv!!)
-
+                        }}}
+                AlertClass(requireActivity()).hideAlert()
             }
 
             override fun onFailure(call: Call<DevisionModel?>, t: Throwable?) {
                 GeneralClass(requireActivity()).checkInternet()
+                AlertClass(requireActivity()).hideAlert()
                 call.cancel()
-               // activity?.let { disableProgress(progressView_parentRv!!, it) }
-                GeneralClass(requireActivity()).disableProgress(progressView_parentRv!!)
-
             }
         })
     }
@@ -224,11 +157,8 @@ class EdetailingFragment : Fragment() {
         tabs!!.setupWithViewPager(viewPager)
     }
 
-
     // Add Fragments to Tabs
-    private fun setupViewPager(
-        viewPager: ViewPager //,
-    )
+    private fun setupViewPager(viewPager: ViewPager)
     {
         if (!isAdded()) return;
         var adapter = ViewPagerAdapter(getChildFragmentManager())
@@ -246,25 +176,9 @@ class EdetailingFragment : Fragment() {
             return mFragmentList[position]
         }
 
-        override fun getCount(): Int {
-            return mFragmentList.size
-        }
+        override fun getCount(): Int { return mFragmentList.size }
 
-        fun addFragment(fragment: Fragment, title: String) {
-            mFragmentList.add(fragment)
-            mFragmentTitleList.add(title)
-        }
-
-        override fun getPageTitle(position: Int): CharSequence? {
-            return mFragmentTitleList[position]
-        }
-
-
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-
+        override fun getPageTitle(position: Int): CharSequence? { return mFragmentTitleList[position] }
     }
 
 
@@ -310,8 +224,7 @@ class EdetailingFragment : Fragment() {
         constructor(context: Context?, attrs: AttributeSet?) : super(
             context!!,
             attrs
-        ) {
-        }
+        ) {}
 
         override fun onTouchEvent(event: MotionEvent?): Boolean {
             return isPagingEnabled && super.onTouchEvent(event)
@@ -321,9 +234,6 @@ class EdetailingFragment : Fragment() {
             return isPagingEnabled && super.onInterceptTouchEvent(event)
         }
 
-        fun setPagingEnabled(b: Boolean) {
-            isPagingEnabled = b
-        }
     }
 
 }

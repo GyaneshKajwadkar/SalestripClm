@@ -1,7 +1,7 @@
 package `in`.processmaster.salestripclm.adapter
 
 import `in`.processmaster.salestripclm.R
-import `in`.processmaster.salestripclm.fragments.DisplayVisualFragment.Companion.doctor_et
+import `in`.processmaster.salestripclm.fragments.PresentEDetailingFrag.Companion.doctor_et
 import `in`.processmaster.salestripclm.interfaceCode.ItemClickDisplayVisual
 import `in`.processmaster.salestripclm.models.DownloadFileModel
 import android.content.Context
