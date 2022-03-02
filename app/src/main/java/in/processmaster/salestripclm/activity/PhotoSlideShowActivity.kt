@@ -6,7 +6,6 @@ import `in`.processmaster.salestripclm.interfaceCode.ItemClickDisplayVisual
 import `in`.processmaster.salestripclm.interfaceCode.StringInterface
 import `in`.processmaster.salestripclm.models.DevisionModel
 import `in`.processmaster.salestripclm.models.DownloadFileModel
-import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -75,7 +74,6 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
     var empId=0
     var startDateTime=""
     var doctorId=0
-    var db : DatabaseHandler? = null
     var currentProduct_btn: Button?= null
     var otherProduct_btn: Button?= null
     var isCurrent=true;
@@ -122,7 +120,6 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetWeb)
 
-        db=DatabaseHandler(this)
 
         horizontal_rv?.setLayoutManager(
             LinearLayoutManager(
@@ -157,9 +154,9 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
             doctorId = intent.getIntExtra("doctorId", 0)
             //  val file = File(webUrlPath)
 
-            db?.insertFileID(model!!.fileId,startDateTime)
+            dbBase?.insertFileID(model!!.fileId,startDateTime)
 
-            eDetailingId= model?.geteDetailingId()!!
+            eDetailingId= model?.eDetailingId!!
 
             end_btn?.setOnClickListener({
 
@@ -170,7 +167,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
                 val currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(
                     Date()
                 )
-                db?.updateendData(currentDate + " " + currentTime,startDateTime)
+                dbBase?.updateendData(currentDate + " " + currentTime,startDateTime)
                 onBackPressed()
                 finish()
 
@@ -204,12 +201,12 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
             fabLike?.setOnClickListener({
                 if (isList) {
-                    db?.insertlike(0, model!!.fileId,startDateTime)
+                    dbBase?.insertlike(0, model!!.fileId,startDateTime)
                     fabLike?.setColorFilter(Color.BLACK)
                     isList = false
                 }
                 else {
-                    db?.insertlike(1,model!!.fileId,startDateTime)
+                    dbBase?.insertlike(1,model!!.fileId,startDateTime)
                     fabLike?.setColorFilter(Color.WHITE)
                     isList = true
                 }
@@ -231,6 +228,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
                     setHorizontalAdapter(arrayImage, position,model!!)
 
+                    isCurrent=true
                     isCurrent=true
                 }
             })
@@ -373,13 +371,13 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
     @RequiresApi(Build.VERSION_CODES.N)
     fun getAllEdetailingProduct() : java.util.ArrayList<DevisionModel.Data.EDetailing>
     {
-        var  edetailingList = db?.getAlleDetail() //fetch edetailing list from db
+        var  edetailingList = dbBase?.getAlleDetail() //fetch edetailing list from dbBase
         var  filteredList: ArrayList<DevisionModel.Data.EDetailing> = ArrayList()
         for (itemParent in edetailingList!! )
         {
             if(itemParent.isSaved==1)
             {
-                var downloadedList = db?.getAllDownloadedData(itemParent.geteDetailId())
+                var downloadedList = dbBase?.getAllDownloadedData(itemParent.geteDetailId()!!)
 
                 if(downloadedList?.stream()!!.anyMatch({ o -> o.downloadType.equals("IMAGE") }))
                 {
@@ -473,7 +471,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
                         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
 
-                        db?.insertFileID(model!!.fileId, startDateTime)
+                        dbBase?.insertFileID(model!!.fileId, startDateTime)
                         setSlideViewTime()
                     }
                 }
@@ -505,7 +503,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
                         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
 
-                        db?.insertFileID(model!!.fileId, startDateTime)
+                        dbBase?.insertFileID(model!!.fileId, startDateTime)
                         setSlideViewTime()
                     }
                 }
@@ -664,7 +662,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
         val post_btn = dialogView.findViewById(R.id.post_btn) as Button
         val comment_et = dialogView.findViewById(R.id.comment_et) as EditText
 
-        val storecomment= db?.getComment(model!!.fileId.toString(),startDateTime)
+        val storecomment= dbBase?.getComment(model!!.fileId.toString(),startDateTime)
         comment_et.setText(storecomment)
 
         cancel_btn.setOnClickListener({
@@ -684,7 +682,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
                 return@setOnClickListener
             }
 
-            db?.insertComment(comment_et.text.toString(),model!!.fileId,startDateTime)
+            dbBase?.insertComment(comment_et.text.toString(),model!!.fileId,startDateTime)
 
             val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(dialogView.getWindowToken(), 0)
@@ -702,7 +700,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
         arrayImage.clear()
 
-        for (itemParent in db!!.getAllDownloadedData(passingInterface) )
+        for (itemParent in dbBase!!.getAllDownloadedData(passingInterface) )
         {
 
             if(itemParent.downloadType.equals("IMAGE"))
@@ -732,7 +730,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
         otherFileAdapter?.notifyDataSetChanged()
 
         brandId=brandIDInterface
-        db?.insertStartTimeSlide(startDateTime,doctorId,brandId,model?.brandName,0,currentTime.toString())
+        dbBase?.insertStartTimeSlide(startDateTime,doctorId,brandId,model?.brandName,0,currentTime.toString())
 
         onClickString("")
 
@@ -752,9 +750,9 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
     fun likeCommentColor()
     {
-        db?.insertFileID(model!!.fileId, startDateTime)
+        dbBase?.insertFileID(model!!.fileId, startDateTime)
 
-        val isLike=db?.getLike(model!!.fileId.toString(),startDateTime)
+        val isLike=dbBase?.getLike(model!!.fileId.toString(),startDateTime)
 
         if(isLike!!)
         {
@@ -768,7 +766,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
         }
         setSlideViewTime()
 
-        val storecomment= db?.getComment(model!!.fileId.toString(),startDateTime)
+        val storecomment= dbBase?.getComment(model!!.fileId.toString(),startDateTime)
 
         if(storecomment!=null)
         {
@@ -784,7 +782,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
     fun setSlideViewTime()
     {
         thread?.interrupt()
-        var dbTimer=db?.getTime(model!!.fileId.toString(),startDateTime)
+        var dbBaseTimer=dbBase?.getTime(model!!.fileId.toString(),startDateTime)
 
         thread = object : Thread() {
             override fun run() {
@@ -792,10 +790,10 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
                     while (!this.isInterrupted) {
                         sleep(1000)
                         runOnUiThread {
-                            dbTimer=dbTimer!!+1
+                            dbBaseTimer=dbBaseTimer!!+1
 
-                            //  Log.e("timerSlider",dbTimer.toString())
-                            db?.insertTime(dbTimer!!, model!!.fileId ,startDateTime)
+                            //  Log.e("timerSlider",dbBaseTimer.toString())
+                            dbBase?.insertTime(dbBaseTimer!!, model!!.fileId ,startDateTime)
                         }
                     }
                 } catch (e: InterruptedException) {
@@ -887,17 +885,17 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
     fun slideBrandWiseInsert(startDateTime: String,brandID:Int)
     {
         threadBrand?.interrupt()
-        var dbTimer=db?.getBrandTime(brandID.toString(),startDateTime)
+        var dbBaseTimer=dbBase?.getBrandTime(brandID.toString(),startDateTime)
         threadBrand = object : Thread() {
             override fun run() {
                 try {
                     while (!this.isInterrupted) {
                         sleep(1000)
                         runOnUiThread {
-                            dbTimer=dbTimer!!+1
+                            dbBaseTimer=dbBaseTimer!!+1
 
-                            Log.e("timerBrandWiseSlider",dbTimer.toString())
-                            db?.insertBrandTime(dbTimer!!  ,startDateTime,brandID.toString())
+                            Log.e("timerBrandWiseSlider",dbBaseTimer.toString())
+                            dbBase?.insertBrandTime(dbBaseTimer!!  ,startDateTime,brandID.toString())
                         }
                     }
                 } catch (e: InterruptedException) {

@@ -38,15 +38,12 @@ import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.ui.PlayerControlView
-import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.activity_video_player.*
+import kotlinx.android.synthetic.main.web_bottom_sheet.*
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -55,17 +52,12 @@ import kotlin.collections.ArrayList
 
 class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerControlView.VisibilityListener
 {
-
     private var mPlayer: SimpleExoPlayer? = null
-    private lateinit var playerView: PlayerView
     private var playWhenReady = true
     private var currentWindow = 0
     private var playbackPosition: Long = 0
      var uris:ArrayList<Uri> = ArrayList()
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
-    private lateinit var bottomSheetWeb: ConstraintLayout
-    var end_btn: Button? =null
-    var horizontal_rv: RecyclerView?=null
     var position=0
     var brandId=0
     var empId=0
@@ -75,42 +67,23 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
     var isList=false
 
     var eDetailingId=0
-    var currentProduct_btn: Button?= null
-    var otherProduct_btn: Button?= null
     var isCurrent=true;
     var otherFileAdapter : OtherFileAdapter?=null
     var edetailingList: ArrayList<DevisionModel.Data.EDetailing>? = null
     var arrayVideo: ArrayList<DownloadFileModel> = ArrayList<DownloadFileModel>()
-    var fabLike : FloatingActionButton?= null
-    var fabComment : FloatingActionButton?= null
-    var productParent_ll: LinearLayout?=null
-
     var doubleclick= false
     var thread: Thread?= null
-
 
     companion object {
         var videoModel : DownloadFileModel?= null
     }
-
-    private val hlsUrl =
-        "https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8"
 
     override fun onCreate (savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video_player)
 
-        playerView = findViewById(R.id.playerView)
-        bottomSheetWeb=findViewById(R.id.bottomSheetWeb) as ConstraintLayout
-        end_btn=findViewById(R.id.end_btn) as Button
-        horizontal_rv = findViewById<RecyclerView>(R.id.horizontal_rv)
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetWeb)
-        productParent_ll = findViewById(R.id.productParent_ll) as LinearLayout
-
-        currentProduct_btn = findViewById<Button> (R.id.currentProduct_btn)
-        otherProduct_btn = findViewById<Button> (R.id.otherProduct_btn)
-
 
         floating_action_backBtn.setOnClickListener({
             onBackPressed()
@@ -121,15 +94,13 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
 
                 if(intent.getSerializableExtra("videoArray")==null)
                 {
-                    if (playerView?.isControllerVisible())
+                    if (playerView.isControllerVisible())
                     {
                         floating_action_backBtn.visibility=View.VISIBLE
-                        // Do something if controls are visible
                     }
                     else
                     {
                         floating_action_backBtn.visibility=View.GONE
-                        // Do something else if controls are not showing
                     }
                 }
 
@@ -140,12 +111,9 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
     @RequiresApi(Build.VERSION_CODES.N)
     private fun initPlayer() {
         mPlayer = SimpleExoPlayer.Builder(this).build()
-        // Bind the player to the view.
         playerView.player = mPlayer
         mPlayer!!.playWhenReady = true
         mPlayer!!.seekTo(playbackPosition)
-
-     //   mPlayer!!.prepare(buildMediaSource(uris), false, false)
 
         if(intent.getSerializableExtra("videoArray")!=null)
         {
@@ -153,9 +121,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
             videoModel = intent.getSerializableExtra("model") as DownloadFileModel
 
             if(!videoModel?.favFileName?.isEmpty()!!)
-            {
-                productParent_ll?.visibility= View.GONE
-            }
+            { productParent_ll?.visibility= View.GONE }
 
 
             position = intent.getIntExtra("position", 0)
@@ -175,17 +141,10 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
                 mPlayer!!.addListener(object : Player.EventListener {
                     override fun onPlayerStateChanged(playWhenReady: Boolean,playbackState: Int) {
 
-                        /* if(playWhenReady) {
-                            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
-
-                        } else {
-                            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED)
-                        }*/
-
                     }
                 })
 
-                eDetailingId= videoModel?.geteDetailingId()!!
+                eDetailingId= videoModel?.eDetailingId!!
 
                 //getData
                 val intent = intent
@@ -213,9 +172,6 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
                     onBackPressed()
                     finish()
                 })
-
-                 fabLike    = findViewById<View>(R.id.fabLike) as FloatingActionButton
-                 fabComment = findViewById<View>(R.id.fabComment) as FloatingActionButton
 
                 fabLike?.setOnClickListener({
 
@@ -362,34 +318,6 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
         mPlayer = null
     }
 
-    private fun buildMediaSource(): MediaSource {
-        val userAgent =
-            Util.getUserAgent(playerView.context, playerView.context.getString(R.string.app_name))
-
-        val dataSourceFactory = DefaultHttpDataSourceFactory(userAgent)
-        val hlsMediaSource =
-            HlsMediaSource.Factory(dataSourceFactory).createMediaSource(Uri.parse(hlsUrl))
-
-        return hlsMediaSource
-    }
-
-/*
-    private fun buildMediaSource(uris: ArrayList<URL>): ConcatenatingMediaSource {
-        val userAgent = Util.getUserAgent(this, "MusicPlayer")
-        val defaultMediaSource = DefaultDataSourceFactory(this, userAgent)
-        val progressiveMediaSource = ProgressiveMediaSource.Factory(defaultMediaSource)
-        val mediaSources = ArrayList<MediaSource>()
-
-        for (uri in uris) {
-            mediaSources.add(progressiveMediaSource.createMediaSource(Uri.parse(uri.toString())))
-        }
-
-        val concatenatingMediaSource = ConcatenatingMediaSource()
-        concatenatingMediaSource.addMediaSources(mediaSources)
-
-        return concatenatingMediaSource
-    }
-*/
 
     private fun buildMediaSourceVideoArray(uris: ArrayList<Uri>): ConcatenatingMediaSource {
         val userAgent = Util.getUserAgent(this, "MusicPlayer")
@@ -589,7 +517,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
         {
             if(itemParent.isSaved==1)
             {
-                var downloadedList = db.getAllDownloadedData(itemParent.geteDetailId())
+                var downloadedList = db.getAllDownloadedData(itemParent.geteDetailId()!!)
 
                 if(downloadedList.stream().anyMatch({ o -> o.downloadType.equals("VIDEO") }))
                 {

@@ -24,7 +24,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "SalesTrip_CLM_db";
     private static final String KEY_ID = "id";
 
-    //=========================================hold SyncData===============================================
+    //=========================================hold api Data using static id===============================================
+
+    //id=1 for sync api, id=2 for getScheduleMeetingApi, id=3 for getQuantityApi id=4 for getDoctorGraphApi
+    // id=5 for getDocCall api
 
     private static final String TABLE_SAVE_API = "apiData";
     private static final String KEY_DATA = "data";
@@ -300,7 +303,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         for(int i=0;i<eretailDetailList.size();i++)
         {
             DownloadFileModel returnData= getSingleDownloadedData(eretailDetailList.get(i).getFileId());
-            if(returnData.getFileName()!=null)
+            if(returnData.getFileName()!=null && returnData.getFileName()!="" && !returnData.getFileName().isEmpty())
             { returnValue=true; }
             else
             { returnValue=false; break; }

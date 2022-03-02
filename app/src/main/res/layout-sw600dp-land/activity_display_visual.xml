@@ -72,6 +72,7 @@
 
 
                         <LinearLayout
+                            android:visibility="invisible"
                             android:layout_centerVertical="true"
                             android:id="@+id/allbrandparent_ll"
                             android:layout_marginRight="10dp"
@@ -103,6 +104,7 @@
                             android:id="@+id/favParent_ll"
                             android:layout_marginRight="10dp"                                    android:padding="2dp"
                             android:gravity="center"
+                            android:visibility="invisible"
                             android:layout_gravity="center"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -147,7 +149,6 @@
 
                 <LinearLayout
                     android:id="@+id/splitViewparent_ll"
-                    android:layout_below="@+id/selectorButton_rv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -159,7 +160,6 @@
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="0.3">
-
 
 
                         <androidx.recyclerview.widget.RecyclerView
@@ -277,7 +277,6 @@
                     android:textColor="@color/black"
                     android:textSize="20sp"
                     android:text="No data found"
-                    android:layout_below="@+id/selectorButton_rv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 

@@ -4,6 +4,8 @@ import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.PhotoSlideShowActivity
 import `in`.processmaster.salestripclm.activity.VideoPlayerActivity
 import `in`.processmaster.salestripclm.activity.WebViewActivity
+import `in`.processmaster.salestripclm.fragments.ShowDownloadedFragment.Companion.currentDate
+import `in`.processmaster.salestripclm.fragments.ShowDownloadedFragment.Companion.currentTime
 import `in`.processmaster.salestripclm.models.DownloadFileModel
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
@@ -99,11 +101,8 @@ class DownloadedFolderAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
 
         //get current date and time
-        val currentDate: String = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(
-            Date()
-        )
-
-        val currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
+        // val currentDate: String = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(Date())
+        //val currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
 
         if(downloadedType.equals("VIDEO"))
         {
@@ -155,10 +154,7 @@ class DownloadedFolderAdapter(
                     intent.putExtra("videoArray", arraylist)
                     for ((index, value) in arraylist?.withIndex()!!) {
                         if(value==videomodel)
-                        {
-                            intent.putExtra("position", index)
-
-                        }
+                        { intent.putExtra("position", index) }
                     }
                     intent.putExtra("model", videomodel)
                     context.startActivity(intent)

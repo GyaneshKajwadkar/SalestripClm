@@ -7,9 +7,7 @@ import `in`.processmaster.salestripclm.networkUtils.ConnectivityChangeReceiver
 import `in`.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.view.MeetingWindowHelper
 import `in`.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.zoommeetingui.ZoomMeetingUISettingHelper
 import `in`.processmaster.salestripclm.zoom_sdk_code.startjoinmeeting.UserLoginCallback
-import `in`.processmaster.salestripclm.zoom_sdk_code.startjoinmeeting.emailloginuser.EmailUserLoginHelper
 import android.app.AlertDialog
-import android.app.ProgressDialog
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
@@ -24,7 +22,6 @@ import com.google.gson.Gson
 import us.zoom.sdk.*
 import java.util.ArrayList
 import `in`.processmaster.salestripclm.models.GetScheduleModel
-import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import kotlinx.android.synthetic.main.join_activity_view.*
 
 
@@ -114,7 +111,7 @@ class MeetingActivity : BaseActivity(), MeetingServiceListener, View.OnClickList
         }
         catch (e:Exception){return}
 
-        val responseData: String = DatabaseHandler(this).getApiDetail(2)
+        val responseData: String = dbBase.getApiDetail(2)
         if (responseData != "") {
             val getScheduleModel: GetScheduleModel = Gson().fromJson<GetScheduleModel>(
                 responseData,

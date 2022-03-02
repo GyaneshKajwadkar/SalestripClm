@@ -55,7 +55,7 @@ class SplashActivity : BaseActivity()
         if(sharePreferance!!.getPrefBool("isLogin"))
         {
 //         //if no internet connection and database have sync data then open directly home page
-            if(!generalClass.isInternetAvailable() && dbBase.datasCount > 0)
+            if(!generalClass.isInternetAvailable() && dbBase.getDatasCount() > 0)
             {
                 Handler(Looper.getMainLooper()).postDelayed({
                     val intent = Intent(this@SplashActivity, HomePage::class.java)

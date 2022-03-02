@@ -9,7 +9,6 @@ import `in`.processmaster.salestripclm.activity.HomePage.Companion.apiInterface
 import `in`.processmaster.salestripclm.adapter.ScheduleMeetingAdapter
 import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.models.*
-import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
@@ -750,8 +749,8 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
     @SuppressLint("ResourceType")
     private fun setSheduleApi()
     {
-        progressMessage_tv?.setText("Scheduling Meeting")
-        generalClass.enableProgress(progressView_parentRv!!)
+
+        alertClass.showProgressAlert("")
 
         val originalFormat: DateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
         val targetFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd")
@@ -839,14 +838,14 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
                 if (response.code() == 200 && !response.body().toString().isEmpty())
                 {
                     var getResponse=response.body()
-                    if(!getResponse?.errorObj?.errorMessage.equals(""))
+                    if(!getResponse?.getErrorObj()?.errorMessage!!.equals(""))
                     {
                         Toast.makeText(this@SetSchedule_Activity, "Server error ", Toast.LENGTH_SHORT).show()
 
                     }
                     else{
-                        generalClass.disableProgress(progressView_parentRv!!)
-                        AlertClass(this@SetSchedule_Activity).commonAlert(getResponse?.data?.message.toString(),"")
+                        alertClass.hideAlert()
+                        alertClass.commonAlert(getResponse?.getData()?.message.toString(),"")
 
                         for((i,apiDoctorList) in arrayListSelectorDoctor.withIndex())
                         {
@@ -878,13 +877,13 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
                 {
                     Toast.makeText(this@SetSchedule_Activity, "Server error ", Toast.LENGTH_SHORT).show()
                 }
-                generalClass.disableProgress(progressView_parentRv!!)
+                alertClass.hideAlert()
 
             }
 
             override fun onFailure(call: Call<GenerateOTPModel?>, t: Throwable?) {
                 call.cancel()
-                generalClass.disableProgress(progressView_parentRv!!)
+                alertClass.hideAlert()
 
             }
         })

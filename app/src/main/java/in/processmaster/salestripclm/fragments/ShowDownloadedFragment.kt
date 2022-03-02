@@ -6,11 +6,9 @@ import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.adapter.DownloadedFolderAdapter
 import `in`.processmaster.salestripclm.models.DownloadFileModel
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
-import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,8 +21,10 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.fragment_show_downloaded.*
 import pl.droidsonroids.gif.GifImageView
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 class ShowDownloadedFragment : Fragment() {
     var video_rv: RecyclerView?=null
@@ -44,6 +44,12 @@ class ShowDownloadedFragment : Fragment() {
     var adapterWeb : DownloadedFolderAdapter?=null
     var filterFavList_et : EditText?=null
     private var db: DatabaseHandler? = null
+    companion object
+    {
+        var currentTime = ""
+        var currentDate = ""
+
+    }
 
 
     override fun onCreateView(
@@ -52,7 +58,13 @@ class ShowDownloadedFragment : Fragment() {
     ): View? {
         var view= inflater.inflate(R.layout.fragment_show_downloaded, container, false)
 
-        db = DatabaseHandler(activity)
+        db = DatabaseHandler(requireActivity())
+
+        if(currentDate.isEmpty()&& currentDate.isEmpty())
+        {
+            currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
+            currentDate = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(Date())
+        }
 
         video_rv=view.findViewById(R.id.video_rv)
         images_rv=view.findViewById(R.id.images_rv)
@@ -108,7 +120,7 @@ class ShowDownloadedFragment : Fragment() {
             }
             else
             {
-                 downloadList=db!!.getAllFavList()
+                 downloadList= db!!.getAllFavList()
                 if(downloadList.size==0)
                 {
                     nodata_gif?.visibility=View.VISIBLE
@@ -124,18 +136,18 @@ class ShowDownloadedFragment : Fragment() {
             {
                 if(valueDownload.downloadType.equals("VIDEO"))
                 {
-                    valueDownload.seteDetailingId(value)
+                    valueDownload.eDetailingId=value
                     arraylistVideo.add(valueDownload)
                 }
                 else  if(valueDownload.downloadType.equals("IMAGE"))
                 {
-                    valueDownload.seteDetailingId(value)
+                    valueDownload.eDetailingId=value
                     arraylistImages.add(valueDownload)
                 }
 
                 else
                 {
-                    valueDownload.seteDetailingId(value)
+                    valueDownload.eDetailingId=value
                     arraylistZip.add(valueDownload)
                 }
             }

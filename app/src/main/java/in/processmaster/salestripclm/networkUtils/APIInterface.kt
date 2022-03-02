@@ -34,22 +34,9 @@ interface APIInterface
     ): Call<LoginModel?>?
 
 
-    @FormUrlEncoded
-    @POST("token")
-    suspend  fun  // login api
-            loginAPICoo(
-        @Field("grant_type") grant_type: String?,
-        @Field("username") username: String?,
-        @Field("password") password: String?
-    ): Response<LoginModel?>?
-
     @GET("api/common/syncData") //sync api
     suspend fun
             syncApiCoo(@Header("Authorization") authorization: String?): Response<SyncModel?>?
-
-    @GET("api/common/syncData")
-    fun  //sync api
-            syncApi(@Header("Authorization") authorization: String?): Call<SyncModel?>?
 
     @FormUrlEncoded
     @POST("users/generateOTP")
@@ -91,31 +78,11 @@ interface APIInterface
         @Path("divisionId") divisionId: String?
     ): Response<DevisionModel?>?
 
-    @GET("api/e-detailing/documents/{eDetailId}")
-    fun downloadUrl(
-        @Header("Authorization") authorization: String?,
-        @Path("eDetailId") eDetailId: String?
-    ): Call<DownloadEdetail_model?>?
-
-    @POST("api/e-detailing/transaction")  //submit e-detailing api
-    fun submitVisualAds(
-        @Header("Authorization") authorization: String?,
-        @Body arrayVisual: ArrayList<VisualAdsModel_Send>
-    ): Call<SyncModel?>?
-
     @GET("api/users/allLevelHierarchyEmp/{empId}") //get teams members
     fun getTeamsMember(
         @Header("Authorization") authorization: String?,
         @Path("empId") empId: String?
     ): Call<TeamsModel?>?
-
-    @GET("api/users/allLevelHierarchyEmp/{empId}")
-    suspend fun  //get teams members
-            getTeamsMemberCoo(
-        @Header("Authorization") authorization: String?,
-        @Path("empId") empId: String?
-    ): Response<TeamsModel?>?
-
 
     @GET("api/users/{empId}")
     fun getProfileData(
@@ -161,7 +128,7 @@ interface APIInterface
     @GET("api/zoomMeeting/credentials/{empId}")
     fun getZoomCredientail(
         @Header("Authorization") authorization: String?,
-        @Path("empId") empId: String?
+        @Path("empId") empId: Int?
     ): Call<ZoomCredientialModel?>?
 
     @GET("api/zoomMeeting/credentials/{empId}")
@@ -201,5 +168,16 @@ interface APIInterface
 
     @GET("api/gs-receive/employee-sample-balance") //sync api
     suspend fun getQuantiyApiCoo(@Header("Authorization") authorization: String): Response<CommonModel.QuantityModel>
+
+    @GET("api/dashboard/visited-doctor-retailer") //sync api
+    suspend fun
+            visitDoctorGraphApi(@Header("Authorization") authorization: String?,
+                                @Query("fromDate") fromDate:String,
+                                @Query("toDate") toDate:String): Response<DoctorGraphModel>
+
+    @GET("api/dcr/doctors") //sync api
+    suspend fun
+            dailyDocCallApi(@Header("Authorization") authorization: String?,
+                                @Query("dcrDate") fromDate:String): Response<DailyDocVisitModel>
 
 }

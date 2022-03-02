@@ -8,8 +8,6 @@ import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.models.GenerateOTPModel
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.models.ProfileModel
-import `in`.processmaster.salestripclm.networkUtils.APIClient
-import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.DialogInterface
@@ -69,7 +67,7 @@ class ProfileeActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
-        progressView_parentRv?.visibility=View.VISIBLE
+        alertClass.showProgressAlert("")
         getProfileDataApi()
 
         personal_mb.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.appColor))
@@ -316,7 +314,6 @@ class ProfileeActivity : BaseActivity() {
             val okBtn_rl = dialogView.findViewById<View>(R.id.okBtn_rl) as RelativeLayout
             val cancelBtn_rl = dialogView.findViewById<View>(R.id.cancelBtn_rl) as RelativeLayout
 
-            val progressViewDilog = dialogView.findViewById<View>(R.id.progressView_parentRv) as RelativeLayout
 
             newpassword_et.addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) {}
@@ -407,7 +404,7 @@ class ProfileeActivity : BaseActivity() {
                     return@setOnClickListener
                 }
                 GeneralClass(this).HideKeyboard(it)
-                changePasswordApi(currentpassword_et,newpassword_et,alertDialog,progressViewDilog)
+                changePasswordApi(currentpassword_et,newpassword_et,alertDialog)
 
             }
 
@@ -533,12 +530,12 @@ class ProfileeActivity : BaseActivity() {
                 {
                     Toast.makeText(this@ProfileeActivity, "Server error ", Toast.LENGTH_SHORT).show()
                 }
-                progressView_parentRv?.visibility=View.GONE
+                alertClass.hideAlert()
             }
 
             override fun onFailure(call: Call<ProfileModel?>, t: Throwable?) {
                 call.cancel()
-                progressView_parentRv?.visibility=View.GONE
+                alertClass.hideAlert()
             }
         })
     }
@@ -547,10 +544,9 @@ class ProfileeActivity : BaseActivity() {
         oldPassword: EditText,
         newPassword: EditText,
         alertDialog: AlertDialog,
-        progressViewDilog: RelativeLayout
     )
     {
-        progressViewDilog?.visibility=View.VISIBLE
+        alertClass.showProgressAlert("")
 
         Log.e("callingApi","ChangePasswordApi")
 
@@ -574,27 +570,27 @@ class ProfileeActivity : BaseActivity() {
                 {
                     var getObject=response.body()
 
-                    if(getObject?.data?.message.toString().equals("Password changed successfully"))
+                    if(getObject?.getData()?.message.toString().equals("Password changed successfully"))
                     {
-                        Toast.makeText(this@ProfileeActivity,getObject?.data?.message,Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@ProfileeActivity,getObject?.getData()?.message,Toast.LENGTH_LONG).show()
                         alertDialog?.dismiss()
                     }
                     else
                     {
                         oldPassword.requestFocus()
-                        oldPassword.setError(getObject?.errorObj?.errorMessage)
+                        oldPassword.setError(getObject?.getErrorObj()?.errorMessage!!)
                     }
                 }
                 else
                 {
                     Toast.makeText(this@ProfileeActivity, "Server error ", Toast.LENGTH_SHORT).show()
                 }
-                progressViewDilog?.visibility=View.GONE
+                alertClass.hideAlert()
             }
 
             override fun onFailure(call: Call<GenerateOTPModel?>, t: Throwable?) {
                 call.cancel()
-                progressViewDilog?.visibility=View.GONE
+                alertClass.hideAlert()
 
             }
         })
@@ -602,7 +598,7 @@ class ProfileeActivity : BaseActivity() {
 
     fun updateProfilePic()
     {
-        progressView_parentRv?.visibility=View.VISIBLE
+        alertClass.showProgressAlert("Updating profile")
 
         val filePart = MultipartBody.Part.createFormData(
             "File1",
@@ -633,7 +629,7 @@ class ProfileeActivity : BaseActivity() {
                 if (response.code() == 200 && !response.body().toString().isEmpty())
                 {
                     var getObject=response.body()
-                    loginModelHomePage.imageName=getObject?.data?.imageName.toString()
+                    loginModelHomePage.imageName=getObject?.getData()?.imageName.toString()
 
                     val gson = Gson()
                     sharePreferanceBase?.setPref("profileData", gson.toJson(loginModelHomePage))
@@ -647,12 +643,12 @@ class ProfileeActivity : BaseActivity() {
 
                 }
 
-                progressView_parentRv?.visibility=View.GONE
+                alertClass.hideAlert()
             }
 
             override fun onFailure(call: Call<GenerateOTPModel?>, t: Throwable?) {
                 call.cancel()
-                progressView_parentRv?.visibility=View.GONE
+                alertClass.hideAlert()
                 Toast.makeText(this@ProfileeActivity, "Server error ", Toast.LENGTH_SHORT).show()
 
             }

@@ -139,6 +139,9 @@
                             android:background="@color/appDarkColor"
                             android:text="Select Working with"
                             android:id="@+id/workingWith_tv"
+                            android:drawableRight="@drawable/ic_drop_down"
+                            android:drawablePadding="2dp"
+                            android:drawableTint="@color/white"
                             android:textColor="@color/white" />
 
                         <androidx.recyclerview.widget.RecyclerView
@@ -166,6 +169,9 @@
                             android:background="@color/appDarkColor"
                             android:text="Select Samples"
                             android:id="@+id/clickSample_tv"
+                            android:drawableRight="@drawable/ic_drop_down"
+                            android:drawablePadding="2dp"
+                            android:drawableTint="@color/white"
                             android:textColor="@color/white" />
 
                         <androidx.recyclerview.widget.RecyclerView
@@ -192,6 +198,9 @@
                             android:background="@color/appDarkColor"
                             android:text="Select Gifts"
                             android:id="@+id/giftClick_tv"
+                            android:drawableRight="@drawable/ic_drop_down"
+                            android:drawablePadding="2dp"
+                            android:drawableTint="@color/white"
                             android:textColor="@color/white" />
 
                         <androidx.recyclerview.widget.RecyclerView

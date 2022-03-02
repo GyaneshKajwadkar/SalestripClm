@@ -67,7 +67,7 @@ class AlertClass(val context : Context)
     }
 
 
-    fun showAlert(message: String)
+    fun showProgressAlert(message: String)
     {
         if(alertDialog!=null&& alertDialog!!.isShowing)
         {

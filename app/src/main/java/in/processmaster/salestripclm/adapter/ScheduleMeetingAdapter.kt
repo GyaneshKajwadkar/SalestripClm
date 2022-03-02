@@ -242,7 +242,7 @@ class ScheduleMeetingAdapter(
 
     fun initilizeDelete(position: Int)
     {
-        AlertClass(context).showAlert("Deleting data...")
+        AlertClass(context).showProgressAlert("Deleting data...")
         val coroutine=CoroutineScope(Dispatchers.IO).launch {
             val deleteSchedule= async {
                 setSheduleApi(filteredData?.get(position))

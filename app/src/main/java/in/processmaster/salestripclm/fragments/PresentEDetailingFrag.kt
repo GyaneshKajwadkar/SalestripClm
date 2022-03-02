@@ -1,11 +1,9 @@
 package `in`.processmaster.salestripclm.fragments
 
 import `in`.processmaster.salestripclm.R
-import `in`.processmaster.salestripclm.activity.HomePage
 import `in`.processmaster.salestripclm.activity.SplashActivity
 import `in`.processmaster.salestripclm.activity.SubmitE_DetailingActivity
 import `in`.processmaster.salestripclm.adapter.VisualFileAdapter
-import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.interfaceCode.ItemClickDisplayVisual
 import `in`.processmaster.salestripclm.interfaceCode.SortingDisplayVisual
 import `in`.processmaster.salestripclm.models.*
@@ -14,11 +12,8 @@ import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,11 +34,6 @@ import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_display_visual.view.*
 import kotlinx.android.synthetic.main.activity_display_visual.view.noData_tv
 import kotlinx.android.synthetic.main.bottom_sheet_visualads.view.*
-import kotlinx.android.synthetic.main.progress_view.view.*
-import kotlinx.android.synthetic.main.progress_view.view.progressBar
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -57,7 +47,7 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
     }
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var bottomSheet: ConstraintLayout
-    var db = DatabaseHandler(activity)
+    lateinit var db : DatabaseHandler
     var adapter: BottomSheetDoctorAdapter? = null
     var adapterVisualFile: VisualFileAdapter? = null
     var sharePreferance: PreferenceClass? = null
@@ -74,7 +64,7 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
         savedInstanceState: Bundle?
     ): View? {
         views = inflater.inflate(R.layout.activity_display_visual, container, false)
-        db = DatabaseHandler(activity)
+        db = DatabaseHandler(requireActivity())
         initView(views!!)
         return views }
 
@@ -328,10 +318,10 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
                     value.filePath,
                     object : TypeToken<DownloadFileModel?>() {}.type
                 )
-                downloadFilePathLocal.setDownloadType(value.divisionName) //set division name
-                downloadFilePathLocal.setBrandId(value.brandId)
-                downloadFilePathLocal.setBrandName(value.brandName)
-                downloadFilePathLocal.seteDetailingId(value.geteDetailId())
+                downloadFilePathLocal.downloadType=value.divisionName !!
+                downloadFilePathLocal.brandId=value.brandId!!
+                downloadFilePathLocal.brandName=value.brandName!!
+                downloadFilePathLocal.eDetailingId=value.geteDetailId()!!
                 downloadFilePathList.add(downloadFilePathLocal)
                 storedDownloadedList.add(downloadFilePathLocal)
             }
@@ -373,10 +363,10 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
             )
             //get and convert save file string to array list
 
-            downloadFilePathLocal.setDownloadType(value.divisionName) //set division name
-            downloadFilePathLocal.setBrandId(value.brandId)
-            downloadFilePathLocal.setBrandName(value.brandName)
-            downloadFilePathLocal.seteDetailingId(value.geteDetailId())
+            downloadFilePathLocal.downloadType=value.divisionName!! //set division name
+            downloadFilePathLocal.brandId=value.brandId!!
+            downloadFilePathLocal.brandName=value.brandName!!
+            downloadFilePathLocal.eDetailingId=value.geteDetailId()!!
 
         }
     }

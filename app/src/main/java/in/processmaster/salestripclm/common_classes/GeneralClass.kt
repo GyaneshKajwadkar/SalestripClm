@@ -27,21 +27,6 @@ class GeneralClass(val activity: Activity) {
         imm.hideSoftInputFromWindow(view!!.getWindowToken(), 0)
     }
 
-    fun enableProgress(progressBar: RelativeLayout)
-    {
-        progressBar?.visibility = View.VISIBLE
-        activity.getWindow().setFlags(
-            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-    }
-
-    //disable progress bar
-    fun disableProgress(progressBar: RelativeLayout)
-    {
-        progressBar?.visibility = View.GONE
-        activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-    }
-
     fun enableSimpleProgress(progressBar: ProgressBar)
     {
         progressBar?.visibility = View.VISIBLE

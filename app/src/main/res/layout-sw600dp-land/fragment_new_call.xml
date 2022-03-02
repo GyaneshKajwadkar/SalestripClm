@@ -533,42 +533,50 @@
                                     android:padding="5dp"
                                     android:weightSum="2.01">
                                     <LinearLayout
+                                        android:layout_gravity="top"
                                         android:layout_width="0dp"
-                                        android:layout_height="wrap_content"
+                                        android:layout_height="match_parent"
                                         android:orientation="vertical"
                                         android:layout_weight="1">
+
                                         <TextView
-                                            android:layout_weight="0.1"
                                             android:layout_width="match_parent"
                                             android:layout_height="wrap_content"
                                             android:text="Last POB Details"
                                             android:textSize="18sp"
                                             android:textColor="@color/black" />
                                         <TextView
-                                            android:layout_weight="0.5"
                                             android:layout_width="match_parent"
                                             android:layout_height="wrap_content"
                                             android:text="Assigned stocklist:"
                                             android:textColor="@color/appColor"
                                             />
                                         <TextView
-                                            android:layout_weight="0.5"
                                             android:layout_width="match_parent"
                                             android:layout_height="wrap_content"
                                             android:id="@+id/total_tv"
                                             />
                                         <TextView
-                                            android:layout_weight="0.5"
                                             android:layout_width="match_parent"
                                             android:layout_height="wrap_content"
                                             android:id="@+id/remarkPOB_tv"
                                             />
                                         <TextView
-                                            android:layout_weight="0.5"
                                             android:layout_width="match_parent"
                                             android:layout_height="wrap_content"
                                             android:id="@+id/datePob_tv"
                                             />
+
+                                        <Button
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:text="View detail"
+                                            android:backgroundTint="@color/appDarkColor"
+                                            android:shadowRadius="20"
+                                            android:visibility="gone"
+                                            android:layout_margin="5dp"
+                                            android:layout_gravity="bottom"
+                                            android:id="@+id/viewDetail_lpobDetail"/>
                                     </LinearLayout>
 
                                     <View
@@ -580,7 +588,7 @@
                                     <LinearLayout
                                         android:layout_marginLeft="10dp"
                                         android:layout_width="0dp"
-                                        android:layout_height="wrap_content"
+                                        android:layout_height="match_parent"
                                         android:orientation="vertical"
                                         android:layout_weight="1">
                                         <TextView
@@ -589,27 +597,15 @@
                                             android:layout_height="wrap_content"
                                             android:text="Last RCPA Details"
                                             android:textSize="18sp"
+                                            android:id="@+id/lastRcpaHeader_tv"
                                             android:textColor="@color/black"
                                             />
-                                        <TextView
-                                            android:layout_weight="0.5"
+
+                                        <androidx.recyclerview.widget.RecyclerView
                                             android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:text="Retailer:"
-                                            android:textColor="@color/appColor"
-                                            />
-                                        <TextView
-                                            android:layout_weight="0.5"
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:id="@+id/demoSales_tv"
-                                            />
-                                        <TextView
-                                            android:layout_weight="0.5"
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:id="@+id/dateRCPA_tv"
-                                            />
+                                            android:layout_height="match_parent"
+                                            android:id="@+id/lastRcpaDetail_rv"/>
+
                                     </LinearLayout>
                                 </LinearLayout>
 
@@ -783,6 +779,7 @@
         <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
             <include layout="@layout/bottom_sheet_visualads" />
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

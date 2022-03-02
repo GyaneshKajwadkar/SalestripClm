@@ -54,7 +54,7 @@ class OtherFileAdapter(
 
         holder.parentLayout.setOnClickListener()
         {
-            mCallback?.onClickDisplayVisual(modeldata?.geteDetailId()!!,modeldata?.brandId,0)
+            mCallback?.onClickDisplayVisual(modeldata?.geteDetailId()!!,modeldata?.brandId!!,0)
         }
 
     }

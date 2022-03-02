@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:ignore="MissingDefaultResource">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -106,10 +107,7 @@
             </LinearLayout>
 
             <ScrollView
-                android:paddingTop="5dp"
-                android:paddingRight="5dp"
-                android:paddingLeft="5dp"
-                android:paddingBottom="10dp"
+                android:padding="8dp"
                 android:layout_weight="1.5"
                 android:layout_width="0dp"
                 android:fillViewport="true"
@@ -1255,8 +1253,6 @@
         </LinearLayout>
     </LinearLayout>
 
-
-    <include layout="@layout/progress_view" />
 
 
 </RelativeLayout>

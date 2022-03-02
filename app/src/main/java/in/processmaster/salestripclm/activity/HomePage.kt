@@ -4,8 +4,8 @@ import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.staticSyncData
 import `in`.processmaster.salestripclm.fragments.*
 import `in`.processmaster.salestripclm.models.LoginModel
+import `in`.processmaster.salestripclm.models.Send_EDetailingModel
 import `in`.processmaster.salestripclm.models.SyncModel
-import `in`.processmaster.salestripclm.networkUtils.APIClient
 import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.utils.PreferenceClass
@@ -43,6 +43,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.google.gson.JsonObject
 
 
 class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/*, UserLoginCallback.ZoomDemoAuthenticationListener , MeetingServiceListener, InitAuthSDKCallback*/
@@ -65,7 +66,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         var profileData = sharePreferance.getPref("profileData")
 
          loginModelHomePage = Gson().fromJson(profileData, LoginModel::class.java)
-        apiInterface = APIClient.getClient(2, sharePreferance?.getPref("secondaryUrl")).create(
+        apiInterface = APIClientKot().getClient(2, sharePreferance?.getPref("secondaryUrl")).create(
             APIInterface::class.java)
 
         initView()
@@ -85,7 +86,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         bottomNavigation?.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
 
         drawer_layout=findViewById(R.id.drawer_layout) as DrawerLayout
-        userName_tv?.setText(loginModelHomePage.userName)
+        userName_tv?.setText(loginModelHomePage.userName!!)
         //change status bar colour
         changeStatusBar()
 
@@ -334,9 +335,9 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
     fun callingMultipleAPI()
     {
-        alertClass.showAlert("")
+        alertClass.showProgressAlert("")
 
-        if (dbBase.datasCount > 0) {
+        if (dbBase.getDatasCount() > 0) {
             dbBase.deleteAll()
         }
 
@@ -351,6 +352,10 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
             val sendEdetailing= async { submitDCRCo() }
 
+            val doctorGraphApi= async { getDoctorGraphAPI() }
+
+            val getDocCall= async { getDocCallAPI() }
+
             val initilizeZoom= async {
                 var zoomSDKBase = ZoomSDK.getInstance()
                 if(!zoomSDKBase.isLoggedIn)
@@ -364,6 +369,8 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             quantityApi.await()
             initilizeZoom.await()
             sendEdetailing.await()
+            doctorGraphApi.await()
+            getDocCall.await()
 
         }
         coroutineScope.invokeOnCompletion {
@@ -399,7 +406,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             {
                 if (response.code() == 200 && !response.body().toString().isEmpty())
                 {
-                    for ((index, value) in response.body()?.data?.geteDetailingList()?.withIndex()!!) {
+                    for ((index, value) in response.body()?.getData()?.geteDetailingList()?.withIndex()!!) {
                         //store edetailing data to db
                         val gson = Gson()
                         dbBase.insertOrUpdateEDetail(
@@ -409,9 +416,9 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                     }
 
                     // clear database
-                    for (dbList in dbBase.getAlleDetail()) {
+                    for (dbList in dbBase.getAlleDetail()!!) {
                         var isSet = false
-                        for (mainList in response.body()?.data?.geteDetailingList()!!) {
+                        for (mainList in response.body()?.getData()?.geteDetailingList()!!) {
                             if (mainList.geteDetailId() == dbList.geteDetailId()) {
                                 isSet = true
                             }
@@ -422,10 +429,10 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                             dbBase.deleteEdetailingData(dbList.geteDetailId().toString())
 
                             var downloadModelArrayList =
-                                dbBase.getAllDownloadedData(dbList.geteDetailId())
+                                dbBase.getAllDownloadedData(dbList.geteDetailId()!!)
 
                             //Delete files from folder before erase db
-                            for (item in downloadModelArrayList) {
+                            for (item in downloadModelArrayList!!) {
                                 val someDir = File(item.fileDirectoryPath)
                                 someDir.deleteRecursively()
                             }
@@ -544,5 +551,48 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             openFragmentStr = "CallsFragment"
         }
     }
+
+    suspend fun getDoctorGraphAPI()
+    {
+        val cal = Calendar.getInstance()
+        cal.add(Calendar.MONTH, -6)
+        cal.set(Calendar.DAY_OF_MONTH, 1)
+        val c:Date=cal.time
+        val df = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
+
+        val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
+        ).visitDoctorGraphApi("bearer " + loginModelHomePage.accessToken,df.format(c),generalClass.currentDateMMDDYY())
+        withContext(Dispatchers.Main) {
+            Log.e("getDoctorGraphAPI", response.body().toString()!!)
+            if (response!!.isSuccessful)
+            {
+                if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage!!.isEmpty()) {
+                    var model = response.body()
+                    dbBase?.addAPIData(Gson().toJson(model?.getData()),4,)
+                  }
+                else Log.e("elseDoctorGraphAPI", response.code().toString())
+            }
+            else Log.e("DoctorGraphERROR", response.errorBody().toString())
+        }
+    }
+
+    suspend fun getDocCallAPI()
+    {
+        val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
+        ).dailyDocCallApi("bearer " + loginModelHomePage.accessToken,generalClass.currentDateMMDDYY())
+        withContext(Dispatchers.Main) {
+            Log.e("getDocCallAPI", response.body().toString()!!)
+            if (response!!.isSuccessful)
+            {
+                if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage!!.isEmpty()) {
+                    var model = response.body()
+                    dbBase?.addAPIData(Gson().toJson(model?.getData()),5,)
+                }
+                else Log.e("elsegetDocCallAPI", response.code().toString())
+            }
+            else Log.e("getDocCallAPIERROR", response.errorBody().toString())
+        }
+    }
+
 
 }

@@ -3,8 +3,8 @@ package `in`.processmaster.salestripclm.models
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
-public class ProfileModel
-{
+class GenerateOTPModel {
+
     @SerializedName("responseCode")
     @Expose
     private var responseCode: Int? = null
@@ -51,21 +51,24 @@ public class ProfileModel
         var fldErrors: Any? = null
     }
 
-
     class Data {
-      /*  @SerializedName("hqList")
+        @SerializedName("isOTPMatched")
         @Expose
-        var hqList: List<Any>? = null
+        var isOTPMatched = false
 
-        @SerializedName("stateList")
+        @SerializedName("imageName")
         @Expose
-        var stateList: List<Any>? = null*/
+        var imageName: String? = null
 
-        @SerializedName("users")
+        @SerializedName("message")
         @Expose
-        var users: List<User>? = null
+        var message: String? = null
 
-        class User {
+        @SerializedName("userData")
+        @Expose
+        var userData: UserData? = null
+
+        inner class UserData {
             @SerializedName("empId")
             @Expose
             var empId: Int? = null
@@ -90,7 +93,7 @@ public class ProfileModel
             @Expose
             var emailId: String? = null
 
-            @SerializedName("mobileNo")
+          /*  @SerializedName("mobileNo")
             @Expose
             var mobileNo: String? = null
 
@@ -120,39 +123,39 @@ public class ProfileModel
 
             @SerializedName("stateId")
             @Expose
-            var stateId: Int? = null
+            var stateId: Int? = null*/
 
             @SerializedName("stateName")
             @Expose
-            var stateName: String? = null
+            var stateName: Any? = null
 
-            @SerializedName("countryId")
+          /*  @SerializedName("countryId")
             @Expose
             var countryId: Int? = null
 
             @SerializedName("countryName")
             @Expose
-            var countryName: String? = null
+            var countryName: Any? = null*/
 
             @SerializedName("pinCode")
             @Expose
-            var pinCode: String? = null
+            var pinCode: Int? = null
 
-            @SerializedName("phone")
+          /*  @SerializedName("phone")
             @Expose
-            var phone: String? = null
+            var phone: String? = null*/
 
             @SerializedName("division")
             @Expose
             var division: String? = null
 
-            @SerializedName("headQuaterId")
+       /*     @SerializedName("headQuaterId")
             @Expose
             var headQuaterId: String? = null
 
             @SerializedName("headQuaterName")
             @Expose
-            var headQuaterName: String? = null
+            var headQuaterName: Any? = null
 
             @SerializedName("hierachyId")
             @Expose
@@ -208,7 +211,7 @@ public class ProfileModel
 
             @SerializedName("deleteBy")
             @Expose
-            var deleteBy: Int? = null
+            var deleteBy: Int? = null*/
 
             @SerializedName("mode")
             @Expose
@@ -261,22 +264,22 @@ public class ProfileModel
             @SerializedName("imageExt")
             @Expose
             var imageExt: String? = null
-*/
+
             @SerializedName("isAuthPassword")
             @Expose
             private var isAuthPassword: Boolean? = null
 
-         /*   @SerializedName("roleType")
+            @SerializedName("roleType")
             @Expose
             var roleType: String? = null
 
             @SerializedName("roleName")
             @Expose
-            var roleName: String? = null
+            var roleName: Any? = null
 
             @SerializedName("prevRoleName")
             @Expose
-            var prevRoleName: String? = null
+            var prevRoleName: Any? = null
 
             @SerializedName("roleTypeName")
             @Expose
@@ -325,7 +328,7 @@ public class ProfileModel
             @SerializedName("strLastLoginDate")
             @Expose
             var strLastLoginDate: Any? = null
-*/
+
             @SerializedName("mPin")
             @Expose
             private var mPin: Any? = null
@@ -340,17 +343,17 @@ public class ProfileModel
 
             @SerializedName("cityName")
             @Expose
-            var cityName: String? = null
+            var cityName: Any? = null
 
             @SerializedName("canBeDeleted")
             @Expose
             var canBeDeleted: Boolean? = null
-
+*/
             @SerializedName("absolutePath")
             @Expose
-            var absolutePath: String? = null
+            var absolutePath: Any? = null
 
-       /*     @SerializedName("disableSMSNotification")
+           /* @SerializedName("disableSMSNotification")
             @Expose
             var disableSMSNotification: Boolean? = null
 
@@ -361,14 +364,14 @@ public class ProfileModel
             @SerializedName("prevLastName")
             @Expose
             var prevLastName: String? = null
-
-            @SerializedName("prevUserName")
+*/
+         /*   @SerializedName("prevUserName")
             @Expose
-            var prevUserName: String? = null*/
+            var prevUserName: String? = null
 
             @SerializedName("fullName")
             @Expose
-            var fullName: String? = null
+            var fullName: Any? = null
 
             @SerializedName("headQuaterType")
             @Expose
@@ -376,59 +379,59 @@ public class ProfileModel
 
             @SerializedName("employeeCode")
             @Expose
-            var employeeCode: String? = null
+            var employeeCode: Any? = null
 
             @SerializedName("joiningDate")
             @Expose
             var joiningDate: String? = null
 
-         /*   @SerializedName("onFieldJobDate")
+            @SerializedName("onFieldJobDate")
             @Expose
             var onFieldJobDate: String? = null
 
             @SerializedName("hierachyCode")
             @Expose
-            var hierachyCode: String? = null
+            var hierachyCode: Any? = null
 
             @SerializedName("hierachyType")
             @Expose
-            var hierachyType: String? = null
+            var hierachyType: Any? = null
 
             @SerializedName("reportingManagerStatus")
             @Expose
-            var reportingManagerStatus: String? = null
+            var reportingManagerStatus: Any? = null
 
             @SerializedName("lastLoginDeviceId")
             @Expose
-            var lastLoginDeviceId: String? = null
+            var lastLoginDeviceId: Any? = null
 
             @SerializedName("pushToken")
             @Expose
-            var pushToken: String? = null
-*/
+            var pushToken: Any? = null
+
             @SerializedName("hierDesc")
             @Expose
-            var hierDesc: String? = null
+            var hierDesc: Any? = null
 
             @SerializedName("teamLevel")
             @Expose
-            var teamLevel: Int? = null
+            var teamLevel: Int? = null*/
 
             @SerializedName("divisionName")
             @Expose
-            var divisionName: String? = null
+            var divisionName: Any? = null
 
           /*  @SerializedName("linkedStateName")
             @Expose
-            var linkedStateName: String? = null
+            var linkedStateName: Any? = null
 
             @SerializedName("qualificationName")
             @Expose
-            var qualificationName: String? = null
+            var qualificationName: Any? = null
 
             @SerializedName("nameWithCode")
             @Expose
-            var nameWithCode: String? = null
+            var nameWithCode: Any? = null
 
             @SerializedName("receiveEmailUpdate")
             @Expose
@@ -442,30 +445,30 @@ public class ProfileModel
             @Expose
             var callDetails: Any? = null
 
-        /*    @SerializedName("strDateOfBirth")
+       /*     @SerializedName("strDateOfBirth")
             @Expose
-            var strDateOfBirth: String? = null
+            var strDateOfBirth: Any? = null
 
             @SerializedName("strJoiningDate")
             @Expose
-            var strJoiningDate: String? = null
+            var strJoiningDate: Any? = null
 
             @SerializedName("strOnFieldJobDate")
             @Expose
-            var strOnFieldJobDate: String? = null
+            var strOnFieldJobDate: Any? = null
 
             @SerializedName("reportingHierachyCode")
             @Expose
-            var reportingHierachyCode: String? = null
+            var reportingHierachyCode: Any? = null
 
             @SerializedName("mobileAppVersionInUse")
             @Expose
-            var mobileAppVersionInUse: String? = null
-*/
+            var mobileAppVersionInUse: Any? = null
+
             @SerializedName("previousHierarchyType")
             @Expose
             var previousHierarchyType: Any? = null
-
+*/
             @SerializedName("month")
             @Expose
             var month: Int? = null
@@ -474,7 +477,7 @@ public class ProfileModel
             @Expose
             var year: Int? = null
 
-            @SerializedName("promotionDate")
+          /*  @SerializedName("promotionDate")
             @Expose
             var promotionDate: String? = null
 
@@ -529,30 +532,7 @@ public class ProfileModel
             @SerializedName("regionId")
             @Expose
             var regionId: Int? = null
-
-            @SerializedName("zoneId")
-            @Expose
-            var zoneId: Int? = null
-
-            @SerializedName("strDeactivationDate")
-            @Expose
-            var strDeactivationDate: Any? = null
-
-            fun getIsAuthPassword(): Boolean? {
-                return isAuthPassword
-            }
-
-            fun setIsAuthPassword(isAuthPassword: Boolean?) {
-                this.isAuthPassword = isAuthPassword
-            }
-
-            fun getmPin(): Any? {
-                return mPin
-            }
-
-            fun setmPin(mPin: Any?) {
-                this.mPin = mPin
-            }
+*/
         }
     }
 

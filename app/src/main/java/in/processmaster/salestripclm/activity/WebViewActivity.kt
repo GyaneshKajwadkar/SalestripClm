@@ -154,7 +154,7 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
 
             position = intent.getIntExtra("position", 0)
 
-            eDetailingId= modelweb?.geteDetailingId()!!
+            eDetailingId= modelweb?.eDetailingId!!
 
             val relativeParent = findViewById<RelativeLayout>(R.id.relativeParent)
 
@@ -653,7 +653,7 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
         {
             if(itemParent.isSaved==1)
             {
-                var downloadedList = db.getAllDownloadedData(itemParent.geteDetailId())
+                var downloadedList = db.getAllDownloadedData(itemParent.geteDetailId()!!)
 
                 if(downloadedList.stream().anyMatch({ o -> o.downloadType.equals("ZIP") }))
                 {

@@ -7,14 +7,11 @@ import `in`.processmaster.salestripclm.adapter.Edetailing_Adapter
 import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.models.DevisionModel
-import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
@@ -22,9 +19,6 @@ import android.util.Log
 import android.view.*
 import android.widget.EditText
 import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
@@ -52,7 +46,7 @@ class EdetailingDownloadFragment : Fragment() {
         var filter_et : EditText?=null
     }
 
-    var db = DatabaseHandler(activity)
+    lateinit var db : DatabaseHandler
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -68,7 +62,7 @@ class EdetailingDownloadFragment : Fragment() {
         filter_et=view.findViewById(R.id.filter_et)as EditText
         syncData_ll=view.findViewById(R.id.syncData_ll)as LinearLayout
         sharePreferance = PreferenceClass(activity)
-        db = DatabaseHandler(activity)
+        db = DatabaseHandler(requireActivity())
         viewPager = view.findViewById<View>(R.id.viewpager) as ViewPager
         tabs = view.findViewById<View>(R.id.result_tabs) as TabLayout
 
@@ -91,7 +85,7 @@ class EdetailingDownloadFragment : Fragment() {
     //call_divisioinApi
     private fun division_api()
     {
-        AlertClass(requireActivity()).showAlert("Sync data")
+        AlertClass(requireActivity()).showProgressAlert("Sync data")
         val jsonObject = JSONObject(loginModelHomePage?.getEmployeeObj().toString())
 
         var call: Call<DevisionModel> = HomePage.apiInterface?.detailingApi(
@@ -108,11 +102,11 @@ class EdetailingDownloadFragment : Fragment() {
                 Log.e("division_api", response.code().toString() + "")
                 if (response.code() == 200 && !response.body().toString().isEmpty())
                 {
-                    for ((index, value) in db.alleDetail?.withIndex()!!) {
+                    for ((index, value) in db.getAlleDetail()?.withIndex()!!) {
                         val gson = Gson()
                         db.insertOrUpdateEDetail(value.geteDetailId().toString(), gson.toJson(value))
 
-                        if (index == response.body()?.data?.geteDetailingList()!!.size - 1)
+                        if (index == response.body()?.getData()?.geteDetailingList()!!.size - 1)
                         { calladapter() }
                     }
 
@@ -120,7 +114,7 @@ class EdetailingDownloadFragment : Fragment() {
                     for(dbList in db.getAlleDetail())
                     {
                         var isSet=false
-                        for (mainList in response.body()?.data?.geteDetailingList()!!)
+                        for (mainList in response.body()?.getData()?.geteDetailingList()!!)
                         {
                             if (mainList.geteDetailId() == dbList.geteDetailId())
                             { isSet = true }
@@ -130,7 +124,7 @@ class EdetailingDownloadFragment : Fragment() {
                         if(!isSet)
                         {
                            db.deleteEdetailingData(dbList.geteDetailId().toString())
-                            var downloadModelArrayList=db.getAllDownloadedData(dbList.geteDetailId())
+                            var downloadModelArrayList=db.getAllDownloadedData(dbList.geteDetailId()!!)
                             for(item in downloadModelArrayList)
                             {
                                 val someDir = File(item.fileDirectoryPath)

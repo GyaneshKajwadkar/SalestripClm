@@ -14,12 +14,9 @@ class APIClientKot {
         interceptor.level = HttpLoggingInterceptor.Level.BODY
         val client = OkHttpClient.Builder().addInterceptor(interceptor).build()
 
-        if (parent == 1) {
-            commonUrl = "https://app.salestrip.in/api/"
-          //  commonUrl = "https://pms-test.azurewebsites.net/"
-        } else {
-            commonUrl = childUrl
-        }
+        if (parent == 1) commonUrl = "https://app.salestrip.in/api/"
+         else  commonUrl = childUrl
+
 
         return Retrofit.Builder()
             .client(client)
@@ -27,5 +24,24 @@ class APIClientKot {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(APIInterface::class.java)
+    }
+
+    fun getClient(parent: Int, childUrl: String?): Retrofit {
+        val interceptor = HttpLoggingInterceptor()
+        interceptor.level = HttpLoggingInterceptor.Level.BODY
+        val client = OkHttpClient.Builder().addInterceptor(interceptor).build()
+        var commonUrl: String? = ""
+
+        // commonUrl="https://pms-test.azurewebsites.net/";
+        commonUrl = if (parent == 1)  "https://app.salestrip.in/api/"
+        else  childUrl
+
+
+        val retrofit = Retrofit.Builder()
+            .baseUrl(commonUrl)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(client)
+            .build()
+        return retrofit
     }
 }

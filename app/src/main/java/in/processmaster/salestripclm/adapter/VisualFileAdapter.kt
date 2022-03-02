@@ -75,7 +75,7 @@ class VisualFileAdapter(
                 selectedPosition=position;
                 notifyDataSetChanged();
 
-                mCallback?.onClickDisplayVisual(modeldata?.geteDetailingId()!!,modeldata?.brandId,selectionType)
+                mCallback?.onClickDisplayVisual(modeldata?.eDetailingId!!,modeldata?.brandId,selectionType)
 
             }
         }

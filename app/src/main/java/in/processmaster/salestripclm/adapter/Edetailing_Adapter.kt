@@ -60,7 +60,7 @@ class Edetailing_Adapter(
             holder.download_rl?.visibility = View.GONE
             holder.reDownload_rl?.visibility = View.VISIBLE
 
-            val checkDownloadStatus= db.getDownloadStatus(modeldata?.eretailDetailList)
+            val checkDownloadStatus= db.getDownloadStatus(modeldata?.eretailDetailList!!)
 
             if(!checkDownloadStatus)
             {
@@ -116,7 +116,7 @@ class Edetailing_Adapter(
                 constraint = constraint.toString().lowercase()
                 for (i in 0 until edetailidList?.size!!) {
                     val dataNames: DevisionModel.Data.EDetailing = edetailidList?.get(i)!!
-                    if (dataNames.brandName.lowercase().startsWith(constraint.toString())) {
+                    if (dataNames.brandName?.lowercase()?.startsWith(constraint.toString())!!) {
                         FilteredArrayNames.add(dataNames)
                     }
                 }

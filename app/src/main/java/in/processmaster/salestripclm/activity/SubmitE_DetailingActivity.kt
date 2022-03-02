@@ -11,7 +11,6 @@ import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.fragments.PresentEDetailingFrag.Companion.doctorIdDisplayVisual
 import `in`.processmaster.salestripclm.interfaceCode.IdNameBoll_interface
 import `in`.processmaster.salestripclm.models.*
-import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -89,7 +88,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
 
 
 
-        visualSendModel = DatabaseHandler(this).getAllSubmitVisual()
+        visualSendModel = dbBase.getAllSubmitVisual()
         edetailing_rv.layoutManager=LinearLayoutManager(this)
         edetailing_rv.adapter=EdetallingAdapter()
 
@@ -295,7 +294,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
         saveModel: Send_EDetailingModel,
         quantityArray: ArrayList<CommonModel.QuantityModel.Data.EmployeeSampleBalance>
     ) {
-        alertClass?.showAlert("")
+        alertClass?.showProgressAlert("")
         var call: Call<JsonObject> = HomePage.apiInterface?.submitEdetailingApi("bearer " + loginModelHomePage.accessToken,saveModel) as Call<JsonObject>
         call.enqueue(object : Callback<JsonObject?> {
             override fun onResponse(call: Call<JsonObject?>?, response: Response<JsonObject?>) {

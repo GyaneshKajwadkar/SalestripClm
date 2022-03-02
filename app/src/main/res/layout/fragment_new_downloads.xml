@@ -8,9 +8,10 @@
     <TextView
         android:visibility="gone"
         android:textAlignment="center"
+        android:padding="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="No downloads yet"
+        android:text="No downloads available"
         android:id="@+id/nodownload_tv"/>
 
     <androidx.recyclerview.widget.RecyclerView

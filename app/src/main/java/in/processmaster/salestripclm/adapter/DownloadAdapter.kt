@@ -120,12 +120,13 @@ class DownloadAdapter constructor() :
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int)
     {
+        var db = DatabaseHandler(context!!)
         if(downloadedType.equals("VIDEO"))
         {
             val videoView: ViewHoldersVideo = holder as ViewHoldersVideo
             var videomodel=arraylistVideo.get(position)
 
-            var db = DatabaseHandler(context)
+
             var dbdata=db.getSingleDownloadedData(videomodel.fileId!!)
             if(dbdata.fileName!=null)
             {
@@ -214,7 +215,6 @@ class DownloadAdapter constructor() :
             videoView.imageTitle.setText(imagemodel.fileName)
             videoView.imageTitle.setSelected(true);
 
-            var db = DatabaseHandler(context)
             var dbdata=db.getSingleDownloadedData(imagemodel.fileId!!)
             if(dbdata.fileName!=null)
             {
@@ -302,7 +302,6 @@ class DownloadAdapter constructor() :
             videoView.webViewTitle.setText(zipmodel.fileName)
             videoView.webViewTitle.setSelected(true);
 
-            var db = DatabaseHandler(context)
             var dbdata=db.getSingleDownloadedData(zipmodel.fileId!!)
             if(dbdata.fileName!=null)
             {
@@ -442,6 +441,8 @@ class DownloadAdapter constructor() :
     fun getAllfileList(pathdirectoryIs:String,fileName:String) :Boolean
     {
         val yourDir = File(pathdirectoryIs)
+        if(yourDir.listFiles()==null) { return false }
+
         for (f in yourDir.listFiles()) {
             val name = f.name
             Log.i("filenames", name)
@@ -513,7 +514,7 @@ class DownloadAdapter constructor() :
                     output.flush()
                     output.close()
 
-                    var db = DatabaseHandler(context)
+                    var db = DatabaseHandler(context!!)
 
                     var fileModel= DownloadFileModel()
                     fileModel.fileName=extension.replace("/","")
@@ -527,7 +528,7 @@ class DownloadAdapter constructor() :
 
                     var downloadedModel=db.getSingleDownloadedData(model.fileId!!)
 
-                    if(downloadedModel.isFavFile)
+                    if(downloadedModel.favFile)
                     {
                         fileModel.favFilePath=downloadedModel.favFilePath
                         fileModel.favFileName=downloadedModel.favFileName
@@ -737,11 +738,11 @@ class DownloadAdapter constructor() :
                     fileModel.brandId=parentId
                     fileModel.brandName=brandName
 
-                    var db = DatabaseHandler(context)
+                    var db = DatabaseHandler(context!!)
 
                     var downloadedModel=db.getSingleDownloadedData(zipmodel.fileId!!)
 
-                    if(downloadedModel.isFavFile)
+                    if(downloadedModel.favFile)
                     {
                         fileModel.favFilePath=downloadedModel.favFilePath
                         fileModel.favFileName=downloadedModel.favFileName
@@ -1008,7 +1009,7 @@ class DownloadAdapter constructor() :
 
     fun deleteAndsaveRedownloads(db: DatabaseHandler, videomodel: DownloadEdetail_model.Data.EDetailingImages, downloadedModel: DownloadFileModel)
     {
-        if(downloadedModel.isFavFile)
+        if(downloadedModel.favFile)
         {
             val sourcePath = downloadedModel.filePath
             val source = File(sourcePath)

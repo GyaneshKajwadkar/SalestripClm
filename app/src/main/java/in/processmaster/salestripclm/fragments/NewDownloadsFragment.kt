@@ -19,7 +19,7 @@ class NewDownloadsFragment : Fragment() {
 
     var recyclerView: RecyclerView?=null
     var sharePreferance: PreferenceClass?= null
-    var db = DatabaseHandler(activity)
+    lateinit var db : DatabaseHandler
     var nodownload_tv: TextView?= null
     var getAlleDetailListDb: ArrayList<DevisionModel.Data.EDetailing> = ArrayList()
     var isFirstTimeOpen=true
@@ -39,12 +39,14 @@ class NewDownloadsFragment : Fragment() {
         nodownload_tv=view.findViewById(R.id.nodownload_tv)as TextView
 
         sharePreferance = PreferenceClass(activity)
-        db = DatabaseHandler(activity)
+        db = DatabaseHandler(requireActivity())
 
         Handler(Looper.getMainLooper())
             .postDelayed({
 
         getAlleDetailListDb= db.getSelectedeDetail(false)
+
+        if(getAlleDetailListDb.size==0)nodownload_tv?.visibility=View.VISIBLE
 
         adapter =  Edetailing_Adapter(
             getAlleDetailListDb, sharePreferance, requireActivity(), db)
@@ -73,6 +75,8 @@ class NewDownloadsFragment : Fragment() {
         {
             getAlleDetailListDb.clear()
             getAlleDetailListDb.addAll(geteDetail)
+            if(getAlleDetailListDb.size==0)nodownload_tv?.visibility=View.VISIBLE
+
             adapter =  Edetailing_Adapter(
                 getAlleDetailListDb, sharePreferance, requireActivity(), db
             )

@@ -308,7 +308,7 @@ class DownloadedActivtiy : BaseActivity() {
 
                         var downloadedModel=db.getSingleDownloadedData(model.fileId!!)
 
-                        if(downloadedModel.isFavFile)
+                        if(downloadedModel.favFile)
                         {
                             fileModel.favFilePath=downloadedModel.favFilePath
                             fileModel.favFileName=downloadedModel.favFileName
@@ -477,7 +477,7 @@ class DownloadedActivtiy : BaseActivity() {
 
                     var downloadedModel=db.getSingleDownloadedData(zipmodel.fileId!!)
 
-                    if(downloadedModel.isFavFile)
+                    if(downloadedModel.favFile)
                     {
                         fileModel.favFilePath=downloadedModel.favFilePath
                         fileModel.favFileName=downloadedModel.favFileName
@@ -521,7 +521,7 @@ class DownloadedActivtiy : BaseActivity() {
 
     fun deleteAndsaveRedownloads(db: DatabaseHandler, videomodel: DownloadEdetail_model.Data.EDetailingImages, downloadedModel: DownloadFileModel)
     {
-        if(downloadedModel.isFavFile)
+        if(downloadedModel.favFile)
         {
             val sourcePath = downloadedModel.filePath
             val source = File(sourcePath)

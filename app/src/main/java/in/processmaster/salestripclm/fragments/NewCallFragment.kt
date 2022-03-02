@@ -5,6 +5,7 @@ import `in`.processmaster.salestripclm.activity.HomePage.Companion.loginModelHom
 import `in`.processmaster.salestripclm.activity.OnlinePresentationActivity
 import `in`.processmaster.salestripclm.activity.SplashActivity
 import `in`.processmaster.salestripclm.activity.SubmitE_DetailingActivity
+import `in`.processmaster.salestripclm.adapter.LastRCPA_Adapter
 import `in`.processmaster.salestripclm.adapter.SimpleListAdapter
 import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.common_classes.CommonListGetClass
@@ -36,19 +37,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import kotlinx.android.synthetic.main.activity_display_visual.view.*
-import kotlinx.android.synthetic.main.activity_submit_edetailing.*
 import kotlinx.android.synthetic.main.bottom_sheet_visualads.view.*
 import kotlinx.android.synthetic.main.bottom_sheet_visualads.view.bottomSheet
 import kotlinx.android.synthetic.main.bottom_sheet_visualads.view.close_imv
-import kotlinx.android.synthetic.main.checkbox_bottom_sheet.view.*
-import kotlinx.android.synthetic.main.dcr_entry.*
 import kotlinx.android.synthetic.main.dcr_entry.view.*
 import kotlinx.android.synthetic.main.fragment_new_call.*
 import kotlinx.android.synthetic.main.fragment_new_call.view.*
-import kotlinx.android.synthetic.main.join_activity_view.view.*
 import kotlinx.android.synthetic.main.join_activity_view.view.noData_tv
-import kotlinx.android.synthetic.main.progress_view.view.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -57,7 +52,7 @@ import kotlin.collections.ArrayList
 
 
 class NewCallFragment : Fragment() {
-    var dataBase = DatabaseHandler(activity)
+    lateinit var db : DatabaseHandler
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     var views:View?=null
     private lateinit var adapter:BottomSheetDoctorAdapter
@@ -78,7 +73,7 @@ class NewCallFragment : Fragment() {
     ): View? {
         views= inflater.inflate(R.layout.fragment_new_call, container, false)
 
-        dataBase = DatabaseHandler(activity)
+        db = DatabaseHandler(requireActivity())
         sharePreferance = PreferenceClass(activity)
         alertClass = AlertClass(requireActivity())
 
@@ -120,7 +115,9 @@ class NewCallFragment : Fragment() {
 
         views!!.startDetailing_btn.setOnClickListener({
 
-            if(views?.lastVisitDate_tv?.text?.equals(generalClassObject!!.getCurrentDate())!! || dataBase.isEDetailingAvailable(selectedDocID,generalClassObject?.getCurrentDate()))
+            if(views?.lastVisitDate_tv?.text?.equals(generalClassObject!!.getCurrentDate())!! || db.isEDetailingAvailable(selectedDocID,
+                    generalClassObject?.getCurrentDate()!!
+                ))
             {
                 alertClass?.commonAlert("Alert!","Doctor e-detailing already done for today")
                 return@setOnClickListener
@@ -454,7 +451,7 @@ class NewCallFragment : Fragment() {
                         view!!.noDataBrand.visibility=View.GONE
                         for( data in analysisModel?.productList!!)
                         {
-                            mainList.add(data.productName)
+                            mainList.add(data.productName!!)
                         }
                         var adapterProduct=SimpleListAdapter(mainList,subList)
                         views!!.brandList_rv.adapter=adapterProduct
@@ -495,17 +492,32 @@ class NewCallFragment : Fragment() {
 
                     views!!.total_tv.setText("Total: "+analysisModel?.lastPOBDetails?.totalPOB)
 
-                    if(analysisModel?.lastPOBDetails?.remark == null)  views!!.remarkPOB_tv.visibility=View.GONE
 
-                    views!!.remarkPOB_tv.setText("Remark: "+analysisModel?.lastPOBDetails?.remark)
-                    views!!.datePob_tv.setText("Date: "+analysisModel?.lastPOBDetails?.lastPobDate)
+                    if(generalClassObject?.checkStringNullEmpty(analysisModel?.lastPOBDetails?.remark!!)!!)
+                    { views?.remarkPOB_tv?.visibility=View.GONE }
+                    else{ views?.remarkPOB_tv?.setText("Remark: "+analysisModel?.lastPOBDetails?.remark) }
 
-                    if(generalClassObject?.checkStringNullEmpty(analysisModel?.lastPOBDetails!!.lastPobDate!!)!!)
+                    if(generalClassObject?.checkStringNullEmpty(analysisModel?.lastPOBDetails?.strPobDate!!)!!)
+                    { views?.datePob_tv?.visibility=View.GONE }
+                    else{ views?.datePob_tv?.setText("Date: "+analysisModel?.lastPOBDetails?.strPobDate) }
+
+                        if(analysisModel?.lastRCPADetails?.size!=0)
+                        {
+                            views?.lastRcpaDetail_rv?.layoutManager=LinearLayoutManager(requireActivity())
+                            val adapter=LastRCPA_Adapter(analysisModel?.lastRCPADetails)
+                            view?.lastRcpaDetail_rv?.adapter=adapter
+                        }
+                    else{ views?.lastRcpaHeader_tv?.visibility=View.GONE}
+
+                   // viewDetail_lRcpaDetail
+                   // viewDetail_lpobDetail
+
+                /*    if(generalClassObject?.checkStringNullEmpty(analysisModel?.lastPOBDetails!!.strPobDate!!)!!)
                     { views!!.datePob_tv.setText("Date: --") }
                     else{
-                        if(generalClassObject!!.checkDateValidation(analysisModel?.lastPOBDetails?.lastPobDate!!))
-                        { views!!.datePob_tv.setText("Date: "+analysisModel?.lastPOBDetails?.lastPobDate) }
-                        else{ views!!.datePob_tv.setText("Date: ----")} }
+                        if(generalClassObject!!.checkDateValidation(analysisModel?.lastPOBDetails?.strPobDate!!))
+                        { views!!.datePob_tv.setText("Date: "+analysisModel?.lastPOBDetails?.strPobDate) }
+                        else{ views!!.datePob_tv.setText("Date: ----")} }*/
 
 
 
@@ -623,8 +635,8 @@ class NewCallFragment : Fragment() {
 
             val commonSaveDcrModel=CommonModel.SaveDcrModel()
             commonSaveDcrModel.dcrDate= generalClassObject!!.currentDateMMDDYY()
-            commonSaveDcrModel.empId= loginModelHomePage.empId
-            commonSaveDcrModel.employeeId= loginModelHomePage.empId
+            commonSaveDcrModel.empId= loginModelHomePage.empId!!
+            commonSaveDcrModel.employeeId= loginModelHomePage.empId!!
             commonSaveDcrModel.workingType=workAreaSeletd.substring(0, i)
             commonSaveDcrModel.remark=dialogView.remarkEt.text.toString()
             commonSaveDcrModel.routeId=routeId
@@ -646,7 +658,7 @@ class NewCallFragment : Fragment() {
 
     }
     fun checkCurrentDCR_API(){
-        alertClass?.showAlert("")
+        alertClass?.showProgressAlert("")
 
         var call: Call<JsonObject> = apiInterface?.checkDCR_API("bearer " + loginModelHomePage.accessToken, loginModelHomePage.empId,generalClassObject!!.currentDateMMDDYY()) as Call<JsonObject>
         call.enqueue(object : Callback<JsonObject?> {
@@ -686,7 +698,7 @@ class NewCallFragment : Fragment() {
     }
 
     fun saveDCR_API(dcrObject: CommonModel.SaveDcrModel, alertDialog: AlertDialog) {
-        alertClass?.showAlert("")
+        alertClass?.showProgressAlert("")
         var call: Call<JsonObject> = apiInterface?.saveDCS("bearer " + loginModelHomePage.accessToken,dcrObject) as Call<JsonObject>
         call.enqueue(object : Callback<JsonObject?> {
             override fun onResponse(call: Call<JsonObject?>?, response: Response<JsonObject?>) {

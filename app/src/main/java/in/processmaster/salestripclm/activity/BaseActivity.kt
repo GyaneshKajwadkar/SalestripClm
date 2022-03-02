@@ -36,7 +36,6 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import kotlinx.android.synthetic.main.progress_view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Call
@@ -235,8 +234,8 @@ open class BaseActivity : AppCompatActivity(){
     //Get teams api
     fun getTeamsApi( context:Activity, progressmessage:String) : ArrayList<DocManagerModel>
     {
-        progressMessage_tv?.setText(progressmessage)
-        GeneralClass(this).enableProgress(progressView_parentRv!!)
+        alertClass.showProgressAlert("")
+
         var getResponseList=ArrayList<DocManagerModel>()
 
         var call: Call<TeamsModel> = apiInterface?.getTeamsMember(
@@ -268,12 +267,13 @@ open class BaseActivity : AppCompatActivity(){
                     Toast.makeText(this@BaseActivity, "Server error ", Toast.LENGTH_SHORT).show()
                     return
                 }
-                GeneralClass(context).disableProgress(progressView_parentRv!!)
+                alertClass.hideAlert()
+
             }
 
             override fun onFailure(call: Call<TeamsModel?>, t: Throwable?) {
                 call.cancel()
-                GeneralClass(context).disableProgress(progressView_parentRv!!)
+                alertClass.hideAlert()
             }
         })
         return getResponseList
@@ -312,21 +312,25 @@ open class BaseActivity : AppCompatActivity(){
                 {
                     var model = response.body()
                     ZoomInitilizeClass().initilizeZoom(context as Activity,model)
+                    sharePreferanceBase?.setPrefBool("zoomCrediential", true)
                 }
                 else
-                { Log.e("elseGetCrediential", response.code().toString()) }
+                { Log.e("elseGetCrediential", response.code().toString())
+                    sharePreferanceBase?.setPrefBool("zoomCrediential", false)}
             }
             else
-            { Log.e("scheduleERROR", response.errorBody().toString()) }
+            { Log.e("scheduleERROR", response.errorBody().toString())
+                sharePreferanceBase?.setPrefBool("zoomCrediential", false)}
         } }
 
     fun getCredientail_api(context: Activity) {
 
-        var call: Call<ZoomCredientialModel> = apiInterface?.getZoomCredientail("bearer " + loginModelHomePage.accessToken,"389") as Call<ZoomCredientialModel>
+        var call: Call<ZoomCredientialModel> = apiInterface?.getZoomCredientail("bearer " + loginModelHomePage.accessToken, loginModelHomePage.empId
+        ) as Call<ZoomCredientialModel>
         call.enqueue(object : Callback<ZoomCredientialModel?> {
             override fun onResponse(call: Call<ZoomCredientialModel?>?, response: Response<ZoomCredientialModel?>) {
                 Log.e("getcrediential_api", response.code().toString() + "")
-                if (response.code() == 200 && !response.body().toString().isEmpty())
+                if (response.code() == 200 && response.body().toString().isEmpty())
                 {
                     var model = response.body()
                     sharePreferanceBase?.setPrefBool("zoomCrediential", true)
@@ -348,7 +352,7 @@ open class BaseActivity : AppCompatActivity(){
     suspend fun submitDCRCo()
     {
         val stringArray=dbBase.getAllSaveSend("feeback")
-        if(stringArray.size<=0 )return
+        if(stringArray!!.size<=0 )return
 
         val saveModel=Gson().fromJson(stringArray.get(0),Send_EDetailingModel::class.java)
 
@@ -373,4 +377,6 @@ open class BaseActivity : AppCompatActivity(){
             else Log.e("submitDCRCoAPIERROR", response.errorBody().toString())
         }
     }
+
+
 }

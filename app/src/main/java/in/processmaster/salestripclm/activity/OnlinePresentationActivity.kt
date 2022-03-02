@@ -85,7 +85,8 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
 
             doctorName_tv.setText(doctorName)
             toolbarHeader_rl.visibility=View.VISIBLE
-            back_iv.setOnClickListener({onBackPressed()})
+            //back_iv.setOnClickListener({onBackPressed()})
+            back_iv.visibility=View.INVISIBLE
         }
 
 
@@ -237,6 +238,11 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
     }
 
     override fun onBackPressed() {
+
+//        if(intent.getStringExtra("doctorName")!=null)
+//        {
+//          return
+//        }
 
         if(mMeetingService!=null && mInMeetingService == null)
         {

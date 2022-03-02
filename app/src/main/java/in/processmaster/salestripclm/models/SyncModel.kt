@@ -34,55 +34,55 @@ class SyncModel {
         @Expose
         var routeList= ArrayList<Route>()
 
-        @SerializedName("specialistList")
+   /*     @SerializedName("specialistList")
         @Expose
-        var specialistList= ArrayList<Specialist>()
+        var specialistList= ArrayList<Specialist>()*/
 
-        @SerializedName("qualificationList")
+   /*     @SerializedName("qualificationList")
         @Expose
-        var qualificationList= ArrayList<Qualification>()
+        var qualificationList= ArrayList<Qualification>()*/
 
-        @SerializedName("cityList")
+       /* @SerializedName("cityList")
         @Expose
-        var cityList= ArrayList<City>()
+        var cityList= ArrayList<City>()*/
 
-        @SerializedName("transportList")
+      /*  @SerializedName("transportList")
         @Expose
-        var transportList= ArrayList<Transport>()
+        var transportList= ArrayList<Transport>()*/
 
         @SerializedName("workTypeList")
         @Expose
         var workTypeList= ArrayList<WorkType>()
 
-        @SerializedName("retailerList")
+     /*   @SerializedName("retailerList")
         @Expose
-        var retailerList= ArrayList<Retailer>()
+        var retailerList= ArrayList<Retailer>()*/
 
         @SerializedName("doctorList")
         @Expose
         var doctorList= ArrayList<Doctor>()
 
-        @SerializedName("productList")
+       /* @SerializedName("productList")
         @Expose
-        var productList= ArrayList<Product>()
+        var productList= ArrayList<Product>()*/
 
-        @SerializedName("brandList")
+     /*   @SerializedName("brandList")
         @Expose
-        var brandList= ArrayList<Brand>()
+        var brandList= ArrayList<Brand>()*/
 
         @SerializedName("workingWithList")
         @Expose
         var workingWithList: ArrayList<WorkingWith>? = null
 
-        @SerializedName("expenseListTypeWiseList")
+     /*   @SerializedName("expenseListTypeWiseList")
         @Expose
-        var expenseListTypeWiseList: ArrayList<ExpenseListTypeWise>? = null
+        var expenseListTypeWiseList: ArrayList<ExpenseListTypeWise>? = null*/
 
-        @SerializedName("fieldStaffTeamList")
+    /*    @SerializedName("fieldStaffTeamList")
         @Expose
-        var fieldStaffTeamList: ArrayList<FieldStaffTeam>? = null
+        var fieldStaffTeamList: ArrayList<FieldStaffTeam>? = null*/
 
-        @SerializedName("doctorFieldConfigDict")
+  /*      @SerializedName("doctorFieldConfigDict")
         @Expose
         var doctorFieldConfigDict: String = ""
 
@@ -92,29 +92,29 @@ class SyncModel {
 
         @SerializedName("configurationSetting")
         @Expose
-        var configurationSetting: String = ""
+        var configurationSetting: String = ""*/
 
-        @SerializedName("holidayList")
+      /*  @SerializedName("holidayList")
         @Expose
-        var holidayList: ArrayList<Holiday>? = null
+        var holidayList: ArrayList<Holiday>? = null*/
 
-        @SerializedName("doctorCategoryList")
+/*        @SerializedName("doctorCategoryList")
         @Expose
         var doctorCategoryList: ArrayList<DoctorCategory>? = null
 
         @SerializedName("commonMastersList")
         @Expose
-        var commonMastersList: ArrayList<CommonMasters>? = null
+        var commonMastersList: ArrayList<CommonMasters>? = null*/
 
-        @SerializedName("hospitalList")
+ /*       @SerializedName("hospitalList")
         @Expose
-        var hospitalList: ArrayList<Hospital>? = null
+        var hospitalList: ArrayList<Hospital>? = null*/
 
-        @SerializedName("schemeList")
+    /*    @SerializedName("schemeList")
         @Expose
-        var schemeList: ArrayList<Scheme>? = null
+        var schemeList: ArrayList<Scheme>? = null*/
 
-        class Brand {
+      /*  class Brand {
             @SerializedName("brandId")
             @Expose
             var brandId: Int = 0
@@ -163,8 +163,8 @@ class SyncModel {
             @Expose
             var categoryId: Int = 0
 
-        }
-        class City {
+        }*/
+     /*   class City {
             @SerializedName("stateId")
             @Expose
             var stateId: Int = 0
@@ -233,7 +233,7 @@ class SyncModel {
             @SerializedName("mode")
             @Expose
             var mode: Int = 0
-        }
+        }*/
         class Doctor {
             @SerializedName("doctorId")
             @Expose
@@ -403,7 +403,7 @@ class SyncModel {
             @Expose
             var speciality: Int = 0
         }
-        class DoctorCategory {
+    /*    class DoctorCategory {
             @SerializedName("categoryId")
             @Expose
             var categoryId: Int = 0
@@ -423,8 +423,8 @@ class SyncModel {
             @SerializedName("active")
             @Expose
             var active: Boolean = false
-        }
-        class ExpenseListTypeWise {
+        }*/
+     /*   class ExpenseListTypeWise {
             @SerializedName("expenseHeadId")
             @Expose
             var expenseHeadId: Int = 0
@@ -456,8 +456,8 @@ class SyncModel {
             @SerializedName("type")
             @Expose
             var type: String = ""
-        }
-        class FieldStaffTeam {
+        }*/
+/*        class FieldStaffTeam {
             @SerializedName("empId")
             @Expose
             var empId: Int = 0
@@ -1002,8 +1002,8 @@ class SyncModel {
             @Expose
             var weekOff: String = ""
 
-        }
-        class Holiday {
+        }*/
+  /*      class Holiday {
             @SerializedName("holidayId")
             @Expose
             var holidayId: Int = 0
@@ -1390,8 +1390,8 @@ class SyncModel {
                 @Expose
                 var mobileNo: String = ""
             }
-        }
-        class Product {
+        }*/
+       /* class Product {
             @SerializedName("productId")
             @Expose
             var productId: Int = 0
@@ -1552,8 +1552,8 @@ class SyncModel {
             @Expose
             var freeStock: Double = 0.0
             
-        }
-        class Qualification {
+        }*/
+     /*   class Qualification {
             @SerializedName("qualificationId")
             @Expose
             var qualificationId: Int = 0
@@ -1950,7 +1950,7 @@ class SyncModel {
             @SerializedName("chemCode")
             @Expose
             var chemCode: String = ""
-        }
+        }*/
         class Route {
             @SerializedName("routeId")
             @Expose
@@ -2108,7 +2108,7 @@ class SyncModel {
             @Expose
             var pinCode: Int = 0
         }
-        class Scheme {
+        /*class Scheme {
             @SerializedName("schemeId")
             @Expose
             var schemeId: Int = 0
@@ -2184,7 +2184,7 @@ class SyncModel {
             @SerializedName("isPobDone")
             @Expose
             var isPobDone: Boolean = false
-        }
+        }*/
         class SettingDCR {
             @SerializedName("settingId")
             @Expose
@@ -2372,7 +2372,7 @@ class SyncModel {
 
 
         }
-        class Specialist {
+       /* class Specialist {
             @SerializedName("specialistId")
             @Expose
             var specialistId: Int = 0
@@ -2392,8 +2392,8 @@ class SyncModel {
             @SerializedName("preSpecialistName")
             @Expose
             var preSpecialistName: String = ""
-        }
-        class Transport {
+        }*/
+      /*  class Transport {
             @SerializedName("transportId")
             @Expose
             var transportId: Int = 0
@@ -2401,7 +2401,7 @@ class SyncModel {
             @SerializedName("transportName")
             @Expose
             var transportName: String = ""
-        }
+        }*/
         class WorkType {
             @SerializedName("workId")
             @Expose

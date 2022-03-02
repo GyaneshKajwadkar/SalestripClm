@@ -22,7 +22,7 @@ class DownloadedFragment : Fragment() {
     var recyclerView: RecyclerView?=null
     var sharePreferance: PreferenceClass?= null
     var nodata_gif: GifImageView?= null
-    var db = DatabaseHandler(activity)
+    lateinit var db : DatabaseHandler
     var nodownload_tv: TextView?= null
     var isFirstTimeOpen=true
     var   getAlleDetailListDb: ArrayList<DevisionModel.Data.EDetailing> = ArrayList()
@@ -42,7 +42,7 @@ class DownloadedFragment : Fragment() {
         nodata_gif=view.findViewById(R.id.nodata_gif)as GifImageView
 
         sharePreferance = PreferenceClass(activity)
-        db = DatabaseHandler(activity)
+        db = DatabaseHandler(requireActivity())
         getAlleDetailListDb= db.getSelectedeDetail(true)
 
         Handler(Looper.getMainLooper())

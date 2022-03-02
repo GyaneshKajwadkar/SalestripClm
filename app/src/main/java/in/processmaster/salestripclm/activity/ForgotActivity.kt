@@ -1,8 +1,6 @@
 package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.R
-import `in`.processmaster.salestripclm.common_classes.AlertClass
-import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -12,7 +10,7 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import `in`.processmaster.salestripclm.models.GenerateOTPModel
-import `in`.processmaster.salestripclm.networkUtils.APIClient
+import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import com.google.android.material.button.MaterialButton
 import kotlinx.android.synthetic.main.activity_forgot.*
@@ -134,8 +132,8 @@ class ForgotActivity : BaseActivity() {
     //generateOTp APi
     private fun generateOTP_api()
     {
-        apiInterface= APIClient.getClient(1, "").create(APIInterface::class.java)
-        alertClass.showAlert("")
+        apiInterface= APIClientKot().getClient(1, "").create(APIInterface::class.java)
+        alertClass.showProgressAlert("")
         var call: Call<GenerateOTPModel> = apiInterface?.generateOtpApi(
             companyCode_et?.getText().toString().uppercase(), userName_et?.getText().toString() , "user"
         ) as Call<GenerateOTPModel>
@@ -145,24 +143,24 @@ class ForgotActivity : BaseActivity() {
                 if (response.code() == 200 && !response.body().toString().isEmpty())
                 {
                     generateModel = response.body()
-                    if(generateModel?.data?.userData == null)
+                    if(generateModel?.getData()?.userData == null)
                     {
-                        if(generateModel?.errorObj?.errorMessage.equals("Invalid company code"))
+                        if(generateModel?.getErrorObj()?.errorMessage!!.equals("Invalid company code"))
                         {
-                            companyCode_et?.setError(generateModel?.errorObj?.errorMessage)
+                            companyCode_et?.setError(generateModel?.getErrorObj()?.errorMessage)
                             companyCode_et?.requestFocus()
                         }
                         else
                         {
-                            userName_et?.setError(generateModel?.errorObj?.errorMessage)
+                            userName_et?.setError(generateModel?.getErrorObj()?.errorMessage)
                             userName_et?.requestFocus()
                         }
 
                     }
                     else
                     {
-                        Toast.makeText(this@ForgotActivity,generateModel?.data?.message,Toast.LENGTH_LONG).show()
-                        checkOTpAlert(generateModel?.data?.userData?.empId.toString())
+                        Toast.makeText(this@ForgotActivity,generateModel?.getData()?.message,Toast.LENGTH_LONG).show()
+                        checkOTpAlert(generateModel?.getData()?.userData?.empId.toString())
                     }
                 }
 
@@ -183,8 +181,8 @@ class ForgotActivity : BaseActivity() {
     //verifyeOTp APi
     private fun verifyOTP_api(progressBar: ProgressBar, otpString: String, empId: String, editText: EditText, alertDialog: AlertDialog)
     {
-        apiInterface= APIClient.getClient(1, "").create(APIInterface::class.java)
-        alertClass.showAlert("")
+        apiInterface= APIClientKot().getClient(1, "").create(APIInterface::class.java)
+        alertClass.showProgressAlert("")
 
         var call: Call<GenerateOTPModel> = apiInterface?.verifyOtpAPI(
             companyCode_et?.getText().toString().uppercase(), empId , otpString
@@ -197,7 +195,7 @@ class ForgotActivity : BaseActivity() {
                     var generateModel = response.body()
 
                     //check otp response
-                    if(generateModel?.data?.isOTPMatched == true)
+                    if(generateModel?.getData()?.isOTPMatched == true)
                     {
                         forgotParent_ll?.visibility = View.GONE
                         newPassParent_ll?.visibility = View.VISIBLE
@@ -224,12 +222,12 @@ class ForgotActivity : BaseActivity() {
     //changePassword APi
     private fun changePassword_api()
     {
-        apiInterface= APIClient.getClient(1, "").create(APIInterface::class.java)
+        apiInterface= APIClientKot().getClient(1, "").create(APIInterface::class.java)
 
-        alertClass.showAlert("")
+        alertClass.showProgressAlert("")
 
         var call: Call<GenerateOTPModel> = apiInterface?.changePassAPI(
-            companyCode_et?.getText().toString().uppercase(), generateModel?.data?.userData?.empId.toString() , conPass_et?.getText().toString()
+            companyCode_et?.getText().toString().uppercase(), generateModel?.getData()?.userData?.empId.toString() , conPass_et?.getText().toString()
         ) as Call<GenerateOTPModel>
         call.enqueue(object : Callback<GenerateOTPModel?> {
             override fun onResponse(call: Call<GenerateOTPModel?>?, response: Response<GenerateOTPModel?>) {
@@ -238,13 +236,13 @@ class ForgotActivity : BaseActivity() {
                 {
                     var generateModel = response.body()
 
-                    if(generateModel?.data?.message.isNullOrEmpty())
+                    if(generateModel?.getData()?.message.isNullOrEmpty())
                     {
-                        Toast.makeText(this@ForgotActivity,generateModel?.errorObj?.errorMessage,Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@ForgotActivity,generateModel?.getErrorObj()?.errorMessage,Toast.LENGTH_LONG).show()
                     }
                     else
                     {
-                        Toast.makeText(this@ForgotActivity,generateModel?.data?.message,Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@ForgotActivity,generateModel?.getData()?.message,Toast.LENGTH_LONG).show()
                         onBackPressed()
                         finish()
                     }

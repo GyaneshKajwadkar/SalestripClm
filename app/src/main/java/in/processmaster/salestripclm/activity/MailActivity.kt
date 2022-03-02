@@ -270,8 +270,8 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
     //Get teams api
     fun sendEmailApi()
     {
-        progressMessage_tv?.setText("Please wait")
-        generalClass.enableProgress(progressView_parentRv!!)
+
+        alertClass.showProgressAlert("")
 
         val selectedImage=retriveAttachment()
         val surveyImagesParts = arrayOfNulls<MultipartBody.Part>(selectedImage!!.size)
@@ -348,23 +348,26 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
             ) {
                 if (response.code() == 200 && !response.body().toString().isEmpty())
                 {
-                    if(response.body()?.errorObj?.errorMessage?.isEmpty()==false)
+                    if(response.body()?.getErrorObj()?.errorMessage?.isEmpty()==false)
                     {
-                        generalClass.showSnackbar(window.decorView.rootView, response.body()!!.errorObj.errorMessage)
+
+                        generalClass.showSnackbar(window.decorView.rootView,
+                            response.body()!!.getErrorObj()!!.errorMessage!!
+                        )
                     }
                     else
                     {
-                        generalClass.showSnackbar(window.decorView.rootView, response.body()?.data?.message!!)
+                        generalClass.showSnackbar(window.decorView.rootView, response.body()?.getData()?.message!!)
                         onBackPressed()
                     }
                 }
                 else
                 {  generalClass.showSnackbar(window.decorView.rootView, "Server error") }
-                generalClass.disableProgress(progressView_parentRv!!)
+                alertClass.hideAlert()
             }
             override fun onFailure(call: Call<GenerateOTPModel?>, t: Throwable?) {
                 call.cancel()
-                generalClass.disableProgress(progressView_parentRv!!)
+                alertClass.hideAlert()
                 generalClass.showSnackbar(window.decorView.rootView, "Server error")
             }
         })

@@ -1,10 +1,8 @@
 package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.R
-import `in`.processmaster.salestripclm.common_classes.AlertClass
-import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.models.LoginModel
-import `in`.processmaster.salestripclm.networkUtils.APIClient.getClient
+import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.content.ActivityNotFoundException
@@ -17,7 +15,6 @@ import android.net.Uri
 import android.os.*
 import android.util.Log
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import com.google.gson.Gson
@@ -43,7 +40,7 @@ class LoginActivity : BaseActivity() {
     fun initView()
     {
         sharePreferance = PreferenceClass(this)
-        apiInterface= getClient(1, "").create(APIInterface::class.java)
+        apiInterface= APIClientKot().getClient(1, "").create(APIInterface::class.java)
 
         mpin_tv!!.setOnClickListener(object : View.OnClickListener {
             override fun onClick(p0: View?) {
@@ -122,8 +119,8 @@ class LoginActivity : BaseActivity() {
     //Login APi
     private fun login_api()
     {
-        alertClass.showAlert("Verify User")
-        apiInterface= getClient(2, sharePreferance?.getPref("secondaryUrl")).create(APIInterface::class.java)
+        alertClass.showProgressAlert("Verify User")
+        apiInterface= APIClientKot().getClient(2, sharePreferance?.getPref("secondaryUrl")).create(APIInterface::class.java)
 
         var call: Call<LoginModel> = apiInterface?.loginAPI(
             "password", userName_et?.getText().toString() + "," +
@@ -171,7 +168,7 @@ class LoginActivity : BaseActivity() {
     //CheckCompanyCode Api
     fun  checkCC_api()
     {
-        alertClass.showAlert("Verify Company code")
+        alertClass.showProgressAlert("Verify Company code")
 
         var call: Call<String> = apiInterface?.checkCompanyCode(
             companyCode_et?.getText().toString().uppercase()
@@ -205,7 +202,7 @@ class LoginActivity : BaseActivity() {
     //check Version API
     fun  checkVersioin_api(companyCode: String)
     {
-        alertClass.showAlert("")
+        alertClass.showProgressAlert("")
 
         var call: Call<String> = apiInterface?.checkVersion() as Call<String>
         call.enqueue(object : Callback<String?> {

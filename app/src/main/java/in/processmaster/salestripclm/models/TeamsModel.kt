@@ -519,22 +519,6 @@ class TeamsModel {
             @SerializedName("strDeactivationDate")
             @Expose
             var strDeactivationDate: Any? = null
-
-            fun getIsAuthPassword(): Boolean? {
-                return isAuthPassword
-            }
-
-            fun setIsAuthPassword(isAuthPassword: Boolean?) {
-                this.isAuthPassword = isAuthPassword
-            }
-
-            fun getmPin(): Any? {
-                return mPin
-            }
-
-            fun setmPin(mPin: Any?) {
-                this.mPin = mPin
-            }
         }
     }
 
