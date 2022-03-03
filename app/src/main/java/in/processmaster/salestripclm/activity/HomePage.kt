@@ -2,9 +2,11 @@ package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.staticSyncData
-import `in`.processmaster.salestripclm.fragments.*
+import `in`.processmaster.salestripclm.fragments.EdetailingDownloadFragment
+import `in`.processmaster.salestripclm.fragments.HomeFragment
+import `in`.processmaster.salestripclm.fragments.NewCallFragment
+import `in`.processmaster.salestripclm.fragments.PresentEDetailingFrag
 import `in`.processmaster.salestripclm.models.LoginModel
-import `in`.processmaster.salestripclm.models.Send_EDetailingModel
 import `in`.processmaster.salestripclm.models.SyncModel
 import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import `in`.processmaster.salestripclm.networkUtils.APIInterface
@@ -27,23 +29,21 @@ import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.navigation.NavigationView
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_home_page.*
 import kotlinx.android.synthetic.main.content_main.*
-import kotlinx.android.synthetic.main.progress_view.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import org.json.JSONObject
-import us.zoom.sdk.*
+import us.zoom.sdk.ZoomSDK
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
-import com.google.gson.JsonObject
 
 
 class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/*, UserLoginCallback.ZoomDemoAuthenticationListener , MeetingServiceListener, InitAuthSDKCallback*/
@@ -52,6 +52,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     var drawerProfileIv: ImageView?=null
     var bottomNavigation: BottomNavigationView? = null
     var openFragmentStr=""
+
 
     companion object {
         var loginModelHomePage= LoginModel()
@@ -75,6 +76,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             callingMultipleAPI()
         else
             staticSyncData=Gson().fromJson(dbBase?.getApiDetail(1), SyncModel::class.java)
+
 
     }
 
@@ -132,6 +134,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         setImages()
         nav_view?.setNavigationItemSelectedListener(this)
         nav_view?.getMenu()?.getItem(0)?.setChecked(true)
+
     }
 
     //change status bar color
@@ -141,6 +144,9 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         window.setStatusBarColor(ContextCompat.getColor(this, R.color.appColor))
     }
+
+
+
 
     //set bottom navigation
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
@@ -503,7 +509,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                     val gson = Gson()
                     var model = response.body()
 
-                    dbBase?.addAPIData(gson.toJson(model?.getData()),3,)
+                    dbBase?.addAPIData(gson.toJson(model?.getData()), 3)
 
                 }
                 else Log.e("elsequantitiveAPI", response.code().toString())
@@ -568,7 +574,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             {
                 if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage!!.isEmpty()) {
                     var model = response.body()
-                    dbBase?.addAPIData(Gson().toJson(model?.getData()),4,)
+                    dbBase?.addAPIData(Gson().toJson(model?.getData()), 4)
                   }
                 else Log.e("elseDoctorGraphAPI", response.code().toString())
             }
@@ -586,7 +592,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             {
                 if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage!!.isEmpty()) {
                     var model = response.body()
-                    dbBase?.addAPIData(Gson().toJson(model?.getData()),5,)
+                    dbBase?.addAPIData(Gson().toJson(model?.getData()), 5)
                 }
                 else Log.e("elsegetDocCallAPI", response.code().toString())
             }

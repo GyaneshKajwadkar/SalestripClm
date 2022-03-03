@@ -88,11 +88,11 @@ class SyncModel {
 
         @SerializedName("retailerFieldConfigDict")
         @Expose
-        var retailerFieldConfigDict: String = ""
+        var retailerFieldConfigDict: String = ""*/
 
         @SerializedName("configurationSetting")
         @Expose
-        var configurationSetting: String = ""*/
+        var configurationSetting: String = ""
 
       /*  @SerializedName("holidayList")
         @Expose

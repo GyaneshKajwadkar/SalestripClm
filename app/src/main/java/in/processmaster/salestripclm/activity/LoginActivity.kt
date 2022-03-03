@@ -207,7 +207,7 @@ class LoginActivity : BaseActivity() {
         var call: Call<String> = apiInterface?.checkVersion() as Call<String>
         call.enqueue(object : Callback<String?> {
             override fun onResponse(call: Call<String?>?, response: Response<String?>) {
-                Log.e("checkVersioin_api", response.code().toString() + "")
+                Log.e("checkVersioin_api", response.body().toString() + "")
                 if (response.body().toString().isEmpty()) {
                 }
                 else {
@@ -221,7 +221,7 @@ class LoginActivity : BaseActivity() {
                         val pInfo: PackageInfo =
                             getPackageManager().getPackageInfo(getPackageName(), 0)
                         var version = pInfo.versionName.replace(".","").toInt()
-                        //  version = "2.1.30"
+                         // version = "2.1.30".replace(".","").toInt()
 
                         //   var updateLower: Boolean = checkForUpdateLower(version, namesList.get(0))
                         //   var updateHigher: Boolean = checkForUpdateHigher(version, namesList.get(1))

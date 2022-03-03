@@ -4,6 +4,7 @@ import `in`.processmaster.salestripclm.activity.HomePage.Companion.apiInterface
 import `in`.processmaster.salestripclm.activity.HomePage.Companion.loginModelHomePage
 import `in`.processmaster.salestripclm.activity.OnlinePresentationActivity
 import `in`.processmaster.salestripclm.activity.SplashActivity
+import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.staticSyncData
 import `in`.processmaster.salestripclm.activity.SubmitE_DetailingActivity
 import `in`.processmaster.salestripclm.adapter.LastRCPA_Adapter
 import `in`.processmaster.salestripclm.adapter.SimpleListAdapter
@@ -14,10 +15,16 @@ import `in`.processmaster.salestripclm.models.CommonModel
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.models.PreCallModel
 import `in`.processmaster.salestripclm.models.SyncModel
+import `in`.processmaster.salestripclm.networkUtils.GPSTracker
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
+import android.content.Context
 import android.content.Intent
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.graphics.Color
+import android.location.Location
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -38,17 +45,15 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import kotlinx.android.synthetic.main.bottom_sheet_visualads.view.*
-import kotlinx.android.synthetic.main.bottom_sheet_visualads.view.bottomSheet
-import kotlinx.android.synthetic.main.bottom_sheet_visualads.view.close_imv
 import kotlinx.android.synthetic.main.dcr_entry.view.*
 import kotlinx.android.synthetic.main.fragment_new_call.*
 import kotlinx.android.synthetic.main.fragment_new_call.view.*
-import kotlinx.android.synthetic.main.join_activity_view.view.noData_tv
+import kotlinx.android.synthetic.main.join_activity_view.view.*
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class NewCallFragment : Fragment() {
@@ -228,10 +233,12 @@ class NewCallFragment : Fragment() {
                 holder.speciality_tv.visibility=View.GONE
 
                 holder.parent_cv.setOnClickListener({
+                    doctorList.clear()
                     views!!.selectRoute_tv.setText((modeldata?.routeName))
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
                     onSelection()
                     applySelectionFilter(modeldata.routeId)
+
                 })
             }
 
@@ -395,9 +402,75 @@ class NewCallFragment : Fragment() {
 
         }
         else if(selectionType==1)
-         doctorList = SplashActivity.staticSyncData?.data?.doctorList!!.filter { s -> s.routeId == id } as java.util.ArrayList<SyncModel.Data.Doctor>
+        {
+            if(staticSyncData?.data?.settingDCR?.isGeoLocationRequired!!)
+            {
+                /*if(areThereMockPermissionApps()){
+                    alertClass?.commonAlert("Alert!","This device contain mock GPS app. Unstall before proceed")
+                return
+                }*/
+
+                val getGpsTracker=GPSTracker(requireActivity())
+                val jsonObj=JSONObject(staticSyncData?.data?.configurationSetting)
+                val getRadius=jsonObj.getInt("SET011")
+
+                val startPoint = Location("locationA")
+                startPoint.setLatitude(getGpsTracker.latitude)
+                startPoint.setLongitude(getGpsTracker.longitude)
+
+                val docFirstFilter= SplashActivity.staticSyncData?.data?.doctorList!!.filter { s -> s.routeId == id } as java.util.ArrayList<SyncModel.Data.Doctor>
+
+            for(fetch in docFirstFilter)
+                {
+                    if(fetch.latitude.toInt()==0 || fetch.longitude.toInt()==0) { return }
+
+                    val endPoint = Location("locationB")
+                    endPoint.latitude = fetch.latitude
+                    endPoint.longitude = fetch.longitude
+                    val distance = startPoint.distanceTo(endPoint).toInt()
+                    if(distance <= getRadius){ doctorList.add(fetch) }
+                }
+            }
+            else
+            {
+                doctorList = SplashActivity.staticSyncData?.data?.doctorList!!.filter { s -> s.routeId == id } as java.util.ArrayList<SyncModel.Data.Doctor>
+            }
+
+        }
 
     }
+
+    fun areThereMockPermissionApps(): Boolean {
+        var count = 0
+        val pm: PackageManager = requireActivity().getPackageManager()
+        val packages: List<ApplicationInfo> =
+            pm.getInstalledApplications(PackageManager.GET_META_DATA)
+        for (applicationInfo in packages) {
+            try {
+                val packageInfo: PackageInfo = pm.getPackageInfo(
+                    applicationInfo.packageName,
+                    PackageManager.GET_PERMISSIONS
+                )
+
+                // Get Permissions
+                val requestedPermissions: Array<String> = packageInfo.requestedPermissions
+                if (requestedPermissions != null) {
+                    for (i in requestedPermissions.indices) {
+                        if ((requestedPermissions[i]
+                                    == "android.permission.ACCESS_MOCK_LOCATION") && !applicationInfo.packageName.equals(
+                                requireActivity().getPackageName()
+                            )
+                        ) {
+                            count++
+                        }
+                    }
+                }
+            } catch (e: PackageManager.NameNotFoundException) {
+            }
+        }
+        return if (count > 0) true else false
+    }
+
 
     private fun preCallAnalysisApi() {
 
