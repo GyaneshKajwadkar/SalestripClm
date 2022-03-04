@@ -9,11 +9,11 @@ class SyncModel {
 
     @SerializedName("errorObj")
     @Expose
-     var errorObj: ErrorObj? = null
+     var errorObj: ErrorObj = ErrorObj()
 
     @SerializedName("data")
     @Expose
-     var data: Data? = null
+     var data: Data = Data()
 
 
     class ErrorObj {
@@ -28,7 +28,7 @@ class SyncModel {
     class Data {
         @SerializedName("settingDCR")
         @Expose
-        var settingDCR: SettingDCR? = null
+        var settingDCR: SettingDCR = SettingDCR()
 
         @SerializedName("routeList")
         @Expose
@@ -72,7 +72,7 @@ class SyncModel {
 
         @SerializedName("workingWithList")
         @Expose
-        var workingWithList: ArrayList<WorkingWith>? = null
+        var workingWithList: ArrayList<WorkingWith>? = ArrayList()
 
      /*   @SerializedName("expenseListTypeWiseList")
         @Expose

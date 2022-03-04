@@ -52,10 +52,10 @@ class CommonModel {
         private var responseCode: Int? = null
         @SerializedName("errorObj")
         @Expose
-        private var errorObj: ErrorObj? = null
+        private var errorObj: ErrorObj = ErrorObj()
         @SerializedName("data")
         @Expose
-        private var data: Data? = null
+        private var data: Data = Data()
         fun getResponseCode(): Int? {
             return responseCode
         }
@@ -66,13 +66,13 @@ class CommonModel {
             return errorObj
         }
         fun setErrorObj(errorObj: ErrorObj?) {
-            this.errorObj = errorObj
+            this.errorObj = errorObj!!
         }
         fun getData(): Data? {
             return data
         }
         fun setData(data: Data?) {
-            this.data = data
+            this.data = data!!
         }
 
         class ErrorObj {

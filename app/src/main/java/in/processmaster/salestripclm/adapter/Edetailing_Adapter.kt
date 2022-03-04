@@ -152,7 +152,7 @@ class Edetailing_Adapter(
             modelClass.filePath=iteams.filePath
             modelClass.fileSize=iteams.fileSize
             modelClass.fileType=iteams.fileType
-            modelClass.seteDetailId(iteams.geteDetailId())
+            modelClass.eDetailId=iteams.geteDetailId()
             arrayList.add(modelClass)
         }
 

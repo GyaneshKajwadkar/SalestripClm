@@ -56,65 +56,43 @@ class DownloadEdetail_model : Serializable {
     class Data : Serializable {
         @SerializedName("eDetailingImagesList")
         @Expose
-        private var eDetailingImagesList: List<EDetailingImages>? = null
+         var eDetailingImagesList: List<EDetailingImages> = ArrayList()
 
         @SerializedName("eDetailingReferenceList")
         @Expose
-        private var eDetailingReferenceList: List<Any>? = null
-        fun geteDetailingImagesList(): List<EDetailingImages>? {
-            return eDetailingImagesList
-        }
-
-        fun seteDetailingImagesList(eDetailingImagesList: List<EDetailingImages>?) {
-            this.eDetailingImagesList = eDetailingImagesList
-        }
-
-        fun geteDetailingReferenceList(): List<Any>? {
-            return eDetailingReferenceList
-        }
-
-        fun seteDetailingReferenceList(eDetailingReferenceList: List<Any>?) {
-            this.eDetailingReferenceList = eDetailingReferenceList
-        }
+         var eDetailingReferenceList: List<Any> = ArrayList()
 
         class EDetailingImages: Serializable {
 
             @SerializedName("eDetailId")
             @Expose
-            private var eDetailId: Int? = null
+            var eDetailId: Int = 0
 
             @SerializedName("fileId")
             @Expose
-            var fileId: Int? = null
+            var fileId: Int = 0
 
             @SerializedName("fileSize")
             @Expose
-            var fileSize: Int? = null
+            var fileSize: Int = 0
 
             @SerializedName("fileName")
             @Expose
-            var fileName: String? = null
+            var fileName: String = ""
 
             @SerializedName("filePath")
             @Expose
-            var filePath: String? = null
+            var filePath: String = ""
 
             @SerializedName("fileType")
             @Expose
-            var fileType: String? = null
+            var fileType: String = ""
 
 
             @SerializedName("fileOrder")
             @Expose
-            var fileOrder: Int? = null
+            var fileOrder: Int = 0
 
-            fun geteDetailId(): Int? {
-                return eDetailId
-            }
-
-            fun seteDetailId(eDetailId: Int?) {
-                this.eDetailId = eDetailId
-            }
         }
     }
 

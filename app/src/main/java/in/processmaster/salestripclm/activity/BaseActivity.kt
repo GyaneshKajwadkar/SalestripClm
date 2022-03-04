@@ -256,11 +256,11 @@ open class BaseActivity : AppCompatActivity(){
                     for(singleItem in getTeamslist?.getData()?.employeeList!!)
                     {
                         var selectorModel =DocManagerModel()
-                        selectorModel.setName(singleItem.firstName+" "+singleItem.lastName)
-                        selectorModel.setRoute(singleItem.headQuaterName)
-                        selectorModel.setSpeciality(singleItem.divisionName)
-                        selectorModel.setId(singleItem.empId)
-                        selectorModel.setMailId(singleItem.emailId)
+                        selectorModel.name=singleItem.firstName+" "+singleItem.lastName
+                        selectorModel.routeName= singleItem.headQuaterName
+                        selectorModel.specialityName= singleItem.divisionName
+                        selectorModel.id= singleItem.empId
+                        selectorModel.mailId= singleItem.emailId
                         getResponseList.add(selectorModel)
                     }
                 }

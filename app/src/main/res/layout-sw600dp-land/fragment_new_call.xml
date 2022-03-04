@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    tools:context=".fragments.NewCallFragment">
+    tools:context=".fragments.NewCallFragment"
+    tools:ignore="MissingDefaultResource">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -639,6 +640,7 @@
                                             android:layout_height="wrap_content"
                                             android:id="@+id/noDataBrand"
                                             android:textSize="16sp"
+                                            android:padding="5dp"
                                             android:textAlignment="center"
                                             android:text="No data available"
                                             android:visibility="gone"
@@ -679,6 +681,7 @@
                                             android:layout_height="wrap_content"
                                             android:id="@+id/noDataSample"
                                             android:textSize="16sp"
+                                            android:padding="5dp"
                                             android:textAlignment="center"
                                             android:text="No data available"
                                             android:visibility="gone"
@@ -719,6 +722,7 @@
                                             android:layout_height="wrap_content"
                                             android:id="@+id/noDataGift"
                                             android:textSize="16sp"
+                                            android:padding="5dp"
                                             android:textAlignment="center"
                                             android:text="No data available"
                                             android:visibility="gone"

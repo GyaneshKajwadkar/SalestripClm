@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -52,7 +53,6 @@ public class GPSTracker extends Service implements LocationListener {
                             LocationManager.NETWORK_PROVIDER,
                             MIN_TIME_BW_UPDATES,
                             MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-                    Log.d("Network", "Network");
                     if (locationManager != null) {
                         location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                         if (location != null) {
@@ -66,12 +66,10 @@ public class GPSTracker extends Service implements LocationListener {
                                     LocationManager.GPS_PROVIDER,
                                     MIN_TIME_BW_UPDATES,
                                     MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-                            Log.d("GPS Enabled", locationManager+"GPS Enabled");
                             if (locationManager != null) {
                                 location = locationManager
                                         .getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-                                Log.d("GPS", location+"GPSjhvyuf");
                                 if (location != null) {
                                     latitude = location.getLatitude();
                                     longitude = location.getLongitude();
@@ -81,6 +79,8 @@ public class GPSTracker extends Service implements LocationListener {
                 }} }
 
         catch (SecurityException e) { }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+        { location.setMock(false); }
         return location;
     }
 

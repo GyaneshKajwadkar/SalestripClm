@@ -63,7 +63,7 @@ public class ProfileModel
 
         @SerializedName("users")
         @Expose
-        var users: List<User>? = null
+        var users: List<User> = ArrayList()
 
         class User {
             @SerializedName("empId")

@@ -45,56 +45,56 @@ class DoctorGraphModel {
     class Data {
         @SerializedName("dcrCountList")
         @Expose
-        var dcrCountList: List<DcrCount>? = null
+        var dcrCountList: List<DcrCount> = ArrayList()
 
         class DcrCount {
             @SerializedName("day")
             @Expose
-            var day: Int? = null
+            var day: Int = 0
 
             @SerializedName("visitedDoctor")
             @Expose
-            var visitedDoctor: Int? = null
+            var visitedDoctor: Int = 0
 
             @SerializedName("visitedRetailer")
             @Expose
-            var visitedRetailer: Int? = null
+            var visitedRetailer: Int = 0
 
             @SerializedName("type")
             @Expose
-            var type: Any? = null
+            var type: String = ""
 
             @SerializedName("monthNo")
             @Expose
-            var monthNo: Int? = null
+            var monthNo: Int = 0
 
             @SerializedName("monthName")
             @Expose
-            var monthName: String? = null
+            var monthName: String = ""
 
             @SerializedName("total")
             @Expose
-            var total: Int? = null
+            var total: Int = 0
 
             @SerializedName("totalTarget")
             @Expose
-            var totalTarget: Double? = null
+            var totalTarget: Double = 0.0
 
             @SerializedName("totalPOB")
             @Expose
-            var totalPOB: Double? = null
+            var totalPOB: Double = 0.0
 
             @SerializedName("totalSample")
             @Expose
-            var totalSample: Int? = null
+            var totalSample: Int = 0
 
             @SerializedName("empName")
             @Expose
-            var empName: Any? = null
+            var empName: String = ""
 
             @SerializedName("partyName")
             @Expose
-            var partyName: Any? = null
+            var partyName: String = ""
         }
     }
 

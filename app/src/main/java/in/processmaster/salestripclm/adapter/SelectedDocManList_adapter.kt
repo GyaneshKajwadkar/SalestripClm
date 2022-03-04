@@ -29,10 +29,10 @@ class SelectedDocManList_adapter(
     }
 
     override fun onBindViewHolder(holder: SelectedDocManList_adapter.ViewHolders, position: Int) {
-        holder.name_tv.setText(arrayListSelector.get(position).getName())
+        holder.name_tv.setText(arrayListSelector.get(position).name)
 
         holder.cross_iv.setOnClickListener({
-            listner.passid(arrayListSelector.get(position).getId()!!,selectionType)
+            listner.passid(arrayListSelector.get(position).id,selectionType)
         })
     }
 

@@ -8,7 +8,7 @@ class TeamsModel {
 
     @SerializedName("responseCode")
     @Expose
-    private var responseCode: Int? = null
+    var responseCode:  Int = 0
 
     @SerializedName("errorObj")
     @Expose
@@ -22,10 +22,7 @@ class TeamsModel {
         return responseCode
     }
 
-    fun setResponseCode(responseCode: Int?) {
-        this.responseCode = responseCode
-    }
-
+    
     fun getErrorObj(): ErrorObj? {
         return errorObj
     }
@@ -45,491 +42,491 @@ class TeamsModel {
     class Data {
         @SerializedName("employeeList")
         @Expose
-        var employeeList: ArrayList<Employee>? = null
+        var employeeList: ArrayList<Employee>? = ArrayList()
 
         inner class Employee {
             @SerializedName("empId")
             @Expose
-            var empId: Int? = null
+            var empId: Int = 0
 
             @SerializedName("firstName")
             @Expose
-            var firstName: String? = null
+            var firstName: String = ""
 
             @SerializedName("lastName")
             @Expose
-            var lastName: String? = null
+            var lastName: String = ""
 
             @SerializedName("userName")
             @Expose
-            var userName: String? = null
+            var userName: String = ""
 
             @SerializedName("password")
             @Expose
-            var password: String? = null
+            var password: String = ""
 
             @SerializedName("emailId")
             @Expose
-            var emailId: String? = null
+            var emailId: String = ""
 
             @SerializedName("mobileNo")
             @Expose
-            var mobileNo: String? = null
+            var mobileNo: String = ""
 
             @SerializedName("dateOfBirth")
             @Expose
-            var dateOfBirth: String? = null
+            var dateOfBirth: String = ""
 
             @SerializedName("doa")
             @Expose
-            var doa: String? = null
+            var doa: String = ""
 
             @SerializedName("gender")
             @Expose
-            var gender: Int? = null
+            var gender: Int = 0
 
             @SerializedName("address1")
             @Expose
-            var address1: String? = null
+            var address1: String = ""
 
             @SerializedName("address2")
             @Expose
-            var address2: String? = null
+            var address2: String = ""
 
             @SerializedName("cityId")
             @Expose
-            var cityId: Int? = null
+            var cityId: Int = 0
 
             @SerializedName("stateId")
             @Expose
-            var stateId: Int? = null
+            var stateId: Int = 0
 
             @SerializedName("stateName")
             @Expose
-            var stateName: Any? = null
+            var stateName: String = ""
 
             @SerializedName("countryId")
             @Expose
-            var countryId: Int? = null
+            var countryId: Int = 0
 
             @SerializedName("countryName")
             @Expose
-            var countryName: Any? = null
+            var countryName: String = ""
 
             @SerializedName("pinCode")
             @Expose
-            var pinCode: Int? = null
+            var pinCode: Int = 0
 
             @SerializedName("phone")
             @Expose
-            var phone: String? = null
+            var phone: String = ""
 
             @SerializedName("division")
             @Expose
-            var division: String? = null
+            var division: String = ""
 
             @SerializedName("headQuaterId")
             @Expose
-            var headQuaterId: String? = null
+            var headQuaterId: String = ""
 
             @SerializedName("headQuaterName")
             @Expose
-            var headQuaterName: String? = null
+            var headQuaterName: String = ""
 
             @SerializedName("hierachyId")
             @Expose
-            var hierachyId: Int? = null
+            var hierachyId: Int = 0
 
             @SerializedName("hierachyName")
             @Expose
-            var hierachyName: Any? = null
+            var hierachyName: String = ""
 
             @SerializedName("reportingHierachy")
             @Expose
-            var reportingHierachy: Int? = null
+            var reportingHierachy: Int = 0
 
             @SerializedName("reportingManager")
             @Expose
-            var reportingManager: Int? = null
+            var reportingManager: Int = 0
 
             @SerializedName("qualificationId")
             @Expose
-            var qualificationId: Int? = null
+            var qualificationId: Int = 0
 
             @SerializedName("marriedStatus")
             @Expose
-            var marriedStatus: Int? = null
+            var marriedStatus: Int = 0
 
             @SerializedName("reportingManagerName")
             @Expose
-            var reportingManagerName: String? = null
+            var reportingManagerName:  String = ""
 
             @SerializedName("reportingManagerEmail")
             @Expose
-            var reportingManagerEmail: String? = null
+            var reportingManagerEmail:  String = ""
 
             @SerializedName("hierachyLevel")
             @Expose
-            var hierachyLevel: Int? = null
+            var hierachyLevel: Int = 0
 
             @SerializedName("roleId")
             @Expose
-            var roleId: Int? = null
+            var roleId: Int = 0
 
             @SerializedName("active")
             @Expose
-            var active: Boolean? = null
+            var active: Boolean = false
 
             @SerializedName("entryBy")
             @Expose
-            var entryBy: Int? = null
+            var entryBy: Int = 0
 
             @SerializedName("updateBy")
             @Expose
-            var updateBy: Int? = null
+            var updateBy: Int = 0
 
             @SerializedName("deleteBy")
             @Expose
-            var deleteBy: Int? = null
+            var deleteBy: Int = 0
 
             @SerializedName("mode")
             @Expose
-            var mode: Int? = null
+            var mode: Int = 0
 
             @SerializedName("compKey")
             @Expose
-            var compKey: Int? = null
+            var compKey: Int = 0
 
             @SerializedName("isFirstLogin")
             @Expose
-            var isFirstLogin: Boolean? = null
+            var isFirstLogin: Boolean = false
 
             @SerializedName("authPassword")
             @Expose
-            var authPassword: String? = null
+            var authPassword:  String = ""
 
             @SerializedName("oldAuthPassword")
             @Expose
-            var oldAuthPassword: String? = null
+            var oldAuthPassword:  String = ""
 
             @SerializedName("dashboardLayout")
             @Expose
-            var dashboardLayout: String? = null
+            var dashboardLayout:  String = ""
 
             @SerializedName("companyCode")
             @Expose
-            var companyCode: String? = null
+            var companyCode:  String = ""
 
             @SerializedName("oldPassword")
             @Expose
-            var oldPassword: String? = null
+            var oldPassword: String = ""
 
             @SerializedName("newPassword")
             @Expose
-            var newPassword: String? = null
+            var newPassword:  String = ""
 
             @SerializedName("userType")
             @Expose
-            var userType: String? = null
+            var userType:  String = ""
 
             @SerializedName("imageName")
             @Expose
-            var imageName: String? = null
+            var imageName: String = ""
 
             @SerializedName("imagePath")
             @Expose
-            var imagePath: String? = null
+            var imagePath:  String = ""
 
             @SerializedName("imageExt")
             @Expose
-            var imageExt: String? = null
+            var imageExt:  String = ""
 
             @SerializedName("isAuthPassword")
             @Expose
-            private var isAuthPassword: Boolean? = null
+            private var isAuthPassword: Boolean = false
 
             @SerializedName("roleType")
             @Expose
-            var roleType: String? = null
+            var roleType:  String = ""
 
             @SerializedName("roleName")
             @Expose
-            var roleName: Any? = null
+            var roleName:  String = ""
 
             @SerializedName("prevRoleName")
             @Expose
-            var prevRoleName: Any? = null
+            var prevRoleName:  String = ""
 
             @SerializedName("roleTypeName")
             @Expose
-            var roleTypeName: String? = null
+            var roleTypeName:  String = ""
 
             @SerializedName("linkedStates")
             @Expose
-            var linkedStates: String? = null
+            var linkedStates:  String = ""
 
             @SerializedName("deactivationDate")
             @Expose
-            var deactivationDate: String? = null
+            var deactivationDate:  String = ""
 
             @SerializedName("oldReportingManagerName")
             @Expose
-            var oldReportingManagerName: Any? = null
+            var oldReportingManagerName:  String = ""
 
             @SerializedName("expenseTemplateData")
             @Expose
-            var expenseTemplateData: Any? = null
+            var expenseTemplateData:  String = ""
 
             @SerializedName("isCheckIn")
             @Expose
-            var isCheckIn: Boolean? = null
+            var isCheckIn: Boolean = false
 
             @SerializedName("allowDoctorEdit")
             @Expose
-            var allowDoctorEdit: Boolean? = null
+            var allowDoctorEdit: Boolean = false
 
             @SerializedName("lastDCRDate")
             @Expose
-            var lastDCRDate: String? = null
+            var lastDCRDate:  String = ""
 
             @SerializedName("strLastDCRDate")
             @Expose
-            var strLastDCRDate: Any? = null
+            var strLastDCRDate:  String = ""
 
             @SerializedName("mobileAppInstall")
             @Expose
-            var mobileAppInstall: Any? = null
+            var mobileAppInstall:  String = ""
 
             @SerializedName("lastLoginDate")
             @Expose
-            var lastLoginDate: String? = null
+            var lastLoginDate:  String = ""
 
             @SerializedName("strLastLoginDate")
             @Expose
-            var strLastLoginDate: Any? = null
+            var strLastLoginDate:  String = ""
 
             @SerializedName("mPin")
             @Expose
-            private var mPin: Any? = null
+            private var mPin:  String = ""
 
             @SerializedName("fingerprint")
             @Expose
-            var fingerprint: Any? = null
+            var fingerprint:  String = ""
 
             @SerializedName("workingHeadQuarter")
             @Expose
-            var workingHeadQuarter: String? = null
+            var workingHeadQuarter:  String = ""
 
             @SerializedName("cityName")
             @Expose
-            var cityName: Any? = null
+            var cityName:  String = ""
 
             @SerializedName("canBeDeleted")
             @Expose
-            var canBeDeleted: Boolean? = null
+            var canBeDeleted:  Boolean = false
 
             @SerializedName("absolutePath")
             @Expose
-            var absolutePath: String? = null
+            var absolutePath:  String = ""
 
             @SerializedName("disableSMSNotification")
             @Expose
-            var disableSMSNotification: Boolean? = null
+            var disableSMSNotification:  Boolean = false
 
             @SerializedName("prevFirstName")
             @Expose
-            var prevFirstName: String? = null
+            var prevFirstName:  String = ""
 
             @SerializedName("prevLastName")
             @Expose
-            var prevLastName: String? = null
+            var prevLastName:  String = ""
 
             @SerializedName("prevUserName")
             @Expose
-            var prevUserName: String? = null
+            var prevUserName:  String = ""
 
             @SerializedName("fullName")
             @Expose
-            var fullName: String? = null
+            var fullName:  String = ""
 
             @SerializedName("headQuaterType")
             @Expose
-            var headQuaterType: Int? = null
+            var headQuaterType:  Int = 0
 
             @SerializedName("employeeCode")
             @Expose
-            var employeeCode: String? = null
+            var employeeCode:  String = ""
 
             @SerializedName("joiningDate")
             @Expose
-            var joiningDate: String? = null
+            var joiningDate:  String = ""
 
             @SerializedName("onFieldJobDate")
             @Expose
-            var onFieldJobDate: String? = null
+            var onFieldJobDate:  String = ""
 
             @SerializedName("hierachyCode")
             @Expose
-            var hierachyCode: String? = null
+            var hierachyCode:  String = ""
 
             @SerializedName("hierachyType")
             @Expose
-            var hierachyType: String? = null
+            var hierachyType:  String = ""
 
             @SerializedName("reportingManagerStatus")
             @Expose
-            var reportingManagerStatus: Any? = null
+            var reportingManagerStatus:  String = ""
 
             @SerializedName("lastLoginDeviceId")
             @Expose
-            var lastLoginDeviceId: Any? = null
+            var lastLoginDeviceId:  String = ""
 
             @SerializedName("pushToken")
             @Expose
-            var pushToken: Any? = null
+            var pushToken:  String = ""
 
             @SerializedName("hierDesc")
             @Expose
-            var hierDesc: String? = null
+            var hierDesc:  String = ""
 
             @SerializedName("teamLevel")
             @Expose
-            var teamLevel: Int? = null
+            var teamLevel:  Int = 0
 
             @SerializedName("divisionName")
             @Expose
-            var divisionName: String? = null
+            var divisionName:  String = ""
 
             @SerializedName("linkedStateName")
             @Expose
-            var linkedStateName: String? = null
+            var linkedStateName:  String = ""
 
             @SerializedName("qualificationName")
             @Expose
-            var qualificationName: Any? = null
+            var qualificationName:  String = ""
 
             @SerializedName("nameWithCode")
             @Expose
-            var nameWithCode: String? = null
+            var nameWithCode:  String = ""
 
             @SerializedName("receiveEmailUpdate")
             @Expose
-            var receiveEmailUpdate: Boolean? = null
+            var receiveEmailUpdate:  Boolean = false
 
             @SerializedName("mainHeadQuarter")
             @Expose
-            var mainHeadQuarter: Int? = null
+            var mainHeadQuarter:  Int = 0
 
             @SerializedName("callDetails")
             @Expose
-            var callDetails: Any? = null
+            var callDetails:  String = ""
 
             @SerializedName("strDateOfBirth")
             @Expose
-            var strDateOfBirth: Any? = null
+            var strDateOfBirth:  String = ""
 
             @SerializedName("strJoiningDate")
             @Expose
-            var strJoiningDate: Any? = null
+            var strJoiningDate:  String = ""
 
             @SerializedName("strOnFieldJobDate")
             @Expose
-            var strOnFieldJobDate: Any? = null
+            var strOnFieldJobDate:  String = ""
 
             @SerializedName("reportingHierachyCode")
             @Expose
-            var reportingHierachyCode: Any? = null
+            var reportingHierachyCode:  String = ""
 
             @SerializedName("mobileAppVersionInUse")
             @Expose
-            var mobileAppVersionInUse: Any? = null
+            var mobileAppVersionInUse:  String = ""
 
             @SerializedName("previousHierarchyType")
             @Expose
-            var previousHierarchyType: Any? = null
+            var previousHierarchyType:  String = ""
 
             @SerializedName("month")
             @Expose
-            var month: Int? = null
+            var month:  Int = 0
 
             @SerializedName("year")
             @Expose
-            var year: Int? = null
+            var year:  Int = 0
 
             @SerializedName("promotionDate")
             @Expose
-            var promotionDate: String? = null
+            var promotionDate:  String = ""
 
             @SerializedName("previousPost")
             @Expose
-            var previousPost: Int? = null
+            var previousPost:  Int = 0
 
             @SerializedName("previousReportingManager")
             @Expose
-            var previousReportingManager: Int? = null
+            var previousReportingManager:  Int = 0
 
             @SerializedName("isExpenseApprovalReq")
             @Expose
-            var isExpenseApprovalReq: Boolean? = null
+            var isExpenseApprovalReq:  Boolean = false
 
             @SerializedName("expenseApproveBy")
             @Expose
-            var expenseApproveBy: Int? = null
+            var expenseApproveBy:  Int = 0
 
             @SerializedName("isMpin")
             @Expose
-            var isMpin: Boolean? = null
+            var isMpin:  Boolean = false
 
             @SerializedName("ledgerCode")
             @Expose
-            var ledgerCode: String? = null
+            var ledgerCode:  String = ""
 
             @SerializedName("isFieldWorkingUser")
             @Expose
-            var isFieldWorkingUser: Boolean? = null
+            var isFieldWorkingUser:  Boolean = false
 
             @SerializedName("isAccessBlocked")
             @Expose
-            var isAccessBlocked: Boolean? = null
+            var isAccessBlocked:  Boolean = false
 
             @SerializedName("otp")
             @Expose
-            var otp: Any? = null
+            var otp:  String = ""
 
             @SerializedName("isGeoFencingApplicable")
             @Expose
-            var isGeoFencingApplicable: Boolean? = null
+            var isGeoFencingApplicable:  Boolean = false
 
             @SerializedName("allowLocationUpdate")
             @Expose
-            var allowLocationUpdate: Boolean? = null
+            var allowLocationUpdate:  Boolean = false
 
             @SerializedName("enableSelfieAttendance")
             @Expose
-            var enableSelfieAttendance: Boolean? = null
+            var enableSelfieAttendance:  Boolean = false
 
             @SerializedName("regionId")
             @Expose
-            var regionId: Int? = null
+            var regionId:  Int = 0
 
             @SerializedName("zoneId")
             @Expose
-            var zoneId: Int? = null
+            var zoneId:  Int = 0
 
             @SerializedName("strDeactivationDate")
             @Expose
-            var strDeactivationDate: Any? = null
+            var strDeactivationDate:  String = ""
         }
     }
 
     class ErrorObj {
         @SerializedName("errorMessage")
         @Expose
-        var errorMessage: String? = null
+        var errorMessage:  String = ""
 
         @SerializedName("fldErrors")
         @Expose
-        var fldErrors: Any? = null
+        var fldErrors:  String = ""
     }
 
 }

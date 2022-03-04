@@ -74,7 +74,7 @@ class PreCallModel {
 
             @SerializedName("productList")
             @Expose
-            var productList: List<Product>? = null
+            var productList: List<Product>? = ArrayList()
 
             @SerializedName("sampleList")
             @Expose

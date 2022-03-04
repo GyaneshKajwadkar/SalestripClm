@@ -140,15 +140,15 @@ interface APIInterface
     //in.processmaster.salestripclm
     @GET("api/report/lastVisitSummary/{docId}")
     fun priCallAnalysisApi(
-        @Header("Authorization") authorization: String?,
-        @Path("docId") dotorId: Int?): Call<PreCallModel>
+        @Header("Authorization") authorization: String,
+        @Path("docId") dotorId: Int): Call<PreCallModel>
 
     @GET("api/dcr/byDCRDate/{empId}")
-    fun checkDCR_API(
+    suspend fun checkDCR_API(
         @Header("Authorization") authorization: String?,
         @Path("empId") empId: Int?,
         @Query("date") date:String?
-    ): Call<JsonObject>
+    ): Response<JsonObject>
 
     @POST("api/dcr")
     fun saveDCS(

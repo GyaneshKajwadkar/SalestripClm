@@ -15,10 +15,10 @@ import `in`.processmaster.salestripclm.models.CommonModel
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.models.PreCallModel
 import `in`.processmaster.salestripclm.models.SyncModel
+import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import `in`.processmaster.salestripclm.networkUtils.GPSTracker
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
-import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
@@ -49,10 +49,12 @@ import kotlinx.android.synthetic.main.dcr_entry.view.*
 import kotlinx.android.synthetic.main.fragment_new_call.*
 import kotlinx.android.synthetic.main.fragment_new_call.view.*
 import kotlinx.android.synthetic.main.join_activity_view.view.*
+import kotlinx.coroutines.*
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import us.zoom.sdk.ZoomSDK
 import java.util.*
 
 
@@ -61,8 +63,8 @@ class NewCallFragment : Fragment() {
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     var views:View?=null
     private lateinit var adapter:BottomSheetDoctorAdapter
-    var doctorList= SplashActivity.staticSyncData?.data?.doctorList!!
-    var routeList= SplashActivity.staticSyncData?.data?.routeList
+    var doctorListArray:ArrayList<SyncModel.Data.Doctor> = ArrayList()
+    var routeList: ArrayList<SyncModel.Data.Route> = ArrayList()
     var selectionType=0
     var selectedDocID=0
     var selectedDocName=""
@@ -70,6 +72,7 @@ class NewCallFragment : Fragment() {
     var generalClassObject:GeneralClass?=null
     var routeIdGetDCR=""
     var alertClass:AlertClass?=null
+    var returnType=false;
 
 
     override fun onCreateView(
@@ -82,46 +85,54 @@ class NewCallFragment : Fragment() {
         sharePreferance = PreferenceClass(activity)
         alertClass = AlertClass(requireActivity())
 
+        SplashActivity.staticSyncData?.data?.doctorList?.let { doctorListArray.addAll(it) }
+        SplashActivity.staticSyncData?.data?.routeList?.let { routeList.addAll(it) }
+
         bottomSheetBehavior = BottomSheetBehavior.from(views!!.bottomSheet)
         generalClassObject= GeneralClass(requireActivity())
 
         if(SplashActivity.staticSyncData?.data?.settingDCR?.roleType=="FS") {
-            views!!.selectTeamsCv.visibility = View.GONE
-            views!!.selectRoutesCv.setEnabled(true) }
+            views?.selectTeamsCv?.visibility = View.GONE
+            views?.selectRoutesCv?.setEnabled(true) }
         else
-           views!!.selectRoutesCv.setEnabled(false)
-           views!!.selectRoute_tv.setBackgroundColor(Color.parseColor("#FA8072"))
+           views?.selectRoutesCv?.setEnabled(false)
+           views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
 
 
-        views!!.selectTeamsCv.setOnClickListener({
-            views!!.bottomSheetTitle_tv?.setText("Select Team")
+        views?.selectTeamsCv?.setOnClickListener({
+            views?.bottomSheetTitle_tv?.setText("Select Team")
             selectionType=0
             openCloseModel() })
 
-        views!!.selectRoutesCv.setOnClickListener({
-            if(!checkDCRusingShareP()) return@setOnClickListener
-            views!!.bottomSheetTitle_tv?.setText("Select route")
+        views?.selectRoutesCv?.setOnClickListener({
+            if(!returnType) {
+                checkDCRusingShareP()
+                return@setOnClickListener
+            }
+
+            views?.bottomSheetTitle_tv?.setText("Select route")
             selectionType=1
             openCloseModel()})
 
-        views!!.selectDoctorsCv.setOnClickListener({
-            views!!.bottomSheetTitle_tv?.setText("Select Doctor")
+        views?.selectDoctorsCv?.setOnClickListener({
+            views?.bottomSheetTitle_tv?.setText("Select Doctor")
             selectionType=2
-            if(doctorList.size<=0)
-            {   GeneralClass(requireActivity()).showSnackbar(it,"This route has no doctor")
+            if(doctorListArray.size<=0)
+            {
+                alertClass?.commonAlert("This route has no doctor","")
                 return@setOnClickListener
             }
             openCloseModel()})
 
-        views!!.selectDoctorsCv.setEnabled(false)
+        views?.selectDoctorsCv?.setEnabled(false)
 
-        views!!.close_imv?.setOnClickListener({ bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)})
-        views!!.doctorSearch_et!!.addTextChangedListener(filterTextWatcher)
+        views?.close_imv?.setOnClickListener({ bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)})
+        views?.doctorSearch_et?.addTextChangedListener(filterTextWatcher)
 
-        views!!.startDetailing_btn.setOnClickListener({
+        views?.startDetailing_btn?.setOnClickListener({
 
-            if(views?.lastVisitDate_tv?.text?.equals(generalClassObject!!.getCurrentDate())!! || db.isEDetailingAvailable(selectedDocID,
-                    generalClassObject?.getCurrentDate()!!
+            if(views?.lastVisitDate_tv?.text?.equals(generalClassObject?.getCurrentDate()) == true || db.isEDetailingAvailable(selectedDocID,
+                    generalClassObject?.getCurrentDate()
                 ))
             {
                 alertClass?.commonAlert("Alert!","Doctor e-detailing already done for today")
@@ -135,7 +146,7 @@ class NewCallFragment : Fragment() {
             startActivityForResult(intent,3)
         })
 
-        views!!.skipDetailing_btn.setOnClickListener({
+        views?.skipDetailing_btn?.setOnClickListener({
             val intent = Intent(activity, SubmitE_DetailingActivity::class.java)
             intent.putExtra("doctorID", selectedDocID)
             intent.putExtra("doctorName", selectedDocName)
@@ -146,22 +157,46 @@ class NewCallFragment : Fragment() {
         routeList = routeList?.filter { s -> s.headQuaterName !=""} as java.util.ArrayList<SyncModel.Data.Route>
         checkDCRusingShareP()
 
+
+
         return views
     }
 
     fun checkDCRusingShareP():Boolean
     {
-        if( sharePreferance?.getPref("todayDate") != generalClassObject?.currentDateMMDDYY() || sharePreferance?.getPref("dcrId")=="0") {
-            checkCurrentDCR_API()
+        if(generalClassObject?.isInternetAvailable() == true)
+        {
+            callCoroutineApi()
+            return false
+        }
+        else if( sharePreferance?.getPref("todayDate") != generalClassObject?.currentDateMMDDYY() || sharePreferance?.getPref("dcrId")=="0") {
+            alertClass?.commonAlert("Alert!","DCR not submitted please connect to internet and fill DCR first.")
             return false }
-        else return true
+        else {
+            returnType=true;
+            return true
+        }
+    }
+
+    fun callCoroutineApi() {
+        alertClass?.showProgressAlert("")
+        val coroutineScope = CoroutineScope(Dispatchers.IO).launch {
+            val api = async { checkCurrentDCR_API() }
+            api.await()
+        }
+
+        coroutineScope.invokeOnCompletion {
+            requireActivity().runOnUiThread(java.lang.Runnable {
+                alertClass?.hideAlert()
+            })
+        }
     }
 
     fun openCloseModel()
     {
         adapter =BottomSheetDoctorAdapter()
-        views!!.doctorList_rv.setLayoutManager(GridLayoutManager(requireActivity(), 3))
-        views!!.doctorList_rv.adapter = adapter
+        views?.doctorList_rv?.setLayoutManager(GridLayoutManager(requireActivity(), 3))
+        views?.doctorList_rv?.adapter = adapter
 
         val state =
             if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED)
@@ -188,7 +223,7 @@ class NewCallFragment : Fragment() {
         Filterable {
 
         var filteredDataRoute:ArrayList<SyncModel.Data.Route> = routeList as ArrayList<SyncModel.Data.Route>
-        var filteredDataDoctor:ArrayList<SyncModel.Data.Doctor> = doctorList as ArrayList<SyncModel.Data.Doctor>
+        var filteredDataDoctor:ArrayList<SyncModel.Data.Doctor> = doctorListArray as ArrayList<SyncModel.Data.Doctor>
 
 
         inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -207,8 +242,8 @@ class NewCallFragment : Fragment() {
         override fun onBindViewHolder(holder: MyViewHolder, position: Int)
         {
             if(selectionType==0)
-            {   if(filteredDataRoute.size<=0)  views!!.noData_tv?.visibility=View.VISIBLE
-                else  views!!.noData_tv?.visibility=View.GONE
+            {   if(filteredDataRoute.size<=0)  views?.noData_tv?.visibility=View.VISIBLE
+                else  views?.noData_tv?.visibility=View.GONE
 
                 val modeldata = filteredDataRoute?.get(position)
                 holder.headerDoctor_tv.setText(modeldata?.routeName)
@@ -217,15 +252,15 @@ class NewCallFragment : Fragment() {
 
 
                 holder.parent_cv.setOnClickListener({
-                    views!!.selectTeam_tv.setText((modeldata?.routeName))
+                    views?.selectTeam_tv?.setText((modeldata?.routeName))
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
                     onSelection()
                 })
             }
 
             else if(selectionType==1)
-            {    if(filteredDataRoute.size<=0)  views!!.noData_tv?.visibility=View.VISIBLE
-                 else  views!!.noData_tv?.visibility=View.GONE
+            {    if(filteredDataRoute.size<=0)  views?.noData_tv?.visibility=View.VISIBLE
+                 else  views?.noData_tv?.visibility=View.GONE
 
                 val modeldata = filteredDataRoute?.get(position)
                 holder.headerDoctor_tv.setText(modeldata?.routeName)
@@ -233,8 +268,8 @@ class NewCallFragment : Fragment() {
                 holder.speciality_tv.visibility=View.GONE
 
                 holder.parent_cv.setOnClickListener({
-                    doctorList.clear()
-                    views!!.selectRoute_tv.setText((modeldata?.routeName))
+                    doctorListArray.clear()
+                    views?.selectRoute_tv?.setText((modeldata?.routeName))
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
                     onSelection()
                     applySelectionFilter(modeldata.routeId)
@@ -243,8 +278,8 @@ class NewCallFragment : Fragment() {
             }
 
             else{
-                if(filteredDataDoctor.size<=0)  views!!.noData_tv?.visibility=View.VISIBLE
-                else  views!!.noData_tv?.visibility=View.GONE
+                if(filteredDataDoctor.size<=0)  views?.noData_tv?.visibility=View.VISIBLE
+                else  views?.noData_tv?.visibility=View.GONE
 
                 val modeldata = filteredDataDoctor?.get(position)
                 holder.headerDoctor_tv.setText(modeldata?.doctorName)
@@ -252,7 +287,7 @@ class NewCallFragment : Fragment() {
                 holder.speciality_tv.setText("Speciality- " + modeldata?.specialityName)
 
                 holder.parent_cv.setOnClickListener({
-                    views!!.selectDoctor_tv.setText((modeldata?.doctorName))
+                    views?.selectDoctor_tv?.setText((modeldata?.doctorName))
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
                     setDoctor(modeldata)
                     onSelection()
@@ -263,11 +298,11 @@ class NewCallFragment : Fragment() {
         override fun getItemCount(): Int
         {
             if(selectionType==0)
-                return filteredDataDoctor?.size!!
+                return filteredDataDoctor?.size
             else if(selectionType==1)
-                return filteredDataRoute?.size!!
+                return filteredDataRoute?.size
             else
-                return filteredDataDoctor?.size!!
+                return filteredDataDoctor?.size
         }
 
 
@@ -290,8 +325,8 @@ class NewCallFragment : Fragment() {
                     {
                         val FilteredArrayNames: ArrayList<SyncModel.Data.Doctor> = ArrayList()
                         constraint = constraint.toString().lowercase()
-                        for (i in 0 until doctorList?.size!!) {
-                            val dataNames: SyncModel.Data.Doctor = doctorList?.get(i)!!
+                        for (i in 0 until doctorListArray?.size!!) {
+                            val dataNames: SyncModel.Data.Doctor = doctorListArray?.get(i)
                             if (dataNames.doctorName.lowercase().startsWith(constraint.toString())) {
                                 FilteredArrayNames.add(dataNames)
                             }
@@ -304,7 +339,7 @@ class NewCallFragment : Fragment() {
                     { val FilteredArrayNames: ArrayList<SyncModel.Data.Route> = ArrayList()
                         constraint = constraint.toString().lowercase()
                         for (i in 0 until routeList?.size!!) {
-                            val routeName: SyncModel.Data.Route = routeList?.get(i)!!
+                            val routeName: SyncModel.Data.Route = routeList?.get(i)
                             if (routeName.routeName.lowercase().startsWith(constraint.toString())) {
                                 FilteredArrayNames.add(routeName)
                             }
@@ -315,8 +350,8 @@ class NewCallFragment : Fragment() {
                     else
                     {   val FilteredArrayNames: ArrayList<SyncModel.Data.Doctor> = ArrayList()
                         constraint = constraint.toString().lowercase()
-                        for (i in 0 until doctorList?.size!!) {
-                            val docNames: SyncModel.Data.Doctor = doctorList?.get(i)!!
+                        for (i in 0 until doctorListArray?.size!!) {
+                            val docNames: SyncModel.Data.Doctor = doctorListArray?.get(i)
                             if (docNames.doctorName.lowercase().startsWith(constraint.toString())) {
                                 FilteredArrayNames.add(docNames)
                             }
@@ -352,7 +387,7 @@ class NewCallFragment : Fragment() {
         if(doctorDetailModel.cityName.isEmpty())
             views?.cityParent?.visibility=View.GONE
 
-        if(generalClassObject!!.isInternetAvailable()) {
+        if(generalClassObject?.isInternetAvailable() == true) {
             noInternet_tv.visibility = View.GONE
             preCallAnalysisApi()
         }
@@ -363,20 +398,20 @@ class NewCallFragment : Fragment() {
 
     fun onSelection()
     {
-    views!!.doctorSearch_et!!.setText("")
+    views?.doctorSearch_et?.setText("")
 
      if(selectionType==0)
      {   views?.doctorDetail_parent?.visibility=View.GONE
          views?.precall_parent?.visibility=View.GONE
          views?.parentButton?.visibility=View.GONE
          views?.noData_gif?.visibility=View.VISIBLE
-         views!!.selectTeam_tv.setBackgroundColor(Color.parseColor("#3CB371"))
-         views!!.selectRoute_tv.setBackgroundColor(Color.parseColor("#FA8072"))
-         views!!.selectRoute_tv.setText("Select route")
-         views!!.selectDoctor_tv.setBackgroundColor(Color.parseColor("#A9A9A9"))
-         views!!.selectDoctor_tv.setText("Select Doctor")
-         views!!.selectRoutesCv.setEnabled(true)
-         views!!.selectDoctorsCv.setEnabled(false)
+         views?.selectTeam_tv?.setBackgroundColor(Color.parseColor("#3CB371"))
+         views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
+         views?.selectRoute_tv?.setText("Select route")
+         views?.selectDoctor_tv?.setBackgroundColor(Color.parseColor("#A9A9A9"))
+         views?.selectDoctor_tv?.setText("Select Doctor")
+         views?.selectRoutesCv?.setEnabled(true)
+         views?.selectDoctorsCv?.setEnabled(false)
      }
      else if(selectionType==1)
      {
@@ -384,93 +419,57 @@ class NewCallFragment : Fragment() {
          views?.precall_parent?.visibility=View.GONE
          views?.parentButton?.visibility=View.GONE
          views?.noData_gif?.visibility=View.VISIBLE
-         views!!.selectRoute_tv.setBackgroundColor(Color.parseColor("#3CB371"))
-         views!!.selectDoctor_tv.setBackgroundColor(Color.parseColor("#FA8072"))
-         views!!.selectDoctor_tv.setText("Select Doctor")
-         views!!.selectDoctorsCv.setEnabled(true)
+         views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#3CB371"))
+         views?.selectDoctor_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
+         views?.selectDoctor_tv?.setText("Select Doctor")
+         views?.selectDoctorsCv?.setEnabled(true)
      }
      else
      {
-         views!!.selectDoctor_tv.setBackgroundColor(Color.parseColor("#3CB371"))
+         views?.selectDoctor_tv?.setBackgroundColor(Color.parseColor("#3CB371"))
      }
     }
 
     fun applySelectionFilter(id:Int)
     {
         if(selectionType==0)
-        {
-
-        }
+        { }
         else if(selectionType==1)
         {
-            if(staticSyncData?.data?.settingDCR?.isGeoLocationRequired!!)
+            if(staticSyncData?.data?.settingDCR?.isGeoLocationRequired == true)
             {
-                /*if(areThereMockPermissionApps()){
-                    alertClass?.commonAlert("Alert!","This device contain mock GPS app. Unstall before proceed")
-                return
-                }*/
-
                 val getGpsTracker=GPSTracker(requireActivity())
                 val jsonObj=JSONObject(staticSyncData?.data?.configurationSetting)
                 val getRadius=jsonObj.getInt("SET011")
 
                 val startPoint = Location("locationA")
-                startPoint.setLatitude(getGpsTracker.latitude)
+               startPoint.setLatitude(getGpsTracker.latitude)
+               // startPoint.setLatitude(22.724177793056885)
                 startPoint.setLongitude(getGpsTracker.longitude)
+               // startPoint.setLongitude(75.90522484470453)
 
-                val docFirstFilter= SplashActivity.staticSyncData?.data?.doctorList!!.filter { s -> s.routeId == id } as java.util.ArrayList<SyncModel.Data.Doctor>
+                val docFirstFilter= SplashActivity.staticSyncData?.data?.doctorList?.filter { s -> s.routeId == id } as java.util.ArrayList<SyncModel.Data.Doctor>
 
             for(fetch in docFirstFilter)
                 {
-                    if(fetch.latitude.toInt()==0 || fetch.longitude.toInt()==0) { return }
+                   if(fetch.latitude==0.00 || fetch.longitude==0.00) { return }
 
                     val endPoint = Location("locationB")
                     endPoint.latitude = fetch.latitude
                     endPoint.longitude = fetch.longitude
                     val distance = startPoint.distanceTo(endPoint).toInt()
-                    if(distance <= getRadius){ doctorList.add(fetch) }
+
+                    doctorListArray.add(fetch)
+                 /*   if(distance <= getRadius){
+                        doctorListArray.add(fetch) }*/
                 }
             }
             else
             {
-                doctorList = SplashActivity.staticSyncData?.data?.doctorList!!.filter { s -> s.routeId == id } as java.util.ArrayList<SyncModel.Data.Doctor>
-            }
-
-        }
-
-    }
-
-    fun areThereMockPermissionApps(): Boolean {
-        var count = 0
-        val pm: PackageManager = requireActivity().getPackageManager()
-        val packages: List<ApplicationInfo> =
-            pm.getInstalledApplications(PackageManager.GET_META_DATA)
-        for (applicationInfo in packages) {
-            try {
-                val packageInfo: PackageInfo = pm.getPackageInfo(
-                    applicationInfo.packageName,
-                    PackageManager.GET_PERMISSIONS
-                )
-
-                // Get Permissions
-                val requestedPermissions: Array<String> = packageInfo.requestedPermissions
-                if (requestedPermissions != null) {
-                    for (i in requestedPermissions.indices) {
-                        if ((requestedPermissions[i]
-                                    == "android.permission.ACCESS_MOCK_LOCATION") && !applicationInfo.packageName.equals(
-                                requireActivity().getPackageName()
-                            )
-                        ) {
-                            count++
-                        }
-                    }
-                }
-            } catch (e: PackageManager.NameNotFoundException) {
+                doctorListArray = SplashActivity.staticSyncData?.data?.doctorList?.filter { s -> s.routeId == id } as java.util.ArrayList<SyncModel.Data.Doctor>
             }
         }
-        return if (count > 0) true else false
     }
-
 
     private fun preCallAnalysisApi() {
 
@@ -485,92 +484,119 @@ class NewCallFragment : Fragment() {
         call.enqueue(object : Callback<PreCallModel?> {
             override fun onResponse(call: Call<PreCallModel?>?, response: Response<PreCallModel?>) {
                 Log.e("preCallAnalysisApi", response.code().toString() + "")
-                if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage?.isEmpty()!!) {
+                if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage?.isEmpty() == true) {
                     val analysisModel=response.body()?.getData()?.lastVisitSummary
                     views?.precall_parent?.visibility=View.VISIBLE
                     views?.parentButton?.visibility=View.VISIBLE
 
                     //remark_ll
-                    if(generalClassObject?.checkStringNullEmpty(analysisModel?.visitPurpose!!)!!)
+                    if(analysisModel?.visitPurpose?.let {
+                            generalClassObject?.checkStringNullEmpty(it) } == true)
                     { views?.visitPurpose_tr?.visibility=View.GONE }
                     else{ views?.visitPurpose_tv?.setText(analysisModel?.visitPurpose) }
 
-                    if(generalClassObject?.checkStringNullEmpty(analysisModel?.workWithName!!)!!)
+                    if(analysisModel?.workWithName?.let { generalClassObject?.checkStringNullEmpty(it) } == true)
                     { views?.workingWith_tr?.visibility=View.GONE }
                     else{ views?.workingWith_tv?.setText(analysisModel?.workWithName) }
 
-                    if(generalClassObject?.checkStringNullEmpty(analysisModel?.strDcrDate!!)!!)
+                    if(analysisModel?.strDcrDate?.let { generalClassObject?.checkStringNullEmpty(it) } == true)
                     { views?.lastVisit_tr?.visibility=View.GONE }
                     else{ views?.lastVisitDate_tv?.setText(analysisModel?.strDcrDate) }
 
-                    if(generalClassObject?.checkStringNullEmpty(analysisModel?.remarks!!)!!)
+                    if(analysisModel?.remarks?.let { generalClassObject?.checkStringNullEmpty(it) } == true)
                     { views?.remark_ll?.visibility=View.GONE }
                     else{ views?.remark_tv?.setText(analysisModel?.remarks) }
 
-                    if(generalClassObject?.checkStringNullEmpty(analysisModel?.strReportedTime!!)!!)
+                    if(analysisModel?.strReportedTime?.let { generalClassObject?.checkStringNullEmpty(it) } == true)
                     { views?.reportedTime_tr?.visibility=View.GONE }
                     else{ views?.reportedTime_tv?.setText(analysisModel?.strReportedTime) }
 
 
-                    views!!.brandList_rv.layoutManager=LinearLayoutManager(requireActivity())
-                    views!!.sampleGiven_rv.layoutManager=LinearLayoutManager(requireActivity())
-                    views!!.giftGiven_rv.layoutManager=LinearLayoutManager(requireActivity())
+                    views?.brandList_rv?.layoutManager=LinearLayoutManager(requireActivity())
+                    views?.sampleGiven_rv?.layoutManager=LinearLayoutManager(requireActivity())
+                    views?.giftGiven_rv?.layoutManager=LinearLayoutManager(requireActivity())
 
                     var mainList= ArrayList<String>()
                     var subList= ArrayList<Int>()
 
-                    if( analysisModel?.productList!=null)
+                    if( analysisModel?.productList!=null && analysisModel?.productList?.size!=0)
                     {
-                        view!!.noDataBrand.visibility=View.GONE
+                        var i: Int = analysisModel?.productList?.size?.minus(1)!!
                         for( data in analysisModel?.productList!!)
                         {
-                            mainList.add(data.productName!!)
+                            data.productName?.let { mainList.add(it) }
+                            if (i-- == 0) {
+                                if(mainList.size==0)view?.noDataBrand?.visibility=View.VISIBLE
+                                else view?.noDataBrand?.visibility=View.GONE
+                            }
                         }
                         var adapterProduct=SimpleListAdapter(mainList,subList)
-                        views!!.brandList_rv.adapter=adapterProduct
-                        if(mainList.size==0)view!!.noDataBrand.visibility=View.VISIBLE
+                        views?.brandList_rv?.adapter=adapterProduct
                     }
-                    else view!!.noDataBrand.visibility=View.VISIBLE
-
-                    if( analysisModel?.sampleList!=null)
+                    else
                     {
-                        view!!.noDataSample.visibility=View.GONE
-                        mainList= ArrayList<String>()
-                        subList= ArrayList<Int>()
+                        view?.noDataBrand?.visibility = View.VISIBLE
+                        views?.brandList_rv?.adapter=SimpleListAdapter(mainList,subList)
+                    }
+
+                    mainList=ArrayList<String>()
+                    subList= ArrayList<Int>()
+
+                    if( analysisModel?.sampleList!=null && analysisModel?.sampleList?.size!=0)
+                    {
+                        var i: Int = analysisModel?.sampleList?.size?.minus(1)!!
                         for( data in analysisModel?.sampleList!!) {
                             mainList.add(data.productName.toString())
-                            subList.add(data.qty!!) }
+                            data.qty?.let { subList.add(it) }
+                            if (i-- == 0) {
+                                if(mainList.size==0)view?.noDataSample?.visibility=View.VISIBLE
+                                else view?.noDataSample?.visibility=View.GONE
+                            }
+                        }
 
                         var adapterSampleGiven=SimpleListAdapter(mainList,subList)
-                        views!!.sampleGiven_rv.adapter=adapterSampleGiven
-                        if(mainList.size==0)view!!.noDataSample.visibility=View.VISIBLE
-                    }
-                    else view!!.noDataSample.visibility=View.VISIBLE
+                        views?.sampleGiven_rv?.adapter=adapterSampleGiven
 
-                    if( analysisModel?.giftList!=null)
+                    }
+                    else
                     {
-                        view!!.noDataGift.visibility=View.GONE
-                        mainList= ArrayList<String>()
-                        subList= ArrayList<Int>()
+                        view?.noDataSample?.visibility = View.VISIBLE
+                        views?.sampleGiven_rv?.adapter=SimpleListAdapter(mainList,subList)
+                    }
+
+                    mainList=ArrayList<String>()
+                    subList= ArrayList<Int>()
+
+                    if( analysisModel?.giftList!=null && analysisModel?.giftList?.size!=0)
+                    {
+                         mainList=ArrayList<String>()
+                         subList= ArrayList<Int>()
+                        var i: Int = analysisModel?.giftList?.size?.minus(1)!!
                         for( data in analysisModel?.giftList!!)
                         {
                             mainList.add(data.productName.toString())
-                            subList.add(data.qty!!)
+                            data.qty?.let { subList.add(it) }
+                            if (i-- == 0) {
+                                if(mainList.size==0)view?.noDataGift?.visibility=View.VISIBLE
+                                else  view?.noDataGift?.visibility=View.GONE
+                            }
                         }
                         var adapterGift=SimpleListAdapter(mainList,subList)
-                        views!!.giftGiven_rv.adapter=adapterGift
-                        if(mainList.size==0)view!!.noDataGift.visibility=View.VISIBLE
+                        views?.giftGiven_rv?.adapter=adapterGift
                     }
-                    else view!!.noDataGift.visibility=View.VISIBLE
+                    else {
+                        view?.noDataGift?.visibility = View.VISIBLE
+                        views?.giftGiven_rv?.adapter=SimpleListAdapter(mainList,subList)
+                    }
 
-                    views!!.total_tv.setText("Total: "+analysisModel?.lastPOBDetails?.totalPOB)
+                    views?.total_tv?.setText("Total: "+analysisModel?.lastPOBDetails?.totalPOB)
 
 
-                    if(generalClassObject?.checkStringNullEmpty(analysisModel?.lastPOBDetails?.remark!!)!!)
+                    if(analysisModel?.lastPOBDetails?.remark?.let { generalClassObject?.checkStringNullEmpty(it) } == true)
                     { views?.remarkPOB_tv?.visibility=View.GONE }
                     else{ views?.remarkPOB_tv?.setText("Remark: "+analysisModel?.lastPOBDetails?.remark) }
 
-                    if(generalClassObject?.checkStringNullEmpty(analysisModel?.lastPOBDetails?.strPobDate!!)!!)
+                    if(analysisModel?.lastPOBDetails?.strPobDate?.let { generalClassObject?.checkStringNullEmpty(it) } == true)
                     { views?.datePob_tv?.visibility=View.GONE }
                     else{ views?.datePob_tv?.setText("Date: "+analysisModel?.lastPOBDetails?.strPobDate) }
 
@@ -707,9 +733,9 @@ class NewCallFragment : Fragment() {
             val month = c[Calendar.MONTH]
 
             val commonSaveDcrModel=CommonModel.SaveDcrModel()
-            commonSaveDcrModel.dcrDate= generalClassObject!!.currentDateMMDDYY()
-            commonSaveDcrModel.empId= loginModelHomePage.empId!!
-            commonSaveDcrModel.employeeId= loginModelHomePage.empId!!
+            commonSaveDcrModel.dcrDate= generalClassObject?.currentDateMMDDYY().toString()
+            commonSaveDcrModel.empId= loginModelHomePage.empId?:0
+            commonSaveDcrModel.employeeId= loginModelHomePage.empId?:0
             commonSaveDcrModel.workingType=workAreaSeletd.substring(0, i)
             commonSaveDcrModel.remark=dialogView.remarkEt.text.toString()
             commonSaveDcrModel.routeId=routeId
@@ -730,7 +756,54 @@ class NewCallFragment : Fragment() {
         alertDialog.show()
 
     }
-    fun checkCurrentDCR_API(){
+    suspend fun checkCurrentDCR_API() {
+
+        val response = APIClientKot().getUsersService(2, sharePreferance?.getPref("secondaryUrl")!!).checkDCR_API(
+            "bearer " + loginModelHomePage.accessToken,
+            loginModelHomePage.empId,
+            generalClassObject!!.currentDateMMDDYY()
+        )
+        withContext(Dispatchers.Main) {
+            if (response!!.isSuccessful) {
+                if (response.code() == 200 && !response.body().toString().isEmpty()) {
+
+                    val jsonObjError: JsonObject = response.body()?.get("errorObj") as JsonObject
+                    if (jsonObjError.get("errorMessage").asString.isEmpty()) {
+                        val data: JsonObject = response.body()?.get("data") as JsonObject
+                        val dcrData: JsonObject = data?.get("dcrData") as JsonObject
+                        if (dcrData.get("routeId").asInt == 0) {
+                            alertClass?.commonAlert("Alert!", "Please submit tour program first")
+                            alertClass?.hideAlert()
+                            returnType=false;
+                            return@withContext
+                        }
+
+                       /* if (dcrData.get("strDCRDate").asString == generalClassObject?.getCurrentDate() ) {
+                            returnType=true;
+                            return@withContext
+                        }*/
+
+                        routeIdGetDCR = dcrData.get("routeId").asString
+                        if (dcrData.get("dcrId").asInt == 0) {
+                            returnType=false;
+                            createDCRAlert(dcrData.get("routeId").asString)
+                            sharePreferance?.setPref("dcrId", dcrData.get("dcrId").asString)
+                        } else {
+                            returnType=true;
+                            sharePreferance?.setPref("todayDate", generalClassObject?.currentDateMMDDYY())
+                            sharePreferance?.setPref("dcrId", dcrData.get("dcrId").asString)
+                        }
+
+                    } else {
+                        returnType=false;
+                        GeneralClass(requireActivity()).checkInternet() }
+                }
+            }
+        }
+
+
+
+       /* var returnType=false;
         alertClass?.showProgressAlert("")
 
         var call: Call<JsonObject> = apiInterface?.checkDCR_API("bearer " + loginModelHomePage.accessToken, loginModelHomePage.empId,generalClassObject!!.currentDateMMDDYY()) as Call<JsonObject>
@@ -743,20 +816,27 @@ class NewCallFragment : Fragment() {
                   {
                       val data:JsonObject = response.body()?.get("data") as JsonObject
                       val dcrData:JsonObject = data?.get("dcrData") as JsonObject
-                     if(dcrData.get("routeId").asString.isEmpty())
+                     if(dcrData.get("routeId").asInt==0)
                      {
                          alertClass?.commonAlert("Alert!","Please submit tour program first")
                          alertClass?.hideAlert()
+                         returnType=false
                          return
                      }
 
+                      if( dcrData.get("strDCRDate").asString == generalClassObject?.getCurrentDate() )
+                      {
+                          returnType=true; return }
+
                     routeIdGetDCR=dcrData.get("routeId").asString
                       if(dcrData.get("dcrId").asInt==0) {
+                          returnType=false
                           createDCRAlert(dcrData.get("routeId").asString)
                           sharePreferance?.setPref("dcrId", dcrData.get("dcrId").asString) }
                       else
                       sharePreferance?.setPref("todayDate",generalClassObject?.currentDateMMDDYY())
                       sharePreferance?.setPref("dcrId",dcrData.get("dcrId").asString)
+                      returnType=true
                   }
                 }
                 alertClass?.hideAlert()
@@ -766,8 +846,10 @@ class NewCallFragment : Fragment() {
                 GeneralClass(requireActivity()).checkInternet()
                 alertClass?.hideAlert()// check internet connection
                 call.cancel()
+                returnType=false
             }
-        })
+        })*/
+
     }
 
     fun saveDCR_API(dcrObject: CommonModel.SaveDcrModel, alertDialog: AlertDialog) {
@@ -785,7 +867,7 @@ class NewCallFragment : Fragment() {
                     }
                     else {
                     val jsonObjData:JsonObject = response.body()?.get("data") as JsonObject
-
+                    returnType=true;
                     alertClass?.commonAlert("",jsonObjData.get("message").asString)
                     sharePreferance?.setPref("todayDate",generalClassObject?.currentDateMMDDYY())
                     sharePreferance?.setPref("dcrId",jsonObjData.get("dcrId").asString)

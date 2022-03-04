@@ -31,7 +31,7 @@ class SimpleListAdapter(var mainList: ArrayList<String>, var subList: ArrayList<
         else{
             holder.subHeader.setText("Qty:-"+subList.get(position))
         }
-        holder.header.setText(mainList.get(position))
+        holder.header.setText(mainList.get(position).lowercase())
     }
 
     override fun getItemCount(): Int {

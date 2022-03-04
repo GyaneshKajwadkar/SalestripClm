@@ -155,10 +155,10 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
             {
                 for((i,apiDoctorList) in arrayListSelectorDoctor.withIndex())
                 {
-                    if(intentDocList.memberId==apiDoctorList.getId())
+                    if(intentDocList.memberId==apiDoctorList.id)
                     {
-                        apiDoctorList.setChecked(true)
-                        apiDoctorList.setMeetingId(intentDocList.meetingId.toString())
+                        apiDoctorList.checked=true
+                        apiDoctorList.meetingId=intentDocList.meetingId.toString()
                         arrayListSelectorDoctor.set(i,apiDoctorList)
                     }
                 }
@@ -169,10 +169,10 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
             {
                 for((i,apiTeamList) in arrayListSelectorTeams.withIndex())
                 {
-                    if(intentTeamList.memberId==apiTeamList.getId())
+                    if(intentTeamList.memberId==apiTeamList.id)
                     {
-                        apiTeamList.setChecked(true)
-                        apiTeamList.setMeetingId(intentTeamList.meetingId.toString())
+                        apiTeamList.checked=true
+                        apiTeamList.meetingId=intentTeamList.meetingId.toString()
                         arrayListSelectorTeams.set(i,apiTeamList)
                     }
                 }
@@ -378,11 +378,11 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
         for(item in SplashActivity.staticSyncData?.data?.doctorList!!)
         {
             val selectorModel = DocManagerModel()
-            selectorModel.setName(item.doctorName)
-            selectorModel.setRoute(item.routeName)
-            selectorModel.setSpeciality(item.specialityName)
-            selectorModel.setId(item.doctorId)
-            selectorModel.setMailId(item.emailId)
+            selectorModel.name=item.doctorName
+            selectorModel.routeName=item.routeName
+            selectorModel.specialityName=item.specialityName
+            selectorModel.id=item.doctorId
+            selectorModel.mailId=item.emailId
             arrayListSelectorDoctor.add(selectorModel)
         }
 
@@ -632,7 +632,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
         {
             constructorList= ArrayList()
             for (item in arrayListSelectorDoctor) {
-                if(item.getChecked()!!)
+                if(item.checked!!)
                 {
                     constructorList.add(item)
                 }
@@ -647,7 +647,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
         {
             constructorListTeam= ArrayList()
             for (item in arrayListSelectorTeams) {
-                if(item.getChecked()!!)
+                if(item.checked!!)
                 {
                     constructorListTeam.add(item)
                 }
@@ -677,10 +677,10 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
         {
             for ((iMain, itemMain) in arrayListSelectorDoctor.withIndex())
             {
-                if(itemMain.getId()== id)
+                if(itemMain.id== id)
                 {
                     val modeldata=arrayListSelectorDoctor.get(iMain)
-                    modeldata.setChecked(false)
+                    modeldata.checked=false
                     arrayListSelectorDoctor.set(iMain,modeldata)
                     selectedAdapeter?.notifyDataSetChanged()
                 }
@@ -690,10 +690,10 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
         {
             for ((iMain, itemMain) in arrayListSelectorTeams.withIndex())
             {
-                if(itemMain.getId()== id)
+                if(itemMain.id== id)
                 {
                     val modeldata=arrayListSelectorTeams.get(iMain)
-                    modeldata.setChecked(false)
+                    modeldata.checked=false
                     arrayListSelectorTeams.set(iMain,modeldata)
                     selectedAdapeterTeams?.notifyDataSetChanged()
                 }
@@ -723,11 +723,11 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
                     for(singleItem in getTeamslist?.getData()?.employeeList!!)
                     {
                         var selectorModel =DocManagerModel()
-                        selectorModel.setName(singleItem.firstName+" "+singleItem.lastName)
-                        selectorModel.setRoute(singleItem.headQuaterName)
-                        selectorModel.setSpeciality(singleItem.divisionName)
-                        selectorModel.setId(singleItem.empId)
-                        selectorModel.setMailId(singleItem.emailId)
+                        selectorModel.name=singleItem.firstName+" "+singleItem.lastName
+                        selectorModel.routeName=singleItem.headQuaterName
+                        selectorModel.specialityName=singleItem.divisionName
+                        selectorModel.id=singleItem.empId
+                        selectorModel.mailId=singleItem.emailId
                         arrayListSelectorTeams.add(selectorModel)
                     }
                     updateSchedule()
@@ -794,14 +794,14 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
         val doctorList = JSONArray()
         for( item in arrayListSelectorDoctor)
         {
-            if(item.getChecked()!!)
+            if(item.checked!!)
             {
                 val arrayObject = JSONObject()
-                arrayObject.put("MeetingId",item.getMeetingID())
-                arrayObject.put("MemberId",item.getId())
+                arrayObject.put("MeetingId",item.meetingId)
+                arrayObject.put("MemberId",item.id)
                 arrayObject.put("MemberType","doc")
-                arrayObject.put("EmailId",item.getMailId())
-                arrayObject.put("name",item.getName())
+                arrayObject.put("EmailId",item.mailId)
+                arrayObject.put("name",item.name)
                 doctorList.put(arrayObject)
             }
 
@@ -810,14 +810,14 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
         val teamList = JSONArray()
         for( item in arrayListSelectorTeams)
         {
-            if(item.getChecked()!!)
+            if(item.checked!!)
             {
                 val arrayObject = JSONObject()
-                arrayObject.put("MeetingId",item.getMeetingID())
-                arrayObject.put("MemberId",item.getId())
+                arrayObject.put("MeetingId",item.meetingId)
+                arrayObject.put("MemberId",item.id)
                 arrayObject.put("MemberType","Empl")
-                arrayObject.put("EmailId",item.getMailId())
-                arrayObject.put("name",item.getName())
+                arrayObject.put("EmailId",item.mailId)
+                arrayObject.put("name",item.name)
                 teamList.put(arrayObject)
             }
         }
@@ -849,13 +849,13 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
 
                         for((i,apiDoctorList) in arrayListSelectorDoctor.withIndex())
                         {
-                            apiDoctorList.setChecked(false)
+                            apiDoctorList.checked=false
                             arrayListSelectorDoctor.set(i,apiDoctorList)
                         }
 
                         for((i,apiTeamList) in arrayListSelectorTeams.withIndex())
                         {
-                            apiTeamList.setChecked(false)
+                            apiTeamList.checked=false
                             arrayListSelectorTeams.set(i,apiTeamList)
 
                         }

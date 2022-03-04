@@ -60,42 +60,42 @@ class ZoomCredientialModel {
     class CredentialData {
         @SerializedName("empId")
         @Expose
-        var empId: Int? = null
+        var empId: Int = 0
 
         @SerializedName("secretKey")
         @Expose
-        var secretKey: String? = null
+        var secretKey: String = ""
 
         @SerializedName("apiKey")
         @Expose
-        var apiKey: String? = null
+        var apiKey: String = ""
 
         @SerializedName("entryDate")
         @Expose
-        var entryDate: String? = null
+        var entryDate: String = ""
 
         @SerializedName("entryBy")
         @Expose
-        var entryBy: Int? = null
+        var entryBy: Int = 0
 
         @SerializedName("updateDate")
         @Expose
-        var updateDate: String? = null
+        var updateDate: String = ""
 
         @SerializedName("updateBy")
         @Expose
-        var updateBy: Int? = null
+        var updateBy: Int = 0
 
         @SerializedName("userName")
         @Expose
-        var userName: String? = null
+        var userName: String = ""
 
         @SerializedName("password")
         @Expose
-        var password: String? = null
+        var password: String = ""
 
         @SerializedName("jwtToken")
         @Expose
-        var jwtToken: String? = null
+        var jwtToken: String = ""
     }
 }

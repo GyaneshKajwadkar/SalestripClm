@@ -12,7 +12,7 @@ class DailyDocVisitModel {
 
     @SerializedName("errorObj")
     @Expose
-    private var errorObj: SyncModel.ErrorObj? = null
+    private var errorObj: SyncModel.ErrorObj = SyncModel.ErrorObj()
 
     @SerializedName("data")
     @Expose
@@ -31,7 +31,7 @@ class DailyDocVisitModel {
     }
 
     fun setErrorObj(errorObj: SyncModel.ErrorObj?) {
-        this.errorObj = errorObj
+        this.errorObj = errorObj!!
     }
 
     fun getData(): Data? {
@@ -45,252 +45,252 @@ class DailyDocVisitModel {
     class Data {
         @SerializedName("dcrDoctorlist")
         @Expose
-        var dcrDoctorlist: List<DcrDoctor>? = null
+        var dcrDoctorlist: List<DcrDoctor>? = ArrayList()
 
         class DcrDoctor {
             @SerializedName("dcrId")
             @Expose
-            var dcrId: Int? = null
+            var dcrId: Int = 0
 
             @SerializedName("doctorId")
             @Expose
-            var doctorId: Int? = null
+            var doctorId: Int = 0
 
             @SerializedName("isVisited")
             @Expose
-            var isVisited: Boolean? = null
+            var isVisited: Boolean = false
 
             @SerializedName("detailType")
             @Expose
-            var detailType: String? = null
+            var detailType: String = ""
 
             @SerializedName("isDelete")
             @Expose
-            var isDelete: Boolean? = null
+            var isDelete: Boolean = false
 
             @SerializedName("isNextFollowUp")
             @Expose
-            var isNextFollowUp: Boolean? = null
+            var isNextFollowUp: Boolean = false
 
             @SerializedName("remark")
             @Expose
-            var remark: String? = null
+            var remark: String = ""
 
             @SerializedName("subject")
             @Expose
-            var subject: String? = null
+            var subject: String = ""
 
             @SerializedName("dateAndTime")
             @Expose
-            var dateAndTime: String? = null
+            var dateAndTime: String = ""
 
             @SerializedName("followUpRemark")
             @Expose
-            var followUpRemark: Any? = null
+            var followUpRemark: String = ""
 
             @SerializedName("workWith")
             @Expose
-            var workWith: String? = null
+            var workWith: String = ""
 
             @SerializedName("metAtTime")
             @Expose
-            var metAtTime: String? = null
+            var metAtTime: String = ""
 
             @SerializedName("latitude")
             @Expose
-            var latitude: Double? = null
+            var latitude: Double = 0.0
 
             @SerializedName("longitude")
             @Expose
-            var longitude: Double? = null
+            var longitude: Double = 0.0
 
             @SerializedName("reportedTime")
             @Expose
-            var reportedTime: String? = null
+            var reportedTime: String = ""
 
             @SerializedName("strReportedTime")
             @Expose
-            var strReportedTime: String? = null
+            var strReportedTime: String = ""
 
             @SerializedName("addedThrough")
             @Expose
-            var addedThrough: String? = null
+            var addedThrough: String = ""
 
             @SerializedName("isDocumentAdd")
             @Expose
-            var isDocumentAdd: Boolean? = null
+            var isDocumentAdd: Boolean = false
 
             @SerializedName("docName")
             @Expose
-            var docName: Any? = null
+            var docName: String = ""
 
             @SerializedName("productList")
             @Expose
-            var productList: Any? = null
+            var productList: ArrayList<Any> = ArrayList()
 
             @SerializedName("giftList")
             @Expose
-            var giftList: Any? = null
+            var giftList: ArrayList<Any> = ArrayList()
 
             @SerializedName("sampleList")
             @Expose
-            var sampleList: Any? = null
+            var sampleList: ArrayList<Any> = ArrayList()
 
             @SerializedName("eDetailList")
             @Expose
-            private var eDetailList: List<Any>? = null
+            private var eDetailList: ArrayList<Any> = ArrayList()
 
             @SerializedName("doctorName")
             @Expose
-            var doctorName: String? = null
+            var doctorName: String = ""
 
             @SerializedName("qualificationName")
             @Expose
-            var qualificationName: String? = null
+            var qualificationName: String = ""
 
             @SerializedName("cityName")
             @Expose
-            var cityName: Any? = null
+            var cityName: String = ""
 
             @SerializedName("routeName")
             @Expose
-            var routeName: String? = null
+            var routeName: String = ""
 
             @SerializedName("headQuaterName")
             @Expose
-            var headQuaterName: Any? = null
+            var headQuaterName: String = ""
 
             @SerializedName("strDateAndTime")
             @Expose
-            var strDateAndTime: Any? = null
+            var strDateAndTime: String = ""
 
             @SerializedName("visitFrequency")
             @Expose
-            var visitFrequency: Int? = null
+            var visitFrequency: Int = 0
 
             @SerializedName("visitPurpose")
             @Expose
-            var visitPurpose: Int? = null
+            var visitPurpose: Int = 0
 
             @SerializedName("mode")
             @Expose
-            var mode: Int? = null
+            var mode: Int = 0
 
             @SerializedName("specialityName")
             @Expose
-            var specialityName: String? = null
+            var specialityName: String = ""
 
             @SerializedName("docExt")
             @Expose
-            var docExt: Any? = null
+            var docExt: String = ""
 
             @SerializedName("docPath")
             @Expose
-            var docPath: Any? = null
+            var docPath: String = ""
 
             @SerializedName("urlPath")
             @Expose
-            var urlPath: Any? = null
+            var urlPath: String = ""
 
             @SerializedName("imageUrl")
             @Expose
-            var imageUrl: Any? = null
+            var imageUrl: String = ""
 
             @SerializedName("workWithName")
             @Expose
-            var workWithName: String? = null
+            var workWithName: String = ""
 
             @SerializedName("visitPurposeName")
             @Expose
-            var visitPurposeName: String? = null
+            var visitPurposeName: String = ""
 
             @SerializedName("metAtTimeDisplay")
             @Expose
-            var metAtTimeDisplay: String? = null
+            var metAtTimeDisplay: String = ""
 
             @SerializedName("isEDetailing")
             @Expose
-            var isEDetailing: Boolean? = null
+            var isEDetailing: Boolean = false
 
             @SerializedName("productDetailCount")
             @Expose
-            var productDetailCount: Int? = null
+            var productDetailCount: Int = 0
 
             @SerializedName("totalSampleValue")
             @Expose
-            var totalSampleValue: Double? = null
+            var totalSampleValue: Double = 0.0
 
             @SerializedName("totalAchValue")
             @Expose
-            var totalAchValue: Double? = null
+            var totalAchValue: Double = 0.0
 
             @SerializedName("giftGivenCount")
             @Expose
-            var giftGivenCount: Int? = null
+            var giftGivenCount: Int = 0
 
             @SerializedName("totalGiftValue")
             @Expose
-            var totalGiftValue: Double? = null
+            var totalGiftValue: Double = 0.0
 
             @SerializedName("totalPrescriptionCount")
             @Expose
-            var totalPrescriptionCount: Int? = null
+            var totalPrescriptionCount: Int = 0
 
             @SerializedName("freeMedicineCamp")
             @Expose
-            var freeMedicineCamp: Boolean? = null
+            var freeMedicineCamp: Boolean = false
 
             @SerializedName("dcrDate")
             @Expose
-            var dcrDate: String? = null
+            var dcrDate: String = ""
 
             @SerializedName("dcrMonth")
             @Expose
-            var dcrMonth: Int? = null
+            var dcrMonth: Int = 0
 
             @SerializedName("dcrYear")
             @Expose
-            var dcrYear: Int? = null
+            var dcrYear: Int = 0
 
             @SerializedName("empId")
             @Expose
-            var empId: Int? = null
+            var empId: Int = 0
 
             @SerializedName("dcrDetailId")
             @Expose
-            var dcrDetailId: Int? = null
+            var dcrDetailId: Int = 0
 
             @SerializedName("fiscalYear")
             @Expose
-            var fiscalYear: Int? = null
+            var fiscalYear: Int = 0
 
             @SerializedName("doctorType")
             @Expose
-            var doctorType: Int? = null
+            var doctorType: Int = 0
 
             @SerializedName("workingWithAM")
             @Expose
-            var workingWithAM: Boolean? = null
+            var workingWithAM: Boolean = false
 
             @SerializedName("workingWithRM")
             @Expose
-            var workingWithRM: Boolean? = null
+            var workingWithRM: Boolean = false
 
             @SerializedName("workingWithZM")
             @Expose
-            var workingWithZM: Boolean? = null
+            var workingWithZM: Boolean = false
 
             @SerializedName("categoryId")
             @Expose
-            var categoryId: Int? = null
+            var categoryId: Int = 0
 
             @SerializedName("callTiming")
             @Expose
-            var callTiming: String? = null
+            var callTiming: String = ""
 
             @SerializedName("callTimingName")
             @Expose
-            var callTimingName: String? = null
+            var callTimingName: String = ""
 
             @SerializedName("routeType")
             @Expose
@@ -298,67 +298,67 @@ class DailyDocVisitModel {
 
             @SerializedName("categoryName")
             @Expose
-            var categoryName: String? = null
+            var categoryName: String = ""
 
             @SerializedName("callMediumType")
             @Expose
-            var callMediumType: Int? = null
+            var callMediumType: Int = 0
 
             @SerializedName("callMediumTypeName")
             @Expose
-            var callMediumTypeName: String? = null
+            var callMediumTypeName: String = ""
 
             @SerializedName("totalPOB")
             @Expose
-            var totalPOB: Double? = null
+            var totalPOB: Double = 0.0
 
             @SerializedName("isOnLocationReported")
             @Expose
-            var isOnLocationReported: Boolean? = null
+            var isOnLocationReported: Boolean = false
 
             @SerializedName("otherLocReportRemark")
             @Expose
-            var otherLocReportRemark: Any? = null
+            var otherLocReportRemark: String = ""
 
             @SerializedName("partyLatitude")
             @Expose
-            var partyLatitude: Double? = null
+            var partyLatitude: Double = 0.0
 
             @SerializedName("partyLongitude")
             @Expose
-            var partyLongitude: Double? = null
+            var partyLongitude: Double = 0.0
 
             @SerializedName("partyDistance")
             @Expose
-            var partyDistance: Int? = null
+            var partyDistance: Int = 0
 
             @SerializedName("hospitalId")
             @Expose
-            var hospitalId: Int? = null
+            var hospitalId: Int = 0
 
             @SerializedName("hospitalName")
             @Expose
-            var hospitalName: Any? = null
+            var hospitalName: String = ""
 
             @SerializedName("hospCode")
             @Expose
-            var hospCode: Any? = null
+            var hospCode: String = ""
 
             @SerializedName("isFeedback")
             @Expose
-            var isFeedback: String? = null
+            var isFeedback: String = ""
 
             @SerializedName("eDetailing")
             @Expose
-            private var eDetailing: String? = null
+            private var eDetailing: String = ""
 
             @SerializedName("grade")
             @Expose
-            var grade: Any? = null
+            var grade: String = ""
 
             @SerializedName("docGrade")
             @Expose
-            var docGrade: String? = null
+            var docGrade: String = ""
 
 
         }

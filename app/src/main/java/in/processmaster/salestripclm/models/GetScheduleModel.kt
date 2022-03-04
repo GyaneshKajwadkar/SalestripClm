@@ -60,157 +60,157 @@ class GetScheduleModel :Serializable {
         class Meeting :Serializable{
             @SerializedName("meetingId")
             @Expose
-            var meetingId: Int? = null
+            var meetingId: Int = 0
 
             @SerializedName("meetingLink")
             @Expose
-            var meetingLink: String? = null
+            var meetingLink: String = ""
 
             @SerializedName("meetingDate")
             @Expose
-            var meetingDate: String? = null
+            var meetingDate: String = ""
 
             @SerializedName("topic")
             @Expose
-            var topic: String? = null
+            var topic: String = ""
 
             @SerializedName("startTime")
             @Expose
-            var startTime: String? = null
+            var startTime: String = ""
 
             @SerializedName("endTime")
             @Expose
-            var endTime: String? = null
+            var endTime: String = ""
 
             @SerializedName("meetingType")
             @Expose
-            var meetingType: String? = null
+            var meetingType: String = ""
 
             @SerializedName("entryDate")
             @Expose
-            var entryDate: String? = null
+            var entryDate: String = ""
 
             @SerializedName("entryBy")
             @Expose
-            var entryBy: Int? = null
+            var entryBy: Int = 0
 
             @SerializedName("duration")
             @Expose
-            var duration: Long? = null
+            var duration: Long = 0
 
             @SerializedName("updateDate")
             @Expose
-            var updateDate: String? = null
+            var updateDate: String = ""
 
             @SerializedName("updateBy")
             @Expose
-            var updateBy: Int? = null
+            var updateBy: Int = 0
 
             @SerializedName("empId")
             @Expose
-            var empId: Int? = null
+            var empId: Int = 0
 
             @SerializedName("mode")
             @Expose
-            var mode: Int? = null
+            var mode: Int = 0
 
             @SerializedName("type")
             @Expose
-            var type: Int? = null
+            var type: Int = 0
 
             @SerializedName("pre_Shedule")
             @Expose
-            var preShedule: Boolean? = null
+            var preShedule: Boolean = false
 
             @SerializedName("password")
             @Expose
-            var password: Any? = null
+            var password: String = ""
 
             @SerializedName("default_Password")
             @Expose
-            var defaultPassword: Boolean? = null
+            var defaultPassword: Boolean = false
 
             @SerializedName("timezone")
             @Expose
-            var timezone: String? = null
+            var timezone: String = ""
 
             @SerializedName("agenda")
             @Expose
-            var agenda: Any? = null
+            var agenda: String = ""
 
             @SerializedName("zoomMeetingId")
             @Expose
-            var zoomMeetingId: String? = null
+            var zoomMeetingId: String = ""
 
             @SerializedName("strStartTime")
             @Expose
-            var strStartTime: String? = null
+            var strStartTime: String = ""
 
             @SerializedName("strEndTime")
             @Expose
-            var strEndTime: String? = null
+            var strEndTime: String = ""
 
             @SerializedName("description")
             @Expose
-            var description: String? = null
+            var description: String = ""
 
             @SerializedName("isError")
             @Expose
-            var isError: Boolean? = null
+            var isError: Boolean = false
 
             @SerializedName("errorMessage")
             @Expose
-            var errorMessage: Any? = null
+            var errorMessage: String = ""
 
             @SerializedName("doctorList")
             @Expose
-            var doctorList: List<Doctor>? = null
+            var doctorList: List<Doctor> = ArrayList()
 
             @SerializedName("employeeList")
             @Expose
-            var employeeList: List<Employee>? = null
+            var employeeList: List<Employee> = ArrayList()
 
             class Employee :Serializable {
                 @SerializedName("meetingId")
                 @Expose
-                var meetingId: Int? = null
+                var meetingId: Int = 0
 
                 @SerializedName("memberId")
                 @Expose
-                var memberId: Int? = null
+                var memberId: Int = 0
 
                 @SerializedName("memberType")
                 @Expose
-                var memberType: String? = null
+                var memberType: String = ""
 
                 @SerializedName("emailId")
                 @Expose
-                var emailId: String? = null
+                var emailId: String = ""
 
                 @SerializedName("name")
                 @Expose
-                var name: String? = null
+                var name: String = ""
             }
             class Doctor :Serializable {
                 @SerializedName("meetingId")
                 @Expose
-                var meetingId: Int? = null
+                var meetingId: Int = 0
 
                 @SerializedName("memberId")
                 @Expose
-                var memberId: Int? = null
+                var memberId: Int = 0
 
                 @SerializedName("memberType")
                 @Expose
-                var memberType: String? = null
+                var memberType: String = ""
 
                 @SerializedName("emailId")
                 @Expose
-                var emailId: String? = null
+                var emailId: String = ""
 
                 @SerializedName("name")
                 @Expose
-                var name: String? = null
+                var name: String = ""
             }
         }
     }

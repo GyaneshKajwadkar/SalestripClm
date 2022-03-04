@@ -29,21 +29,21 @@ class DoctorManagerSelector_Adapter(
     {
         val modeldata = filteredData?.get(position)
         //set text of layout
-        holder.headerDoctor_tv.setText(modeldata?.getName())
-        holder.route_tv.setText("Route: " + modeldata?.getRoute())
-        holder.speciality_tv.setText("Speciality: " + modeldata?.getSpeciality())
-        holder.select_checkBox.isChecked= modeldata.getChecked()!!
+        holder.headerDoctor_tv.setText(modeldata?.name)
+        holder.route_tv.setText("Route: " + modeldata?.routeName)
+        holder.speciality_tv.setText("Speciality: " + modeldata?.specialityName)
+        holder.select_checkBox.isChecked= modeldata.checked
 
 
         holder.checkParent_ll.setOnClickListener({
             for ((iMain, itemMain) in arrayListSelector.withIndex())
             {
-                if(itemMain.getId()== modeldata.getId())
+                if(itemMain.id== modeldata.id)
                     {
-                        var getChecked=modeldata.getChecked()
-                        modeldata.setChecked(!getChecked!!)
+                        var getChecked=modeldata.checked
+                        modeldata.checked=!modeldata.checked
                         arrayListSelector.set(iMain,modeldata)
-                        holder.select_checkBox.isChecked=!getChecked!!
+                        holder.select_checkBox.isChecked=!getChecked
                         listner.selectorArray(arrayListSelector,selectionType)
                     }
             }
@@ -112,7 +112,7 @@ class DoctorManagerSelector_Adapter(
                 constraint = constraint.toString().lowercase()
                 for (i in 0 until arrayListSelector?.size!!) {
                     val dataNames: DocManagerModel = arrayListSelector?.get(i)!!
-                    if (dataNames.getName()?.toLowerCase()?.startsWith(constraint.toString()) == true) {
+                    if (dataNames.name.lowercase()?.startsWith(constraint.toString()) == true) {
                         FilteredArrayNames.add(dataNames)
                     }
                 }

@@ -73,10 +73,10 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
         for(item in SplashActivity.staticSyncData?.data?.doctorList!!)
         {
             val selectorModel = DocManagerModel()
-            selectorModel.setName(item.doctorName)
-            selectorModel.setRoute(item.routeName)
-            selectorModel.setSpeciality(item.specialityName)
-            selectorModel.setId(item.doctorId)
+            selectorModel.name=item.doctorName
+            selectorModel.routeName=item.routeName
+            selectorModel.specialityName=item.specialityName
+            selectorModel.id=item.doctorId
             arrayListSelectorDoctor.add(selectorModel)
         }
 
@@ -205,7 +205,7 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
         if(selectionType==1)
         {
             constructorList= ArrayList()
-            constructorList = arrayListSelectorDoctor.filter { s -> s.getChecked()==true } as ArrayList<DocManagerModel>
+            constructorList = arrayListSelectorDoctor.filter { s -> s.checked==true } as ArrayList<DocManagerModel>
 
 //            for (item in arrayListSelectorDoctor) {
 //                if(item.getChecked()!!)
@@ -222,7 +222,7 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
         {
             constructorListTeam= ArrayList()
 
-            constructorListTeam = arrayListSelectorTeams.filter { s -> s.getChecked()==true } as ArrayList<DocManagerModel>
+            constructorListTeam = arrayListSelectorTeams.filter { s -> s.checked==true } as ArrayList<DocManagerModel>
 
 //            for (item in arrayListSelectorTeams) {
 //                if(item.getChecked()!!)
@@ -244,9 +244,9 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
         {
             for ((iMain, itemMain) in arrayListSelectorDoctor.withIndex())
             {
-                if(itemMain.getId()== id)
+                if(itemMain.id== id)
                 {
-                    itemMain.setChecked(false)
+                    itemMain.checked=false
                     arrayListSelectorDoctor.set(iMain,itemMain)
                     selectedAdapeter?.notifyDataSetChanged()
                 }
@@ -256,9 +256,9 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
         {
             for ((iMain, itemMain) in arrayListSelectorTeams.withIndex())
             {
-                if(itemMain.getId()== id)
+                if(itemMain.id== id)
                 {
-                    itemMain.setChecked(false)
+                    itemMain.checked=false
                     arrayListSelectorTeams.set(iMain,itemMain)
                     selectedAdapeterTeams?.notifyDataSetChanged()
                 }
@@ -313,7 +313,7 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
         {
             val arrayObject = JSONObject()
             arrayObject.put("sendBy",loginModelHomePage.empId)
-            arrayObject.put("sendTo",item.getId())
+            arrayObject.put("sendTo",item.id)
             arrayObject.put("sendType","To")
             arrayObject.put("isSeen","false")
             arrayObject.put("isStarred","false")
@@ -324,7 +324,7 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
             val arrayObject = JSONObject()
 
             arrayObject.put("sendBy",loginModelHomePage.empId)
-            arrayObject.put("sendTo",item.getId())
+            arrayObject.put("sendTo",item.id)
             arrayObject.put("sendType","Cc")
             arrayObject.put("isSeen","false")
             arrayObject.put("isStarred","false")
