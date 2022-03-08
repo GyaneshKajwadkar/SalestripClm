@@ -30,6 +30,7 @@
                     app:cardBackgroundColor="#FA8072"
                     android:layout_marginTop="5dp"
                     style="@style/generalCard"
+                    android:visibility="gone"
                     android:id="@+id/selectTeamsCv">
                     <TextView
                         android:layout_width="match_parent"

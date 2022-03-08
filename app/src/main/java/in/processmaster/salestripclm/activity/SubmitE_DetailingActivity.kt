@@ -32,6 +32,10 @@ import kotlinx.android.synthetic.main.bottom_sheet_visualads.bottomSheet
 import kotlinx.android.synthetic.main.bottom_sheet_visualads.close_imv
 import kotlinx.android.synthetic.main.checkbox_bottom_sheet.*
 import kotlinx.android.synthetic.main.common_toolbar.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -62,7 +66,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
         visitPurpose_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
               if(position!=0)
-                selectedPurposeID = CommonListGetClass().getWorkTypeForSpinner()[position].workId
+                selectedPurposeID = CommonListGetClass().getWorkTypeForSpinner()[position].workId!!
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {
@@ -117,8 +121,8 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
         for(workWith in staticSyncData?.data?.workingWithList!!)
         {
             val data =IdNameBoll_model()
-            data.id=workWith.emailId
-            data.name=workWith.fullName
+            data.id= workWith.emailId.toString()
+            data.name= workWith.fullName.toString()
             workWithArray.add(data)
         }
 
@@ -311,7 +315,13 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
                         commonModel.employeeSampleBalanceList=quantityArray
                         dbBase.addAPIData(Gson().toJson(commonModel),3)
                         val jsonObjData:JsonObject = response.body()?.get("data") as JsonObject
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val getDocCall= async {
+                                getDocCallAPI()}
+                            getDocCall.await()
+                        }
                         callRunnableAlert(jsonObjData.get("message").asString)
+
                     } } }
 
             override fun onFailure(call: Call<JsonObject?>, t: Throwable?) {

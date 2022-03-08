@@ -380,5 +380,21 @@ open class BaseActivity : AppCompatActivity(){
         }
     }
 
-
+     suspend fun getDocCallAPI()
+    {
+        val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
+        ).dailyDocCallApi("bearer " + loginModelHomePage.accessToken,generalClass.currentDateMMDDYY())
+        withContext(Dispatchers.Main) {
+            Log.e("getDocCallAPI", response.body().toString()!!)
+            if (response!!.isSuccessful)
+            {
+                if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage!!.isEmpty()) {
+                    var model = response.body()
+                    dbBase?.addAPIData(Gson().toJson(model?.getData()), 5)
+                }
+                else Log.e("elsegetDocCallAPI", response.code().toString())
+            }
+            else Log.e("getDocCallAPIERROR", response.errorBody().toString())
+        }
+    }
 }

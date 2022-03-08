@@ -83,7 +83,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
                         finish()
                     }}}
             alertClass.commonAlertWithRunnable("Zoom Alert","Zoom account is not created. Contact to your administration for more info",r)
-            return
+
         }
         else{
             getTeamsApi()
@@ -378,11 +378,11 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
         for(item in SplashActivity.staticSyncData?.data?.doctorList!!)
         {
             val selectorModel = DocManagerModel()
-            selectorModel.name=item.doctorName
-            selectorModel.routeName=item.routeName
-            selectorModel.specialityName=item.specialityName
-            selectorModel.id=item.doctorId
-            selectorModel.mailId=item.emailId
+            selectorModel.name= item.doctorName.toString()
+            selectorModel.routeName= item.routeName.toString()
+            selectorModel.specialityName= item.specialityName.toString()
+            selectorModel.id= item.doctorId!!
+            selectorModel.mailId= item.emailId.toString()
             arrayListSelectorDoctor.add(selectorModel)
         }
 
@@ -704,7 +704,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
 
     private fun getTeamsApi()
     {
-        progressView_parentRv?.visibility=View.VISIBLE
+        alertClass.showProgressAlert("")
 
         var call: Call<TeamsModel> = apiInterface?.getTeamsMember(
             "bearer " + HomePage.loginModelHomePage.accessToken,
@@ -736,13 +736,12 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
                 {
                     Toast.makeText(this@SetSchedule_Activity, "Server error ", Toast.LENGTH_SHORT).show()
                 }
-                progressView_parentRv?.visibility=View.GONE
+                alertClass.hideAlert()
             }
 
             override fun onFailure(call: Call<TeamsModel?>, t: Throwable?) {
                 call.cancel()
-                progressView_parentRv?.visibility=View.GONE
-            }
+                alertClass.hideAlert() }
         })
     }
 

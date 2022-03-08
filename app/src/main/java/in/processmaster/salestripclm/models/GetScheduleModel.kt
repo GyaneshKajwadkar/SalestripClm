@@ -46,7 +46,7 @@ class GetScheduleModel :Serializable {
     class ErrorObj :Serializable {
         @SerializedName("errorMessage")
         @Expose
-        var errorMessage: String? = null
+        var errorMessage: String?? = null
 
         @SerializedName("fldErrors")
         @Expose
@@ -60,107 +60,107 @@ class GetScheduleModel :Serializable {
         class Meeting :Serializable{
             @SerializedName("meetingId")
             @Expose
-            var meetingId: Int = 0
+            var meetingId: Int? = 0
 
             @SerializedName("meetingLink")
             @Expose
-            var meetingLink: String = ""
+            var meetingLink: String? = ""
 
             @SerializedName("meetingDate")
             @Expose
-            var meetingDate: String = ""
+            var meetingDate: String? = ""
 
             @SerializedName("topic")
             @Expose
-            var topic: String = ""
+            var topic: String? = ""
 
             @SerializedName("startTime")
             @Expose
-            var startTime: String = ""
+            var startTime: String? = ""
 
             @SerializedName("endTime")
             @Expose
-            var endTime: String = ""
+            var endTime: String? = ""
 
             @SerializedName("meetingType")
             @Expose
-            var meetingType: String = ""
+            var meetingType: String? = ""
 
             @SerializedName("entryDate")
             @Expose
-            var entryDate: String = ""
+            var entryDate: String? = ""
 
             @SerializedName("entryBy")
             @Expose
-            var entryBy: Int = 0
+            var entryBy: Int? = 0
 
             @SerializedName("duration")
             @Expose
-            var duration: Long = 0
+            var duration: Long? = 0
 
             @SerializedName("updateDate")
             @Expose
-            var updateDate: String = ""
+            var updateDate: String? = ""
 
             @SerializedName("updateBy")
             @Expose
-            var updateBy: Int = 0
+            var updateBy: Int? = 0
 
             @SerializedName("empId")
             @Expose
-            var empId: Int = 0
+            var empId: Int? = 0
 
             @SerializedName("mode")
             @Expose
-            var mode: Int = 0
+            var mode: Int? = 0
 
             @SerializedName("type")
             @Expose
-            var type: Int = 0
+            var type: Int? = 0
 
             @SerializedName("pre_Shedule")
             @Expose
-            var preShedule: Boolean = false
+            var preShedule: Boolean? = false
 
             @SerializedName("password")
             @Expose
-            var password: String = ""
+            var password: String? = ""
 
             @SerializedName("default_Password")
             @Expose
-            var defaultPassword: Boolean = false
+            var defaultPassword: Boolean? = false
 
             @SerializedName("timezone")
             @Expose
-            var timezone: String = ""
+            var timezone: String? = ""
 
             @SerializedName("agenda")
             @Expose
-            var agenda: String = ""
+            var agenda: String? = ""
 
             @SerializedName("zoomMeetingId")
             @Expose
-            var zoomMeetingId: String = ""
+            var zoomMeetingId: String? = ""
 
             @SerializedName("strStartTime")
             @Expose
-            var strStartTime: String = ""
+            var strStartTime: String? = ""
 
             @SerializedName("strEndTime")
             @Expose
-            var strEndTime: String = ""
+            var strEndTime: String? = ""
 
             @SerializedName("description")
             @Expose
-            var description: String = ""
+            var description: String? = ""
 
             @SerializedName("isError")
             @Expose
-            var isError: Boolean = false
+            var isError: Boolean? = false
 
             @SerializedName("errorMessage")
             @Expose
-            var errorMessage: String = ""
+            var errorMessage: String? = ""
 
             @SerializedName("doctorList")
             @Expose
@@ -173,44 +173,44 @@ class GetScheduleModel :Serializable {
             class Employee :Serializable {
                 @SerializedName("meetingId")
                 @Expose
-                var meetingId: Int = 0
+                var meetingId: Int? = 0
 
                 @SerializedName("memberId")
                 @Expose
-                var memberId: Int = 0
+                var memberId: Int? = 0
 
                 @SerializedName("memberType")
                 @Expose
-                var memberType: String = ""
+                var memberType: String? = ""
 
                 @SerializedName("emailId")
                 @Expose
-                var emailId: String = ""
+                var emailId: String? = ""
 
                 @SerializedName("name")
                 @Expose
-                var name: String = ""
+                var name: String? = ""
             }
             class Doctor :Serializable {
                 @SerializedName("meetingId")
                 @Expose
-                var meetingId: Int = 0
+                var meetingId: Int? = 0
 
                 @SerializedName("memberId")
                 @Expose
-                var memberId: Int = 0
+                var memberId: Int? = 0
 
                 @SerializedName("memberType")
                 @Expose
-                var memberType: String = ""
+                var memberType: String? = ""
 
                 @SerializedName("emailId")
                 @Expose
-                var emailId: String = ""
+                var emailId: String? = ""
 
                 @SerializedName("name")
                 @Expose
-                var name: String = ""
+                var name: String? = ""
             }
         }
     }

@@ -36,10 +36,13 @@ class ZoomInitilizeClass() : Activity(), UserLoginCallback.ZoomDemoAuthenticatio
         {
             Log.e("logResult", "loginSuccessoverride")
             UserLoginCallback.getInstance().removeListener(this)
+            progressDialog?.dismiss()
         }
         else
-        { Log.e("logResult", "loginErroroverride") }
-        progressDialog?.dismiss()
+        { Log.e("logResult", "loginErroroverride")
+            progressDialog?.dismiss()
+        }
+
     }
 
     override fun onZoomSDKLogoutResult(result: Long)

@@ -606,17 +606,11 @@
                     android:visibility="gone"
                     android:id="@+id/progressNewSchedule"/>
 
-
             </RelativeLayout>
-
-
-
-
 
         </LinearLayout>
 
     </LinearLayout>
 
-    <include layout="@layout/progress_view" />
 
 </RelativeLayout>

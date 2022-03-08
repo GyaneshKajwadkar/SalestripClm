@@ -8,7 +8,7 @@ class DoctorGraphModel {
 
     @SerializedName("responseCode")
     @Expose
-    private var responseCode: Int? = null
+    private var responseCode: Int?? = null
 
     @SerializedName("errorObj")
     @Expose
@@ -18,11 +18,11 @@ class DoctorGraphModel {
     @Expose
     private var data: Data? = null
 
-    fun getResponseCode(): Int? {
+    fun getResponseCode(): Int?? {
         return responseCode
     }
 
-    fun setResponseCode(responseCode: Int?) {
+    fun setResponseCode(responseCode: Int??) {
         this.responseCode = responseCode
     }
 
@@ -50,15 +50,15 @@ class DoctorGraphModel {
         class DcrCount {
             @SerializedName("day")
             @Expose
-            var day: Int = 0
+            var day: Int? = 0
 
             @SerializedName("visitedDoctor")
             @Expose
-            var visitedDoctor: Int = 0
+            var visitedDoctor: Int? = 0
 
             @SerializedName("visitedRetailer")
             @Expose
-            var visitedRetailer: Int = 0
+            var visitedRetailer: Int? = 0
 
             @SerializedName("type")
             @Expose
@@ -66,7 +66,7 @@ class DoctorGraphModel {
 
             @SerializedName("monthNo")
             @Expose
-            var monthNo: Int = 0
+            var monthNo: Int? = 0
 
             @SerializedName("monthName")
             @Expose
@@ -74,19 +74,19 @@ class DoctorGraphModel {
 
             @SerializedName("total")
             @Expose
-            var total: Int = 0
+            var total: Int? = 0
 
             @SerializedName("totalTarget")
             @Expose
-            var totalTarget: Double = 0.0
+            var totalTarget: Double? = 0.0
 
             @SerializedName("totalPOB")
             @Expose
-            var totalPOB: Double = 0.0
+            var totalPOB: Double? = 0.0
 
             @SerializedName("totalSample")
             @Expose
-            var totalSample: Int = 0
+            var totalSample: Int? = 0
 
             @SerializedName("empName")
             @Expose

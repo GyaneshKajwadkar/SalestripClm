@@ -9,7 +9,7 @@ class DownloadEdetail_model : Serializable {
 
     @SerializedName("responseCode")
     @Expose
-    private var responseCode: Int? = null
+    private var responseCode: Int?? = null
 
     @SerializedName("errorObj")
     @Expose
@@ -19,11 +19,11 @@ class DownloadEdetail_model : Serializable {
     @Expose
     private var data: Data? = null
 
-    fun getResponseCode(): Int? {
+    fun getResponseCode(): Int?? {
         return responseCode
     }
 
-    fun setResponseCode(responseCode: Int?) {
+    fun setResponseCode(responseCode: Int??) {
         this.responseCode = responseCode
     }
 
@@ -46,7 +46,7 @@ class DownloadEdetail_model : Serializable {
     class ErrorObj {
         @SerializedName("errorMessage")
         @Expose
-        var errorMessage: String? = null
+        var errorMessage: String?? = null
 
         @SerializedName("fldErrors")
         @Expose
@@ -66,32 +66,32 @@ class DownloadEdetail_model : Serializable {
 
             @SerializedName("eDetailId")
             @Expose
-            var eDetailId: Int = 0
+            var eDetailId: Int? = 0
 
             @SerializedName("fileId")
             @Expose
-            var fileId: Int = 0
+            var fileId: Int? = 0
 
             @SerializedName("fileSize")
             @Expose
-            var fileSize: Int = 0
+            var fileSize: Int? = 0
 
             @SerializedName("fileName")
             @Expose
-            var fileName: String = ""
+            var fileName: String? = ""
 
             @SerializedName("filePath")
             @Expose
-            var filePath: String = ""
+            var filePath: String? = ""
 
             @SerializedName("fileType")
             @Expose
-            var fileType: String = ""
+            var fileType: String? = ""
 
 
             @SerializedName("fileOrder")
             @Expose
-            var fileOrder: Int = 0
+            var fileOrder: Int? = 0
 
         }
     }

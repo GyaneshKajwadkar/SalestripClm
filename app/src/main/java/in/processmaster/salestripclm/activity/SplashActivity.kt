@@ -43,14 +43,14 @@ class SplashActivity : BaseActivity()
         sharePreferance = PreferenceClass(this)
         progressBar=findViewById(R.id.progressBar) as ProgressBar
 
-        FirebaseMessaging.getInstance().token
+       /* FirebaseMessaging.getInstance().token
             .addOnCompleteListener(OnCompleteListener { task ->
                 if (!task.isSuccessful) {
                     return@OnCompleteListener
                 }
                 val token: String = task.getResult().toString()
                 Log.e("TOKEN",token)
-            })
+            })*/
 
         if(sharePreferance!!.getPrefBool("isLogin"))
         {
@@ -65,11 +65,17 @@ class SplashActivity : BaseActivity()
             }
             else
             {
+                if(!generalClass.isInternetAvailable()){
+                    alertClass.networkAlert()
+                    return
+                }
+
                 generalClass.enableSimpleProgress(progressBar!!)
                 val scope= GlobalScope.launch { callingSyncAPI() }
                 scope.invokeOnCompletion {
                     this.runOnUiThread(java.lang.Runnable { generalClass.disableSimpleProgress(progressBar!!) })
-                } }}
+                }
+            }}
 
         else
         {

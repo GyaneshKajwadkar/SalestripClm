@@ -73,10 +73,10 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
         for(item in SplashActivity.staticSyncData?.data?.doctorList!!)
         {
             val selectorModel = DocManagerModel()
-            selectorModel.name=item.doctorName
-            selectorModel.routeName=item.routeName
-            selectorModel.specialityName=item.specialityName
-            selectorModel.id=item.doctorId
+            selectorModel.name= item.doctorName.toString()
+            selectorModel.routeName= item.routeName.toString()
+            selectorModel.specialityName= item.specialityName.toString()
+            selectorModel.id=item.doctorId!!
             arrayListSelectorDoctor.add(selectorModel)
         }
 

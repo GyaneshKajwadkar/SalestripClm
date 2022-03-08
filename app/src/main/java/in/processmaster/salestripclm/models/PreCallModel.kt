@@ -70,7 +70,7 @@ class PreCallModel {
 
             @SerializedName("visitPurpose")
             @Expose
-            var visitPurpose: String = ""
+            var visitPurpose: String? = ""
 
             @SerializedName("productList")
             @Expose

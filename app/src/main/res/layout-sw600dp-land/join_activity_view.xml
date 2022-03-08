@@ -6,7 +6,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:id="@+id/linearLayoutParent"
-    tools:openDrawer="end">
+    tools:openDrawer="end"
+    tools:ignore="MissingDefaultResource">
 
     <LinearLayout
         android:id="@+id/parentToolbar"
@@ -120,7 +121,7 @@
 
 
                 <TextView
-                    android:visibility="gone"
+
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"

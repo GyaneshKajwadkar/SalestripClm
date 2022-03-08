@@ -23,6 +23,7 @@ import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
@@ -75,7 +76,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         if(generalClass.isInternetAvailable())
             callingMultipleAPI()
         else
-            staticSyncData=Gson().fromJson(dbBase?.getApiDetail(1), SyncModel::class.java)
+            if(dbBase?.getApiDetail(1)!="") staticSyncData=Gson().fromJson(dbBase?.getApiDetail(1), SyncModel::class.java)
 
 
     }
@@ -322,10 +323,10 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             {
                 if(generalClass.isInternetAvailable())
                     callingMultipleAPI()
-                else
-                    staticSyncData=Gson().fromJson(dbBase?.getApiDetail(1), SyncModel::class.java)
-
-                sharePreferanceBase?.setPref("SyncDate", formattedDate)
+                else {
+                    sharePreferanceBase?.setPref("SyncDate", formattedDate)
+                    if (dbBase?.getApiDetail(1) != "") staticSyncData = Gson().fromJson(dbBase?.getApiDetail(1), SyncModel::class.java)
+                }
             }
 
         }
@@ -582,23 +583,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         }
     }
 
-    suspend fun getDocCallAPI()
-    {
-        val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
-        ).dailyDocCallApi("bearer " + loginModelHomePage.accessToken,generalClass.currentDateMMDDYY())
-        withContext(Dispatchers.Main) {
-            Log.e("getDocCallAPI", response.body().toString()!!)
-            if (response!!.isSuccessful)
-            {
-                if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage!!.isEmpty()) {
-                    var model = response.body()
-                    dbBase?.addAPIData(Gson().toJson(model?.getData()), 5)
-                }
-                else Log.e("elsegetDocCallAPI", response.code().toString())
-            }
-            else Log.e("getDocCallAPIERROR", response.errorBody().toString())
-        }
-    }
+
 
 
 }

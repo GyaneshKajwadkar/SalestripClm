@@ -1,5 +1,6 @@
 package `in`.processmaster.salestripclm.fragments
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.activity.HomePage
 import `in`.processmaster.salestripclm.activity.HomePage.Companion.apiInterface
 import `in`.processmaster.salestripclm.activity.HomePage.Companion.loginModelHomePage
 import `in`.processmaster.salestripclm.activity.OnlinePresentationActivity
@@ -20,9 +21,6 @@ import `in`.processmaster.salestripclm.networkUtils.GPSTracker
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.content.Intent
-import android.content.pm.ApplicationInfo
-import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
@@ -72,7 +70,6 @@ class NewCallFragment : Fragment() {
     var generalClassObject:GeneralClass?=null
     var routeIdGetDCR=""
     var alertClass:AlertClass?=null
-    var returnType=false;
 
 
     override fun onCreateView(
@@ -80,6 +77,15 @@ class NewCallFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         views= inflater.inflate(R.layout.fragment_new_call, container, false)
+
+        if (activity != null && isAdded)
+        { initView() }
+
+        return views
+    }
+
+    fun initView()
+    {
 
         db = DatabaseHandler(requireActivity())
         sharePreferance = PreferenceClass(activity)
@@ -95,8 +101,8 @@ class NewCallFragment : Fragment() {
             views?.selectTeamsCv?.visibility = View.GONE
             views?.selectRoutesCv?.setEnabled(true) }
         else
-           views?.selectRoutesCv?.setEnabled(false)
-           views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
+            views?.selectRoutesCv?.setEnabled(false)
+        views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
 
 
         views?.selectTeamsCv?.setOnClickListener({
@@ -105,14 +111,12 @@ class NewCallFragment : Fragment() {
             openCloseModel() })
 
         views?.selectRoutesCv?.setOnClickListener({
-            if(!returnType) {
-                checkDCRusingShareP()
-                return@setOnClickListener
+            if(checkDCRusingShareP(1)){
+                views?.bottomSheetTitle_tv?.setText("Select route")
+                selectionType=1
+                openCloseModel()
             }
-
-            views?.bottomSheetTitle_tv?.setText("Select route")
-            selectionType=1
-            openCloseModel()})
+        })
 
         views?.selectDoctorsCv?.setOnClickListener({
             views?.bottomSheetTitle_tv?.setText("Select Doctor")
@@ -155,33 +159,27 @@ class NewCallFragment : Fragment() {
         })
 
         routeList = routeList?.filter { s -> s.headQuaterName !=""} as java.util.ArrayList<SyncModel.Data.Route>
-        checkDCRusingShareP()
-
-
-
-        return views
+      //  checkDCRusingShareP(0)
     }
 
-    fun checkDCRusingShareP():Boolean
+
+    fun checkDCRusingShareP(i: Int):Boolean
     {
         if(generalClassObject?.isInternetAvailable() == true)
-        {
-            callCoroutineApi()
-            return false
-        }
+        { callCoroutineApi(i)
+        return false}
         else if( sharePreferance?.getPref("todayDate") != generalClassObject?.currentDateMMDDYY() || sharePreferance?.getPref("dcrId")=="0") {
             alertClass?.commonAlert("Alert!","DCR not submitted please connect to internet and fill DCR first.")
-            return false }
-        else {
-            returnType=true;
+        return false}
+        else{
             return true
         }
     }
 
-    fun callCoroutineApi() {
+    fun callCoroutineApi(i: Int) {
         alertClass?.showProgressAlert("")
         val coroutineScope = CoroutineScope(Dispatchers.IO).launch {
-            val api = async { checkCurrentDCR_API() }
+            val api = async { checkCurrentDCR_API(i) }
             api.await()
         }
 
@@ -272,7 +270,7 @@ class NewCallFragment : Fragment() {
                     views?.selectRoute_tv?.setText((modeldata?.routeName))
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
                     onSelection()
-                    applySelectionFilter(modeldata.routeId)
+                    modeldata.routeId?.let { it1 -> applySelectionFilter(it1) }
 
                 })
             }
@@ -327,7 +325,7 @@ class NewCallFragment : Fragment() {
                         constraint = constraint.toString().lowercase()
                         for (i in 0 until doctorListArray?.size!!) {
                             val dataNames: SyncModel.Data.Doctor = doctorListArray?.get(i)
-                            if (dataNames.doctorName.lowercase().startsWith(constraint.toString())) {
+                            if (dataNames.doctorName?.lowercase()?.startsWith(constraint.toString()) == true) {
                                 FilteredArrayNames.add(dataNames)
                             }
                         }
@@ -340,7 +338,7 @@ class NewCallFragment : Fragment() {
                         constraint = constraint.toString().lowercase()
                         for (i in 0 until routeList?.size!!) {
                             val routeName: SyncModel.Data.Route = routeList?.get(i)
-                            if (routeName.routeName.lowercase().startsWith(constraint.toString())) {
+                            if (routeName.routeName?.lowercase()?.startsWith(constraint.toString()) == true) {
                                 FilteredArrayNames.add(routeName)
                             }
                         }
@@ -352,7 +350,7 @@ class NewCallFragment : Fragment() {
                         constraint = constraint.toString().lowercase()
                         for (i in 0 until doctorListArray?.size!!) {
                             val docNames: SyncModel.Data.Doctor = doctorListArray?.get(i)
-                            if (docNames.doctorName.lowercase().startsWith(constraint.toString())) {
+                            if (docNames.doctorName?.lowercase()?.startsWith(constraint.toString()) == true) {
                                 FilteredArrayNames.add(docNames)
                             }
                         }
@@ -376,15 +374,15 @@ class NewCallFragment : Fragment() {
         views?.city_tv?.setText(doctorDetailModel.cityName)
         views?.specility_tv?.setText(doctorDetailModel.specialityName)
         views?.qualifiction_tv?.setText(doctorDetailModel.qualificationName)
-        selectedDocID=doctorDetailModel.doctorId
-        selectedDocName=doctorDetailModel.doctorName
+        selectedDocID= doctorDetailModel.doctorId!!
+        selectedDocName= doctorDetailModel.doctorName.toString()
 
 
-        if(doctorDetailModel.mobileNo.isEmpty())
+        if(doctorDetailModel.mobileNo?.isEmpty() == true)
             views?.mobileNumberParent?.visibility=View.GONE
-        if(doctorDetailModel.emailId.isEmpty())
+        if(doctorDetailModel.emailId?.isEmpty() == true)
             views?.emailParent?.visibility=View.GONE
-        if(doctorDetailModel.cityName.isEmpty())
+        if(doctorDetailModel.cityName?.isEmpty() == true)
             views?.cityParent?.visibility=View.GONE
 
         if(generalClassObject?.isInternetAvailable() == true) {
@@ -657,6 +655,8 @@ class NewCallFragment : Fragment() {
 
         val headerText = dialogView.findViewById<View>(R.id.doctorName_tv) as TextView
         val cancelImag = dialogView.findViewById<View>(R.id.back_iv) as ImageView
+        val toggleSwitch = dialogView.findViewById<View>(R.id.toggleSwitch) as Switch
+        val selectActivityHeader = dialogView.findViewById<View>(R.id.selectActivityHeader) as TextView
 
         headerText.setText("New DCR")
         dialogView.dcr_date_tv.setText(generalClassObject?.getCurrentDate())
@@ -664,8 +664,12 @@ class NewCallFragment : Fragment() {
 
         var fieldWorkingList= arrayOf("Select","HQ ","Ex Station","Out Station")
 
+        val firstFilter= CommonListGetClass().getNonRouteListForSpinner().filter { s -> (s.routeId != -7)  }
+        val secondFilter= firstFilter.filter { s -> (s.routeId != -11)  }
+        val thirdFilter= secondFilter.filter { s -> (s.routeId != -6)  }
+
         val adapterRoute: ArrayAdapter<SyncModel.Data.Route> = ArrayAdapter<SyncModel.Data.Route>(requireActivity(),
-            android.R.layout.simple_spinner_dropdown_item, CommonListGetClass().getNonRouteListForSpinner())
+            android.R.layout.simple_spinner_dropdown_item, thirdFilter)
         dialogView.activity_spin.setAdapter(adapterRoute)
 
         val startEndRoute: ArrayAdapter<SyncModel.Data.Route> = ArrayAdapter<SyncModel.Data.Route>(requireActivity(),
@@ -691,29 +695,46 @@ class NewCallFragment : Fragment() {
         dialogView.startingStation_spin.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
-                startingStation = CommonListGetClass().getRouteListForSpinner()[position].routeId
+                startingStation = CommonListGetClass().getRouteListForSpinner()[position].routeId!!
             }
             override fun onNothingSelected(parentView: AdapterView<*>?) {}
         })
+
         dialogView.ending_spin.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
                 if(position!=0)
-                    endingStation = CommonListGetClass().getRouteListForSpinner()[position].routeId
+                    endingStation = CommonListGetClass().getRouteListForSpinner()[position].routeId!!
 
             }
             override fun onNothingSelected(parentView: AdapterView<*>?) {}
         })
+
         dialogView.activity_spin.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
-                if(position!=0)
-                    activityId = CommonListGetClass().getNonRouteListForSpinner()[position].routeId
+                if(position!=0) {
+                    activityId =
+                        CommonListGetClass().getNonRouteListForSpinner()[position].routeId!!
+                    if(toggleSwitch.isChecked) dialogView.additionalParent.visibility=View.VISIBLE
+
+                }
+                else{
+                    if(toggleSwitch.isChecked) dialogView.additionalParent.visibility=View.GONE
+                }
             }
             override fun onNothingSelected(parentView: AdapterView<*>?) {}
         })
 
 
+        toggleSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+        if(isChecked) { selectActivityHeader.setText("Additional activity")
+        if(!dialogView.activity_spin.getSelectedItem().toString().equals("Select")){dialogView.additionalParent.visibility=View.VISIBLE}
+        }
+        else{
+            selectActivityHeader.setText("Select activity")
+            dialogView.additionalParent.visibility=View.GONE}
+        }
 
         dialogView.save_btn.setOnClickListener({
             val activitySeletd: String = dialogView.activity_spin.getSelectedItem().toString()
@@ -722,10 +743,11 @@ class NewCallFragment : Fragment() {
             val startingSeletd: String = dialogView.startingStation_spin.getSelectedItem().toString()
 
             if(workAreaSeletd.equals("Select")) {generalClassObject?.showSnackbar(it,"Working area not selected"); return@setOnClickListener}
-            if(activitySeletd.equals("Select")) {generalClassObject?.showSnackbar(it,"Activity not selected"); return@setOnClickListener}
+            if(activitySeletd.equals("Select") && !toggleSwitch.isChecked) {generalClassObject?.showSnackbar(it,"Activity not selected"); return@setOnClickListener}
             if(startingSeletd.equals("Select") && dialogView.startEndParent.visibility==View.VISIBLE) {generalClassObject?.showSnackbar(it,"Start date not selected"); return@setOnClickListener}
             if(endingSeletd.equals("Select") && dialogView.startEndParent.visibility==View.VISIBLE) {generalClassObject?.showSnackbar(it,"End station not selected"); return@setOnClickListener}
-            if(dialogView.remarkEt.text.isEmpty()) {generalClassObject?.showSnackbar(it,"Remark is empty"); return@setOnClickListener}
+            if(dialogView.remarkEt.text.isEmpty() && !toggleSwitch.isChecked) {generalClassObject?.showSnackbar(it,"Remark is empty"); return@setOnClickListener}
+            if(dialogView.additionalEt.text.isEmpty() && toggleSwitch.isChecked && !activitySeletd.equals("Select")) {generalClassObject?.showSnackbar(it,"Additional activity remark is empty"); return@setOnClickListener}
             val i: Int = workAreaSeletd.indexOf(' ')
 
             val c = Calendar.getInstance()
@@ -742,6 +764,8 @@ class NewCallFragment : Fragment() {
             commonSaveDcrModel.monthNo=month+1
             commonSaveDcrModel.year=year
             commonSaveDcrModel.dayCount="0"
+            commonSaveDcrModel.additionalActivityRemark=dialogView.additionalEt.text.toString()
+            commonSaveDcrModel.dcrType=if(toggleSwitch.isChecked) 0  else 1
 
             if(dialogView.startEndParent.visibility==View.VISIBLE)
             {
@@ -756,7 +780,7 @@ class NewCallFragment : Fragment() {
         alertDialog.show()
 
     }
-    suspend fun checkCurrentDCR_API() {
+    suspend fun checkCurrentDCR_API(i: Int) {
 
         val response = APIClientKot().getUsersService(2, sharePreferance?.getPref("secondaryUrl")!!).checkDCR_API(
             "bearer " + loginModelHomePage.accessToken,
@@ -774,28 +798,23 @@ class NewCallFragment : Fragment() {
                         if (dcrData.get("routeId").asInt == 0) {
                             alertClass?.commonAlert("Alert!", "Please submit tour program first")
                             alertClass?.hideAlert()
-                            returnType=false;
                             return@withContext
                         }
-
-                       /* if (dcrData.get("strDCRDate").asString == generalClassObject?.getCurrentDate() ) {
-                            returnType=true;
-                            return@withContext
-                        }*/
-
                         routeIdGetDCR = dcrData.get("routeId").asString
                         if (dcrData.get("dcrId").asInt == 0) {
-                            returnType=false;
                             createDCRAlert(dcrData.get("routeId").asString)
                             sharePreferance?.setPref("dcrId", dcrData.get("dcrId").asString)
                         } else {
-                            returnType=true;
                             sharePreferance?.setPref("todayDate", generalClassObject?.currentDateMMDDYY())
                             sharePreferance?.setPref("dcrId", dcrData.get("dcrId").asString)
-                        }
-
+                            if(i==1)
+                            {
+                                views?.bottomSheetTitle_tv?.setText("Select route")
+                                selectionType=1
+                                openCloseModel()
+                            }
+                            }
                     } else {
-                        returnType=false;
                         GeneralClass(requireActivity()).checkInternet() }
                 }
             }
@@ -867,10 +886,11 @@ class NewCallFragment : Fragment() {
                     }
                     else {
                     val jsonObjData:JsonObject = response.body()?.get("data") as JsonObject
-                    returnType=true;
                     alertClass?.commonAlert("",jsonObjData.get("message").asString)
                     sharePreferance?.setPref("todayDate",generalClassObject?.currentDateMMDDYY())
                     sharePreferance?.setPref("dcrId",jsonObjData.get("dcrId").asString)
+
+
                     alertDialog.cancel()
                     }
                 }
@@ -884,4 +904,7 @@ class NewCallFragment : Fragment() {
             }
         })
     }
+
+
+
 }

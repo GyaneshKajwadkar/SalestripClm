@@ -19,6 +19,7 @@ import android.util.Log
 import android.view.*
 import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
@@ -53,7 +54,8 @@ class EdetailingDownloadFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         var view= inflater.inflate(R.layout.activity_edetailing_, container, false)
-        initView(view)
+        if (activity != null && isAdded) { initView(view)  }
+
         return view }
 
     fun initView(view: View)

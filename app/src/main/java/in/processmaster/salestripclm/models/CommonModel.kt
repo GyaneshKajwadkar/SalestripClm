@@ -40,6 +40,12 @@ class CommonModel {
         var dayCount=""
             get() = field
             set(value) { field = value }
+        var additionalActivityRemark=""
+            get() = field
+            set(value) { field = value }
+        var dcrType=0
+            get() = field
+            set(value) { field = value }
 
 
 

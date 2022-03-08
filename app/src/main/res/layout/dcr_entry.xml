@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@color/white">
-   <include layout="@layout/common_toolbar"/>
+    <include layout="@layout/common_toolbar"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -19,17 +19,51 @@
             android:background="@color/orange"
             />
 
+        <LinearLayout
+            android:gravity="center"
+            android:layout_marginTop="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
+            <TextView
+                android:textColor="@color/black"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Other Activity"/>
+
+            <Switch
+                android:checked="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/toggleSwitch"
+                />
+
+            <TextView
+                android:textColor="@color/black"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Field working"/>
+
+        </LinearLayout>
+
+        <View
+            android:layout_marginBottom="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/gray"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/header_text"
+            android:padding="0dp"
+            android:textColor="@color/darkBlue"
             android:text="Select working area"/>
         <Spinner
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="5dp"
+            android:padding="3dp"
             android:id="@+id/workingArea_spin"/>
 
 
@@ -37,11 +71,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/header_text"
+            android:padding="0dp"
+            android:textColor="@color/darkBlue"
+            android:id="@+id/selectActivityHeader"
             android:text="Select activity"/>
         <Spinner
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="5dp"
+            android:padding="3dp"
             android:id="@+id/activity_spin"/>
 
 
@@ -89,17 +126,41 @@
             </LinearLayout>
         </LinearLayout>
 
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/additionalParent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/header_text"
+                android:padding="0dp"
+                android:textColor="@color/darkBlue"
+                android:text="Additional Activity Remark"/>
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:lines="3"
+                android:padding="3dp"
+                android:id="@+id/additionalEt"/>
+        </LinearLayout>
+
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/header_text"
+            android:padding="0dp"
+            android:textColor="@color/darkBlue"
             android:text="Remark"/>
-       <EditText
-           android:layout_width="match_parent"
-           android:layout_height="wrap_content"
-           android:lines="3"
-           android:padding="3dp"
-           android:id="@+id/remarkEt"/>
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lines="3"
+            android:padding="3dp"
+            android:id="@+id/remarkEt"/>
 
         <Button
             android:layout_width="match_parent"

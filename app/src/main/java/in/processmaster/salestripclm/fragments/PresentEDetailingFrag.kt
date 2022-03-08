@@ -504,7 +504,7 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
                     constraint = constraint.toString().toLowerCase()
                     for (i in 0 until doctorList?.size!!) {
                         val dataNames: SyncModel.Data.Doctor = doctorList?.get(i)!!
-                        if (dataNames.doctorName.lowercase().startsWith(constraint.toString())) {
+                        if (dataNames.doctorName?.lowercase()?.startsWith(constraint.toString()) == true) {
                             FilteredArrayNames.add(dataNames)
                         }
                     }

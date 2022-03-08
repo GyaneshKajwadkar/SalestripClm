@@ -36,7 +36,6 @@ class MeetingActivity : BaseActivity(), MeetingServiceListener, View.OnClickList
     private var mbPendingStartMeeting = false
     lateinit  var zoomSDK: ZoomSDK
     private var mInMeetingService: InMeetingService? = null
-    var scheduledBack_iv: ImageView? = null
     private var isResumed = false
     private var mMeetingService: MeetingService? = null
     var meetingItemGlobal: MeetingItem? = null
@@ -76,8 +75,9 @@ class MeetingActivity : BaseActivity(), MeetingServiceListener, View.OnClickList
             initilizeZoom()
         }
 
+        if(generalClass.isInternetAvailable())
+        { scheduledProgess.setVisibility(View.VISIBLE) }
 
-        scheduledProgess.setVisibility(View.VISIBLE)
 
         scheduledBack_iv?.setOnClickListener(View.OnClickListener { onBackPressed() })
 
@@ -127,6 +127,8 @@ class MeetingActivity : BaseActivity(), MeetingServiceListener, View.OnClickList
                     meetinglist.add(getScheduleModel.getData()?.meetingList?.get(i)!!)
                 }
             }
+            if(meetinglist.size!=0){noData_tv.visibility=View.GONE}
+
             adapterRecycler = ScheduleMeetingAdapter(this, 1, meetinglist, zoomSDK!!)
             sheduled_rv!!.layoutManager = LinearLayoutManager(this)
             sheduled_rv!!.adapter = adapterRecycler

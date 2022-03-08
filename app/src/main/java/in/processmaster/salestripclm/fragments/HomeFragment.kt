@@ -85,36 +85,37 @@ class HomeFragment : Fragment(), OnChartGestureListener {
 
         val root = inflater.inflate(R.layout.fragment_home, container, false)
 
-        parent_ll        = root.findViewById<View>(R.id.parent_ll) as LinearLayout
-        progressHomeFrag = root.findViewById<View>(R.id.progressHomeFrag) as ProgressBar
-        expandable_Rv    = root.findViewById<View>(R.id.expandable_Rv) as RecyclerView
-        dailyDoctorCall_rv = root.findViewById<View>(R.id.dailyDoctorCall_rv) as RecyclerView
-        noDocCall_tv = root.findViewById<View>(R.id.noDocCall_tv) as TextView
+        if (activity != null && isAdded) {
+            parent_ll        = root.findViewById<View>(R.id.parent_ll) as LinearLayout
+            progressHomeFrag = root.findViewById<View>(R.id.progressHomeFrag) as ProgressBar
+            expandable_Rv    = root.findViewById<View>(R.id.expandable_Rv) as RecyclerView
+            dailyDoctorCall_rv = root.findViewById<View>(R.id.dailyDoctorCall_rv) as RecyclerView
+            noDocCall_tv = root.findViewById<View>(R.id.noDocCall_tv) as TextView
 
-        sharePreferance = PreferenceClass(activity)
-        db= DatabaseHandler(requireActivity())
+            sharePreferance = PreferenceClass(activity)
+            db= DatabaseHandler(requireActivity())
 
-        chart = root.findViewById(R.id.chart1)
-       // charthalf = root.findViewById(R.id.charthalf)
+            chart = root.findViewById(R.id.chart1)
+            // charthalf = root.findViewById(R.id.charthalf)
 
-        val handler = Handler(Looper.getMainLooper())
-        val executorAdapter: ExecutorService = Executors.newSingleThreadExecutor()
-
-
-        executorAdapter.execute(Runnable {
-          //  pieChartInitilize()
-            handler.post(Runnable {
-                parent_ll?.visibility = View.VISIBLE
-                progressHomeFrag?.visibility = View.GONE
+            val handler = Handler(Looper.getMainLooper())
+            val executorAdapter: ExecutorService = Executors.newSingleThreadExecutor()
+            executorAdapter.execute(Runnable {
+                //  pieChartInitilize()
+                handler.post(Runnable {
+                    parent_ll?.visibility = View.VISIBLE
+                    progressHomeFrag?.visibility = View.GONE
+                })
             })
-        })
-
-        expandable_Rv?.layoutManager = LinearLayoutManager(requireActivity())
+            expandable_Rv?.layoutManager = LinearLayoutManager(requireActivity())
+        }
 
         return root
     }
 
     override fun onResume() {
+
+
         super.onResume()
         val responseData=db.getApiDetail(2)
         val responseGraph=db.getApiDetail(4)
@@ -168,7 +169,9 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         arrayListDoctor.add("Select Doctor")
 
         for(item in SplashActivity.staticSyncData?.data?.doctorList!!)
-        { arrayListDoctor.add(item.doctorName) }
+        {
+            item.doctorName?.let { arrayListDoctor.add(it) }
+        }
 
         val dialogBuilder = AlertDialog.Builder(context)
         val inflater = context.layoutInflater

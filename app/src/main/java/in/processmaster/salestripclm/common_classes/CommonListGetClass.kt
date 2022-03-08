@@ -24,7 +24,7 @@ class CommonListGetClass {
     }
 
     fun getNonRouteListForSpinner(): ArrayList<SyncModel.Data.Route> {
-        val routWithNegativeList =  SplashActivity.staticSyncData?.data?.routeList!!?.filter { s -> s.routeId <0} as java.util.ArrayList<SyncModel.Data.Route>
+        val routWithNegativeList =  SplashActivity.staticSyncData?.data?.routeList!!?.filter { s -> s.routeId!! <0} as java.util.ArrayList<SyncModel.Data.Route>
         var routeList= ArrayList<SyncModel.Data.Route>()
         var routeobj=SyncModel.Data.Route()
         routeobj.routeName="Select"
@@ -34,7 +34,7 @@ class CommonListGetClass {
     }
 
     fun getRouteListForSpinner(): ArrayList<SyncModel.Data.Route> {
-        val routWithNegativeList =  SplashActivity.staticSyncData?.data?.routeList!!?.filter { s -> s.routeId >=0} as java.util.ArrayList<SyncModel.Data.Route>
+        val routWithNegativeList =  SplashActivity.staticSyncData?.data?.routeList!!?.filter { s -> s.routeId!! >=0} as java.util.ArrayList<SyncModel.Data.Route>
         var routeList= ArrayList<SyncModel.Data.Route>()
         var routeobj=SyncModel.Data.Route()
         routeobj.routeName="Select"
