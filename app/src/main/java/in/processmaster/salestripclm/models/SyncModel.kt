@@ -54,9 +54,9 @@ class SyncModel {
         @Expose
         var workTypeList= ArrayList<WorkType>()
 
-     /*   @SerializedName("retailerList")
+        @SerializedName("retailerList")
         @Expose
-        var retailerList= ArrayList<Retailer>()*/
+        var retailerList= ArrayList<Retailer>()
 
         @SerializedName("doctorList")
         @Expose
@@ -1594,363 +1594,366 @@ class SyncModel {
             @Expose
             var errorCode: String? = ""
         }
-        class Retailer {
-            @SerializedName("retailerId")
-            @Expose
-            var retailerId: Int? = 0
-
-            @SerializedName("shopName")
-            @Expose
-            var shopName: String? = ""
-
-            @SerializedName("contactPerson")
-            @Expose
-            var contactPerson: String? = ""
-
-            @SerializedName("address1")
-            @Expose
-            var address1: String? = ""
-
-            @SerializedName("address2")
-            @Expose
-            var address2: String? = ""
-
-            @SerializedName("routeId")
-            @Expose
-            var routeId: Int? = 0
-
-            @SerializedName("cityId")
-            @Expose
-            var cityId: Int? = 0
-
-            @SerializedName("pincode")
-            @Expose
-            var pincode: String? = ""
-
-            @SerializedName("phoneNo")
-            @Expose
-            var phoneNo: String? = ""
-
-            @SerializedName("mobileNo")
-            @Expose
-            var mobileNo: String? = ""
-
-            @SerializedName("emailId")
-            @Expose
-            var emailId: String? = ""
-
-            @SerializedName("isHospitalChemist")
-            @Expose
-            var isHospitalChemist: Boolean? = false
-
-            @SerializedName("hospitalType")
-            @Expose
-            var hospitalType: Int? = 0
-
-            @SerializedName("hospitalName")
-            @Expose
-            var hospitalName: String? = ""
-
-            @SerializedName("drugLic1")
-            @Expose
-            var drugLic1: String? = ""
-
-            @SerializedName("drugLic2")
-            @Expose
-            var drugLic2: String? = ""
-
-            @SerializedName("visitDay")
-            @Expose
-            var visitDay: Int? = 0
-
-            @SerializedName("visitTime")
-            @Expose
-            var visitTime: String? = ""
-
-            @SerializedName("empId")
-            @Expose
-            var empId: Int? = 0
-
-            @SerializedName("mode")
-            @Expose
-            var mode: Int? = 0
-
-            @SerializedName("headQuaterId")
-            @Expose
-            var headQuaterId: Int? = 0
-
-            @SerializedName("preShopName")
-            @Expose
-            var preShopName: String? = ""
-
-            @SerializedName("cityName")
-            @Expose
-            var cityName: String? = ""
-
-            @SerializedName("stateName")
-            @Expose
-            var stateName: String? = ""
-
-            @SerializedName("countryName")
-            @Expose
-            var countryName: String? = ""
-
-            @SerializedName("headQuaterName")
-            @Expose
-            var headQuaterName: String? = ""
+     */
+    class Retailer {
+        @SerializedName("retailerId")
+        @Expose
+        var retailerId: Int? = 0
+
+        @SerializedName("shopName")
+        @Expose
+        var shopName: String? = ""
+
+        @SerializedName("contactPerson")
+        @Expose
+        var contactPerson: String? = ""
+
+        @SerializedName("address1")
+        @Expose
+        var address1: String? = ""
+
+        @SerializedName("address2")
+        @Expose
+        var address2: String? = ""
+
+        @SerializedName("routeId")
+        @Expose
+        var routeId: Int? = 0
+
+        @SerializedName("cityId")
+        @Expose
+        var cityId: Int? = 0
+
+        @SerializedName("pincode")
+        @Expose
+        var pincode: String? = ""
+
+        @SerializedName("phoneNo")
+        @Expose
+        var phoneNo: String? = ""
+
+        @SerializedName("mobileNo")
+        @Expose
+        var mobileNo: String? = ""
+
+        @SerializedName("emailId")
+        @Expose
+        var emailId: String? = ""
+
+        @SerializedName("isHospitalChemist")
+        @Expose
+        var isHospitalChemist: Boolean? = false
+
+        @SerializedName("hospitalType")
+        @Expose
+        var hospitalType: Int? = 0
+
+        @SerializedName("hospitalName")
+        @Expose
+        var hospitalName: String? = ""
+
+        @SerializedName("drugLic1")
+        @Expose
+        var drugLic1: String? = ""
+
+        @SerializedName("drugLic2")
+        @Expose
+        var drugLic2: String? = ""
+
+        @SerializedName("visitDay")
+        @Expose
+        var visitDay: Int? = 0
+
+        @SerializedName("visitTime")
+        @Expose
+        var visitTime: String? = ""
+
+        @SerializedName("empId")
+        @Expose
+        var empId: Int? = 0
+
+        @SerializedName("mode")
+        @Expose
+        var mode: Int? = 0
+
+        @SerializedName("headQuaterId")
+        @Expose
+        var headQuaterId: Int? = 0
+
+        @SerializedName("preShopName")
+        @Expose
+        var preShopName: String? = ""
+
+        @SerializedName("cityName")
+        @Expose
+        var cityName: String? = ""
+
+        @SerializedName("stateName")
+        @Expose
+        var stateName: String? = ""
+
+        @SerializedName("countryName")
+        @Expose
+        var countryName: String? = ""
+
+        @SerializedName("headQuaterName")
+        @Expose
+        var headQuaterName: String? = ""
+
+        @SerializedName("routeName")
+        @Expose
+        var routeName: String? = ""
+
+        @SerializedName("gstinNo")
+        @Expose
+        var gstinNo: String? = ""
+
+        @SerializedName("status")
+        @Expose
+        var status: String? = ""
+
+        @SerializedName("approveStatus")
+        @Expose
+        var approveStatus: String? = ""
+
+        @SerializedName("approveStatusName")
+        @Expose
+        var approveStatusName: String? = ""
+
+        @SerializedName("deactivateStatusName")
+        @Expose
+        var deactivateStatusName: String? = ""
+
+        @SerializedName("approveBy")
+        @Expose
+        var approveBy: Int? = 0
+
+        @SerializedName("rejectReason")
+        @Expose
+        var rejectReason: String? = ""
+
+        @SerializedName("active")
+        @Expose
+        var active: Boolean? = false
+
+        @SerializedName("approveByName")
+        @Expose
+        var approveByName: String? = ""
+
+        @SerializedName("createdBy")
+        @Expose
+        var createdBy: String? = ""
+
+        @SerializedName("approveDate")
+        @Expose
+        var approveDate: String? = ""
+
+        @SerializedName("strApproveDate")
+        @Expose
+        var strApproveDate: String? = ""
+
+        @SerializedName("createdDate")
+        @Expose
+        var createdDate: String? = ""
+
+        @SerializedName("strCreatedDate")
+        @Expose
+        var strCreatedDate: String? = ""
+
+        @SerializedName("statusType")
+        @Expose
+        var statusType: String? = ""
+
+        @SerializedName("strVisitTime")
+        @Expose
+        var strVisitTime: String? = ""
+
+        @SerializedName("type")
+        @Expose
+        var type: String? = ""
+
+        @SerializedName("stateId")
+        @Expose
+        var stateId: Int? = 0
+
+        @SerializedName("employeeManagerId")
+        @Expose
+        var employeeManagerId: Int? = 0
+
+        @SerializedName("userType")
+        @Expose
+        var userType: String? = ""
+
+        @SerializedName("canBeEdited")
+        @Expose
+        var canBeEdited: Boolean? = false
+
+        @SerializedName("employeeName")
+        @Expose
+        var employeeName: String? = ""
+
+        @SerializedName("isError")
+        @Expose
+        var isError: Boolean? = false
+
+        @SerializedName("errorMessage")
+        @Expose
+        var errorMessage: String? = ""
+
+        @SerializedName("latitude")
+        @Expose
+        var latitude: Double = 0.0
+
+        @SerializedName("longitude")
+        @Expose
+        var longitude: Double = 0.0
+
+        @SerializedName("isImageAdd")
+        @Expose
+        var isImageAdd: Boolean? = false
+
+        @SerializedName("imageName")
+        @Expose
+        var imageName: String? = ""
+
+        @SerializedName("imagePath")
+        @Expose
+        var imagePath: String? = ""
+
+        @SerializedName("imageExt")
+        @Expose
+        var imageExt: String? = ""
+
+        @SerializedName("urlPath")
+        @Expose
+        var urlPath: String? = ""
+
+        @SerializedName("savedFileName")
+        @Expose
+        var savedFileName: String? = ""
+
+        @SerializedName("preImageName")
+        @Expose
+        var preImageName: String? = ""
+
+        @SerializedName("incorporationDayTime")
+        @Expose
+        var incorporationDayTime: String? = ""
+
+        @SerializedName("amCore")
+        @Expose
+        var amCore: Boolean? = false
+
+        @SerializedName("rmCore")
+        @Expose
+        var rmCore: Boolean? = false
+
+        @SerializedName("mrCore")
+        @Expose
+        var mrCore: Boolean? = false
+
+        @SerializedName("anniversaryDateTime")
+        @Expose
+        var anniversaryDateTime: String? = ""
 
-            @SerializedName("routeName")
-            @Expose
-            var routeName: String? = ""
+        @SerializedName("birthDateTime")
+        @Expose
+        var birthDateTime: String? = ""
 
-            @SerializedName("gstinNo")
-            @Expose
-            var gstinNo: String? = ""
+        @SerializedName("code")
+        @Expose
+        var code: String? = ""
 
-            @SerializedName("status")
-            @Expose
-            var status: String? = ""
+        @SerializedName("birthDate")
+        @Expose
+        var birthDate: String? = ""
 
-            @SerializedName("approveStatus")
-            @Expose
-            var approveStatus: String? = ""
+        @SerializedName("anniversaryDate")
+        @Expose
+        var anniversaryDate: String? = ""
 
-            @SerializedName("approveStatusName")
-            @Expose
-            var approveStatusName: String? = ""
+        @SerializedName("incorporationDay")
+        @Expose
+        var incorporationDay: String? = ""
 
-            @SerializedName("deactivateStatusName")
-            @Expose
-            var deactivateStatusName: String? = ""
+        @SerializedName("nextApproval")
+        @Expose
+        var nextApproval: Int? = 0
 
-            @SerializedName("approveBy")
-            @Expose
-            var approveBy: Int? = 0
+        @SerializedName("deactivateApproveBy")
+        @Expose
+        var deactivateApproveBy: String? = ""
 
-            @SerializedName("rejectReason")
-            @Expose
-            var rejectReason: String? = ""
+        @SerializedName("deactivateRejectReason")
+        @Expose
+        var deactivateRejectReason: String? = ""
 
-            @SerializedName("active")
-            @Expose
-            var active: Boolean? = false
+        @SerializedName("deactivateRequestDate")
+        @Expose
+        var deactivateRequestDate: String? = ""
 
-            @SerializedName("approveByName")
-            @Expose
-            var approveByName: String? = ""
+        @SerializedName("strDeactivateRequestDate")
+        @Expose
+        var strDeactivateRequestDate: String? = ""
 
-            @SerializedName("createdBy")
-            @Expose
-            var createdBy: String? = ""
+        @SerializedName("deactivateApproveStatus")
+        @Expose
+        var deactivateApproveStatus: String? = ""
 
-            @SerializedName("approveDate")
-            @Expose
-            var approveDate: String? = ""
+        @SerializedName("deactivateRemark")
+        @Expose
+        var deactivateRemark: String? = ""
 
-            @SerializedName("strApproveDate")
-            @Expose
-            var strApproveDate: String? = ""
+        @SerializedName("nextApproverName")
+        @Expose
+        var nextApproverName: String? = ""
 
-            @SerializedName("createdDate")
-            @Expose
-            var createdDate: String? = ""
+        @SerializedName("fieldStaffId")
+        @Expose
+        var fieldStaffId: Int? = 0
 
-            @SerializedName("strCreatedDate")
-            @Expose
-            var strCreatedDate: String? = ""
+        @SerializedName("fsCode")
+        @Expose
+        var fsCode: String? = ""
 
-            @SerializedName("statusType")
-            @Expose
-            var statusType: String? = ""
+        @SerializedName("requestId")
+        @Expose
+        var requestId: String? = ""
 
-            @SerializedName("strVisitTime")
-            @Expose
-            var strVisitTime: String? = ""
+        @SerializedName("empCode")
+        @Expose
+        var empCode: String? = ""
 
-            @SerializedName("type")
-            @Expose
-            var type: String? = ""
+        @SerializedName("designation")
+        @Expose
+        var designation: String? = ""
 
-            @SerializedName("stateId")
-            @Expose
-            var stateId: Int? = 0
+        @SerializedName("division")
+        @Expose
+        var division: String? = ""
 
-            @SerializedName("employeeManagerId")
-            @Expose
-            var employeeManagerId: Int? = 0
+        @SerializedName("region")
+        @Expose
+        var region: String? = ""
 
-            @SerializedName("userType")
-            @Expose
-            var userType: String? = ""
+        @SerializedName("zone")
+        @Expose
+        var zone: String? = ""
 
-            @SerializedName("canBeEdited")
-            @Expose
-            var canBeEdited: Boolean? = false
+        @SerializedName("mobileNo2")
+        @Expose
+        var mobileNo2: String? = ""
 
-            @SerializedName("employeeName")
-            @Expose
-            var employeeName: String? = ""
+        @SerializedName("fsCodeWithEmpName")
+        @Expose
+        var fsCodeWithEmpName: String? = ""
 
-            @SerializedName("isError")
-            @Expose
-            var isError: Boolean? = false
+        @SerializedName("chemCode")
+        @Expose
+        var chemCode: String? = ""
+    }
 
-            @SerializedName("errorMessage")
-            @Expose
-            var errorMessage: String? = ""
 
-            @SerializedName("latitude")
-            @Expose
-            var latitude: Double = 0.0
-
-            @SerializedName("longitude")
-            @Expose
-            var longitude: Double = 0.0
-
-            @SerializedName("isImageAdd")
-            @Expose
-            var isImageAdd: Boolean? = false
-
-            @SerializedName("imageName")
-            @Expose
-            var imageName: String? = ""
-
-            @SerializedName("imagePath")
-            @Expose
-            var imagePath: String? = ""
-
-            @SerializedName("imageExt")
-            @Expose
-            var imageExt: String? = ""
-
-            @SerializedName("urlPath")
-            @Expose
-            var urlPath: String? = ""
-
-            @SerializedName("savedFileName")
-            @Expose
-            var savedFileName: String? = ""
-
-            @SerializedName("preImageName")
-            @Expose
-            var preImageName: String? = ""
-
-            @SerializedName("incorporationDayTime")
-            @Expose
-            var incorporationDayTime: String? = ""
-
-            @SerializedName("amCore")
-            @Expose
-            var amCore: Boolean? = false
-
-            @SerializedName("rmCore")
-            @Expose
-            var rmCore: Boolean? = false
-
-            @SerializedName("mrCore")
-            @Expose
-            var mrCore: Boolean? = false
-
-            @SerializedName("anniversaryDateTime")
-            @Expose
-            var anniversaryDateTime: String? = ""
-
-            @SerializedName("birthDateTime")
-            @Expose
-            var birthDateTime: String? = ""
-
-            @SerializedName("code")
-            @Expose
-            var code: String? = ""
-
-            @SerializedName("birthDate")
-            @Expose
-            var birthDate: String? = ""
-
-            @SerializedName("anniversaryDate")
-            @Expose
-            var anniversaryDate: String? = ""
-
-            @SerializedName("incorporationDay")
-            @Expose
-            var incorporationDay: String? = ""
-
-            @SerializedName("nextApproval")
-            @Expose
-            var nextApproval: Int? = 0
-
-            @SerializedName("deactivateApproveBy")
-            @Expose
-            var deactivateApproveBy: String? = ""
-
-            @SerializedName("deactivateRejectReason")
-            @Expose
-            var deactivateRejectReason: String? = ""
-
-            @SerializedName("deactivateRequestDate")
-            @Expose
-            var deactivateRequestDate: String? = ""
-
-            @SerializedName("strDeactivateRequestDate")
-            @Expose
-            var strDeactivateRequestDate: String? = ""
-
-            @SerializedName("deactivateApproveStatus")
-            @Expose
-            var deactivateApproveStatus: String? = ""
-
-            @SerializedName("deactivateRemark")
-            @Expose
-            var deactivateRemark: String? = ""
-
-            @SerializedName("nextApproverName")
-            @Expose
-            var nextApproverName: String? = ""
-
-            @SerializedName("fieldStaffId")
-            @Expose
-            var fieldStaffId: Int? = 0
-
-            @SerializedName("fsCode")
-            @Expose
-            var fsCode: String? = ""
-
-            @SerializedName("requestId")
-            @Expose
-            var requestId: String? = ""
-
-            @SerializedName("empCode")
-            @Expose
-            var empCode: String? = ""
-
-            @SerializedName("designation")
-            @Expose
-            var designation: String? = ""
-
-            @SerializedName("division")
-            @Expose
-            var division: String? = ""
-
-            @SerializedName("region")
-            @Expose
-            var region: String? = ""
-
-            @SerializedName("zone")
-            @Expose
-            var zone: String? = ""
-
-            @SerializedName("mobileNo2")
-            @Expose
-            var mobileNo2: String? = ""
-
-            @SerializedName("fsCodeWithEmpName")
-            @Expose
-            var fsCodeWithEmpName: String? = ""
-
-            @SerializedName("chemCode")
-            @Expose
-            var chemCode: String? = ""
-        }*/
         class Route {
             @SerializedName("routeId")
             @Expose

@@ -35,4 +35,10 @@ class IdNameBoll_model {
         set(value) {
             field = value
         }
+    var city=""
+        get() = field
+        set(value) {
+            field = value
+        }
+
 }

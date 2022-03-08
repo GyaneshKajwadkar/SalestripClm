@@ -27,8 +27,12 @@ class CheckboxSpinnerAdapter(var adapterList:ArrayList<IdNameBoll_model>, var ca
     }
 
     override fun onBindViewHolder(holder:MyViewHolder, @SuppressLint("RecyclerView") position: Int) {
-        holder.checkBox.setText(adapterList.get(position).name)
-        holder.checkBox.isChecked=adapterList.get(position).isChecked
+
+        val model=adapterList.get(position)
+        holder.checkBox.setText(model.name)
+        holder.checkBox.isChecked=model.isChecked
+
+        if(model.city!="")  holder.checkBox.buttonDrawable=null
 
         holder.checkBox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener {
             override fun onCheckedChanged(p0: CompoundButton?, p1: Boolean) {

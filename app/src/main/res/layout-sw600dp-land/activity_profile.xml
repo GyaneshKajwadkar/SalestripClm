@@ -90,13 +90,10 @@
 
 
                 <com.google.android.material.button.MaterialButton
-                    android:gravity="center"
                     android:id="@+id/changeProfile_mb"
                     android:textColor="@color/white"
                     app:iconGravity="textStart"
-                    android:layout_marginRight="5dp"
-                    android:layout_marginLeft="5dp"
-                    android:padding="5dp"
+                    style="@style/materialButtonWithImage"
                     android:layout_width="match_parent"
                     android:backgroundTint="@color/appColor"
                     android:layout_height="match_parent"
@@ -128,52 +125,31 @@
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/personal_mb"
-                            android:gravity="center"
-                            android:textColor="@color/black"
-                            app:iconGravity="textStart"
-                            android:layout_marginRight="5dp"
-                            android:layout_marginLeft="5dp"
-                            android:padding="5dp"
                             android:layout_weight="1"
                             android:layout_width="0dp"
-                            android:backgroundTint="@color/gray"
+                            style="@style/materialButtonWithImage"
                             android:layout_height="match_parent"
                             app:icon="@drawable/ic_login_edit"
-                            app:iconTint="@color/black"
                             android:text="Personal"/>
 
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/contact_mb"
-                            android:gravity="center"
-                            android:textColor="@color/black"
-                            app:iconGravity="textStart"
-                            android:layout_marginRight="5dp"
-                            android:layout_marginLeft="5dp"
-                            android:padding="5dp"
                             android:layout_weight="1"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
-                            android:backgroundTint="@color/gray"
                             app:icon="@drawable/ic_call"
-                            app:iconTint="@color/black"
+                            style="@style/materialButtonWithImage"
                             android:text="Contact"/>
 
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/territory_mb"
-                            android:gravity="center"
-                            android:textColor="@color/black"
-                            app:iconGravity="textStart"
-                            android:layout_marginRight="5dp"
-                            android:layout_marginLeft="5dp"
-                            android:padding="5dp"
                             android:layout_weight="1"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
-                            android:backgroundTint="@color/gray"
                             app:icon="@drawable/ic_palace"
-                            app:iconTint="@color/black"
+                            style="@style/materialButtonWithImage"
                             android:text="Territory"/>
 
 

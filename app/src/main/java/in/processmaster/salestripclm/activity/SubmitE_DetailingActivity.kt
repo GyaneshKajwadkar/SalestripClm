@@ -25,13 +25,18 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.button.MaterialButtonToggleGroup.OnButtonCheckedListener
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import kotlinx.android.synthetic.main.activity_submit_edetailing.*
 import kotlinx.android.synthetic.main.bottom_sheet_visualads.bottomSheet
 import kotlinx.android.synthetic.main.bottom_sheet_visualads.close_imv
 import kotlinx.android.synthetic.main.checkbox_bottom_sheet.*
+import kotlinx.android.synthetic.main.checkbox_bottom_sheet.noDataCheckAdapter_tv
+import kotlinx.android.synthetic.main.checkbox_bottom_sheet.selectHeader_tv
 import kotlinx.android.synthetic.main.common_toolbar.*
+import kotlinx.android.synthetic.main.pob_product_bottom_sheet.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -41,15 +46,17 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
+
 
 class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
 
     var visualSendModel= ArrayList<VisualAdsModel_Send>()
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
+    private lateinit var bottomSheetPobProduct: BottomSheetBehavior<ConstraintLayout>
     var workWithArray=ArrayList<IdNameBoll_model>()
     var sampleArray=ArrayList<IdNameBoll_model>()
     var giftArray=ArrayList<IdNameBoll_model>()
+    var stokistArray=ArrayList<IdNameBoll_model>()
     var selectionType=0
     var selectedPurposeID=0
     var dcrId=0
@@ -57,7 +64,6 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_submit_edetailing)
-
 
         val adapterVisit: ArrayAdapter<SyncModel.Data.WorkType> = ArrayAdapter<SyncModel.Data.WorkType>(this,
             android.R.layout.simple_spinner_dropdown_item, CommonListGetClass().getWorkTypeForSpinner())
@@ -68,10 +74,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
               if(position!=0)
                 selectedPurposeID = CommonListGetClass().getWorkTypeForSpinner()[position].workId!!
             }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-
-            }
+            override fun onNothingSelected(parent: AdapterView<*>) {}
         }
         dcrId= PreferenceClass(this).getPref("dcrId").toInt()
 
@@ -90,13 +93,11 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
             dbBase.deleteAllChildVisual()
         }
 
-
-
         visualSendModel = dbBase.getAllSubmitVisual()
         edetailing_rv.layoutManager=LinearLayoutManager(this)
         edetailing_rv.adapter=EdetallingAdapter()
 
-        if(visualSendModel.size==0)notData_tv.visibility=View.VISIBLE
+        if(visualSendModel.size==0)nodata_gif.visibility=View.VISIBLE
 
         back_iv.setOnClickListener({onBackPressed()})
         workingWith_tv.setOnClickListener({openCloseModel(1)
@@ -110,13 +111,25 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
         close_imv.setOnClickListener({   bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)})
 
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+        bottomSheetPobProduct = BottomSheetBehavior.from(BS_product_pob)
 
          val quantityModel=Gson().fromJson(dbBase.getApiDetail(3),CommonModel.QuantityModel.Data::class.java)
 
         var listSample = quantityModel.employeeSampleBalanceList!!.filter { s -> s.productType == "Sample"}
+        var listStokist = staticSyncData?.data?.retailerList?.filter { s -> s.type == "STOCKIST" }
       //  var listSample = Sample!!.filter { s -> s.actualBalanceQty != 0}
         var Gift = quantityModel.employeeSampleBalanceList!!.filter { s -> s.productType == "Gift"}
         var listGift = Gift!!.filter { s -> s.actualBalanceQty != 0}
+
+        for(stockist in listStokist!!)
+        {
+            val data =IdNameBoll_model()
+            data.id= stockist.retailerId.toString()
+            data.city= stockist.cityName.toString()
+            data.name= stockist.shopName.toString()
+            stokistArray.add(data)
+        }
+
 
         for(workWith in staticSyncData?.data?.workingWithList!!)
         {
@@ -144,6 +157,41 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
             giftArray.add(data)
         }
 
+        toggleButton.addOnButtonCheckedListener(OnButtonCheckedListener { group, checkedId, isChecked ->
+            if (isChecked && R.id.samples_btn == checkedId) {
+                hideAllSelection()
+                selectBtn.setText("Select Samples")
+                sample_rv.visibility=View.VISIBLE
+                selectBtn.visibility=View.VISIBLE
+            }
+            else if(isChecked && R.id.workingWith_btn == checkedId)
+            {
+                hideAllSelection()
+                selectBtn.setText("Select Working with")
+                workingWithRv.visibility=View.VISIBLE
+                selectBtn.visibility=View.VISIBLE
+            }
+            else if(isChecked && R.id.gifts_btn == checkedId)
+            {
+                hideAllSelection()
+                selectBtn.setText("Select Gifts")
+                gift_rv.visibility=View.VISIBLE
+                selectBtn.visibility=View.VISIBLE
+            }
+            else if(isChecked && R.id.pob_btn == checkedId)
+            {
+                hideAllSelection()
+                pobParent.visibility=View.VISIBLE
+            }
+        })
+
+        selectBtn.setOnClickListener({
+            if(selectBtn.text.equals("Select Working with")){ openCloseModel(1)}
+            if(selectBtn.text.equals("Select Samples")){ openCloseModel(2)}
+            if(selectBtn.text.equals("Select Gifts")){   openCloseModel(3)}
+        })
+
+        assignStockist.setOnClickListener({openCloseModel(4)})
 
         submitDetailing_btn.setOnClickListener({
 
@@ -193,6 +241,24 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
             }
             else{ submitDcr(saveModel,quantityArray) }
         })
+
+        pobProduct_btn.setOnClickListener({
+            val state =
+                if (bottomSheetPobProduct.state == BottomSheetBehavior.STATE_EXPANDED)
+                    BottomSheetBehavior.STATE_COLLAPSED
+                else
+                    BottomSheetBehavior.STATE_EXPANDED
+            bottomSheetPobProduct.state = state
+        })
+    }
+
+    fun hideAllSelection()
+    {
+        pobParent.visibility=View.GONE
+        sample_rv.visibility=View.GONE
+        gift_rv.visibility=View.GONE
+        workingWithRv.visibility=View.GONE
+        selectBtn.visibility=View.GONE
     }
 
     fun getSaveData():Send_EDetailingModel
@@ -278,11 +344,15 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
         if(type==2) {
             if (sampleArray.size == 0) noDataCheckAdapter_tv.visibility = View.VISIBLE else noDataCheckAdapter_tv.visibility = View.GONE
             checkRecyclerView_rv.adapter = CheckboxSpinnerAdapter(sampleArray, this)
-
         }
         if(type==3) {
             if (giftArray.size == 0) noDataCheckAdapter_tv.visibility = View.VISIBLE else noDataCheckAdapter_tv.visibility = View.GONE
             checkRecyclerView_rv.adapter = CheckboxSpinnerAdapter(giftArray, this)
+        }
+        if(type==4)
+        {
+            if (stokistArray.size == 0) noDataCheckAdapter_tv.visibility = View.VISIBLE else noDataCheckAdapter_tv.visibility = View.GONE
+            checkRecyclerView_rv.adapter = CheckboxSpinnerAdapter(stokistArray, this)
         }
 
         val state =
@@ -368,7 +438,8 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
         override fun onBindViewHolder(holder: MyViewHolder, @SuppressLint("RecyclerView") position: Int)
         {
             var objectDetailing=visualSendModel.get(position)
-            holder.brandName_headerTv.setText(objectDetailing.brandName)
+            holder.brandName_headerTv.setText("Name :"+objectDetailing.brandName)
+
 
             val dateFormatter = SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
             val dateFormatterSet = SimpleDateFormat("HH:mm:ss")
@@ -387,7 +458,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
             val timeString = String.format("%02d:%02d:%02d", hours, minutes, seconds);
 
            // holder.startEndTime_tv.setText(objectDetailing.brandWiseStartTime+"-"+objectDetailing.brandWiseStopTime)
-            holder.startEndTime_tv.setText(timeString)
+            holder.startEndTime_tv.setText("Duration :"+timeString)
 
             holder.feeback_et.addTextChangedListener(object:TextWatcher{
                 override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
@@ -437,8 +508,19 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface {
                     TextWithEditAdapter(sendingList as ArrayList<IdNameBoll_model>, this, 1, this)
             }
         }
-
-
+        if(selectionType==4)
+        {
+            stokistArray= ArrayList<IdNameBoll_model>()
+            stokistArray.addAll(passingArrayList)
+            stokistArray.forEachIndexed { index, element ->
+                if(element.isChecked) {
+                    stockistName.visibility=View.VISIBLE
+                    stockistName.text="Stockist name - "+element.name }
+                element.isChecked=false
+                stokistArray.set(index,element)
+            }
+            if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED)  bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        }
 
     }
 
