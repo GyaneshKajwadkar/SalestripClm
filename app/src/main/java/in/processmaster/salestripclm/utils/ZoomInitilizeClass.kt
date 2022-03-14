@@ -1,7 +1,9 @@
 package `in`.processmaster.salestripclm.utils
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.MeetingActivity
+import `in`.processmaster.salestripclm.models.SyncModel
 import `in`.processmaster.salestripclm.models.ZoomCredientialModel
+import `in`.processmaster.salestripclm.networkUtils.ConnectivityChangeReceiver
 import `in`.processmaster.salestripclm.zoom_sdk_code.initsdk.InitAuthSDKCallback
 import `in`.processmaster.salestripclm.zoom_sdk_code.initsdk.InitAuthSDKHelper
 import `in`.processmaster.salestripclm.zoom_sdk_code.startjoinmeeting.UserLoginCallback
@@ -14,6 +16,7 @@ import android.util.Log
 import android.view.View
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import us.zoom.sdk.*
 
 class ZoomInitilizeClass() : Activity(), UserLoginCallback.ZoomDemoAuthenticationListener ,
@@ -21,7 +24,11 @@ class ZoomInitilizeClass() : Activity(), UserLoginCallback.ZoomDemoAuthenticatio
 {
     private var zoomSDKBase = ZoomSDK.getInstance()
     var zoomCredientialModel: ZoomCredientialModel?=null
-    var progressDialog: androidx.appcompat.app.AlertDialog? = null
+
+    companion object {
+        var progressDialogZoom: AlertDialog? = null
+    }
+
 
     public fun initilizeZoom(context: Activity, model: ZoomCredientialModel?)
     {
@@ -34,13 +41,14 @@ class ZoomInitilizeClass() : Activity(), UserLoginCallback.ZoomDemoAuthenticatio
     {
         if (result == ZoomAuthenticationError.ZOOM_AUTH_ERROR_SUCCESS.toLong())
         {
+            if(progressDialogZoom!=null)progressDialogZoom?.dismiss()
             Log.e("logResult", "loginSuccessoverride")
             UserLoginCallback.getInstance().removeListener(this)
-            progressDialog?.dismiss()
+
         }
         else
         { Log.e("logResult", "loginErroroverride")
-            progressDialog?.dismiss()
+            if(progressDialogZoom!=null)progressDialogZoom?.dismiss()
         }
 
     }
@@ -54,17 +62,17 @@ class ZoomInitilizeClass() : Activity(), UserLoginCallback.ZoomDemoAuthenticatio
         else
         { }
 
-        progressDialog?.dismiss()
+        if(progressDialogZoom!=null)progressDialogZoom?.dismiss()
     }
 
     override fun onZoomIdentityExpired()
     {
-        progressDialog?.dismiss()
+        if(progressDialogZoom!=null)progressDialogZoom?.dismiss()
     }
 
     override fun onZoomAuthIdentityExpired()
     {
-        progressDialog?.dismiss()
+        if(progressDialogZoom!=null)progressDialogZoom?.dismiss()
     }
 
     override fun onZoomSDKInitializeResult(errorCode: Int, internalErrorCode: Int)
@@ -85,13 +93,13 @@ class ZoomInitilizeClass() : Activity(), UserLoginCallback.ZoomDemoAuthenticatio
                 UserLoginCallback.getInstance().addListener(this)
             }
         }
-        progressDialog?.dismiss()
+        if(progressDialogZoom!=null)progressDialogZoom?.dismiss()
 
     }
 
     override fun onMeetingStatusChanged(p0: MeetingStatus?, p1: Int, p2: Int)
     {
-        progressDialog?.dismiss()
+        if(progressDialogZoom!=null)progressDialogZoom?.dismiss()
     }
 
     private fun loginFirstbase(credentialData: ZoomCredientialModel.CredentialData?): Unit
@@ -99,7 +107,7 @@ class ZoomInitilizeClass() : Activity(), UserLoginCallback.ZoomDemoAuthenticatio
 
         if(credentialData==null)
         {
-            if(progressDialog!=null)progressDialog?.dismiss()
+            if(progressDialogZoom!=null)progressDialogZoom?.dismiss()
             return
         }
 
@@ -130,12 +138,12 @@ class ZoomInitilizeClass() : Activity(), UserLoginCallback.ZoomDemoAuthenticatio
         {
 
         }
-        if(progressDialog!=null)progressDialog?.dismiss()
+        if(progressDialogZoom!=null)progressDialogZoom?.dismiss()
     }
 
     fun progressAlert(context: Activity)
     {
-        if(progressDialog?.isShowing == true)
+        if(progressDialogZoom?.isShowing == true)
         {
             return
         }
@@ -145,9 +153,9 @@ class ZoomInitilizeClass() : Activity(), UserLoginCallback.ZoomDemoAuthenticatio
         val dialogView: View = inflater.inflate(R.layout.progress_view, null)
         dialogBuilder.setView(dialogView)
 
-        progressDialog= dialogBuilder.create()
-        progressDialog?.setCanceledOnTouchOutside(false)
-        progressDialog?.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        progressDialogZoom= dialogBuilder.create()
+        progressDialogZoom?.setCanceledOnTouchOutside(false)
+        progressDialogZoom?.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
 
         val progressbarRelative = dialogView.findViewById<View>(R.id.progressView_parentRv) as RelativeLayout
@@ -155,7 +163,7 @@ class ZoomInitilizeClass() : Activity(), UserLoginCallback.ZoomDemoAuthenticatio
         progressbarRelative.visibility=View.VISIBLE
         mainTitle.setText("Initilize Zoom")
         progressbarRelative.setBackgroundColor(Color.TRANSPARENT)
-        progressDialog?.show()
+        progressDialogZoom?.show()
     }
 
 }

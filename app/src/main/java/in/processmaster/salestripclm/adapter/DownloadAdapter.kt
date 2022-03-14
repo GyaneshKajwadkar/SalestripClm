@@ -5,6 +5,8 @@ import `in`.processmaster.salestripclm.activity.PhotoSlideShowActivity
 import `in`.processmaster.salestripclm.activity.VideoPlayerActivity
 import `in`.processmaster.salestripclm.activity.WebViewActivity
 import `in`.processmaster.salestripclm.activity.DownloadedActivtiy
+import `in`.processmaster.salestripclm.common_classes.AlertClass
+import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.models.DownloadEdetail_model
 import `in`.processmaster.salestripclm.models.DownloadFileModel
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
@@ -191,15 +193,26 @@ class DownloadAdapter constructor() :
             })
 
             videoView.videoTitle.setText(videomodel.fileName)
-            videoView.videoTitle.setSelected(true);
+            videoView.videoTitle.setSelected(true)
 
             videoView.download_rl.setOnClickListener({
+                if(!GeneralClass(context!!).isInternetAvailable())
+                {
+                    AlertClass(context!!).networkAlert()
+                    return@setOnClickListener
+                }
+
                 progressDialog()
                 progressBarAlert?.setIndeterminate(true)
                 downloadUrl(videomodel.filePath!!,position,"VIDEO",videomodel)
             })
 
             videoView.reDownload_rl.setOnClickListener({
+                if(!GeneralClass(context!!).isInternetAvailable())
+                {
+                    AlertClass(context!!).networkAlert()
+                    return@setOnClickListener
+                }
                 progressDialog()
                 progressBarAlert?.setIndeterminate(true)
                 downloadUrl(videomodel.filePath!!,position,"VIDEO",videomodel)
@@ -248,18 +261,23 @@ class DownloadAdapter constructor() :
 
                     if(dbdata.favFile!!)
                     {
-                        videoView.fav_iv.setColorFilter(ContextCompat.getColor(context!!, R.color.zm_red));
+                        videoView.fav_iv.setColorFilter(ContextCompat.getColor(context!!, R.color.zm_red))
                         videoView.fav_iv.setTag("set")
                     }
                     else
                     {
-                        videoView.fav_iv.setColorFilter(ContextCompat.getColor(context!!, R.color.gray));
+                        videoView.fav_iv.setColorFilter(ContextCompat.getColor(context!!, R.color.gray))
                         videoView.fav_iv.setTag("not")
                     }
                 }
             }
 
             videoView.download_rl.setOnClickListener({
+                if(!GeneralClass(context!!).isInternetAvailable())
+                {
+                    AlertClass(context!!).networkAlert()
+                    return@setOnClickListener
+                }
                 progressDialog()
                 progressBarAlert?.setIndeterminate(true)
                 downloadUrl(imagemodel.filePath!!, position, "IMAGE", imagemodel)
@@ -267,6 +285,11 @@ class DownloadAdapter constructor() :
             })
 
             videoView.reDownload_rl.setOnClickListener({
+                if(!GeneralClass(context!!).isInternetAvailable())
+                {
+                    AlertClass(context!!).networkAlert()
+                    return@setOnClickListener
+                }
                 progressDialog()
                 progressBarAlert?.setIndeterminate(true)
                 downloadUrl(imagemodel.filePath!!, position, "IMAGE", imagemodel)
@@ -376,6 +399,11 @@ class DownloadAdapter constructor() :
 
 
             videoView.download_rl.setOnClickListener({
+                if(!GeneralClass(context!!).isInternetAvailable())
+                {
+                    AlertClass(context!!).networkAlert()
+                    return@setOnClickListener
+                }
                 progressDialog()
                 progressBarAlert?.setIndeterminate(true)
                 downloadHtmlZip(zipmodel.filePath!!, position,zipmodel)
@@ -383,6 +411,11 @@ class DownloadAdapter constructor() :
             })
 
             videoView.reDownload_rl.setOnClickListener({
+                if(!GeneralClass(context!!).isInternetAvailable())
+                {
+                    AlertClass(context!!).networkAlert()
+                    return@setOnClickListener
+                }
                 progressDialog()
                 progressBarAlert?.setIndeterminate(true)
                 downloadHtmlZip(zipmodel.filePath!!, position,zipmodel)

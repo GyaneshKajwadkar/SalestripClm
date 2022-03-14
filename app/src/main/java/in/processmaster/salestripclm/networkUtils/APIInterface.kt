@@ -84,11 +84,13 @@ interface APIInterface
         @Path("empId") empId: String?
     ): Call<TeamsModel?>?
 
-    @GET("api/users/{empId}")
+  /*  @GET("api/users/{empId}")
     fun getProfileData(
         @Header("Authorization") authorization: String?,
         @Path("empId") empId: String?
-    ): Call<ProfileModel?>?
+    ): Call<ProfileModel?>?*/
+
+
 
     @POST("api/users/changePassword")
     fun changePassword(@Header("Authorization") authorization: String?, @Body params: JSONObject):Call<GenerateOTPModel?>?
@@ -179,5 +181,11 @@ interface APIInterface
     suspend fun
             dailyDocCallApi(@Header("Authorization") authorization: String?,
                                 @Query("dcrDate") fromDate:String): Response<DailyDocVisitModel>
+
+    @GET("api/users/{empId}") // profile api
+    suspend fun getProfileData(
+        @Header("Authorization") authorization: String?,
+        @Path("empId") empId: String?
+    ): Response<ProfileModel?>?
 
 }

@@ -62,9 +62,9 @@ class SyncModel {
         @Expose
         var doctorList= ArrayList<Doctor>()
 
-       /* @SerializedName("productList")
+        @SerializedName("productList")
         @Expose
-        var productList= ArrayList<Product>()*/
+        var productList= ArrayList<Product>()
 
      /*   @SerializedName("brandList")
         @Expose
@@ -110,9 +110,9 @@ class SyncModel {
         @Expose
         var hospitalList: ArrayList<Hospital>? = null*/
 
-    /*    @SerializedName("schemeList")
+        @SerializedName("schemeList")
         @Expose
-        var schemeList: ArrayList<Scheme>? = null*/
+        var schemeList: ArrayList<Scheme>? = null
 
       /*  class Brand {
             @SerializedName("brandId")
@@ -1391,7 +1391,15 @@ class SyncModel {
                 var mobileNo: String? = ""
             }
         }*/
-       /* class Product {
+        class Product {
+
+          /*  @SerializedName("notNeed")
+            @Expose
+            var pobProductObj: Send_EDetailingModel.PobObj.PobDetailList? = null*/
+
+
+
+
             @SerializedName("productId")
             @Expose
             var productId: Int? = 0
@@ -1551,8 +1559,37 @@ class SyncModel {
             @SerializedName("freeStock")
             @Expose
             var freeStock: Double = 0.0
-            
-        }*/
+
+            var notApi= NotApiData()
+        //=================================Not for api ==========================
+
+       class NotApiData()
+        {
+            var rate: Double?= 0.0
+            var qty: Int?= null
+            var amount: Double?= 0.0
+            var totalQty: Int?= 0
+            var freeQtyMain: Int?= 0
+            var salesQtyMain: Int?= 0
+            var scheme: String?= ""
+            var schemeId: Int? = 0
+            var salesQty: Int? = 0
+            var freeQty: Int? = 0
+            var insertedProductId: Int? = 0
+            var isSaved=false;
+        }
+
+
+
+
+        /*   @SerializedName("qty")      var qty              : Int?                   = 0
+           @SerializedName("amount")   var amount           : Double?                   = 0.0
+           @SerializedName("totalQty") var totalQty         : Int?                   = 0
+           @SerializedName("freeQty")  var  freeQtyMain         : Int?                   = 0
+           @SerializedName("freeQty")  var  salesQtyMain         : Int?                   = 0
+           @SerializedName("scheme")  var  scheme         : String?     = null*/
+
+        }
      /*   class Qualification {
             @SerializedName("qualificationId")
             @Expose
@@ -2111,7 +2148,7 @@ class SyncModel {
             @Expose
             var pinCode: Int? = 0
         }
-        /*class Scheme {
+        class Scheme {
             @SerializedName("schemeId")
             @Expose
             var schemeId: Int? = 0
@@ -2187,7 +2224,7 @@ class SyncModel {
             @SerializedName("isPobDone")
             @Expose
             var isPobDone: Boolean? = false
-        }*/
+        }
         class SettingDCR {
             @SerializedName("settingId")
             @Expose

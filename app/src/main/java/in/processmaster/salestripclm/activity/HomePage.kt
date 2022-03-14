@@ -317,14 +317,13 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         }
         else
         {
-            if(sharePreferanceBase?.getPref("SyncDate")==formattedDate)
+            if(sharePreferanceBase?.getPref("SyncDate").toString().equals(formattedDate))
             { }
             else
             {
-                if(generalClass.isInternetAvailable())
-                    callingMultipleAPI()
+                sharePreferanceBase?.setPref("SyncDate", formattedDate)
+                if(generalClass.isInternetAvailable()) callingMultipleAPI()
                 else {
-                    sharePreferanceBase?.setPref("SyncDate", formattedDate)
                     if (dbBase?.getApiDetail(1) != "") staticSyncData = Gson().fromJson(dbBase?.getApiDetail(1), SyncModel::class.java)
                 }
             }
@@ -363,6 +362,8 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
             val getDocCall= async { getDocCallAPI() }
 
+            val profileApi= async { profileApi() }
+
             val initilizeZoom= async {
                 var zoomSDKBase = ZoomSDK.getInstance()
                 if(!zoomSDKBase.isLoggedIn)
@@ -378,6 +379,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             sendEdetailing.await()
             doctorGraphApi.await()
             getDocCall.await()
+            profileApi.await()
 
         }
         coroutineScope.invokeOnCompletion {
@@ -584,6 +586,23 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     }
 
 
-
+    suspend fun profileApi()
+    {
+        val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
+        ).getProfileData("bearer " + loginModelHomePage.accessToken,
+            loginModelHomePage.empId.toString())
+        withContext(Dispatchers.Main) {
+            Log.e("getProfileAPI", response?.body().toString()!!)
+            if (response!!.isSuccessful)
+            {
+                if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage!!.isEmpty()) {
+                    var model = response.body()
+                    dbBase?.addAPIData(Gson().toJson(model?.getData()), 6)
+                }
+                else Log.e("elseProfileAPI", response.code().toString())
+            }
+            else Log.e("getProfileAPIERROR", response.errorBody().toString())
+        }
+    }
 
 }

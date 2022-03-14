@@ -3,12 +3,13 @@
 <resources>
     <color name="purple_200">#7B68EE</color>
     <color name="purple_500">#6A5ACD</color>
-    <color name="purple_700">#FF3700B3</color>
+    <color name="purple_700">#FF6936DA</color>
     <color name="teal_200">#055E99</color>
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="appColor">#9370DB</color>
+    <color name="appColorlight">#B094E8</color>
     <color name="appDarkColor">#055E99</color>
     <color name="gray">#c5c5c5</color>
     <color name="offwhite">#FAF0E6</color>
@@ -30,5 +31,8 @@
     <color name="lightpurple">#DDA0DD </color>
     <color name="lightskin">#eecbad </color>
     <color name="orange">#FF8C00 </color>
+    <color name="brightBlue">#0096FF</color>
+    <color name="spinnerBack">#fff0f5</color>
+    <color name="darkgray">#a9a9a9</color>
 
 </resources>

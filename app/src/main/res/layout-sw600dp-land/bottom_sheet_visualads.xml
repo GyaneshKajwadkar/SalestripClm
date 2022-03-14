@@ -43,12 +43,15 @@
 
 
                 <ImageView
-                   android:layout_margin="10dp"
-                    android:layout_alignParentEnd="true"
                     android:id="@+id/close_imv"
-                    android:backgroundTint="@color/white"
                     android:layout_width="25dp"
                     android:layout_height="25dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:backgroundTint="@color/white"
                     android:src="@drawable/ic_close"
                     app:tint="@color/white" />
             </RelativeLayout>

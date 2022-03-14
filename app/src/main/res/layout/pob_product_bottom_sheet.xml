@@ -18,15 +18,33 @@
         tools:ignore="MissingConstraints">
 
         <RelativeLayout
-            android:background="@color/yellow"
+            android:background="@color/appDarkColor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <RelativeLayout
-                android:padding="10dp"
                 android:id="@+id/toolbarParent"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:padding="10dp">
+
+                <ImageView
+                    android:id="@+id/closePob_iv"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:padding="7dp"
+                    android:src="@drawable/ic_close"
+                    app:tint="@color/white" />
+
+                <ImageView
+                    android:id="@+id/okPob_iv"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_alignParentEnd="true"
+                    android:padding="5dp"
+                    android:src="@drawable/zm_ic_tick"
+                    app:tint="@color/white" />
+
 
                 <TextView
                     android:id="@+id/selectHeader_tv"
@@ -40,46 +58,46 @@
                     android:textStyle="bold" />
 
             </RelativeLayout>
+
             <LinearLayout
-                android:layout_below="@+id/toolbarParent"
-                android:background="@color/yellow"
-                android:weightSum="3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/toolbarParent"
+                android:background="@color/appDarkColor"
                 android:orientation="horizontal"
+                android:weightSum="3"
                 tools:ignore="MissingConstraints">
 
                 <LinearLayout
-                    android:layout_weight="0.5"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content">
-                </LinearLayout>
-
-                <LinearLayout
-                    android:padding="5dp"
-                    android:layout_weight="2"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="0.5"></LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
                     android:orientation="vertical"
+                    android:padding="5dp"
                     tools:ignore="MissingConstraints">
 
                     <EditText
                         android:id="@+id/doctorSearch_et"
-                        android:drawableTint="@color/appColor"
-                        android:drawableLeft="@android:drawable/ic_menu_search"
-                        android:paddingLeft="5dp"
-                        android:background="@drawable/edittext_capsul"
-                        android:layout_marginTop="5dp"
                         android:layout_width="match_parent"
-                        android:layout_height="40dp"/>
+                        android:layout_height="40dp"
+                        android:layout_marginTop="5dp"
+                        android:background="@drawable/edittext_capsul"
+                        android:drawableLeft="@android:drawable/ic_menu_search"
+                        android:drawableTint="@color/appColor"
+                        android:paddingLeft="5dp" />
 
 
                 </LinearLayout>
+
                 <LinearLayout
-                    android:layout_weight="0.5"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content">
-                </LinearLayout>
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"></LinearLayout>
 
             </LinearLayout>
         </RelativeLayout>

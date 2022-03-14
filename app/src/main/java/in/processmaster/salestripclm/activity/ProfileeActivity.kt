@@ -6,6 +6,7 @@ import `in`.processmaster.salestripclm.activity.HomePage.Companion.apiInterface
 import `in`.processmaster.salestripclm.activity.HomePage.Companion.loginModelHomePage
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.models.GenerateOTPModel
+import `in`.processmaster.salestripclm.models.GetScheduleModel
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.models.ProfileModel
 import android.annotation.SuppressLint
@@ -67,8 +68,8 @@ class ProfileeActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
-        alertClass.showProgressAlert("")
-        getProfileDataApi()
+       // alertClass.showProgressAlert("")
+        setLayout()
 
         personal_mb.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.appColor))
         personal_mb.setTextColor(ContextCompat.getColorStateList(this, R.color.white))
@@ -101,7 +102,8 @@ class ProfileeActivity : BaseActivity() {
         })
 
         changeProfile_mb.setOnClickListener({
-            selectImage()
+            if(generalClass.isInternetAvailable()) selectImage()
+            else alertClass.networkAlert()
         })
 
         backProfile.setOnClickListener({
@@ -461,7 +463,57 @@ class ProfileeActivity : BaseActivity() {
         else false
     }
 
-    fun getProfileDataApi()
+    fun setLayout()
+    {
+        val responseData=dbBase.getApiDetail(6)
+        if(!responseData.equals("")) {
+            var parentObject: ProfileModel.Data = Gson().fromJson(responseData, ProfileModel.Data::class.java)
+            var getObject=parentObject.users?.get(0)
+
+            val options: RequestOptions = RequestOptions()
+                .centerCrop()
+                .placeholder(android.R.mipmap.sym_def_app_icon)
+                .error(android.R.mipmap.sym_def_app_icon)
+
+            Glide.with(this@ProfileeActivity).load(getObject?.absolutePath).apply(options)
+                .into(changeProfilePic_civ!!)
+
+
+            // dateOfbirth_tv.setText(getObject?.dateOfBirth)
+            gender_tv.setText(if (getObject?.gender == 1) "Male" else "Female")
+            maritalStatus_tv.setText(if (getObject?.marriedStatus == 1) "Un-Married" else "Married")
+            email_tv.setText(getObject?.emailId)
+
+            address_tv.setText(getObject?.address1 + " " + getObject?.address2)
+            city_tv.setText(getObject?.cityName)
+            state_tv.setText(getObject?.stateName)
+            country_tv.setText(getObject?.countryName)
+            phoneNumber_tv.setText(getObject?.phone)
+            mobile_tv.setText(getObject?.mobileNo)
+            pincode_tv.setText(getObject?.pinCode!!)
+            divison_tv.setText(getObject?.divisionName)
+            headquarter_tv.setText(getObject?.headQuaterName)
+            manager_tv.setText(getObject?.reportingManagerName)
+
+            val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+            try {
+                val d = sdf.parse(getObject?.joiningDate)
+                val d2 = sdf.parse(getObject?.dateOfBirth)
+                sdf.applyPattern("dd MMM yyyy")
+
+                joiningDate_tv.setText(sdf.format(d))
+                dateOfbirth_tv.setText(sdf.format(d2))
+            } catch (ex: ParseException) {
+                Log.v("Exception", ex.getLocalizedMessage())
+            }
+
+            name_tv.setText(getObject?.fullName)
+            designation_tv.setText(getObject?.hierDesc)
+        }
+    }
+
+
+    /*fun getProfileDataApi()
     {
 
 
@@ -522,10 +574,7 @@ class ProfileeActivity : BaseActivity() {
                     name_tv.setText(getObject?.fullName)
                     designation_tv.setText(getObject?.hierDesc)
 
-                    // fieldWork_id.setText(getObject?.field)
-                    // degree_tv.setText(getObject?.)
-                    // anniversary_tv.setText(if(getObject?.marriedStatus == 1) "Un-Married" else "Married")
-                }
+                        }
                 else
                 {
                     Toast.makeText(this@ProfileeActivity, "Server error ", Toast.LENGTH_SHORT).show()
@@ -538,7 +587,7 @@ class ProfileeActivity : BaseActivity() {
                 alertClass.hideAlert()
             }
         })
-    }
+    }*/
 
     fun changePasswordApi(
         oldPassword: EditText,

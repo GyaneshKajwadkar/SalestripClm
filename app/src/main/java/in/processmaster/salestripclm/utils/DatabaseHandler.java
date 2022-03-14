@@ -27,7 +27,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     //=========================================hold api Data using static id===============================================
 
     //id=1 for sync api, id=2 for getScheduleMeetingApi, id=3 for getQuantityApi id=4 for getDoctorGraphApi
-    // id=5 for getDocCall api
+    // id=5 for getDocCall api // id=6 for profile api
 
     private static final String TABLE_SAVE_API = "apiData";
     private static final String KEY_DATA = "data";

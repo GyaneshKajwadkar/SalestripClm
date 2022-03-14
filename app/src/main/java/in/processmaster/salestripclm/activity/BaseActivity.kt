@@ -397,4 +397,7 @@ open class BaseActivity : AppCompatActivity(){
             else Log.e("getDocCallAPIERROR", response.errorBody().toString())
         }
     }
+
+
+
 }

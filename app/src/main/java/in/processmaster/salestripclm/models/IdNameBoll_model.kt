@@ -22,7 +22,7 @@ class IdNameBoll_model {
             field = value
         }
 
-    var qty=0
+    var qty=-1
         get() = field
         // setter
         set(value) {
