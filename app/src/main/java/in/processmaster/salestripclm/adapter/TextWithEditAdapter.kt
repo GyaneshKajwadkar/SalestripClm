@@ -7,22 +7,19 @@ import `in`.processmaster.salestripclm.models.IdNameBoll_model
 import android.annotation.SuppressLint
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
-import com.zipow.videobox.confapp.ConfMgr.getApplicationContext
 
 class TextWithEditAdapter(
-    var mainList: ArrayList<IdNameBoll_model>,
-    var callback: IdNameBoll_interface,
-    var showEdit: Int,
-    val context: SubmitE_DetailingActivity
-) : RecyclerView.Adapter<TextWithEditAdapter.MyViewHolder>() {
+    var mainList: ArrayList<IdNameBoll_model>?,
+    var callback: IdNameBoll_interface?,
+    var showEdit: Int?,
+    val context: SubmitE_DetailingActivity?,
+    var selectionType: Int,
+) : RecyclerView.Adapter<TextWithEditAdapter.MyViewHolder>(), Filterable {
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -40,20 +37,20 @@ class TextWithEditAdapter(
     }
 
     override fun onBindViewHolder(holder:MyViewHolder, @SuppressLint("RecyclerView") position: Int) {
-        holder.brandName.setText(mainList.get(position).name)
+        holder.brandName.setText(mainList?.get(position)?.name)
         if(showEdit==0) {
             holder.quantity_et.visibility = View.GONE
             holder.availableQtyTv.visibility = View.GONE
         }
 
-        holder.availableQtyTv.setText(mainList.get(position).availableQty.toString() +" QTY")
+        holder.availableQtyTv.setText(mainList?.get(position)?.availableQty.toString() +" QTY")
 
         holder.quantity_et.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 val text=holder.quantity_et.text.toString()
                 if(text!="") {
-                    mainList.get(position).qty = text.toInt()
-                    callback.onChangeArray(mainList, false)
+                    mainList?.get(position)?.qty = text.toInt()
+                    mainList?.let { callback?.onChangeArray(it, false,selectionType) }
                 }
             }
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -61,7 +58,7 @@ class TextWithEditAdapter(
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 val text=holder.quantity_et.text.toString()
                 if(text!="") {
-                    if(text.toInt()<=mainList.get(position).availableQty)
+                    if(text.toInt()<= mainList?.get(position)?.availableQty!!)
                     { }
                     else{
                         val length: Int = text.length
@@ -74,6 +71,43 @@ class TextWithEditAdapter(
     }
 
     override fun getItemCount(): Int {
-        return mainList.size
+        return mainList?.size!!
     }
+
+    override fun getFilter(): Filter? {
+        return object : Filter() {
+            override fun publishResults(constraint: CharSequence?, results: FilterResults) {
+                mainList = results.values as java.util.ArrayList<IdNameBoll_model>?
+                notifyDataSetChanged()
+            }
+            override fun performFiltering(constraint: CharSequence): FilterResults? {
+                var constraint = constraint
+                val results = FilterResults()
+                val FilteredArrayNames: java.util.ArrayList<IdNameBoll_model> =
+                    java.util.ArrayList()
+                constraint = constraint.toString().lowercase()
+                for (i in 0 until mainList?.size!!) {
+                    val docNames: IdNameBoll_model = mainList?.get(i)!!
+                    if (docNames.name?.lowercase()?.startsWith(constraint.toString()) == true) {
+                        FilteredArrayNames.add(docNames)
+                    }
+                }
+                results.count = FilteredArrayNames.size
+                results.values = FilteredArrayNames
+                return results
+            }
+        }
+    }
+
+    fun filter(text: String) {
+
+        for (s in mainList!!) {
+            if (s.name.lowercase().contains(text.lowercase())) {
+                mainList?.add(s)
+            }
+        }
+        notifyDataSetChanged()
+    }
+
+
 }

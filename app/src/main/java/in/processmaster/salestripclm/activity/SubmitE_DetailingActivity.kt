@@ -76,7 +76,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
     var passingSchemeList:ArrayList<SyncModel.Data.Scheme> = ArrayList()
     var filteredProductList:ArrayList<SyncModel.Data.Product> = ArrayList()
     var selectedStockist=IdNameBoll_model()
-
+    var commonSlectionAdapter=CheckboxSpinnerAdapter(ArrayList(),this)
     var sendEDetailingArray:ArrayList<Send_EDetailingModel.PobObj.PobDetailList> = ArrayList()
 
 
@@ -103,6 +103,8 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         gift_rv.layoutManager=LinearLayoutManager(this)
         selectedPob_rv.layoutManager=LinearLayoutManager(this)
 
+        commonSearch_et?.addTextChangedListener(filterCheckboxWatcher)
+        productSearch_et?.addTextChangedListener(filterTextPobWatcher)
 
         doctorName_tv.setText(intent.getStringExtra("doctorName"))
 
@@ -115,17 +117,6 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         }
 
 
-
-        commonSearch_et.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable) {
-
-            }
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-            }
-        })
-
-
         visualSendModel = dbBase.getAllSubmitVisual()
         edetailing_rv.layoutManager=LinearLayoutManager(this)
         edetailing_rv.adapter=EdetallingAdapter()
@@ -133,12 +124,12 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         if(visualSendModel.size==0)nodata_gif.visibility=View.VISIBLE
 
         back_iv.setOnClickListener({onBackPressed()})
-        workingWith_tv.setOnClickListener({openCloseModel(1)
+      /*  workingWith_tv.setOnClickListener({openCloseModel(1)
             selectHeader_tv.setText("Select Work with")})
         clickSample_tv.setOnClickListener({openCloseModel(2)
             selectHeader_tv.setText("Select Samples")})
         giftClick_tv.setOnClickListener({openCloseModel(3)
-            selectHeader_tv.setText("Select Gifts")})
+            selectHeader_tv.setText("Select Gifts")})*/
 
 
         close_imv.setOnClickListener({   bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)})
@@ -238,7 +229,9 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             if(selectBtn.text.equals("Select Gifts")){   openCloseModel(3)}
         })
 
-        assignStockist.setOnClickListener({openCloseModel(4)})
+        assignStockist.setOnClickListener({
+            commonSearch_et.visibility=View.GONE
+            openCloseModel(4)})
 
         submitDetailing_btn.setOnClickListener({
 
@@ -280,7 +273,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
             val filterSelectecd=filteredProductList.filter { s -> (s.notApi.isSaved==true) }
 
-
+            saveModel.pobObject = Send_EDetailingModel.PobObj()
             for(dataObj in filterSelectecd)
             {
               val pobObje=Send_EDetailingModel.PobObj.PobDetailList()
@@ -294,22 +287,27 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
               saveModel.pobObject?.pobDetailList?.add(pobObje)
             }
 
-            saveModel.pobObject?.pobId=0
-            saveModel.pobObject?.pobNo=""
-            saveModel.pobObject?.pobDate=generalClass.getCurrentDateTimeApiForamt()
-            saveModel.pobObject?.partyId=doctorIdDisplayVisual
-            saveModel.pobObject?.employeeId= loginModelHomePage.empId
-
-            val jsonObj= JSONObject(staticSyncData?.data?.configurationSetting)
-            val checkStockistRequired=jsonObj.getInt("SET014")
-            if(checkStockistRequired==1)
+            if(filterSelectecd.size!=0)
             {
-                alertClass.commonAlert("Stockist unselected","Please assign stockist in POB section")
-                return@setOnClickListener
+                saveModel.pobObject?.pobId=0
+                saveModel.pobObject?.pobNo=""
+                saveModel.pobObject?.pobDate=generalClass.getCurrentDateTimeApiForamt()
+                saveModel.pobObject?.partyId=doctorIdDisplayVisual
+                saveModel.pobObject?.employeeId= loginModelHomePage.empId
+
+                Log.e("oioioioio",saveModel.pobObject?.employeeId.toString())
+
+                val jsonObj= JSONObject(staticSyncData?.data?.configurationSetting)
+                val checkStockistRequired=jsonObj.getInt("SET014")
+                if(checkStockistRequired==1)
+                {
+                    alertClass.commonAlert("Stockist unselected","Please assign stockist in POB section")
+                    return@setOnClickListener
+                }
+
             }
-            if(selectedStockist.id!=null)  saveModel.pobObject?.stockistId=selectedStockist.id.toInt()
 
-
+            if(selectedStockist.id!=null && selectedStockist.id!="" && filterSelectecd.size!=0)  saveModel.pobObject?.stockistId=selectedStockist.id.toInt()
 
             if(!GeneralClass(this).isInternetAvailable())
             {   dbBase.insertOrUpdateSaveAPI(dcrId, Gson().toJson(saveModel),"feedback")
@@ -319,12 +317,15 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
                 callRunnableAlert("Data save successfully")
             }
-            else{ submitDcr(saveModel,quantityArray) }
+           else{ submitDcr(saveModel,quantityArray) }
         })
 
         pobProduct_btn.setOnClickListener({
            // setPobProductAdapter()
-            closeBottomSheet()
+            runOnUiThread {
+                pobProduct_rv.scrollToPosition(0)
+                closeBottomSheet()
+            }
         })
 
         val list= staticSyncData?.data?.productList?.filter { s -> (s.productType==1) } as ArrayList<SyncModel.Data.Product>
@@ -374,7 +375,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             var passingProductList= ArrayList<SyncModel.Data.Product>()
             for (passingData in filteredProductList){passingProductList.add(passingData)}
 
-            pobProductSelectAdapter=PobProductAdapter(passingProductList, passingSchemeList,this,this,sendEDetailingArray,this)
+            pobProductSelectAdapter=PobProductAdapter(filteredProductList, passingSchemeList,this)
             pobProduct_rv.adapter= pobProductSelectAdapter
 
             selectedPobAdapter=SelectedPobAdapter(filteredProductList,this,this)
@@ -385,10 +386,48 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
 
         okPob_iv.setOnClickListener({
-         //  pobProductSelectAdapter.setSelction()
-            closeBottomSheet()
-            pobProductSelectAdapter.setSelction()
+
+            for ((index,selected) in filteredProductList.withIndex())
+            {
+                if(selected?.notApi?.insertedProductId!=0)
+                {
+                    selected.notApi.isSaved=true
+                }
+                if(index==filteredProductList.size-1)
+                {
+                    runOnUiThread {
+                        generalClass.hideKeyboard(this@SubmitE_DetailingActivity,it)
+                        pobProductSelectAdapter.notifyDataSetChanged()
+                        selectedPobAdapter.notifyDataSetChanged()
+                    }
+                    calculateTotalProduct()
+                }
+            }
+            runOnUiThread {
+                generalClass.hideKeyboard(this@SubmitE_DetailingActivity,it)
+                closeBottomSheet()
+            }
+
+
+        //   pobProductSelectAdapter.setSelction()
         })
+    }
+
+    val filterTextPobWatcher: TextWatcher = object : TextWatcher {
+        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+            pobProductSelectAdapter?.getFilter()?.filter(s.toString())
+        }
+        override fun afterTextChanged(editable: Editable) {}
+    }
+
+
+    val filterCheckboxWatcher: TextWatcher = object : TextWatcher {
+        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+         commonSlectionAdapter?.getFilter()?.filter(s.toString())
+        }
+        override fun afterTextChanged(editable: Editable) {}
     }
 
 
@@ -404,7 +443,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
 
     fun hideAllSelection()
-    {
+    {   commonSearch_et.setText("")
         pobParent.visibility=View.GONE
         sample_rv.visibility=View.GONE
         gift_rv.visibility=View.GONE
@@ -490,15 +529,20 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
         if(type==1) {
             if (workWithArray.size == 0) noDataCheckAdapter_tv.visibility = View.VISIBLE else noDataCheckAdapter_tv.visibility = View.GONE
-            checkRecyclerView_rv.adapter = CheckboxSpinnerAdapter(workWithArray, this)
+           val passingWorkWith=ArrayList<IdNameBoll_model>()
+            passingWorkWith.addAll(workWithArray)
+            commonSlectionAdapter=   CheckboxSpinnerAdapter(passingWorkWith, this)
+            checkRecyclerView_rv.adapter = commonSlectionAdapter
         }
         if(type==2) {
             if (sampleArray.size == 0) noDataCheckAdapter_tv.visibility = View.VISIBLE else noDataCheckAdapter_tv.visibility = View.GONE
-            checkRecyclerView_rv.adapter = CheckboxSpinnerAdapter(sampleArray, this)
+            commonSlectionAdapter=CheckboxSpinnerAdapter(sampleArray, this)
+            checkRecyclerView_rv.adapter = commonSlectionAdapter
         }
         if(type==3) {
             if (giftArray.size == 0) noDataCheckAdapter_tv.visibility = View.VISIBLE else noDataCheckAdapter_tv.visibility = View.GONE
-            checkRecyclerView_rv.adapter = CheckboxSpinnerAdapter(giftArray, this)
+            commonSlectionAdapter=CheckboxSpinnerAdapter(giftArray, this)
+            checkRecyclerView_rv.adapter = commonSlectionAdapter
         }
         if(type==4)
         {
@@ -519,6 +563,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         saveModel: Send_EDetailingModel,
         quantityArray: ArrayList<CommonModel.QuantityModel.Data.EmployeeSampleBalance>
     ) {
+
         alertClass?.showProgressAlert("")
         var call: Call<JsonObject> = HomePage.apiInterface?.submitEdetailingApi("bearer " + loginModelHomePage.accessToken,saveModel) as Call<JsonObject>
         call.enqueue(object : Callback<JsonObject?> {
@@ -631,32 +676,37 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
     }
 
     override fun onChangeArray(
-        passingArrayList: java.util.ArrayList<IdNameBoll_model>, isUpdate: Boolean) {
-        if(selectionType==1)
-        { workWithArray= ArrayList<IdNameBoll_model>()
+        passingArrayList: java.util.ArrayList<IdNameBoll_model>, isUpdate: Boolean,selectionTypeInterface: Int) {
+
+        var localSelection= if(selectionTypeInterface==0)selectionType else selectionTypeInterface
+        Log.e("shfioshgfuis",localSelection.toString())
+
+        if(localSelection==1)
+        {
+          workWithArray= ArrayList<IdNameBoll_model>()
           workWithArray.addAll(passingArrayList)
             if(isUpdate) {
                 var sendingList = workWithArray!!.filter { s -> s.isChecked == true }
-                workingWithRv.adapter =
-                    TextWithEditAdapter(sendingList as ArrayList<IdNameBoll_model>, this,0,this)
+                workingWithRv.adapter = TextWithEditAdapter(sendingList as ArrayList<IdNameBoll_model>, this,0,this,selectionType)
             }
         }
-        if(selectionType==2)
-        { sampleArray= ArrayList<IdNameBoll_model>()
+        if(localSelection==2)
+        {
+
+            sampleArray= ArrayList<IdNameBoll_model>()
             sampleArray.addAll(passingArrayList)
             if(isUpdate) {
                 var sendingList = sampleArray!!.filter { s -> s.isChecked == true }
-                sample_rv.adapter =
-                    TextWithEditAdapter(sendingList as ArrayList<IdNameBoll_model>, this, 1, this)
+                sample_rv.adapter =TextWithEditAdapter(sendingList as ArrayList<IdNameBoll_model>, this, 1, this,selectionType)
             }
         }
-        if(selectionType==3)
+        if(localSelection==3)
         { giftArray= ArrayList<IdNameBoll_model>()
             giftArray.addAll(passingArrayList)
             if(isUpdate) {
                 var sendingList = giftArray!!.filter { s -> s.isChecked == true }
-                gift_rv.adapter =
-                    TextWithEditAdapter(sendingList as ArrayList<IdNameBoll_model>, this, 1, this)
+                gift_rv.adapter = TextWithEditAdapter(sendingList as ArrayList<IdNameBoll_model>, this, 1, this,selectionType)
+
             }
         }
         if(selectionType==4)
@@ -687,27 +737,29 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
     override fun onClickButtonProduct(selectedList: ArrayList<SyncModel.Data.Product>) {
 
-        filteredProductList.clear()
-        for ((index,selected) in selectedList.withIndex())
-        {
-            if(selected?.notApi?.insertedProductId!=0)
+            for ((index,selected) in selectedList.withIndex())
             {
-                selected.notApi.isSaved=true
-                selectedPobAdapter.notifyItemChanged(index)
+                if(selected?.notApi?.insertedProductId!=0)
+                {
+                    selected.notApi.isSaved=true
+                }
+                if(!selected.equals(filteredProductList.get(index)))
+                {
+                    filteredProductList.set(index,selected)
+                }
+                if(index==selectedList.size-1)
+                {
+                    pobProductSelectAdapter.notifyDataSetChanged()
+                    selectedPobAdapter.notifyDataSetChanged()
+                    calculateTotalProduct()
+                }
             }
-            else  selectedPobAdapter.notifyDataSetChanged()
-
-            filteredProductList.add(selected)
-        }
-        pobProductSelectAdapter.notifyDataSetChanged()
-        calculateTotalProduct()
     }
 
     fun updateSpecificElement(returnModel: SyncModel.Data.Product?, position: Int)
     {
         returnModel?.let { filteredProductList.set(position, it) }
         calculateTotalProduct()
-
     }
 
     fun calculateTotalProduct()
@@ -715,12 +767,8 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         val filterSelectecd=filteredProductList.filter { s -> (s.notApi.isSaved==true) }
         var calculation=0.0
         for(data in filterSelectecd)
-        {
-            calculation= data.notApi.amount?.plus(calculation)!!
-        }
-
+        { calculation= data.notApi.amount?.plus(calculation)!! }
         totalProductPrice_tv.setText("Grand Total: "+String.format("%.2f", calculation))
-
     }
 
 }

@@ -8,6 +8,8 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -89,8 +91,15 @@ class SelectedPobAdapter(
         holder.close.setOnClickListener({
             model?.notApi=SyncModel.Data.Product.NotApiData()
             model?.let { it1 -> sendEDetailingArray?.set(position, it1) }
-            sendEDetailingArray?.let { sendProductInterface?.onClickButtonProduct(it) }
 
+            notifyItemChanged(position)
+            submiteDetailingactivity?.calculateTotalProduct()
+            Handler(Looper.getMainLooper()).postDelayed({
+                submiteDetailingactivity?.pobProductSelectAdapter?.notifyItemChanged(position)
+            }, 100)
+
+
+         //   sendEDetailingArray?.let { sendProductInterface?.onClickButtonProduct(it) }
         })
 
         holder.qty_et.setOnFocusChangeListener(object : View.OnFocusChangeListener {
@@ -104,7 +113,6 @@ class SelectedPobAdapter(
                 }
             }
         })
-
 
     }
 
@@ -154,6 +162,13 @@ class SelectedPobAdapter(
         alertqty_et.setText(model?.notApi?.qty.toString())
 
         ok_btn.setOnClickListener{
+
+            if(alertqty_et.text.isEmpty() || alertqty_et.text.toString().toInt()==0)
+            {
+                alertqty_et.setError("Required")
+                alertqty_et.requestFocus()
+                return@setOnClickListener
+            }
 
            val returnModel= model?.let { it1 -> getSchemeObject(it1,alertqty_et.text.toString()) }
             returnModel?.let { it1 -> sendEDetailingArray?.set(position, it1) }

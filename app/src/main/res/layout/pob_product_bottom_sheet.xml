@@ -30,17 +30,18 @@
 
                 <ImageView
                     android:id="@+id/closePob_iv"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:padding="7dp"
                     android:src="@drawable/ic_close"
                     app:tint="@color/white" />
 
-                <ImageView
+                <ImageButton
                     android:id="@+id/okPob_iv"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
                     android:layout_alignParentEnd="true"
+                    android:background="?attr/selectableItemBackgroundBorderless"
                     android:padding="5dp"
                     android:src="@drawable/zm_ic_tick"
                     app:tint="@color/white" />
@@ -82,7 +83,7 @@
                     tools:ignore="MissingConstraints">
 
                     <EditText
-                        android:id="@+id/doctorSearch_et"
+                        android:id="@+id/productSearch_et"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:layout_marginTop="5dp"

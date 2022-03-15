@@ -14,6 +14,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.Filter
+import android.widget.Filterable
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
@@ -21,14 +23,13 @@ import androidx.recyclerview.widget.RecyclerView
 class PobProductAdapter(
     val productList: ArrayList<SyncModel.Data.Product>?,
     val schemeList: ArrayList<SyncModel.Data.Scheme>?,
-    val submiteDetailingactivity: SubmitE_DetailingActivity?,
-    val mCallback: PobProductTransfer?,
-    var sendEDetailingArray:ArrayList<Send_EDetailingModel.PobObj.PobDetailList>?,
     var sendProductInterface: productTransfer?
-): RecyclerView.Adapter<PobProductAdapter.MyViewHolder>() {
+): RecyclerView.Adapter<PobProductAdapter.MyViewHolder>(), Filterable {
+
+    var productFilteringList= ArrayList(productList)
 
 
-    constructor() : this(null, null,null,null,null,null) {
+    constructor() : this(ArrayList(), ArrayList(),null) {
     }
 
     override fun onCreateViewHolder(
@@ -49,10 +50,6 @@ class PobProductAdapter(
         var scheme_tv = view.findViewById<TextView>(R.id.scheme_tv)
         var qty_et = view.findViewById<EditText>(R.id.qty_et)
         var parentlinearL = view.findViewById<View>(R.id.parentlinearL)
-
-
-
-
     }
 
     override fun onBindViewHolder(
@@ -60,7 +57,7 @@ class PobProductAdapter(
         @SuppressLint("RecyclerView") position: Int
     ) {
 
-        val model = productList?.get(position)
+        val model = productFilteringList?.get(position)
         holder.titlePobproduct_tv.text=model?.productName
         holder.uom_tv.text="UOM: "+model?.packingTypeName
         holder.division_tv.text="Divison: "+model?.divisionName
@@ -206,13 +203,13 @@ class PobProductAdapter(
     }
 
     override fun getItemCount(): Int {
-        return productList?.size!!
+        return productFilteringList?.size!!
     }
 
 
      fun setSelction()
     {
-        productList?.let { sendProductInterface?.onClickButtonProduct(it) }
+        productFilteringList?.let { sendProductInterface?.onClickButtonProduct(it) }
     }
 
 
@@ -224,5 +221,29 @@ class PobProductAdapter(
         return position
     }
 
+    override fun getFilter(): Filter? {
+        return object : Filter() {
+            override fun publishResults(constraint: CharSequence?, results: FilterResults) {
+                productFilteringList = results.values as java.util.ArrayList<SyncModel.Data.Product>
+                notifyDataSetChanged()
+            }
+            override fun performFiltering(constraint: CharSequence): FilterResults? {
+                var constraint = constraint
+                val results = FilterResults()
+                val FilteredArrayNames: java.util.ArrayList<SyncModel.Data.Product> =
+                    java.util.ArrayList()
+                    constraint = constraint.toString().lowercase()
+                    for (i in 0 until productList?.size!!) {
+                        val docNames: SyncModel.Data.Product = productList?.get(i)
+                        if (docNames.productName?.lowercase()?.startsWith(constraint.toString()) == true) {
+                            FilteredArrayNames.add(docNames)
+                        }
+                    }
+                    results.count = FilteredArrayNames.size
+                    results.values = FilteredArrayNames
+                    return results
+            }
+        }
+    }
 
 }

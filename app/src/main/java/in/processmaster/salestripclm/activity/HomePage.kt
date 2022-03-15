@@ -273,11 +273,8 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             }
 
             R.id.sync_menu -> {
-                //call sync api
-                if (generalClass.isInternetAvailable()) {
-                  //  sync_api()
-                      callingMultipleAPI()
-                }
+                if (generalClass.isInternetAvailable()) callingMultipleAPI() //  sync_api()
+                else alertClass.networkAlert()
             }
 
             R.id.nav_scheduled -> {
