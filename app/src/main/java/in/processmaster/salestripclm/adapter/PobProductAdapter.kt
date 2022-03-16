@@ -100,7 +100,6 @@ class PobProductAdapter(
 
                         val getFree=s.toString().toInt()/ model?.notApi?.salesQty!! * model?.notApi?.freeQtyMain!!
 
-                        Log.e("shfuisgf",getFree.toString())
 
                         model?.notApi?.freeQty=getFree
                         val totalQty=getFree+s.toString().toInt()
@@ -145,6 +144,7 @@ class PobProductAdapter(
                     }*/
 
                 }
+                else model?.notApi=SyncModel.Data.Product.NotApiData()
             }
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {

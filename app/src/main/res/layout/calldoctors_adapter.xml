@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_height="wrap_content">
@@ -161,7 +162,24 @@
                         android:textSize="13sp"
                         android:text="meeting at"/>
 
+
+
+
                 </LinearLayout>
+
+                <Button
+                    android:layout_gravity="end"
+                    android:textColor="@color/white"
+                    android:text="Edit"
+                    android:id="@+id/editDoctorCall_mb"
+                    android:textAllCaps="false"
+                    android:textAlignment="center"
+                    android:scaleType="fitCenter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="35dp"
+                    android:textSize="12dp"
+                    tools:ignore="RtlCompat" />
+
             </LinearLayout>
         </LinearLayout>
 

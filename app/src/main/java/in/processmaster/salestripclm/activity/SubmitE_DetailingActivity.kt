@@ -17,6 +17,7 @@ import `in`.processmaster.salestripclm.interfaceCode.productTransfer
 import `in`.processmaster.salestripclm.models.*
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -26,6 +27,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.annotation.NonNull
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -42,7 +44,6 @@ import kotlinx.android.synthetic.main.bottom_sheet_visualads.bottomSheet
 import kotlinx.android.synthetic.main.bottom_sheet_visualads.close_imv
 import kotlinx.android.synthetic.main.checkbox_bottom_sheet.*
 import kotlinx.android.synthetic.main.checkbox_bottom_sheet.noDataCheckAdapter_tv
-import kotlinx.android.synthetic.main.checkbox_bottom_sheet.selectHeader_tv
 import kotlinx.android.synthetic.main.common_toolbar.*
 import kotlinx.android.synthetic.main.pob_product_bottom_sheet.*
 import kotlinx.coroutines.CoroutineScope
@@ -55,7 +56,8 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 
 class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProductTransfer,
@@ -74,10 +76,17 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
     var pobProductSelectAdapter=PobProductAdapter()
     var selectedPobAdapter=SelectedPobAdapter()
     var passingSchemeList:ArrayList<SyncModel.Data.Scheme> = ArrayList()
-    var filteredProductList:ArrayList<SyncModel.Data.Product> = ArrayList()
+
     var selectedStockist=IdNameBoll_model()
     var commonSlectionAdapter=CheckboxSpinnerAdapter(ArrayList(),this)
     var sendEDetailingArray:ArrayList<Send_EDetailingModel.PobObj.PobDetailList> = ArrayList()
+
+
+    //pob initilize------
+    var filteredProductList:ArrayList<SyncModel.Data.Product> = ArrayList()
+    var mainProductList:ArrayList<SyncModel.Data.Product> = ArrayList()
+    var selectedProductList:ArrayList<SyncModel.Data.Product> = ArrayList()
+    var unSelectedProductList:ArrayList<SyncModel.Data.Product> = ArrayList()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -114,6 +123,12 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         {
             dbBase.deleteAllVisualAds()
             dbBase.deleteAllChildVisual()
+        }
+
+
+        if(intent.getStringExtra("apiDataDcr")?.isEmpty() == false)
+        {
+
         }
 
 
@@ -168,7 +183,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         for(workWith in staticSyncData?.data?.workingWithList!!)
         {
             val data =IdNameBoll_model()
-            data.id= workWith.emailId.toString()
+            data.id= workWith.empId.toString()
             data.name= workWith.fullName.toString()
             workWithArray.add(data)
         }
@@ -271,7 +286,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 }
             }
 
-            val filterSelectecd=filteredProductList.filter { s -> (s.notApi.isSaved==true) }
+            val filterSelectecd=selectedProductList.filter { s -> (s.notApi.isSaved==true) }
 
             saveModel.pobObject = Send_EDetailingModel.PobObj()
             for(dataObj in filterSelectecd)
@@ -294,8 +309,6 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 saveModel.pobObject?.pobDate=generalClass.getCurrentDateTimeApiForamt()
                 saveModel.pobObject?.partyId=doctorIdDisplayVisual
                 saveModel.pobObject?.employeeId= loginModelHomePage.empId
-
-                Log.e("oioioioio",saveModel.pobObject?.employeeId.toString())
 
                 val jsonObj= JSONObject(staticSyncData?.data?.configurationSetting)
                 val checkStockistRequired=jsonObj.getInt("SET014")
@@ -321,21 +334,17 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         })
 
         pobProduct_btn.setOnClickListener({
-           // setPobProductAdapter()
-            runOnUiThread {
-                pobProduct_rv.scrollToPosition(0)
-                closeBottomSheet()
-            }
+            closeBottomSheet()
         })
 
         val list= staticSyncData?.data?.productList?.filter { s -> (s.productType==1) } as ArrayList<SyncModel.Data.Product>
-        for(addData in list)
-        {
-            addData?.notApi=SyncModel.Data.Product.NotApiData()
-            filteredProductList.add(addData)
-        }
 
-        // filteredProductList = productArray.clone() as ArrayList<SyncModel.Data.Product>
+       var tempList= ArrayList(list)
+
+        val stringAnimal = Gson().toJson(staticSyncData?.data)
+        val data= Gson().fromJson(stringAnimal, SyncModel.Data::class.java)
+        mainProductList.addAll(data.productList.filter { s -> (s.productType==1) } as ArrayList<SyncModel.Data.Product>)
+        unSelectedProductList=ArrayList(mainProductList)
 
         val getSchemeList=staticSyncData?.data?.schemeList
         val filterByTypeSchemeList= getSchemeList?.filter { data -> (data?.schemeFor=="S" || data?.schemeFor=="H") }
@@ -375,10 +384,10 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             var passingProductList= ArrayList<SyncModel.Data.Product>()
             for (passingData in filteredProductList){passingProductList.add(passingData)}
 
-            pobProductSelectAdapter=PobProductAdapter(filteredProductList, passingSchemeList,this)
+            pobProductSelectAdapter=PobProductAdapter(unSelectedProductList, passingSchemeList,this)
             pobProduct_rv.adapter= pobProductSelectAdapter
 
-            selectedPobAdapter=SelectedPobAdapter(filteredProductList,this,this)
+            selectedPobAdapter=SelectedPobAdapter(selectedProductList,this,this)
             selectedPob_rv.adapter= selectedPobAdapter
             }, 500)
 
@@ -386,30 +395,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
 
         okPob_iv.setOnClickListener({
-
-            for ((index,selected) in filteredProductList.withIndex())
-            {
-                if(selected?.notApi?.insertedProductId!=0)
-                {
-                    selected.notApi.isSaved=true
-                }
-                if(index==filteredProductList.size-1)
-                {
-                    runOnUiThread {
-                        generalClass.hideKeyboard(this@SubmitE_DetailingActivity,it)
-                        pobProductSelectAdapter.notifyDataSetChanged()
-                        selectedPobAdapter.notifyDataSetChanged()
-                    }
-                    calculateTotalProduct()
-                }
-            }
-            runOnUiThread {
-                generalClass.hideKeyboard(this@SubmitE_DetailingActivity,it)
-                closeBottomSheet()
-            }
-
-
-        //   pobProductSelectAdapter.setSelction()
+           pobProductSelectAdapter.setSelction()
         })
     }
 
@@ -737,23 +723,84 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
     override fun onClickButtonProduct(selectedList: ArrayList<SyncModel.Data.Product>) {
 
+        selectedProductList.clear()
+        alertClass.showProgressAlert("")
+
+        Handler(Looper.getMainLooper()).postDelayed({
+
+                    val executor: ExecutorService = Executors.newSingleThreadExecutor()
+                    val handler = Handler(Looper.getMainLooper())
+
+                    executor.execute {
+                        for ((index,selected) in selectedList.withIndex())
+                        {
+                            if(selected?.notApi?.insertedProductId!=0)
+                            {
+                                selected.notApi.isSaved=true
+                                selectedProductList.add(selected)
+                               //selectedPobAdapter.notifyItemChanged(index)
+                               //pobProductSelectAdapter.notifyItemChanged(index)
+                            }
+                        }
+                        handler.post {
+                            selectedPobAdapter.notifyDataSetChanged()
+                            pobProductSelectAdapter.notifyDataSetChanged()
+                            pobProduct_rv.scrollToPosition(0)
+
+                            val view = this.currentFocus
+                            if (view != null) {
+                                val imm: InputMethodManager =
+                                    getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                                imm.hideSoftInputFromWindow(view.windowToken, 0)
+                            }
+                            calculateTotalProduct()
+                            closeBottomSheet()
+
+                            Handler(Looper.getMainLooper()).postDelayed({
+                            alertClass.hideAlert()
+                            }, 10)
+                        }
+                    }
+
+        }, 2)
+
+
+
+/*
+        Handler(Looper.getMainLooper()).postDelayed({
             for ((index,selected) in selectedList.withIndex())
             {
                 if(selected?.notApi?.insertedProductId!=0)
                 {
                     selected.notApi.isSaved=true
-                }
-                if(!selected.equals(filteredProductList.get(index)))
-                {
-                    filteredProductList.set(index,selected)
+                    selectedProductList.add(selected)
+                    selectedPobAdapter.notifyItemChanged(index)
+                    pobProductSelectAdapter.notifyItemChanged(index)
                 }
                 if(index==selectedList.size-1)
                 {
-                    pobProductSelectAdapter.notifyDataSetChanged()
-                    selectedPobAdapter.notifyDataSetChanged()
-                    calculateTotalProduct()
+                    val executor: ExecutorService = Executors.newSingleThreadExecutor()
+                    val handler = Handler(Looper.getMainLooper())
+
+                    executor.execute {
+                        calculateTotalProduct()
+                        handler.post {
+                            pobProduct_rv.scrollToPosition(0)
+                            val view = this.currentFocus
+                            if (view != null) {
+                                val imm: InputMethodManager =
+                                    getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                                imm.hideSoftInputFromWindow(view.windowToken, 0)
+                            }
+                            closeBottomSheet()
+                            alertClass.hideAlert()
+                        }
+                    }
                 }
             }
+        }, 10)
+*/
+
     }
 
     fun updateSpecificElement(returnModel: SyncModel.Data.Product?, position: Int)
@@ -764,7 +811,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
     fun calculateTotalProduct()
     {
-        val filterSelectecd=filteredProductList.filter { s -> (s.notApi.isSaved==true) }
+        val filterSelectecd=selectedProductList.filter { s -> (s.notApi.isSaved==true) }
         var calculation=0.0
         for(data in filterSelectecd)
         { calculation= data.notApi.amount?.plus(calculation)!! }

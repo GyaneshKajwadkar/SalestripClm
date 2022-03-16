@@ -69,6 +69,7 @@ class HomeFragment : Fragment(), OnChartGestureListener {
 
     val myCalendar = Calendar.getInstance()
     var selectDate_tv : TextView? =null
+    var todaysCall_tv : TextView? =null
     var expandable_Rv: RecyclerView?= null
     var dailyDoctorCall_rv: RecyclerView?= null
     lateinit var db : DatabaseHandler
@@ -91,6 +92,7 @@ class HomeFragment : Fragment(), OnChartGestureListener {
             expandable_Rv    = root.findViewById<View>(R.id.expandable_Rv) as RecyclerView
             dailyDoctorCall_rv = root.findViewById<View>(R.id.dailyDoctorCall_rv) as RecyclerView
             noDocCall_tv = root.findViewById<View>(R.id.noDocCall_tv) as TextView
+            todaysCall_tv = root.findViewById<View>(R.id.todaysCall_tv) as TextView
 
             sharePreferance = PreferenceClass(activity)
             db= DatabaseHandler(requireActivity())
@@ -145,19 +147,12 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         {
           val  docCallModel= Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
             if(docCallModel.dcrDoctorlist?.size==0) { noDocCall_tv?.visibility = View.VISIBLE; return }
-            val docAdapter=CallDoctor_Adapter(docCallModel.dcrDoctorlist)
+            val docAdapter=CallDoctor_Adapter(docCallModel.dcrDoctorlist,requireActivity())
             dailyDoctorCall_rv?.layoutManager=LinearLayoutManager(requireActivity())
             dailyDoctorCall_rv?.adapter=docAdapter
+            todaysCall_tv?.setText("Today's call- "+docCallModel.dcrDoctorlist?.size)
         }
-
-
-
     }
-
-
-
-
-
 
     fun createAlert(heading: String, buttonText: String, context: Activity)
     {

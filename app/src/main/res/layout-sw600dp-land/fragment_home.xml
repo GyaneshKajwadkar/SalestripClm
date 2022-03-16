@@ -7,8 +7,7 @@
     tools:ignore="MissingDefaultResource">
 
     <LinearLayout
-
-            android:id="@+id/parent_ll"
+         android:id="@+id/parent_ll"
             android:padding="10dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -161,23 +160,24 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
+
                     <TextView
+                        android:id="@+id/todaysCall_tv"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@android:color/holo_green_dark"
-                        android:textColor="@color/white"
-                        android:text="Today's call"
                         android:padding="5dp"
+                        android:text="Today's call"
                         android:textAlignment="center"
-                        android:id="@+id/dd_tv"
-                        android:textSize="18sp"/>
+                        android:textColor="@color/white"
+                        android:textSize="18sp" />
 
                     <androidx.recyclerview.widget.RecyclerView
-                        android:layout_below="@+id/dd_tv"
+                        android:id="@+id/dailyDoctorCall_rv"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="5dp"
-                        android:id="@+id/dailyDoctorCall_rv"/>
+                        android:layout_below="@+id/todaysCall_tv"
+                        android:padding="5dp" />
 
                     <TextView
                         android:visibility="gone"

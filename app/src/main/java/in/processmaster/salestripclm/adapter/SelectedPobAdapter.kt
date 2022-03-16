@@ -1,7 +1,9 @@
 package `in`.processmaster.salestripclm.adapter
 
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.activity.SplashActivity
 import `in`.processmaster.salestripclm.activity.SubmitE_DetailingActivity
+import `in`.processmaster.salestripclm.fragments.PresentEDetailingFrag
 import `in`.processmaster.salestripclm.interfaceCode.productTransfer
 import `in`.processmaster.salestripclm.models.SyncModel
 import android.annotation.SuppressLint
@@ -90,13 +92,28 @@ class SelectedPobAdapter(
 
         holder.close.setOnClickListener({
             model?.notApi=SyncModel.Data.Product.NotApiData()
+
+            for ((index,data) in submiteDetailingactivity?.unSelectedProductList?.withIndex()!!)
+            {
+                if(model?.notApi?.insertedProductId==data.notApi.insertedProductId)
+                {
+                    model?.let { it1 -> submiteDetailingactivity?.unSelectedProductList?.set(index, it1)
+                    }
+                    submiteDetailingactivity?.calculateTotalProduct()
+                    submiteDetailingactivity?.pobProductSelectAdapter?.notifyDataSetChanged()
+                    notifyItemChanged(position)
+                }
+            }
+
+       /*     val insertSelectedModel = submiteDetailingactivity?.mainProductList?.find { it.notApi.insertedProductId == model?.notApi?.insertedProductId }
+
             model?.let { it1 -> sendEDetailingArray?.set(position, it1) }
 
-            notifyItemChanged(position)
-            submiteDetailingactivity?.calculateTotalProduct()
+
+
             Handler(Looper.getMainLooper()).postDelayed({
-                submiteDetailingactivity?.pobProductSelectAdapter?.notifyItemChanged(position)
-            }, 100)
+
+            }, 100)*/
 
 
          //   sendEDetailingArray?.let { sendProductInterface?.onClickButtonProduct(it) }

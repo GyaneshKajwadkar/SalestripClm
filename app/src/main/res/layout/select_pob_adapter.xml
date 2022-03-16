@@ -18,17 +18,17 @@
 
             <ImageView
                 android:id="@+id/close"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:layout_alignParentEnd="true"
-                android:padding="5dp"
+                android:padding="7dp"
                 android:src="@drawable/ic_close" />
             <LinearLayout
                 android:layout_below="@+id/close"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="3dp"
+                android:padding="5dp"
                 android:weightSum="2">
                 <LinearLayout
                     android:layout_width="0dp"
@@ -49,45 +49,62 @@
                         android:textSize="18sp"/>
 
                     <TextView
-                        android:layout_marginLeft="2dp"
                         android:id="@+id/uom_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="UOM"/>
 
+
                     <TextView
                         android:id="@+id/rate_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="2dp"
                         android:text="Rate" />
-                    <TextView
-                        android:id="@+id/free_tv"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="2dp"
-                        android:text="Free" />
 
-                    <TextView
-                        android:id="@+id/qty_tv"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="2dp"
-                        android:text="Total Qty" />
+                        android:orientation="horizontal"
+                        android:weightSum="2">
 
-                    <TextView
-                        android:id="@+id/total_tv"
-                        android:layout_width="wrap_content"
+                        <TextView
+                            android:layout_weight="1"
+                            android:id="@+id/qty_tv"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:text="Total Qty" />
+
+                        <TextView
+                            android:layout_weight="1"
+                            android:id="@+id/total_tv"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:text="Total" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="2dp"
-                        android:text="Total" />
-                    <TextView
-                        android:visibility="gone"
-                        android:layout_marginLeft="2dp"
-                        android:id="@+id/scheme_tv"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Scheme"/>
+                        android:orientation="horizontal"
+                        android:weightSum="2">
+
+                        <TextView
+                            android:layout_weight="1"
+                            android:id="@+id/free_tv"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:text="Free" />
+
+
+                        <TextView
+                            android:layout_weight="1"
+                            android:visibility="gone"
+                            android:id="@+id/scheme_tv"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:text="Scheme"/>
+                    </LinearLayout>
+
 
                 </LinearLayout>
 

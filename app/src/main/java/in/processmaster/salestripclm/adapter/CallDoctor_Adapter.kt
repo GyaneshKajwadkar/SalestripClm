@@ -1,9 +1,12 @@
 package `in`.processmaster.salestripclm.adapter
 
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.activity.SubmitE_DetailingActivity
 import `in`.processmaster.salestripclm.models.DailyDocVisitModel
 import `in`.processmaster.salestripclm.models.SyncModel
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,11 +14,14 @@ import android.widget.Filter
 import android.widget.Filterable
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
 import java.util.ArrayList
 
 class CallDoctor_Adapter(
-    val doctorList: List<DailyDocVisitModel.Data.DcrDoctor>?
+    val doctorList: List<DailyDocVisitModel.Data.DcrDoctor>?,
+    val requireActivity: Activity
 ) : RecyclerView.Adapter<CallDoctor_Adapter.ViewHolders>()
 {
 
@@ -34,6 +40,13 @@ class CallDoctor_Adapter(
         holder.visitPurpose_tv.setText( modeldata?.visitPurposeName)
         holder.meetingAt_tv.setText( modeldata?.callMediumTypeName)
 
+        holder.editDoctorCall_mb.setOnClickListener({
+
+            val intent = Intent(requireActivity, SubmitE_DetailingActivity::class.java)
+            intent.putExtra("apiDataDcr", Gson().toJson(modeldata))
+            requireActivity.startActivity(intent)
+        })
+
     }
 
     override fun getItemCount(): Int {
@@ -48,6 +61,7 @@ class CallDoctor_Adapter(
     var workWithName_tv=view.findViewById<TextView>(R.id.workWithName_tv)
     var visitPurpose_tv=view.findViewById<TextView>(R.id.visitPurpose_tv)
     var meetingAt_tv=view.findViewById<TextView>(R.id.meetingAt_tv)
+    var editDoctorCall_mb=view.findViewById<TextView>(R.id.editDoctorCall_mb)
     }
 
 

@@ -135,8 +135,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_width="0dp"
                                 android:layout_weight="1.8"
-                                android:textStyle="italic"
-                                android:text="abcd"/>
+                                android:textStyle="italic" />
 
                         </TableRow>
 
@@ -194,8 +193,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_width="0dp"
                                 android:layout_weight="1.8"
-                                android:textStyle="italic"
-                                android:text="abcd"/>
+                                android:textStyle="italic" />
 
                         </TableRow>
 

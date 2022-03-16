@@ -116,9 +116,9 @@ open class BaseActivity : AppCompatActivity(){
                     if (report.areAllPermissionsGranted()) { }
                     else { permissionDenied_Dialog(context, false) }
 
-                    if (report.isAnyPermissionPermanentlyDenied()) {
+                   /* if (report.isAnyPermissionPermanentlyDenied()) {
                         // permission is denied permenantly, navigate user to app settings
-                        permissionDenied_Dialog(context, true) }
+                        permissionDenied_Dialog(context, true) }*/
                 }
 
                 override fun onPermissionRationaleShouldBeShown(
@@ -162,7 +162,10 @@ open class BaseActivity : AppCompatActivity(){
             } else { dexterPermission(context) }
             alertDialog!!.dismiss()
         }
-        ok_btn.setOnClickListener { alertDialog!!.dismiss() }
+        ok_btn.setOnClickListener {
+            this.finish();
+            System.exit(0);
+            alertDialog!!.dismiss() }
         alertDialog!!.show()
     }
 
