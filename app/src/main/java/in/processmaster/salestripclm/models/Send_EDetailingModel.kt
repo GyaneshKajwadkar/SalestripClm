@@ -84,14 +84,11 @@ class Send_EDetailingModel(val demo:Int =0) {
       @SerializedName("scheme")  var  scheme         : String?     = null
       @SerializedName("productName")  var  productName         : String?     = null
   }
-
-
     }
 
 
 
      class GiftList {
-
         @SerializedName("dcrId"             ) var dcrId             : Int?    = null
         @SerializedName("detailId"          ) var detailId          : Int?    = null
         @SerializedName("productId"         ) var productId         : Int?    = null
@@ -99,7 +96,6 @@ class Send_EDetailingModel(val demo:Int =0) {
         @SerializedName("prescriptionCount" ) var prescriptionCount : Int?    = null
         @SerializedName("type"              ) var type              : String? = null
         @SerializedName("empId"             ) var empId             : Int?    = null
-
 }
 
      class SampleList {

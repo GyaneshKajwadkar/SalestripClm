@@ -161,11 +161,11 @@ interface APIInterface
     @POST("api/dcr/doctor/v2")
     fun submitEdetailingApi(
         @Header("Authorization") authorization: String?,
-        @Body arrayVisual: Send_EDetailingModel
+        @Body arrayVisual: DailyDocVisitModel.Data.DcrDoctor
     ): Call<JsonObject?>?
 
     @GET("api/dcr/doctor/v2") //sync api
-    suspend fun submitEdetailingApiCoo(@Header("Authorization") authorization: String,  @Body arrayVisual: Send_EDetailingModel): Response<JsonObject>
+    suspend fun submitEdetailingApiCoo(@Header("Authorization") authorization: String,  @Body arrayVisual: DailyDocVisitModel.Data.DcrDoctor): Response<JsonObject>
 
 
     @GET("api/gs-receive/employee-sample-balance") //sync api

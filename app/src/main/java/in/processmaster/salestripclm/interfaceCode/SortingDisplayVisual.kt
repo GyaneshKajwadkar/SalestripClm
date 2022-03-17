@@ -1,7 +1,7 @@
 package `in`.processmaster.salestripclm.interfaceCode
 
+import `in`.processmaster.salestripclm.models.DailyDocVisitModel
 import `in`.processmaster.salestripclm.models.DownloadFileModel
-import `in`.processmaster.salestripclm.models.Send_EDetailingModel
 import `in`.processmaster.salestripclm.models.SyncModel
 import kotlin.collections.ArrayList
 
@@ -11,7 +11,7 @@ interface SortingDisplayVisual {
 }
 
 interface PobProductTransfer{
-    fun onClickButtonPOB(downloadList: ArrayList<Send_EDetailingModel.PobObj.PobDetailList>)
+    fun onClickButtonPOB(downloadList: ArrayList<DailyDocVisitModel.Data.DcrDoctor.PobObj.PobDetailList>)
 }
 
 interface productTransfer{

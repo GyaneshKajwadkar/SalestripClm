@@ -76,14 +76,11 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
     var pobProductSelectAdapter=PobProductAdapter()
     var selectedPobAdapter=SelectedPobAdapter()
     var passingSchemeList:ArrayList<SyncModel.Data.Scheme> = ArrayList()
-
     var selectedStockist=IdNameBoll_model()
     var commonSlectionAdapter=CheckboxSpinnerAdapter(ArrayList(),this)
-    var sendEDetailingArray:ArrayList<Send_EDetailingModel.PobObj.PobDetailList> = ArrayList()
-
+  //  var sendEDetailingArray:ArrayList<Send_EDetailingModel.PobObj.PobDetailList> = ArrayList()
 
     //pob initilize------
-    var filteredProductList:ArrayList<SyncModel.Data.Product> = ArrayList()
     var mainProductList:ArrayList<SyncModel.Data.Product> = ArrayList()
     var selectedProductList:ArrayList<SyncModel.Data.Product> = ArrayList()
     var unSelectedProductList:ArrayList<SyncModel.Data.Product> = ArrayList()
@@ -115,58 +112,12 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         commonSearch_et?.addTextChangedListener(filterCheckboxWatcher)
         productSearch_et?.addTextChangedListener(filterTextPobWatcher)
 
-        doctorName_tv.setText(intent.getStringExtra("doctorName"))
-
         if(intent.getIntExtra("doctorID",0)!=0) doctorIdDisplayVisual= intent.getIntExtra("doctorID",0)!!
 
-        if(intent.getBooleanExtra("skip",false))
-        {
-            dbBase.deleteAllVisualAds()
-            dbBase.deleteAllChildVisual()
-        }
-
-
-        if(intent.getStringExtra("apiDataDcr")?.isEmpty() == false)
-        {
-
-        }
-
-
-        visualSendModel = dbBase.getAllSubmitVisual()
-        edetailing_rv.layoutManager=LinearLayoutManager(this)
-        edetailing_rv.adapter=EdetallingAdapter()
-
-        if(visualSendModel.size==0)nodata_gif.visibility=View.VISIBLE
-
-        back_iv.setOnClickListener({onBackPressed()})
-      /*  workingWith_tv.setOnClickListener({openCloseModel(1)
-            selectHeader_tv.setText("Select Work with")})
-        clickSample_tv.setOnClickListener({openCloseModel(2)
-            selectHeader_tv.setText("Select Samples")})
-        giftClick_tv.setOnClickListener({openCloseModel(3)
-            selectHeader_tv.setText("Select Gifts")})*/
-
-
-        close_imv.setOnClickListener({   bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)})
-
-        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
-        bottomSheetPobProduct = BottomSheetBehavior.from(BS_product_pob)
-
-        bottomSheetPobProduct.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                if (newState == BottomSheetBehavior.STATE_DRAGGING) {
-                    bottomSheetPobProduct.setState(BottomSheetBehavior.STATE_EXPANDED)
-                }
-            }
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
-        })
-
-
-         val quantityModel=Gson().fromJson(dbBase.getApiDetail(3),CommonModel.QuantityModel.Data::class.java)
+        val quantityModel=Gson().fromJson(dbBase.getApiDetail(3),CommonModel.QuantityModel.Data::class.java)
 
         var listSample = quantityModel.employeeSampleBalanceList!!.filter { s -> s.productType == "Sample"}
         var listStokist = staticSyncData?.data?.retailerList?.filter { s -> s.type == "STOCKIST" }
-      //  var listSample = Sample!!.filter { s -> s.actualBalanceQty != 0}
         var Gift = quantityModel.employeeSampleBalanceList!!.filter { s -> s.productType == "Gift"}
         var listGift = Gift!!.filter { s -> s.actualBalanceQty != 0}
 
@@ -178,7 +129,6 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             data.name= stockist.shopName.toString()
             stokistArray.add(data)
         }
-
 
         for(workWith in staticSyncData?.data?.workingWithList!!)
         {
@@ -205,6 +155,198 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             data.availableQty=gift?.actualBalanceQty?.toInt()!!
             giftArray.add(data)
         }
+
+        val stringAnimal = Gson().toJson(staticSyncData?.data)
+        val data= Gson().fromJson(stringAnimal, SyncModel.Data::class.java)
+        mainProductList.addAll(data.productList.filter { s -> (s.productType==1) } as ArrayList<SyncModel.Data.Product>)
+        unSelectedProductList=ArrayList(mainProductList)
+
+        val getSchemeList=staticSyncData?.data?.schemeList
+        val filterByTypeSchemeList= getSchemeList?.filter { data -> (data?.schemeFor=="S" || data?.schemeFor=="H") }
+
+        val getDocDetail: SyncModel.Data.Doctor? = staticSyncData?.data?.doctorList?.find { it.doctorId == doctorIdDisplayVisual }
+
+        getSchemeList?.clear()
+        filterByTypeSchemeList?.sortedBy { it.schemeFor }?.let { getSchemeList?.addAll(it) }
+
+
+        pobProduct_rv.layoutManager=LinearLayoutManager(this)
+        getSchemeList?.let { passingSchemeList.addAll(it)}
+
+        getSchemeList?.forEachIndexed { indexH, hElement ->
+
+            val separated: Array<String>? = hElement.schemeForId?.split(",")?.toTypedArray()
+            val event: String? = separated?.find { it ==getDocDetail?.fieldStaffId?.toString() }
+
+            if(hElement.schemeFor.equals("H") && event!="")
+            {
+                getSchemeList?.forEachIndexed { indexS, SElement ->
+
+                    val separated: Array<String>? = SElement.schemeForId?.split(",")?.toTypedArray()
+                    val event: String? = separated?.find { it ==getDocDetail?.stateId?.toString() }
+                    if(SElement.schemeFor.equals("S") && event!="")
+                    {
+                        if(hElement.productId==SElement.productId) {
+                            passingSchemeList.removeAt(indexS)
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+        if(intent.hasExtra("doctorName"))
+        {
+            if(intent.getBooleanExtra("skip",false))
+            {
+                dbBase.deleteAllVisualAds()
+                dbBase.deleteAllChildVisual()
+            }
+            else
+            { }
+            doctorName_tv.setText(intent.getStringExtra("doctorName"))
+            visualSendModel = dbBase.getAllSubmitVisual()
+
+        }
+        else
+        {
+            if(intent.getStringExtra("apiDataDcr")?.isEmpty() == false)
+            {
+                val edetailingEditModel=Gson().fromJson(intent.getStringExtra("apiDataDcr"),DailyDocVisitModel.Data.DcrDoctor::class.java)
+                doctorIdDisplayVisual=edetailingEditModel.doctorId!!
+                doctorName_tv.setText(edetailingEditModel.doctorName)
+                visualSendModel.addAll(edetailingEditModel.eDetailList)
+                remark_Et.setText(edetailingEditModel.remark)
+                remark_Et.isEnabled=false
+
+                for(intentProduct in edetailingEditModel.sampleList!!)
+                {
+                   for( (index,getSample) in sampleArray.withIndex())
+                   {
+                       if(intentProduct.productId == getSample.id.toInt()){
+                           getSample.isChecked=true
+                           getSample.qty=intentProduct.qty!!
+                           sampleArray.set(index,getSample)
+                       }
+                   }
+                }
+                val passingSamples=sampleArray.filter { s -> (s.isChecked) }
+                sample_rv.adapter = TextWithEditAdapter(passingSamples as ArrayList<IdNameBoll_model>, this, 1, this,selectionType)
+
+                for(intentGift in edetailingEditModel.giftList!!)
+                {
+                    for( (index,getGift) in giftArray.withIndex())
+                    {
+                        if(intentGift.productId == getGift.id.toInt()){
+                            getGift.isChecked=true
+                            getGift.qty=intentGift.qty!!
+                            giftArray.set(index,getGift)
+                        }
+                    }
+                }
+                val passingGift=workWithArray.filter { s -> (s.isChecked) }
+                gift_rv.adapter = TextWithEditAdapter(passingGift as ArrayList<IdNameBoll_model>, this, 1, this,selectionType)
+
+                if(edetailingEditModel.workWith!=null && edetailingEditModel.workWith!="")
+                {
+                    val getWorkingList: List<String> = edetailingEditModel.workWith!!.split(",")
+                    for(workingWith in getWorkingList)
+                    {
+                        for( (index,getWorking) in workWithArray.withIndex())
+                        {
+                            if(workingWith.toInt() == getWorking.id.toInt()){
+                                getWorking.isChecked=true
+                                workWithArray.set(index,getWorking)
+                                workingWithRv.visibility=View.VISIBLE
+                            }
+                        }
+                    }
+                }
+                val passingWorking =workWithArray.filter { s -> (s.isChecked) }
+                workingWithRv.adapter = TextWithEditAdapter(passingWorking as ArrayList<IdNameBoll_model>, this, 0, this,selectionType)
+
+                for( (index,getStockist) in stokistArray.withIndex())
+                {
+                        if(edetailingEditModel?.pobObject?.stockistId!! == getStockist.id.toInt()){
+
+                        }
+                    }
+
+                for((index,visitPurpos) in CommonListGetClass().getWorkTypeForSpinner().withIndex())
+                {
+                    if(visitPurpos.workId==edetailingEditModel.visitPurpose)
+                    {
+                        visitPurpose_spinner.setSelection(index)
+                    }
+                }
+
+                stokistArray.forEachIndexed { index, element ->
+                    if(element.id.toInt() == edetailingEditModel.pobObject?.stockistId) {
+                        selectedStockist=element
+                        stockistName.text="Stockist name - "+element.name }
+                    element.isChecked=false
+                    stokistArray.set(index,element)
+                }
+
+                for (pobProducts in edetailingEditModel.pobObject?.pobDetailList!!)
+                {
+                    for((index,availableProduct) in mainProductList.withIndex())
+                    {
+                        if(availableProduct.productId==pobProducts.productId)
+                        {
+                            availableProduct.notApi.amount=pobProducts.amount
+                            availableProduct.notApi.rate=pobProducts.rate
+                            availableProduct.notApi.qty=pobProducts.qty
+                            availableProduct.notApi.totalQty=pobProducts.totalQty
+                            availableProduct.notApi.scheme=pobProducts.schemeNameWithQty
+                            availableProduct.notApi.schemeId=pobProducts.schemeId
+                            availableProduct.notApi.salesQty=pobProducts.schemeSalesQty
+                            availableProduct.notApi.salesQtyMain=pobProducts.schemeSalesQty
+                            availableProduct.notApi.freeQty=pobProducts.freeQty
+                            availableProduct.notApi.freeQtyMain=pobProducts.schemeFreeQty
+                            availableProduct.notApi.insertedProductId=pobProducts.productId
+                            availableProduct.notApi.isSaved=true
+
+                            unSelectedProductList.set(index,availableProduct)
+                            selectedProductList.add(availableProduct)
+
+                        }
+                    }
+                }
+
+                calculateTotalProduct()
+
+            }
+        }
+
+        if(visualSendModel.size==0)nodata_gif.visibility=View.VISIBLE
+
+        edetailing_rv.layoutManager=LinearLayoutManager(this)
+        edetailing_rv.adapter=EdetallingAdapter()
+
+        back_iv.setOnClickListener({onBackPressed()})
+      /*  workingWith_tv.setOnClickListener({openCloseModel(1)
+            selectHeader_tv.setText("Select Work with")})
+        clickSample_tv.setOnClickListener({openCloseModel(2)
+            selectHeader_tv.setText("Select Samples")})
+        giftClick_tv.setOnClickListener({openCloseModel(3)
+            selectHeader_tv.setText("Select Gifts")})*/
+
+
+        close_imv.setOnClickListener({   bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)})
+
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+        bottomSheetPobProduct = BottomSheetBehavior.from(BS_product_pob)
+
+        bottomSheetPobProduct.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if (newState == BottomSheetBehavior.STATE_DRAGGING) {
+                    bottomSheetPobProduct.setState(BottomSheetBehavior.STATE_EXPANDED)
+                }
+            }
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+        })
 
         toggleButton.forEach { button ->
             button.setOnClickListener { (button as MaterialButton).isChecked = true }
@@ -288,10 +430,10 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
             val filterSelectecd=selectedProductList.filter { s -> (s.notApi.isSaved==true) }
 
-            saveModel.pobObject = Send_EDetailingModel.PobObj()
+            saveModel.pobObject = DailyDocVisitModel.Data.DcrDoctor.PobObj()
             for(dataObj in filterSelectecd)
             {
-              val pobObje=Send_EDetailingModel.PobObj.PobDetailList()
+              val pobObje=DailyDocVisitModel.Data.DcrDoctor.PobObj.PobDetailList()
               pobObje.productId=dataObj.notApi.insertedProductId
               pobObje.rate=dataObj.notApi.rate
               pobObje.qty=dataObj.notApi.qty
@@ -337,66 +479,21 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             closeBottomSheet()
         })
 
-        val list= staticSyncData?.data?.productList?.filter { s -> (s.productType==1) } as ArrayList<SyncModel.Data.Product>
 
-       var tempList= ArrayList(list)
+        closePob_iv.setOnClickListener({closeBottomSheet()})
 
-        val stringAnimal = Gson().toJson(staticSyncData?.data)
-        val data= Gson().fromJson(stringAnimal, SyncModel.Data::class.java)
-        mainProductList.addAll(data.productList.filter { s -> (s.productType==1) } as ArrayList<SyncModel.Data.Product>)
-        unSelectedProductList=ArrayList(mainProductList)
-
-        val getSchemeList=staticSyncData?.data?.schemeList
-        val filterByTypeSchemeList= getSchemeList?.filter { data -> (data?.schemeFor=="S" || data?.schemeFor=="H") }
-
-        val getDocDetail: SyncModel.Data.Doctor? = staticSyncData?.data?.doctorList?.find { it.doctorId == doctorIdDisplayVisual }
-
-        getSchemeList?.clear()
-        filterByTypeSchemeList?.sortedBy { it.schemeFor }?.let { getSchemeList?.addAll(it) }
-
-
-        pobProduct_rv.layoutManager=LinearLayoutManager(this)
-        getSchemeList?.let { passingSchemeList.addAll(it)}
-
-            getSchemeList?.forEachIndexed { indexH, hElement ->
-
-           val separated: Array<String>? = hElement.schemeForId?.split(",")?.toTypedArray()
-           val event: String? = separated?.find { it ==getDocDetail?.fieldStaffId?.toString() }
-
-           if(hElement.schemeFor.equals("H") && event!="")
-           {
-               getSchemeList?.forEachIndexed { indexS, SElement ->
-
-                   val separated: Array<String>? = SElement.schemeForId?.split(",")?.toTypedArray()
-                   val event: String? = separated?.find { it ==getDocDetail?.stateId?.toString() }
-                   if(SElement.schemeFor.equals("S") && event!="")
-                   {
-                       if(hElement.productId==SElement.productId) {
-                           passingSchemeList.removeAt(indexS)
-                       }
-                   }
-               }
-           }
-       }
+        okPob_iv.setOnClickListener({
+           pobProductSelectAdapter.setSelction()
+        })
 
         Handler(Looper.getMainLooper()).postDelayed({
-
-            var passingProductList= ArrayList<SyncModel.Data.Product>()
-            for (passingData in filteredProductList){passingProductList.add(passingData)}
 
             pobProductSelectAdapter=PobProductAdapter(unSelectedProductList, passingSchemeList,this)
             pobProduct_rv.adapter= pobProductSelectAdapter
 
             selectedPobAdapter=SelectedPobAdapter(selectedProductList,this,this)
             selectedPob_rv.adapter= selectedPobAdapter
-            }, 500)
-
-        closePob_iv.setOnClickListener({closeBottomSheet()})
-
-
-        okPob_iv.setOnClickListener({
-           pobProductSelectAdapter.setSelction()
-        })
+        }, 500)
     }
 
     val filterTextPobWatcher: TextWatcher = object : TextWatcher {
@@ -437,10 +534,10 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         selectBtn.visibility=View.GONE
     }
 
-    fun getSaveData():Send_EDetailingModel
+    fun getSaveData():DailyDocVisitModel.Data.DcrDoctor
     {
 
-        var saveModel= Send_EDetailingModel()
+        var saveModel= DailyDocVisitModel.Data.DcrDoctor()
         val c = Calendar.getInstance()
         val year = c[Calendar.YEAR]
         val month = c[Calendar.MONTH]
@@ -467,10 +564,10 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         saveModel.workWith=workWithStr
 
         val tempGiftList=giftArray!!.filter { s -> s.isChecked == true }
-        var giftList=ArrayList<Send_EDetailingModel.GiftList>()
+        var giftList=ArrayList<DailyDocVisitModel.Data.DcrDoctor.GiftList>()
         for(data in tempGiftList)
         {
-            var giftModel=Send_EDetailingModel.GiftList()
+            var giftModel=DailyDocVisitModel.Data.DcrDoctor.GiftList()
             giftModel.dcrId=dcrId
             giftModel.empId=loginModelHomePage.empId
             giftModel.qty=data.qty
@@ -480,10 +577,10 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         }
 
         val tempSampleList=sampleArray!!.filter { s -> s.isChecked == true }
-        var sampleList=ArrayList<Send_EDetailingModel.SampleList>()
+        var sampleList=ArrayList<DailyDocVisitModel.Data.DcrDoctor.SampleList>()
         for(data in tempSampleList)
         {
-            var sampleModel=Send_EDetailingModel.SampleList()
+            var sampleModel=DailyDocVisitModel.Data.DcrDoctor.SampleList()
             sampleModel.dcrId=dcrId
             sampleModel.empId=loginModelHomePage.empId
             sampleModel.qty=data.qty
@@ -491,10 +588,10 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             sampleList.add(sampleModel)
         }
 
-        var productList=ArrayList<Send_EDetailingModel.ProductList>()
+        var productList=ArrayList<DailyDocVisitModel.Data.DcrDoctor.ProductList>()
         for(data in visualSendModel)
         {
-            var productModel=Send_EDetailingModel.ProductList()
+            var productModel=DailyDocVisitModel.Data.DcrDoctor.ProductList()
             productModel.dcrId=dcrId
             productModel.doctorId=data.doctorId?.toInt()
             productModel.productId=data.brandId?.toInt()
@@ -502,10 +599,10 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             productList.add(productModel)
         }
 
-        saveModel.giftList.addAll(giftList)
-        saveModel.sampleList.addAll(sampleList)
-        saveModel.productList.addAll(productList)
-        saveModel.eDetailList.addAll(visualSendModel)
+        saveModel.giftList?.addAll(giftList)
+        saveModel.sampleList?.addAll(sampleList)
+        saveModel.productList?.addAll(productList)
+        saveModel.eDetailList?.addAll(visualSendModel)
         saveModel.dcrDate=generalClass.getCurrentDateTimeApiForamt()
         return saveModel
     }
@@ -546,9 +643,11 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
 
     fun submitDcr(
-        saveModel: Send_EDetailingModel,
+        saveModel: DailyDocVisitModel.Data.DcrDoctor,
         quantityArray: ArrayList<CommonModel.QuantityModel.Data.EmployeeSampleBalance>
     ) {
+        Log.e("igfuisgfuds",Gson().toJson(saveModel))
+        return
 
         alertClass?.showProgressAlert("")
         var call: Call<JsonObject> = HomePage.apiInterface?.submitEdetailingApi("bearer " + loginModelHomePage.accessToken,saveModel) as Call<JsonObject>
@@ -619,6 +718,15 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         }
         override fun onBindViewHolder(holder: MyViewHolder, @SuppressLint("RecyclerView") position: Int)
         {
+            if(intent.getStringExtra("apiDataDcr")?.isEmpty() == false)
+            {
+                holder.brandName_headerTv.isEnabled=false
+                holder.startEndTime_tv.isEnabled=false
+                holder.feeback_et.isEnabled=false
+                holder.ratingBar.isEnabled=false
+            }
+
+
             var objectDetailing=visualSendModel.get(position)
             holder.brandName_headerTv.setText("Name :"+objectDetailing.brandName)
 
@@ -665,7 +773,6 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         passingArrayList: java.util.ArrayList<IdNameBoll_model>, isUpdate: Boolean,selectionTypeInterface: Int) {
 
         var localSelection= if(selectionTypeInterface==0)selectionType else selectionTypeInterface
-        Log.e("shfioshgfuis",localSelection.toString())
 
         if(localSelection==1)
         {
@@ -674,16 +781,17 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             if(isUpdate) {
                 var sendingList = workWithArray!!.filter { s -> s.isChecked == true }
                 workingWithRv.adapter = TextWithEditAdapter(sendingList as ArrayList<IdNameBoll_model>, this,0,this,selectionType)
+                if(sendingList.size!=0)workingWithRv.visibility=View.VISIBLE
             }
         }
         if(localSelection==2)
         {
-
             sampleArray= ArrayList<IdNameBoll_model>()
             sampleArray.addAll(passingArrayList)
             if(isUpdate) {
                 var sendingList = sampleArray!!.filter { s -> s.isChecked == true }
                 sample_rv.adapter =TextWithEditAdapter(sendingList as ArrayList<IdNameBoll_model>, this, 1, this,selectionType)
+                if(sendingList.size!=0)sample_rv.visibility=View.VISIBLE
             }
         }
         if(localSelection==3)
@@ -692,7 +800,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             if(isUpdate) {
                 var sendingList = giftArray!!.filter { s -> s.isChecked == true }
                 gift_rv.adapter = TextWithEditAdapter(sendingList as ArrayList<IdNameBoll_model>, this, 1, this,selectionType)
-
+                if(sendingList.size!=0)gift_rv.visibility=View.VISIBLE
             }
         }
         if(selectionType==4)
@@ -712,14 +820,14 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
     }
 
-    override fun onClickButtonPOB(selectedList: ArrayList<Send_EDetailingModel.PobObj.PobDetailList>) {
-        setSelectedPOBRecycler(selectedList)
+    override fun onClickButtonPOB(selectedList: ArrayList<DailyDocVisitModel.Data.DcrDoctor.PobObj.PobDetailList>) {
+       // setSelectedPOBRecycler(selectedList)
     }
 
-    fun setSelectedPOBRecycler(selectedList: ArrayList<Send_EDetailingModel.PobObj.PobDetailList>)
+   /* fun setSelectedPOBRecycler(selectedList: ArrayList<Send_EDetailingModel.PobObj.PobDetailList>)
     {
 
-    }
+    }*/
 
     override fun onClickButtonProduct(selectedList: ArrayList<SyncModel.Data.Product>) {
 
@@ -805,7 +913,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
     fun updateSpecificElement(returnModel: SyncModel.Data.Product?, position: Int)
     {
-        returnModel?.let { filteredProductList.set(position, it) }
+        returnModel?.let { selectedProductList.set(position, it) }
         calculateTotalProduct()
     }
 

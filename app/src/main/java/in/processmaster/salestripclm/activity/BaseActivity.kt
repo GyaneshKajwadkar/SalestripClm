@@ -359,7 +359,7 @@ open class BaseActivity : AppCompatActivity(){
         val stringArray=dbBase.getAllSaveSend("feeback")
         if(stringArray!!.size<=0 )return
 
-        val saveModel=Gson().fromJson(stringArray.get(0),Send_EDetailingModel::class.java)
+        val saveModel=Gson().fromJson(stringArray.get(0),DailyDocVisitModel.Data.DcrDoctor::class.java)
 
         val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
         ).submitEdetailingApiCoo("bearer " + loginModelHomePage.accessToken,saveModel)

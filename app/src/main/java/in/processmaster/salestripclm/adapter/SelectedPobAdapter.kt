@@ -81,7 +81,7 @@ class SelectedPobAdapter(
 
         model?.notApi?.scheme.let {
             holder.scheme_tv.visibility=View.VISIBLE
-            holder.scheme_tv.text=model?.notApi?.scheme
+            holder.scheme_tv.text="Scheme: "+model?.notApi?.scheme
         }
 
         holder.editIv.setOnClickListener({

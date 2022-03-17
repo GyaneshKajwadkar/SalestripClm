@@ -1,15 +1,11 @@
 package `in`.processmaster.salestripclm.adapter
 
 import `in`.processmaster.salestripclm.R
-import `in`.processmaster.salestripclm.activity.SubmitE_DetailingActivity
-import `in`.processmaster.salestripclm.interfaceCode.PobProductTransfer
 import `in`.processmaster.salestripclm.interfaceCode.productTransfer
-import `in`.processmaster.salestripclm.models.Send_EDetailingModel
 import `in`.processmaster.salestripclm.models.SyncModel
 import android.annotation.SuppressLint
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -165,7 +161,7 @@ class PobProductAdapter(
 
     }
 
-    fun getSchemeObject(
+  /*  fun getSchemeObject(
         getCurrentObj: Send_EDetailingModel.PobObj.PobDetailList?,
         model: SyncModel.Data.Product,
         holder: MyViewHolder,
@@ -201,7 +197,7 @@ class PobProductAdapter(
         }
        return getCurrentObj!!
     }
-
+*/
     override fun getItemCount(): Int {
         return productFilteringList?.size!!
     }

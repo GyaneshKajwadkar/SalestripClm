@@ -37,19 +37,25 @@ class TextWithEditAdapter(
     }
 
     override fun onBindViewHolder(holder:MyViewHolder, @SuppressLint("RecyclerView") position: Int) {
-        holder.brandName.setText(mainList?.get(position)?.name)
+
+        val model=mainList?.get(position)
+
+        holder.brandName.setText(model?.name)
+
+
         if(showEdit==0) {
             holder.quantity_et.visibility = View.GONE
             holder.availableQtyTv.visibility = View.GONE
         }
+        holder.quantity_et.setText(model?.qty.toString())
 
-        holder.availableQtyTv.setText(mainList?.get(position)?.availableQty.toString() +" QTY")
+        holder.availableQtyTv.setText(model?.availableQty.toString() +" QTY")
 
         holder.quantity_et.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 val text=holder.quantity_et.text.toString()
                 if(text!="") {
-                    mainList?.get(position)?.qty = text.toInt()
+                    model?.qty = text.toInt()
                     mainList?.let { callback?.onChangeArray(it, false,selectionType) }
                 }
             }

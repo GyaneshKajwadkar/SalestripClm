@@ -147,6 +147,7 @@ class NewCallFragment : Fragment() {
             val intent = Intent(activity, OnlinePresentationActivity::class.java)
             intent.putExtra("doctorID", selectedDocID)
             intent.putExtra("doctorName", selectedDocName)
+            intent.putExtra("skip", false)
             startActivityForResult(intent,3)
         })
 
