@@ -293,7 +293,7 @@ class DownloadedFolderAdapter(
                         var profileData =sharePreferance?.getPref("profileData")
                         var  loginModel= Gson().fromJson(profileData, LoginModel::class.java)
 
-                        val currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
+                        val currentTimeLocal = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
                         intent.putExtra("empId", loginModel.empId)
                         intent.putExtra("brandId", zipmodel?.brandId)
                         intent.putExtra("doctorId", doctorIdDisplayVisual)
@@ -313,7 +313,7 @@ class DownloadedFolderAdapter(
                         context.startActivity(intent)
 
                         val db= DatabaseHandler(context)
-                        db.insertStartTimeSlide(currentDate + " " + currentTime,doctorIdDisplayVisual,zipmodel?.brandId,zipmodel.brandName,0, currentTime)
+                        db.insertStartTimeSlide(currentDate + " " + currentTime,doctorIdDisplayVisual,zipmodel?.brandId,zipmodel.brandName,0, currentTimeLocal)
 
                         oneTime = false
 

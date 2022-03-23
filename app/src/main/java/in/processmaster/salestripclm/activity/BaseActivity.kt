@@ -393,6 +393,11 @@ open class BaseActivity : AppCompatActivity(){
             {
                 if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage!!.isEmpty()) {
                     var model = response.body()
+                    if(model?.getData()?.dcrDoctorlist?.size==0)
+                    {
+                        dbBase.deleteAllDoctorEdetailing()
+                    }
+
                     dbBase?.addAPIData(Gson().toJson(model?.getData()), 5)
                 }
                 else Log.e("elsegetDocCallAPI", response.code().toString())

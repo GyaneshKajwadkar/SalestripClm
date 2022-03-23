@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import java.text.SimpleDateFormat
+import java.util.*
 
 class LastRCPA_Adapter(val lastRCPADetails: List<PreCallModel.Data.LastVisitSummary.LastRCPADetail>?) : RecyclerView.Adapter<LastRCPA_Adapter.ViewHolders>() {
 
@@ -38,7 +40,11 @@ class LastRCPA_Adapter(val lastRCPADetails: List<PreCallModel.Data.LastVisitSumm
     {
         val model=lastRCPADetails?.get(position)
         holder.retailer_tv.setText("Retailer: "+model?.retailerName)
-        holder.date_tv.setText("Date: "+model?.lastRCPADate)
+        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+        val dateFormatterSet = SimpleDateFormat("dd-MM-yyyy")
+        val startDate: Date = sdf.parse(model?.lastRCPADate)
+
+        holder.date_tv.setText("Date: "+dateFormatterSet.format(startDate))
         holder.ownBrand_tv.setText("Own Brand: "+model?.brandName)
         holder.rxUnit_tv.setText("Rx Unit: "+model?.brandUnits+"Qty")
         holder.comp1_tv.setText("Comp 1: "+model?.getcP1())

@@ -23,7 +23,6 @@ import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
@@ -75,9 +74,12 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
         if(generalClass.isInternetAvailable())
             callingMultipleAPI()
-        else
-            if(dbBase?.getApiDetail(1)!="") staticSyncData=Gson().fromJson(dbBase?.getApiDetail(1), SyncModel::class.java)
-
+        else {
+            if (dbBase?.getApiDetail(1) != "") {
+                staticSyncData = Gson().fromJson(dbBase?.getApiDetail(1), SyncModel::class.java)
+            }
+            bottomNavigation?.selectedItemId= R.id.landingPage
+        }
 
     }
 
@@ -382,6 +384,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         coroutineScope.invokeOnCompletion {
             this.runOnUiThread(java.lang.Runnable {
                 alertClass.hideAlert()
+                bottomNavigation?.selectedItemId= R.id.landingPage
               //  generalClass.disableProgress(progressView_parentRv!!)
             })
         }
@@ -476,7 +479,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                 if (response.code() == 200 && !response.body().toString().isEmpty())
                 {
                     dbBase?.addAPIData(Gson().toJson(response.body()),1)
-                    bottomNavigation?.selectedItemId= R.id.landingPage
                     staticSyncData=response.body()
                 }
 

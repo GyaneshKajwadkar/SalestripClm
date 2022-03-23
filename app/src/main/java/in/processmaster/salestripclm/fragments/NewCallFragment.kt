@@ -130,12 +130,14 @@ class NewCallFragment : Fragment() {
 
         views?.selectDoctorsCv?.setEnabled(false)
 
+        adapter =BottomSheetDoctorAdapter()
+
         views?.close_imv?.setOnClickListener({ bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)})
         views?.doctorSearch_et?.addTextChangedListener(filterTextWatcher)
 
         views?.startDetailing_btn?.setOnClickListener({
 
-            if(views?.lastVisitDate_tv?.text?.equals(generalClassObject?.getCurrentDate()) == true || db.isEDetailingAvailable(selectedDocID,
+            if(views?.lastVisitDate_tv?.text?.equals(generalClassObject?.getCurrentDate()) == true && db.isEDetailingAvailable(selectedDocID,
                     generalClassObject?.getCurrentDate()
                 ))
             {
@@ -167,8 +169,11 @@ class NewCallFragment : Fragment() {
     fun checkDCRusingShareP(i: Int):Boolean
     {
         if(generalClassObject?.isInternetAvailable() == true)
-        { callCoroutineApi(i)
-        return false}
+        {
+           // callCoroutineApi(i)
+        return true
+       // return false
+        }
         else if( sharePreferance?.getPref("todayDate") != generalClassObject?.currentDateMMDDYY() || sharePreferance?.getPref("dcrId")=="0") {
             alertClass?.commonAlert("Alert!","DCR not submitted please connect to internet and fill DCR first.")
         return false}
@@ -449,17 +454,18 @@ class NewCallFragment : Fragment() {
 
                 val docFirstFilter= SplashActivity.staticSyncData?.data?.doctorList?.filter { s -> s.routeId == id } as java.util.ArrayList<SyncModel.Data.Doctor>
 
+
             for(fetch in docFirstFilter)
                 {
-                   if(fetch.latitude==0.00 || fetch.longitude==0.00) { return }
+
+                   if(fetch.latitude==0.00 || fetch.longitude==0.00) { continue }
 
                     val endPoint = Location("locationB")
                     endPoint.latitude = fetch.latitude
                     endPoint.longitude = fetch.longitude
                     val distance = startPoint.distanceTo(endPoint).toInt()
-
                     doctorListArray.add(fetch)
-                 /*   if(distance <= getRadius){
+                  /*  if(distance <= getRadius){
                         doctorListArray.add(fetch) }*/
                 }
             }
@@ -632,8 +638,7 @@ class NewCallFragment : Fragment() {
                     else{ views!!.demoSales_tv.setText("Sales: "+analysisModel?.docLastRCPADetail?.ownSales)}
 */
                 }
-                else
-                    views?.noData_gif?.visibility=View.VISIBLE
+                else views?.noData_gif?.visibility=View.VISIBLE
 
                 views?.analysisProgress?.visibility=View.GONE
             }
@@ -781,6 +786,7 @@ class NewCallFragment : Fragment() {
         alertDialog.show()
 
     }
+
     suspend fun checkCurrentDCR_API(i: Int) {
 
         val response = APIClientKot().getUsersService(2, sharePreferance?.getPref("secondaryUrl")!!).checkDCR_API(

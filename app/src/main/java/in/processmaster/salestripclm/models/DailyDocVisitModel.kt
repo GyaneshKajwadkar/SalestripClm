@@ -493,6 +493,248 @@ class DailyDocVisitModel {
             }
 
 
+            class EdetailingList{
+                @SerializedName("brandId")
+                @Expose
+                private var brandId: Int? = null
+
+                @SerializedName("doctorId")
+                @Expose
+                private var doctorId: Int? = null
+
+                @SerializedName("empId")
+                @Expose
+                private var empId: Int? = null
+
+                @SerializedName("duration")
+                @Expose
+                private var duration: Int? = null
+
+                @SerializedName("startDate")
+                @Expose
+                private var startDate: String? = null
+
+                @SerializedName("endDate")
+                @Expose
+                private var endDate: String? = null
+
+                @SerializedName("transactionDate")
+                @Expose
+                private var transactionDate: String? = null
+
+                @SerializedName("doctorName")
+                @Expose
+                private var doctorName: String? = null
+
+                @SerializedName("qualificationName")
+                @Expose
+                private var qualificationName: String? = null
+
+                @SerializedName("cityName")
+                @Expose
+                private var cityName: String? = null
+
+                @SerializedName("routeName")
+                @Expose
+                private var routeName: String? = null
+
+                @SerializedName("hqName")
+                @Expose
+                private var hqName: String? = null
+
+                @SerializedName("specialityName")
+                @Expose
+                private var specialityName: String? = null
+
+                @SerializedName("visitFrequency")
+                @Expose
+                private var visitFrequency: String? = null
+
+                @SerializedName("brandName")
+                @Expose
+                private var brandName: String? = null
+
+                @SerializedName("divisionName")
+                @Expose
+                private var divisionName: String? = null
+
+                @SerializedName("fileTransList")
+                @Expose
+                private var fileTransList: List<Any?>? = null
+
+                @SerializedName("transactionId")
+                @Expose
+                private var transactionId: Int? = null
+
+                @SerializedName("feedback")
+                @Expose
+                private var feedback: String? = null
+
+                @SerializedName("rating")
+                @Expose
+                private var rating: Double? = null
+
+                fun getBrandId(): Int? {
+                    return brandId
+                }
+
+                fun setBrandId(brandId: Int?) {
+                    this.brandId = brandId
+                }
+
+                fun getDoctorId(): Int? {
+                    return doctorId
+                }
+
+                fun setDoctorId(doctorId: Int?) {
+                    this.doctorId = doctorId
+                }
+
+                fun getEmpId(): Int? {
+                    return empId
+                }
+
+                fun setEmpId(empId: Int?) {
+                    this.empId = empId
+                }
+
+                fun getDuration(): Int? {
+                    return duration
+                }
+
+                fun setDuration(duration: Int?) {
+                    this.duration = duration
+                }
+
+                fun getStartDate(): String? {
+                    return startDate
+                }
+
+                fun setStartDate(startDate: String?) {
+                    this.startDate = startDate
+                }
+
+                fun getEndDate(): String? {
+                    return endDate
+                }
+
+                fun setEndDate(endDate: String?) {
+                    this.endDate = endDate
+                }
+
+                fun getTransactionDate(): String? {
+                    return transactionDate
+                }
+
+                fun setTransactionDate(transactionDate: String?) {
+                    this.transactionDate = transactionDate
+                }
+
+                fun getDoctorName(): String? {
+                    return doctorName
+                }
+
+                fun setDoctorName(doctorName: String?) {
+                    this.doctorName = doctorName
+                }
+
+                fun getQualificationName(): String? {
+                    return qualificationName
+                }
+
+                fun setQualificationName(qualificationName: String?) {
+                    this.qualificationName = qualificationName
+                }
+
+                fun getCityName(): String? {
+                    return cityName
+                }
+
+                fun setCityName(cityName: String?) {
+                    this.cityName = cityName
+                }
+
+                fun getRouteName(): String? {
+                    return routeName
+                }
+
+                fun setRouteName(routeName: String?) {
+                    this.routeName = routeName
+                }
+
+                fun getHqName(): String? {
+                    return hqName
+                }
+
+                fun setHqName(hqName: String?) {
+                    this.hqName = hqName
+                }
+
+                fun getSpecialityName(): String? {
+                    return specialityName
+                }
+
+                fun setSpecialityName(specialityName: String?) {
+                    this.specialityName = specialityName
+                }
+
+                fun getVisitFrequency(): String? {
+                    return visitFrequency
+                }
+
+                fun setVisitFrequency(visitFrequency: String?) {
+                    this.visitFrequency = visitFrequency
+                }
+
+                fun getBrandName(): String? {
+                    return brandName
+                }
+
+                fun setBrandName(brandName: String?) {
+                    this.brandName = brandName
+                }
+
+                fun getDivisionName(): String? {
+                    return divisionName
+                }
+
+                fun setDivisionName(divisionName: String?) {
+                    this.divisionName = divisionName
+                }
+
+                fun getFileTransList(): List<Any?>? {
+                    return fileTransList
+                }
+
+                fun setFileTransList(fileTransList: List<Any?>?) {
+                    this.fileTransList = fileTransList
+                }
+
+                fun getTransactionId(): Int? {
+                    return transactionId
+                }
+
+                fun setTransactionId(transactionId: Int?) {
+                    this.transactionId = transactionId
+                }
+
+                fun getFeedback(): String? {
+                    return feedback
+                }
+
+                fun setFeedback(feedback: String?) {
+                    this.feedback = feedback
+                }
+
+                fun getRating(): Double? {
+                    return rating
+                }
+
+                fun setRating(rating: Double?) {
+                    this.rating = rating
+                }
+            }
+
             class GiftList {
                 @SerializedName("dcrId"             ) var dcrId             : Int?    = null
                 @SerializedName("detailId"          ) var detailId          : Int?    = null

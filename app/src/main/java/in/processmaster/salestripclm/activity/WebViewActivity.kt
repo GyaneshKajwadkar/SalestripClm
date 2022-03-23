@@ -3,6 +3,9 @@ package `in`.processmaster.salestripclm.activity
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.adapter.HorizontalWebViewAdapter
 import `in`.processmaster.salestripclm.adapter.OtherFileAdapter
+import `in`.processmaster.salestripclm.fragments.ShowDownloadedFragment
+import `in`.processmaster.salestripclm.fragments.ShowDownloadedFragment.Companion.currentDate
+import `in`.processmaster.salestripclm.fragments.ShowDownloadedFragment.Companion.currentTime
 import `in`.processmaster.salestripclm.interfaceCode.ItemClickDisplayVisual
 import `in`.processmaster.salestripclm.interfaceCode.StoreVisualInterface
 import `in`.processmaster.salestripclm.models.DevisionModel
@@ -219,12 +222,13 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
             val intent = intent
             //  val webUrlPath = intent.getStringExtra("webUrlPath")
             empId = intent.getIntExtra("empId", 0)
-            startDateTime = intent.getStringExtra("currentDateTime").toString()
+           // startDateTime = intent.getStringExtra("currentDateTime").toString()
+            startDateTime = ShowDownloadedFragment.currentDate + " " + ShowDownloadedFragment.currentTime
             brandId = intent.getIntExtra("brandId", 0)
             doctorId = intent.getIntExtra("doctorId", 0)
             //  val file = File(webUrlPath)
 
-            db?.insertFileID(modelweb!!.fileId,startDateTime)
+            db?.insertFileID(modelweb!!.fileId,startDateTime,brandId)
             setSlideViewTime()
 
             end_btn?.setOnClickListener({
@@ -242,9 +246,7 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
                         onBackPressed()
                         finish()
 
-
             })
-
 
 
         }
@@ -704,7 +706,7 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
     fun likeCommentColor()
     {
 
-        db?.insertFileID(modelweb!!.fileId, startDateTime)
+        db?.insertFileID(modelweb!!.fileId, startDateTime,brandId)
 
         val isLike=db?.getLike(modelweb!!.fileId.toString(),startDateTime)
         val storecomment= db?.getComment(modelweb!!.fileId.toString(),startDateTime)

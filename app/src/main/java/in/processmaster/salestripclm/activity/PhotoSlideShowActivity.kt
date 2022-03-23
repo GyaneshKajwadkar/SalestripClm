@@ -2,6 +2,7 @@ package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.adapter.OtherFileAdapter
+import `in`.processmaster.salestripclm.fragments.ShowDownloadedFragment
 import `in`.processmaster.salestripclm.interfaceCode.ItemClickDisplayVisual
 import `in`.processmaster.salestripclm.interfaceCode.StringInterface
 import `in`.processmaster.salestripclm.models.DevisionModel
@@ -149,12 +150,13 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
             val intent = intent
             //  val webUrlPath = intent.getStringExtra("webUrlPath")
             empId = intent.getIntExtra("empId", 0)
-            startDateTime = intent.getStringExtra("currentDateTime").toString()
+           // startDateTime = intent.getStringExtra("currentDateTime").toString()
+            startDateTime = ShowDownloadedFragment.currentDate + " " + ShowDownloadedFragment.currentTime
             brandId = intent.getIntExtra("brandId", 0)
             doctorId = intent.getIntExtra("doctorId", 0)
             //  val file = File(webUrlPath)
 
-            dbBase?.insertFileID(model!!.fileId,startDateTime)
+            dbBase?.insertFileID(model!!.fileId,startDateTime,brandId)
 
             eDetailingId= model?.eDetailingId!!
 
@@ -471,7 +473,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
                         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
 
-                        dbBase?.insertFileID(model!!.fileId, startDateTime)
+                        dbBase?.insertFileID(model!!.fileId, startDateTime,brandId)
                         setSlideViewTime()
                     }
                 }
@@ -503,7 +505,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
                         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
 
-                        dbBase?.insertFileID(model!!.fileId, startDateTime)
+                        dbBase?.insertFileID(model!!.fileId, startDateTime,brandId)
                         setSlideViewTime()
                     }
                 }
@@ -750,7 +752,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
     fun likeCommentColor()
     {
-        dbBase?.insertFileID(model!!.fileId, startDateTime)
+        dbBase?.insertFileID(model!!.fileId, startDateTime,brandId)
 
         val isLike=dbBase?.getLike(model!!.fileId.toString(),startDateTime)
 

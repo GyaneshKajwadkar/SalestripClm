@@ -114,6 +114,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String CREATE_VISUALADS_CHILD_TABLE = "CREATE TABLE " + TABLE_CHILD_VISUAL_ADS + "("
                 + KEY_ID + " INTEGER,"
                 +  TIMESET + " TEXT,"
+                +  BRAND_ID + " INTEGER,"
                 +  ISLIKE + " INTEGER," +  COMMENT + " TEXT,"
                 +  SINGLE_SLIDE_TIMER + " INTEGER," +  FILE_ID + " INTEGER" +")";
         db.execSQL(CREATE_VISUALADS_CHILD_TABLE);
@@ -542,18 +543,21 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     //=======================================VisualAds table==============================================
     //insert or update visual ads table
-    public void insertStartTimeSlide(String currentTime,int addDoctorId,int addBrandId, String brandName,int monitorTime,String startTime)
+    public void insertStartTimeSlide(String startTime,int addDoctorId,int addBrandId, String brandName,int monitorTime,String currentTime)
     {
+
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues initialValues = new ContentValues();
-        initialValues.put(SLIDE_START_TIME, currentTime);
+        initialValues.put(SLIDE_START_TIME, startTime);
         initialValues.put(DOCTOR_ID, addDoctorId);
         initialValues.put(BRAND_ID, addBrandId);
         initialValues.put(BRAND_NAME, brandName);
-        initialValues.put(START_TIME_BRANDS, startTime);
+        initialValues.put(START_TIME_BRANDS, currentTime);
 
-        if(CheckVisualAds(currentTime,addBrandId))
-        { }
+        if(CheckVisualAds(startTime,addBrandId))
+        {
+
+        }
         else
         {
             Log.e("insertStartTimeSlide","insert");
@@ -597,9 +601,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     visualModel.setBrandId(cursor.getString(2));
                     visualModel.setBrandName(cursor.getString(6));
                     visualModel.setMonitorTime(cursor.getInt(7));
-
                     visualModel.setEnd(true);
-                    visualModel.setChildDataArray(getAllChildBy_ID(startTime));
+                    visualModel.setChildDataArray(getAllChildBy_ID(startTime,Integer.parseInt(visualModel.getBrandId())));
+                    int durationCount=0;
+                    for(int i=0 ; i < visualModel.getChildDataArray().size() ;i++)
+                    {
+                        VisualAdsModel_Send.childData childData = visualModel.getChildDataArray().get(i);
+                        durationCount= durationCount+Integer.parseInt(childData.getViewTime());
+                    }
+                    visualModel.setDuration(durationCount);
                     edetailList.add(visualModel);
                 }
                 else{
@@ -676,12 +686,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     // =======================================Child visual ads table================================================
 
     //insert file id
-    public void  insertFileID(int setfileId,String startTime)
+    public void  insertFileID(int setfileId,String startTime, int brandId)
     {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues initialValues = new ContentValues();
         initialValues.put(TIMESET, startTime);
         initialValues.put(FILE_ID, setfileId);
+        initialValues.put(BRAND_ID , brandId);
 
         if(ChecktimeandFileIdExist(String.valueOf(setfileId),startTime))
         { }
@@ -803,13 +814,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     // get all same id childs
     @SuppressLint("Range")
-    public ArrayList<VisualAdsModel_Send.childData> getAllChildBy_ID(String startTime)
+    public ArrayList<VisualAdsModel_Send.childData> getAllChildBy_ID(String startTime, int brandId)
     {
         ArrayList<VisualAdsModel_Send.childData> childListVisualAds=new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.query(TABLE_CHILD_VISUAL_ADS, new String[] {TIMESET,ISLIKE,COMMENT,SINGLE_SLIDE_TIMER, FILE_ID }, TIMESET + "=?",
-                new String[] { String.valueOf(startTime) }, null, null, null, null);
+        Cursor cursor = db.query(TABLE_CHILD_VISUAL_ADS, new String[] {TIMESET,ISLIKE,COMMENT,SINGLE_SLIDE_TIMER, FILE_ID }, TIMESET + "=?"+ " AND "+ BRAND_ID + "=?",
+                new String[] { String.valueOf(startTime), String.valueOf(brandId)}, null, null, null, null);
         if (cursor.moveToFirst())
         {
             do
@@ -936,5 +947,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         return false;
     }
-    
+
+
+    // delete all data
+    public void deleteAllDoctorEdetailing()
+    {  SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("delete from "+ TABLE_SAVE_DOCTOR_EDETAIL);
+    }
+
 }

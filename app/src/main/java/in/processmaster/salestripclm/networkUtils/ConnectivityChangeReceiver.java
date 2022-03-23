@@ -7,10 +7,12 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
 import in.processmaster.salestripclm.activity.BaseActivity;
+import in.processmaster.salestripclm.activity.SplashActivity;
 import in.processmaster.salestripclm.common_classes.GeneralClass;
 
 public class ConnectivityChangeReceiver extends BroadcastReceiver {
@@ -25,9 +27,14 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver {
 
         if(!isConnected(context))
         {
-            baseActivity.networkAlertNotification(activity);
+            if(SplashActivity.Companion.getShowNetworkAlert())
+            {
+                SplashActivity.Companion.setShowNetworkAlert(false);
+                baseActivity.networkAlertNotification(activity);
+            }
         }
         else {
+             SplashActivity.Companion.setShowNetworkAlert(true);
             baseActivity.disableNetworkAlert();
         }
     }

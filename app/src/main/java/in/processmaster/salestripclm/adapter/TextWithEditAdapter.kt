@@ -42,12 +42,11 @@ class TextWithEditAdapter(
 
         holder.brandName.setText(model?.name)
 
-
         if(showEdit==0) {
             holder.quantity_et.visibility = View.GONE
             holder.availableQtyTv.visibility = View.GONE
         }
-        holder.quantity_et.setText(model?.qty.toString())
+        if(model?.qty!=-1) holder.quantity_et.setText(model?.qty.toString())
 
         holder.availableQtyTv.setText(model?.availableQty.toString() +" QTY")
 

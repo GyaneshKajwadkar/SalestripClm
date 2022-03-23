@@ -26,9 +26,11 @@ import kotlinx.coroutines.withContext
 class SplashActivity : BaseActivity()
 {
     companion object {
+        @kotlin.jvm.JvmField
         var connectivityChangeReceiver= ConnectivityChangeReceiver()
         var alertDialogNetwork: AlertDialog? = null
         var staticSyncData: SyncModel? =null
+        var showNetworkAlert: Boolean =true
     }
     var sharePreferance: PreferenceClass?= null
     var progressBar: ProgressBar?=null

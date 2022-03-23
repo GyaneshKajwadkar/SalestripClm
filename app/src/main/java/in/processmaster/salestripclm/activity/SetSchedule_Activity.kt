@@ -86,6 +86,16 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
 
         }
         else{
+
+            Timer().schedule(50){
+                runOnUiThread(java.lang.Runnable {
+                    init()
+                    setScheduleAdapter()
+                })
+            }
+
+            if(!generalClass.isInternetAvailable()) return
+
             getTeamsApi()
             var zoomSDKBase = ZoomSDK.getInstance()
 
@@ -97,17 +107,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
                     }
                 }
             }
-
-            Timer().schedule(50){
-                runOnUiThread(java.lang.Runnable {
-                    init()
-                    setScheduleAdapter()
-                })
-            }
         }
-
-
-
     }
 
     @RequiresApi(Build.VERSION_CODES.N)

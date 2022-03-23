@@ -8,6 +8,7 @@ import `in`.processmaster.salestripclm.interfaceCode.productTransfer
 import `in`.processmaster.salestripclm.models.SyncModel
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Handler
@@ -15,6 +16,7 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
@@ -91,32 +93,31 @@ class SelectedPobAdapter(
 
 
         holder.close.setOnClickListener({
+
+            submiteDetailingactivity?.selectedProductList?.removeAt(position)
+            notifyItemRemoved(position)
             model?.notApi=SyncModel.Data.Product.NotApiData()
 
-            for ((index,data) in submiteDetailingactivity?.unSelectedProductList?.withIndex()!!)
-            {
-                if(model?.notApi?.insertedProductId==data.notApi.insertedProductId)
-                {
-                    model?.let { it1 -> submiteDetailingactivity?.unSelectedProductList?.set(index, it1)
-                    }
-                    submiteDetailingactivity?.calculateTotalProduct()
-                    submiteDetailingactivity?.pobProductSelectAdapter?.notifyDataSetChanged()
-                    notifyItemChanged(position)
-                }
+            val runnable = java.lang.Runnable {
+                for ((index,data) in submiteDetailingactivity?.unSelectedProductList?.withIndex()!!)
+              {
+                  if(model?.notApi?.insertedProductId==data.notApi.insertedProductId)
+                  {
+                      model?.let { it1 -> submiteDetailingactivity?.unSelectedProductList?.set(index, it1) }
+                      submiteDetailingactivity.runOnUiThread{
+                          submiteDetailingactivity?.calculateTotalProduct()
+                          submiteDetailingactivity?.pobProductSelectAdapter?.notifyItemChanged(index)
+                          notifyItemChanged(position)
+                      }
+                      break
+                  }
+              }
             }
-
-       /*     val insertSelectedModel = submiteDetailingactivity?.mainProductList?.find { it.notApi.insertedProductId == model?.notApi?.insertedProductId }
-
-            model?.let { it1 -> sendEDetailingArray?.set(position, it1) }
+            Thread(runnable).start()
 
 
 
-            Handler(Looper.getMainLooper()).postDelayed({
 
-            }, 100)*/
-
-
-         //   sendEDetailingArray?.let { sendProductInterface?.onClickButtonProduct(it) }
         })
 
         holder.qty_et.setOnFocusChangeListener(object : View.OnFocusChangeListener {

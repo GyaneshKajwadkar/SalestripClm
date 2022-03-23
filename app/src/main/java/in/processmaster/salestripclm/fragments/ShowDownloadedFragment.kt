@@ -9,6 +9,7 @@ import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -64,6 +65,7 @@ class ShowDownloadedFragment : Fragment() {
         {
             currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
             currentDate = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(Date())
+            Log.e("sfiousgfuisfgjsf", currentTime + " " + currentDate)
         }
 
         video_rv=view.findViewById(R.id.video_rv)

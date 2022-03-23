@@ -20,6 +20,7 @@ import android.os.Looper
 import android.text.SpannableString
 import android.text.style.RelativeSizeSpan
 import android.text.style.StyleSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -116,8 +117,6 @@ class HomeFragment : Fragment(), OnChartGestureListener {
     }
 
     override fun onResume() {
-
-
         super.onResume()
         val responseData=db.getApiDetail(2)
         val responseGraph=db.getApiDetail(4)
@@ -141,7 +140,6 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         arrayListString.add("Next week meetings")
         val adapter = MeetingExpandableHeaderAdapter(requireActivity(),arrayListString,getScheduleModel)
         expandable_Rv?.adapter = adapter
-
 
         if(!responseDocCall.equals(""))
         {

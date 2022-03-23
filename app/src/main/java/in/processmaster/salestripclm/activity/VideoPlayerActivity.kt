@@ -156,7 +156,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
                 //  val file = File(webUrlPath)
 
 
-                db?.insertFileID(videoModel!!.fileId,startDateTime)
+                db?.insertFileID(videoModel!!.fileId,startDateTime,brandId)
                 setSlideViewTime()
 
                 end_btn?.setOnClickListener({
@@ -531,7 +531,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
 
     fun likeCommentColor()
     {
-        db?.insertFileID(videoModel!!.fileId, startDateTime)
+        db?.insertFileID(videoModel!!.fileId, startDateTime,brandId)
 
         val isLike=db?.getLike(videoModel!!.fileId.toString(),startDateTime)
 
@@ -575,7 +575,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
                         sleep(1000)
                         runOnUiThread {
 
-                            if(mPlayer?.isPlaying!!)
+                            if(mPlayer?.isPlaying == true)
                             {
                                 dbTimer=dbTimer!!+1
                                 Log.e("timerSlider",dbTimer.toString())
