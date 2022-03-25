@@ -39,7 +39,7 @@
         <activity
             android:name=".activity.SubmitE_DetailingActivity"
             android:screenOrientation="landscape"
-            android:windowSoftInputMode="adjustPan" />
+           />
         <activity
             android:name=".activity.MailActivity"
             android:launchMode="singleTop"

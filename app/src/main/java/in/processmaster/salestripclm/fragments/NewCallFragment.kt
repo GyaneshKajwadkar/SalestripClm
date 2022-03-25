@@ -170,9 +170,8 @@ class NewCallFragment : Fragment() {
     {
         if(generalClassObject?.isInternetAvailable() == true)
         {
-           // callCoroutineApi(i)
-        return true
-       // return false
+            callCoroutineApi(i)
+            return false
         }
         else if( sharePreferance?.getPref("todayDate") != generalClassObject?.currentDateMMDDYY() || sharePreferance?.getPref("dcrId")=="0") {
             alertClass?.commonAlert("Alert!","DCR not submitted please connect to internet and fill DCR first.")
@@ -464,9 +463,9 @@ class NewCallFragment : Fragment() {
                     endPoint.latitude = fetch.latitude
                     endPoint.longitude = fetch.longitude
                     val distance = startPoint.distanceTo(endPoint).toInt()
-                    doctorListArray.add(fetch)
-                  /*  if(distance <= getRadius){
-                        doctorListArray.add(fetch) }*/
+                  //  doctorListArray.add(fetch)
+                    if(distance <= getRadius){
+                        doctorListArray.add(fetch) }
                 }
             }
             else
@@ -798,22 +797,27 @@ class NewCallFragment : Fragment() {
             if (response!!.isSuccessful) {
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
 
-                    val jsonObjError: JsonObject = response.body()?.get("errorObj") as JsonObject
-                    if (jsonObjError.get("errorMessage").asString.isEmpty()) {
-                        val data: JsonObject = response.body()?.get("data") as JsonObject
-                        val dcrData: JsonObject = data?.get("dcrData") as JsonObject
-                        if (dcrData.get("routeId").asInt == 0) {
+                   // val jsonObjError: JsonObject = response.body()?.get("errorObj") as JsonObject
+                    if (response.body()?.errorObj?.errorMessage?.isEmpty() == true) {
+                       // val data: JsonObject = response.body()?.get("data") as JsonObject
+                      //  val dcrData: JsonObject = data?.get("dcrData") as JsonObject
+                        val dcrData=response.body()?.data?.dcrData
+                        if (dcrData?.routeId==0) {
+
                             alertClass?.commonAlert("Alert!", "Please submit tour program first")
                             alertClass?.hideAlert()
                             return@withContext
                         }
-                        routeIdGetDCR = dcrData.get("routeId").asString
-                        if (dcrData.get("dcrId").asInt == 0) {
-                            createDCRAlert(dcrData.get("routeId").asString)
-                            sharePreferance?.setPref("dcrId", dcrData.get("dcrId").asString)
+                        routeIdGetDCR = dcrData?.routeId.toString()
+                        dcrData?.dataSaveType="D"
+                        sharePreferance?.setPref("dcrObj", Gson().toJson(dcrData))
+
+                        if (dcrData?.dcrId == 0) {
+                            createDCRAlert(dcrData?.routeId.toString())
+                            sharePreferance?.setPref("dcrId", dcrData?.dcrId.toString())
                         } else {
                             sharePreferance?.setPref("todayDate", generalClassObject?.currentDateMMDDYY())
-                            sharePreferance?.setPref("dcrId", dcrData.get("dcrId").asString)
+                            sharePreferance?.setPref("dcrId", dcrData?.dcrId.toString())
                             if(i==1)
                             {
                                 views?.bottomSheetTitle_tv?.setText("Select route")

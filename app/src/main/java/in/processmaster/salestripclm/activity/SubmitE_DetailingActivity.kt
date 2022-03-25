@@ -202,19 +202,26 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             {
 
             }
+            if(intent.getStringExtra("apiDataDcr")?.isEmpty() == false)
+            { getUpdateData()
+            }
             runOnUiThread {
-                pobProductSelectAdapter=PobProductAdapter(unSelectedProductList, passingSchemeList,this)
+               /* pobProductSelectAdapter=PobProductAdapter(unSelectedProductList, passingSchemeList,this)
                 pobProduct_rv.adapter= pobProductSelectAdapter
 
                 selectedPobAdapter=SelectedPobAdapter(selectedProductList,this,this)
-                selectedPob_rv.adapter= selectedPobAdapter
+                selectedPob_rv.adapter= selectedPobAdapter*/
+
+                setPobAdapter()
 
                 visitPurpose_spinner.setAdapter(adapterVisit)
 
 
                 Handler(Looper.getMainLooper()).postDelayed({
                     alertClass.hideAlert()
-                }, 200)
+
+
+                }, 10)
 
             }
         }
@@ -371,13 +378,12 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                     alertClass.commonAlert("Stockist unselected","Please assign stockist in POB section")
                     return@setOnClickListener
                 }
-
             }
 
             if(selectedStockist.id!=null && selectedStockist.id!="" && filterSelectecd.size!=0)  saveModel.pobObject?.stockistId=selectedStockist.id.toInt()
 
             if(!GeneralClass(this).isInternetAvailable())
-            {   dbBase.insertOrUpdateSaveAPI(dcrId, Gson().toJson(saveModel),"feedback")
+            {   dbBase.insertOrUpdateSaveAPI(doctorIdDisplayVisual, Gson().toJson(saveModel),"feedback")
                 val commonModel=CommonModel.QuantityModel.Data()
                 commonModel.employeeSampleBalanceList=quantityArray
                 dbBase.addAPIData(Gson().toJson(commonModel),3)
@@ -395,9 +401,6 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             generalClass.hideKeyboard(this,it)
             pobProductSelectAdapter.setSelction() })
 
-        if(intent.getStringExtra("apiDataDcr")?.isEmpty() == false)
-        { getUpdateData()
-        }
 
    /*     executor.execute {
             if(!PreferenceClass(this).getPref("dcrId").isEmpty())
@@ -906,26 +909,21 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
        // return
 
         alertClass?.showProgressAlert("")
-        var call: Call<JsonObject> = HomePage.apiInterface?.submitEdetailingApi("bearer " + loginModelHomePage.accessToken,saveModel) as Call<JsonObject>
-        call.enqueue(object : Callback<JsonObject?> {
-            override fun onResponse(call: Call<JsonObject?>?, response: Response<JsonObject?>) {
+        var call: Call<DailyDocVisitModel> = HomePage.apiInterface?.submitEdetailingApiAndGet("bearer " + loginModelHomePage.accessToken,saveModel) as Call<DailyDocVisitModel>
+        call.enqueue(object : Callback<DailyDocVisitModel?> {
+            override fun onResponse(call: Call<DailyDocVisitModel?>?, response: Response<DailyDocVisitModel?>) {
 
-
+                Log.e("gsuifgidsufhgi",response.body().toString())
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
-                    val jsonObjError: JsonObject = response.body()?.get("errorObj") as JsonObject
-                    if(!jsonObjError.get("errorMessage").asString.isEmpty())
+                    if(response.body()?.getErrorObj()?.errorMessage?.isEmpty()==false)
                     {
                         alertClass?.hideAlert()
-                        alertClass?.commonAlert("",jsonObjError.get("errorMessage").asString)
+                        alertClass?.commonAlert("",response.body()?.getErrorObj()?.errorMessage.toString())
                     }
                     else {
-                        val jsonObjData:JsonObject = response.body()?.get("data") as JsonObject
-
-                        CoroutineScope(Dispatchers.IO).launch {
-                            val getDocCall= async {
-                                getDocCallAPISubmit(jsonObjData)}
-                            getDocCall.await()
-                        }
+                        dbBase?.addAPIData(Gson().toJson(response.body()?.getData()), 5)
+                        alertClass?.hideAlert()
+                        callRunnableAlert("Doctor Dcr save successfully")
 
                         val commonModel=CommonModel.QuantityModel.Data()
                         commonModel.employeeSampleBalanceList=quantityArray
@@ -933,34 +931,11 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
                     } } }
 
-            override fun onFailure(call: Call<JsonObject?>, t: Throwable?) {
+            override fun onFailure(call: Call<DailyDocVisitModel?>, t: Throwable?) {
                 generalClass?.checkInternet()
                 alertClass?.hideAlert()
                 call.cancel()
             } }) }
-
-
-    suspend fun getDocCallAPISubmit(jsonObjData: JsonObject)
-    {
-        val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
-        ).dailyDocCallApi("bearer " + loginModelHomePage.accessToken,generalClass.currentDateMMDDYY())
-        withContext(Dispatchers.Main) {
-            Log.e("getDocCallAPI", response.body().toString()!!)
-            if (response!!.isSuccessful)
-            {
-                if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage!!.isEmpty()) {
-                    var model = response.body()
-                    dbBase?.addAPIData(Gson().toJson(model?.getData()), 5)
-                    alertClass?.hideAlert()
-                    callRunnableAlert(jsonObjData.get("message").asString)
-
-
-                }
-                else Log.e("elsegetDocCallAPI", response.code().toString())
-            }
-            else Log.e("getDocCallAPIERROR", response.errorBody().toString())
-        }
-    }
 
 
     fun callRunnableAlert(message:String)
@@ -1059,9 +1034,6 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                // visualSendModel.set(position,objectDetailing)
             }
 
-
-
-
             holder.feeback_et.addTextChangedListener(object:TextWatcher{
                 override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
                 override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
@@ -1140,7 +1112,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
         alertClass.showProgressAlert("")
         val runnable = java.lang.Runnable {
-            selectedProductList.clear()
+          //  selectedProductList.clear()
 
             for ((index,selected) in selectedList.withIndex())
             {
@@ -1148,18 +1120,18 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 {
                     selected.notApi.isSaved=true
                     selectedProductList.add(selected)
+                    unSelectedProductList.removeAt(index)
                     runOnUiThread {
                         selectedPobAdapter.notifyItemChanged(index)
                       //  pobProductSelectAdapter.notifyItemChanged(index)
                     }
-
                 }
             }
             runOnUiThread {
 
-                calculateTotalProduct()
-                pobProductSelectAdapter.notifyDataSetChanged()
-                pobProduct_rv.scrollToPosition(0)
+               // pobProductSelectAdapter.notifyDataSetChanged()
+                setPobAdapter()
+                //pobProduct_rv.scrollToPosition(0)
                 Handler(Looper.getMainLooper()).postDelayed({
                     closeBottomSheet()
                     alertClass.hideAlert()
@@ -1247,6 +1219,19 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         }, 10)
 */
 
+    }
+
+    fun setPobAdapter()
+    {
+        runOnUiThread{
+            pobProductSelectAdapter=PobProductAdapter(unSelectedProductList, passingSchemeList,this)
+            pobProduct_rv.adapter= pobProductSelectAdapter
+
+            selectedPobAdapter=SelectedPobAdapter(selectedProductList,this,this)
+            selectedPob_rv.adapter= selectedPobAdapter
+
+            calculateTotalProduct()
+        }
     }
 
     fun updateSpecificElement(returnModel: SyncModel.Data.Product?, position: Int)
@@ -1337,7 +1322,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                         availableProduct.notApi.insertedProductId=pobProducts.productId
                         availableProduct.notApi.isSaved=true
 
-                        unSelectedProductList.set(index,availableProduct)
+                        unSelectedProductList.removeAt(index)
                         selectedProductList.add(availableProduct)
                     }
                 }
@@ -1363,6 +1348,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             }
 
             this.runOnUiThread(java.lang.Runnable {
+                if(visualSendModel.size==0)nodata_gif.visibility=View.VISIBLE
                 remark_Et.setText(edetailingEditModel.remark)
                 doctorName_tv.setText(edetailingEditModel.doctorName)
                 workingWithRv.adapter = TextWithEditAdapter(passingWorking as ArrayList<IdNameBoll_model>, this, 0, this,selectionType)
@@ -1380,6 +1366,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 }
                 if(visualSendModel.size!=0)nodata_gif.visibility=View.GONE
 
+                setPobAdapter()
                 calculateTotalProduct()
             })
         }

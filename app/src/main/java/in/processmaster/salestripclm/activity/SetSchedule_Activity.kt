@@ -75,7 +75,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_set_schedule_)
 
-        if(!sharePreferanceBase?.getPrefBool("zoomCrediential")!!)
+        if(!sharePreferanceBase?.getPrefBool("zoomCrediential")!! || sharePreferanceBase?.getPrefBool("zoomCrediential")==null )
         {
             val r: Runnable = object : Runnable {
                 override fun run() {
@@ -397,6 +397,11 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
         })
 
         submit_newSchedule.setOnClickListener({
+            if (!generalClass.isInternetAvailable())
+            {
+                alertClass.networkAlert()
+                return@setOnClickListener
+            }
             generalClass.HideKeyboard(currentFocus ?: View(this@SetSchedule_Activity))
 
             if(constructorList.size==0)
@@ -572,6 +577,10 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
         val list_rv= dialogView.findViewById<View>(R.id.list_rv) as RecyclerView
         val search_et= dialogView.findViewById<View>(R.id.search_et) as EditText
         val ok_btn= dialogView.findViewById<View>(R.id.ok_btn) as Button
+        val headerTv= dialogView.findViewById<View>(R.id.headerTv) as TextView
+        if(selectionType==1)headerTv.setText("Select Doctor")
+        else headerTv.setText("Select Route")
+
 
         val layoutManager = LinearLayoutManager(this)
         list_rv.layoutManager=layoutManager
@@ -719,11 +728,12 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
                 if (response.code() == 200 && !response.body().toString().isEmpty())
                 {
                     var getTeamslist=response.body()
+                    Log.e("getTeamsResponse",Gson().toJson(getTeamslist))
 
                     for(singleItem in getTeamslist?.getData()?.employeeList!!)
                     {
                         var selectorModel =DocManagerModel()
-                        selectorModel.name=singleItem.firstName+" "+singleItem.lastName
+                        selectorModel.name=singleItem.fullName
                         selectorModel.routeName=singleItem.headQuaterName
                         selectorModel.specialityName=singleItem.divisionName
                         selectorModel.id=singleItem.empId

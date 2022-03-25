@@ -21,6 +21,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -146,6 +147,9 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
         val list_rv= dialogView.findViewById<View>(R.id.list_rv) as RecyclerView
         val search_et= dialogView.findViewById<View>(R.id.search_et) as EditText
         val ok_btn= dialogView.findViewById<View>(R.id.ok_btn) as Button
+        val headerTv= dialogView.findViewById<View>(R.id.headerTv) as TextView
+        if(selectionType==1)headerTv.setText("Select Doctor")
+            else headerTv.setText("Select Route")
 
         val layoutManager = LinearLayoutManager(this)
         list_rv.layoutManager=layoutManager

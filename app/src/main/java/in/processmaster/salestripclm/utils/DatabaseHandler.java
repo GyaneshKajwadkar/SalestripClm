@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import in.processmaster.salestripclm.models.DailyDocVisitModel;
 import in.processmaster.salestripclm.models.DevisionModel;
 import in.processmaster.salestripclm.models.DownloadFileModel;
 import in.processmaster.salestripclm.models.VisualAdsModel_Send;
@@ -607,7 +608,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     for(int i=0 ; i < visualModel.getChildDataArray().size() ;i++)
                     {
                         VisualAdsModel_Send.childData childData = visualModel.getChildDataArray().get(i);
-                        durationCount= durationCount+Integer.parseInt(childData.getViewTime());
+                        if(childData.getViewTime()!=null && !childData.getViewTime().isEmpty())
+                        {
+                            durationCount= durationCount+Integer.parseInt(childData.getViewTime());
+                        }
                     }
                     visualModel.setDuration(durationCount);
                     edetailList.add(visualModel);
@@ -894,33 +898,43 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         int u = db.update(TABLE_SAVE_SEND_API, initialValues, "id=?", new String[]{String.valueOf(id)});
 
-        if (u == 0) {
+      if (u == 0) {
             db.insert(TABLE_SAVE_SEND_API, null, initialValues);
-        }
+       }
 
     }
 
+
     @SuppressLint("Range")
-    public ArrayList<String>getAllSaveSend(String type)
+    public ArrayList<DailyDocVisitModel.Data.DcrDoctor>getAllSaveSend(String type)
     {
-        ArrayList<String> saveStringList=new ArrayList<>();
+        ArrayList<DailyDocVisitModel.Data.DcrDoctor> edetailList = new ArrayList<>();
+
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_SAVE_SEND_API, new String[] { APIKEY_DATA}, API_TYPE + "=?",
-                new String[] {type }, null, null, null, null);
+                new String[] {type}, null, null, null, null);
         if (cursor.moveToFirst()) {
             do {
                 String data=cursor.getString(cursor.getColumnIndex(APIKEY_DATA));
-                saveStringList.add(data);
+                DailyDocVisitModel.Data.DcrDoctor getSaveModel  = new Gson().fromJson(data, DailyDocVisitModel.Data.DcrDoctor.class);
+                getSaveModel.setOfflineSave(true);
+                edetailList.add(getSaveModel);
+
             }
             while (cursor.moveToNext());
         }
-        return saveStringList;
+        return edetailList;
     }
 
     public boolean  deleteSaveSend(int id) {
         SQLiteDatabase db = this.getWritableDatabase();
         return  db.delete(TABLE_SAVE_SEND_API, KEY_ID + " = ?",
                 new String[] { String.valueOf(id) }) > 0;
+    }
+
+    public void deleteSendEdetailing()
+    {  SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("delete from "+ TABLE_SAVE_SEND_API);
     }
 
 //=============================================Doctor e detailing table===================================

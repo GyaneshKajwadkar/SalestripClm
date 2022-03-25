@@ -1,7 +1,9 @@
 package `in`.processmaster.salestripclm.fragments
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.SplashActivity
-import `in`.processmaster.salestripclm.adapter.*
+import `in`.processmaster.salestripclm.adapter.CallDoctor_Adapter
+import `in`.processmaster.salestripclm.adapter.MeetingExpandableHeaderAdapter
+import `in`.processmaster.salestripclm.adapter.ScheduleMeetingAdapter
 import `in`.processmaster.salestripclm.models.DailyDocVisitModel
 import `in`.processmaster.salestripclm.models.DoctorGraphModel
 import `in`.processmaster.salestripclm.models.GetScheduleModel
@@ -35,7 +37,10 @@ import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
-import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.github.mikephil.charting.formatter.IValueFormatter
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
@@ -47,6 +52,10 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.utils.ViewPortHandler
 import com.google.android.material.button.MaterialButton
 import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import us.zoom.sdk.ZoomSDK
 import java.text.DecimalFormat
 import java.text.ParseException
@@ -54,7 +63,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import kotlin.collections.ArrayList
 
 
 class HomeFragment : Fragment(), OnChartGestureListener {
@@ -94,14 +102,18 @@ class HomeFragment : Fragment(), OnChartGestureListener {
             dailyDoctorCall_rv = root.findViewById<View>(R.id.dailyDoctorCall_rv) as RecyclerView
             noDocCall_tv = root.findViewById<View>(R.id.noDocCall_tv) as TextView
             todaysCall_tv = root.findViewById<View>(R.id.todaysCall_tv) as TextView
+            dailyDoctorCall_rv?.layoutManager=LinearLayoutManager(activity)
+            expandable_Rv?.layoutManager = LinearLayoutManager(activity)
 
             sharePreferance = PreferenceClass(activity)
-            db= DatabaseHandler(requireActivity())
+            db= DatabaseHandler(activity)
 
             chart = root.findViewById(R.id.chart1)
             // charthalf = root.findViewById(R.id.charthalf)
+            parent_ll?.visibility = View.VISIBLE
+            progressHomeFrag?.visibility = View.GONE
 
-            val handler = Handler(Looper.getMainLooper())
+       /*     val handler = Handler(Looper.getMainLooper())
             val executorAdapter: ExecutorService = Executors.newSingleThreadExecutor()
             executorAdapter.execute(Runnable {
                 //  pieChartInitilize()
@@ -109,48 +121,117 @@ class HomeFragment : Fragment(), OnChartGestureListener {
                     parent_ll?.visibility = View.VISIBLE
                     progressHomeFrag?.visibility = View.GONE
                 })
-            })
-            expandable_Rv?.layoutManager = LinearLayoutManager(requireActivity())
+            })*/
+
+
+
         }
+
 
         return root
     }
 
     override fun onResume() {
         super.onResume()
+        GlobalScope.launch(Dispatchers.Default) {
+            val default = async(Dispatchers.Default) { fetchData() }
+            default.await()
+        }
+    }
+
+  /*  override fun onResume() {
+        super.onResume()
+
+    *//*    val runnable = Runnable {
+            val responseData=db.getApiDetail(2)
+            val responseGraph=db.getApiDetail(4)
+            val responseDocCall=db.getApiDetail(5)
+            var getScheduleModel=GetScheduleModel()
+            if(!responseData.equals(""))
+            {
+                getScheduleModel= Gson().fromJson(responseData, GetScheduleModel::class.java)
+            }
+            if(!responseGraph.equals(""))
+            {
+                var doctorGraphModel=DoctorGraphModel.Data()
+                doctorGraphModel= Gson().fromJson(responseGraph, DoctorGraphModel.Data::class.java)
+                requireActivity().runOnUiThread{ setChart(doctorGraphModel) }
+
+            }
+
+            var arrayListString : ArrayList<String> = ArrayList()
+            arrayListString.add("Today's meetings")
+            arrayListString.add("Tommorow meetings")
+            arrayListString.add("This week meetings")
+            arrayListString.add("Next week meetings")
+            val adapter = MeetingExpandableHeaderAdapter(requireActivity(),arrayListString,getScheduleModel)
+
+            requireActivity().runOnUiThread{ expandable_Rv?.adapter = adapter }
+
+            if(!responseDocCall.equals(""))
+            {
+                val  docCallModel= Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
+                val docAdapter=CallDoctor_Adapter(docCallModel.dcrDoctorlist,requireActivity())
+
+                requireActivity().runOnUiThread {
+                    if(docCallModel.dcrDoctorlist?.size==0) { noDocCall_tv?.visibility = View.VISIBLE}
+                    dailyDoctorCall_rv?.layoutManager=LinearLayoutManager(requireActivity())
+                    dailyDoctorCall_rv?.adapter=docAdapter
+                    todaysCall_tv?.setText("Today's call- "+docCallModel.dcrDoctorlist?.size)
+                }
+            }
+        }
+        Thread(runnable).start()*//*
+
+   *//*    val gs= GlobalScope.launch(Dispatchers.Default) {
+            val default = async(Dispatchers.Default) { fetchData() }
+           default.await()
+       }*//*
+
+    }*/
+
+    suspend fun fetchData() {
+
+        val activity: Activity? = activity
+        if (activity == null && !isAdded) {
+            return
+        }
+
         val responseData=db.getApiDetail(2)
         val responseGraph=db.getApiDetail(4)
         val responseDocCall=db.getApiDetail(5)
-        var getScheduleModel=GetScheduleModel()
         if(!responseData.equals(""))
         {
-            getScheduleModel= Gson().fromJson(responseData, GetScheduleModel::class.java)
+           val  getScheduleModel= Gson().fromJson(responseData, GetScheduleModel::class.java)
+            var arrayListString : ArrayList<String> = ArrayList()
+            arrayListString.add("Today's meetings")
+            arrayListString.add("Tommorow meetings")
+            arrayListString.add("This week meetings")
+            arrayListString.add("Next week meetings")
+            val adapter = activity?.let { MeetingExpandableHeaderAdapter(it,arrayListString,getScheduleModel) }
+            activity?.runOnUiThread {  expandable_Rv?.adapter = adapter }
         }
         if(!responseGraph.equals(""))
         {
             var doctorGraphModel=DoctorGraphModel.Data()
             doctorGraphModel= Gson().fromJson(responseGraph, DoctorGraphModel.Data::class.java)
-            setChart(doctorGraphModel)
+            activity?.runOnUiThread{ setChart(doctorGraphModel) }
         }
-
-        var arrayListString : ArrayList<String> = ArrayList()
-        arrayListString.add("Today's meetings")
-        arrayListString.add("Tommorow meetings")
-        arrayListString.add("This week meetings")
-        arrayListString.add("Next week meetings")
-        val adapter = MeetingExpandableHeaderAdapter(requireActivity(),arrayListString,getScheduleModel)
-        expandable_Rv?.adapter = adapter
 
         if(!responseDocCall.equals(""))
         {
-          val  docCallModel= Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
-            if(docCallModel.dcrDoctorlist?.size==0) { noDocCall_tv?.visibility = View.VISIBLE; return }
-            val docAdapter=CallDoctor_Adapter(docCallModel.dcrDoctorlist,requireActivity())
-            dailyDoctorCall_rv?.layoutManager=LinearLayoutManager(requireActivity())
-            dailyDoctorCall_rv?.adapter=docAdapter
-            todaysCall_tv?.setText("Today's call- "+docCallModel.dcrDoctorlist?.size)
+            val  docCallModel= Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
+            val docAdapter= activity?.let { CallDoctor_Adapter(docCallModel.dcrDoctorlist, it) }
+
+            activity?.runOnUiThread {
+                if(docCallModel.dcrDoctorlist?.size==0) { noDocCall_tv?.visibility = View.VISIBLE}
+                dailyDoctorCall_rv?.adapter=docAdapter
+                todaysCall_tv?.setText("Today's call- "+docCallModel.dcrDoctorlist?.size)
+            }
         }
     }
+
+
 
     fun createAlert(heading: String, buttonText: String, context: Activity)
     {

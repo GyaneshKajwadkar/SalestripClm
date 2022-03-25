@@ -150,7 +150,7 @@ interface APIInterface
         @Header("Authorization") authorization: String?,
         @Path("empId") empId: Int?,
         @Query("date") date:String?
-    ): Response<JsonObject>
+    ): Response<GetDcrToday>
 
     @POST("api/dcr")
     fun saveDCS(
@@ -164,20 +164,20 @@ interface APIInterface
         @Body arrayVisual: DailyDocVisitModel.Data.DcrDoctor
     ): Call<JsonObject?>?
 
-    @GET("api/dcr/doctor/v2") //sync api
-    suspend fun submitEdetailingApiCoo(@Header("Authorization") authorization: String,  @Body arrayVisual: DailyDocVisitModel.Data.DcrDoctor): Response<JsonObject>
+    @POST("api/dcr/mobile/complete-data")
+    suspend fun submitEdetailingApiCoo(@Header("Authorization") authorization: String, @Body arrayVisual: GetDcrToday.Data.DcrData): Response<GetDcrToday>
 
 
-    @GET("api/gs-receive/employee-sample-balance") //sync api
+    @GET("api/gs-receive/employee-sample-balance")
     suspend fun getQuantiyApiCoo(@Header("Authorization") authorization: String): Response<CommonModel.QuantityModel>
 
-    @GET("api/dashboard/visited-doctor-retailer") //sync api
+    @GET("api/dashboard/visited-doctor-retailer")
     suspend fun
             visitDoctorGraphApi(@Header("Authorization") authorization: String?,
                                 @Query("fromDate") fromDate:String,
                                 @Query("toDate") toDate:String): Response<DoctorGraphModel>
 
-    @GET("api/dcr/doctors") //sync api
+    @GET("api/dcr/doctors")
     suspend fun
             dailyDocCallApi(@Header("Authorization") authorization: String?,
                                 @Query("dcrDate") fromDate:String): Response<DailyDocVisitModel>
@@ -187,5 +187,12 @@ interface APIInterface
         @Header("Authorization") authorization: String?,
         @Path("empId") empId: String?
     ): Response<ProfileModel?>?
+
+
+    @POST("api/dcr/clm/doctor")
+    fun submitEdetailingApiAndGet(
+        @Header("Authorization") authorization: String?,
+        @Body arrayVisual: DailyDocVisitModel.Data.DcrDoctor
+    ): Call<DailyDocVisitModel?>?
 
 }

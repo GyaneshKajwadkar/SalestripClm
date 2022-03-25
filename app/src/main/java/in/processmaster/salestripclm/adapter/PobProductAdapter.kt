@@ -96,13 +96,11 @@ class PobProductAdapter(
 
                         val getFree=s.toString().toInt()/ model?.notApi?.salesQty!! * model?.notApi?.freeQtyMain!!
 
-
                         model?.notApi?.freeQty=getFree
                         val totalQty=getFree+s.toString().toInt()
                         model?.notApi?.totalQty=totalQty
                         model?.notApi?.qty=s.toString().toInt()
                         model?.notApi?.amount=s.toString().toInt()*model.price
-
                     }
                     else
                     {

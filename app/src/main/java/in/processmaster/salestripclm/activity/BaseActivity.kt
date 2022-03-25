@@ -1,7 +1,6 @@
 package `in`.processmaster.salestripclm.activity
 
 import DocManagerModel
-import `in`.processmaster.salestripclm.networkUtils.ConnectivityChangeReceiver
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.HomePage.Companion.apiInterface
 import `in`.processmaster.salestripclm.activity.HomePage.Companion.loginModelHomePage
@@ -11,6 +10,7 @@ import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.models.*
 import `in`.processmaster.salestripclm.networkUtils.APIClientKot
+import `in`.processmaster.salestripclm.networkUtils.ConnectivityChangeReceiver
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import `in`.processmaster.salestripclm.utils.ZoomInitilizeClass
@@ -42,8 +42,8 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import us.zoom.sdk.*
-import java.lang.Exception
 import java.lang.ref.WeakReference
+
 
 open class BaseActivity : AppCompatActivity(){
 
@@ -259,7 +259,7 @@ open class BaseActivity : AppCompatActivity(){
                     for(singleItem in getTeamslist?.getData()?.employeeList!!)
                     {
                         var selectorModel =DocManagerModel()
-                        selectorModel.name=singleItem.firstName+" "+singleItem.lastName
+                        selectorModel.name=singleItem.fullName
                         selectorModel.routeName= singleItem.headQuaterName
                         selectorModel.specialityName= singleItem.divisionName
                         selectorModel.id= singleItem.empId
@@ -295,7 +295,7 @@ open class BaseActivity : AppCompatActivity(){
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
                     val gson = Gson()
                     var model = response.body()
-                    dbBase?.addAPIData(gson.toJson(model),2,) }
+                    dbBase?.addAPIData(gson.toJson(model), 2) }
                 else
                 { Log.e("elseGetScheduled", response.code().toString()) }
             }
@@ -356,26 +356,36 @@ open class BaseActivity : AppCompatActivity(){
 
     suspend fun submitDCRCo()
     {
-        val stringArray=dbBase.getAllSaveSend("feeback")
-        if(stringArray!!.size<=0 )return
+        val dcrObj= sharePreferanceBase?.getPref("dcrObj")
+        val eDetailingArray=dbBase.getAllSaveSend("feedback")
+        if(dcrObj==null || dcrObj=="" || eDetailingArray.size==0) { return }
+        var getDcrObj = Gson().fromJson(dcrObj.toString(), GetDcrToday.Data.DcrData::class.java)
+        if(getDcrObj==null) {return}
+        getDcrObj.doctorDCRList=eDetailingArray
+        getDcrObj.mode=2
 
-        val saveModel=Gson().fromJson(stringArray.get(0),DailyDocVisitModel.Data.DcrDoctor::class.java)
+       // Log.e("siofshfioswd", (getDcrObj.doctorDCRList)?.size.toString())
+       // Log.e("trhtruhrtgrfg",Gson().toJson(getDcrObj))
 
         val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
-        ).submitEdetailingApiCoo("bearer " + loginModelHomePage.accessToken,saveModel)
+        ).submitEdetailingApiCoo("bearer " + loginModelHomePage.accessToken,getDcrObj)
         withContext(Dispatchers.Main) {
-            Log.e("submitDCRCoAPI",response.toString())
             if (response!!.isSuccessful)
             {
+             //   Log.e("dfsdgtrertef", response.body().toString())
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
-                    val jsonObjError: JsonObject = response.body()?.get("errorObj") as JsonObject
-                    if(!jsonObjError.get("errorMessage").asString.isEmpty())
+                    if(response.body()?.errorObj?.errorMessage==null || !response.body()?.errorObj?.errorMessage.toString().isEmpty())
                     {
-                        Log.e("errorOnSubmitEDetailing",jsonObjError.get("errorMessage").asString)
+                        response.body()?.errorObj?.errorMessage?.let { Log.e("errorOnSubmitEDetailing", it) }
                     }
                     else {
-                        dbBase.deleteSaveSend(saveModel.dcrId!!)
-                        submitDCRCo();
+                        val dailyCallModel=  DailyDocVisitModel.Data()
+                        dailyCallModel.dcrDoctorlist=response.body()?.data?.dcrData?.doctorDCRList
+                       // Log.e("sdgfuishdi",dailyCallModel.dcrDoctorlist?.size.toString())
+
+                        dbBase?.addAPIData(Gson().toJson(dailyCallModel), 5)
+                       // Log.e("hgmhgjtgyjtrydgdfgdf", response.body().toString())
+                        dbBase.deleteSendEdetailing()
                     } }
                 else Log.e("elsesubmitDCRCoAPI", response.code().toString())
             }

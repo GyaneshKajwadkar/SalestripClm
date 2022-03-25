@@ -111,7 +111,11 @@ class ProfileeActivity : BaseActivity() {
         })
 
         menuProfile?.setOnClickListener({
-
+            if (!generalClass.isInternetAvailable())
+            {
+                alertClass.networkAlert()
+                return@setOnClickListener
+            }
             val menuBuilder = MenuBuilder(this)
             val inflater = MenuInflater(this)
             inflater.inflate(R.menu.profilemenu, menuBuilder)

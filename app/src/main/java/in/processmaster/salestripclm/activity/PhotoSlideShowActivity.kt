@@ -784,7 +784,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
     fun setSlideViewTime()
     {
         thread?.interrupt()
-        var dbBaseTimer=dbBase?.getTime(model!!.fileId.toString(),startDateTime)
+        var dbBaseTimer=dbBase?.getTime(model?.fileId.toString(),startDateTime)
 
         thread = object : Thread() {
             override fun run() {
@@ -793,9 +793,11 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
                         sleep(1000)
                         runOnUiThread {
                             dbBaseTimer=dbBaseTimer!!+1
-
-                            //  Log.e("timerSlider",dbBaseTimer.toString())
-                            dbBase?.insertTime(dbBaseTimer!!, model!!.fileId ,startDateTime)
+                            Log.e("timerSlider",dbBaseTimer.toString())
+                            model?.fileId?.let {
+                                dbBase?.insertTime(dbBaseTimer!!,
+                                    it,startDateTime)
+                            }
                         }
                     }
                 } catch (e: InterruptedException) {

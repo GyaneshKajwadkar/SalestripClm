@@ -48,6 +48,10 @@ class DailyDocVisitModel {
         var dcrDoctorlist: List<DcrDoctor>? = ArrayList()
 
         class DcrDoctor {
+            @SerializedName("isOfflineSave")
+            @Expose
+            var isOfflineSave: Boolean? = false
+
             @SerializedName("dcrId")
             @Expose
             var dcrId: Int? = 0

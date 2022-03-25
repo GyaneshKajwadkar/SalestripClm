@@ -13,6 +13,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -94,30 +95,42 @@ class SelectedPobAdapter(
 
         holder.close.setOnClickListener({
 
-            submiteDetailingactivity?.selectedProductList?.removeAt(position)
-            notifyItemRemoved(position)
-            model?.notApi=SyncModel.Data.Product.NotApiData()
+            submiteDetailingactivity?.alertClass?.showProgressAlert("")
 
             val runnable = java.lang.Runnable {
-                for ((index,data) in submiteDetailingactivity?.unSelectedProductList?.withIndex()!!)
-              {
-                  if(model?.notApi?.insertedProductId==data.notApi.insertedProductId)
-                  {
-                      model?.let { it1 -> submiteDetailingactivity?.unSelectedProductList?.set(index, it1) }
-                      submiteDetailingactivity.runOnUiThread{
-                          submiteDetailingactivity?.calculateTotalProduct()
-                          submiteDetailingactivity?.pobProductSelectAdapter?.notifyItemChanged(index)
-                          notifyItemChanged(position)
-                      }
-                      break
-                  }
-              }
+                for ((index,data) in submiteDetailingactivity?.mainProductList?.withIndex()!!)
+                {
+                    if(model?.notApi?.insertedProductId==data.notApi.insertedProductId)
+                    {
+                        Log.e("gfidsufhlds",index.toString())
+
+                        submiteDetailingactivity?.selectedProductList?.removeAt(position)
+                        data.notApi=SyncModel.Data.Product.NotApiData()
+
+                        submiteDetailingactivity?.unSelectedProductList?.add(index, data)
+                       // model?.let { it1 -> submiteDetailingactivity?.unSelectedProductList?.add(index, it1) }
+
+                        submiteDetailingactivity.runOnUiThread{
+                            notifyItemRemoved(position)
+                            submiteDetailingactivity?.setPobAdapter()
+
+                            Handler(Looper.getMainLooper()).postDelayed({
+                                submiteDetailingactivity?.alertClass?.hideAlert()
+                            }, 1)
+
+
+                        }
+
+                        /* submiteDetailingactivity.runOnUiThread{
+                             submiteDetailingactivity?.pobProductSelectAdapter?.notifyItemChanged(index)
+                             notifyItemChanged(position)
+                             submiteDetailingactivity?.calculateTotalProduct()
+                         }*/
+                        break
+                    }
+                }
             }
             Thread(runnable).start()
-
-
-
-
         })
 
         holder.qty_et.setOnFocusChangeListener(object : View.OnFocusChangeListener {
