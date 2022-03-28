@@ -36,8 +36,7 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -356,37 +355,46 @@ open class BaseActivity : AppCompatActivity(){
 
     suspend fun submitDCRCo()
     {
-        val dcrObj= sharePreferanceBase?.getPref("dcrObj")
+     //   val dcrObj= sharePreferanceBase?.getPref("dcrObj")
         val eDetailingArray=dbBase.getAllSaveSend("feedback")
-        if(dcrObj==null || dcrObj=="" || eDetailingArray.size==0) { return }
-        var getDcrObj = Gson().fromJson(dcrObj.toString(), GetDcrToday.Data.DcrData::class.java)
-        if(getDcrObj==null) {return}
-        getDcrObj.doctorDCRList=eDetailingArray
-        getDcrObj.mode=2
+        if(eDetailingArray.size==0)
+        {
+            CoroutineScope(Dispatchers.IO).launch {
+                val getDocCall= async { getDocCallAPI() }
+                getDocCall.await()
+            }
+            return
+        }
+
+       // if(dcrObj==null || dcrObj=="" || eDetailingArray.size==0) { return }
+     //   var getDcrObj = Gson().fromJson(dcrObj.toString(), GetDcrToday.Data.DcrData::class.java)
+      //  if(getDcrObj==null) {return}
+       // getDcrObj.doctorDCRList=eDetailingArray
+       // getDcrObj.mode=2
 
        // Log.e("siofshfioswd", (getDcrObj.doctorDCRList)?.size.toString())
        // Log.e("trhtruhrtgrfg",Gson().toJson(getDcrObj))
 
         val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
-        ).submitEdetailingApiCoo("bearer " + loginModelHomePage.accessToken,getDcrObj)
+        ).submitEdetailingApiCoo("bearer " + loginModelHomePage.accessToken,eDetailingArray.get(0))
         withContext(Dispatchers.Main) {
             if (response!!.isSuccessful)
             {
              //   Log.e("dfsdgtrertef", response.body().toString())
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
-                    if(response.body()?.errorObj?.errorMessage==null || !response.body()?.errorObj?.errorMessage.toString().isEmpty())
+                    if(response.body()?.getErrorObj()?.errorMessage==null || !response.body()?.getErrorObj()?.errorMessage.toString().isEmpty())
                     {
-                        response.body()?.errorObj?.errorMessage?.let { Log.e("errorOnSubmitEDetailing", it) }
+                        response.body()?.getErrorObj()?.errorMessage?.let { Log.e("errorOnSubmitEDetailing", it) }
                     }
                     else {
-                        val dailyCallModel=  DailyDocVisitModel.Data()
-                        dailyCallModel.dcrDoctorlist=response.body()?.data?.dcrData?.doctorDCRList
-                       // Log.e("sdgfuishdi",dailyCallModel.dcrDoctorlist?.size.toString())
-
-                        dbBase?.addAPIData(Gson().toJson(dailyCallModel), 5)
-                       // Log.e("hgmhgjtgyjtrydgdfgdf", response.body().toString())
-                        dbBase.deleteSendEdetailing()
-                    } }
+                           Log.e("getSubmitEdetailingData", response.body().toString())
+                        eDetailingArray.get(0).doctorId?.let { dbBase.deleteSaveSend(it) }
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val getDocCall= async { submitDCRCo() }
+                            getDocCall.await()
+                        }
+                    }
+                }
                 else Log.e("elsesubmitDCRCoAPI", response.code().toString())
             }
             else Log.e("submitDCRCoAPIERROR", response.errorBody().toString())

@@ -3,10 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="in.processmaster.salestripclm">
 
-    <supports-screens
+  <!--  <supports-screens
         android:anyDensity="true"
         android:largeScreens="true"
-        android:resizeable="true" />
+        android:resizeable="true" />-->
+    <supports-screens
+        android:largeScreens="true"
+        android:smallScreens="false"
+        android:xlargeScreens="true"
+        android:normalScreens="false" />
+
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -39,7 +45,9 @@
         <activity
             android:name=".activity.SubmitE_DetailingActivity"
             android:screenOrientation="landscape"
-           />
+            android:windowSoftInputMode="stateHidden|adjustPan"
+
+            />
         <activity
             android:name=".activity.MailActivity"
             android:launchMode="singleTop"

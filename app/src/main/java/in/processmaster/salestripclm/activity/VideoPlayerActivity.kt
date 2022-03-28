@@ -63,7 +63,6 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
     var empId=0
     var startDateTime=""
     var doctorId=0
-    var db = DatabaseHandler(this)
     var isList=false
 
     var eDetailingId=0
@@ -73,6 +72,9 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
     var arrayVideo: ArrayList<DownloadFileModel> = ArrayList<DownloadFileModel>()
     var doubleclick= false
     var thread: Thread?= null
+    var threadBrand: Thread?= null
+    val currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
+
 
     companion object {
         var videoModel : DownloadFileModel?= null
@@ -106,6 +108,9 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
 
             }
         })
+
+        slideBrandWiseInsert(startDateTime,brandId)
+
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -156,7 +161,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
                 //  val file = File(webUrlPath)
 
 
-                db?.insertFileID(videoModel!!.fileId,startDateTime,brandId)
+                dbBase?.insertFileID(videoModel!!.fileId,startDateTime,brandId)
                 setSlideViewTime()
 
                 end_btn?.setOnClickListener({
@@ -168,7 +173,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
                     val currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(
                             Date()
                     )
-                    db?.updateendData(currentDate + " " + currentTime,startDateTime)
+                    dbBase?.updateendData(currentDate + " " + currentTime,startDateTime)
                     onBackPressed()
                     finish()
                 })
@@ -176,12 +181,12 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
                 fabLike?.setOnClickListener({
 
                     if (isList) {
-                        db?.insertlike(0, videoModel!!.fileId,startDateTime)
+                        dbBase?.insertlike(0, videoModel!!.fileId,startDateTime)
                         fabLike?.setColorFilter(Color.BLACK)
                         isList = false
                     }
                     else {
-                        db?.insertlike(1, videoModel!!.fileId,startDateTime)
+                        dbBase?.insertlike(1, videoModel!!.fileId,startDateTime)
                         fabLike?.setColorFilter(Color.WHITE)
                         isList = true
                     }
@@ -249,7 +254,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
 
             })
 
-
+            likeCommentColor()
         }
 
 
@@ -301,6 +306,8 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
 
     override fun onStop() {
         super.onStop()
+        threadBrand?.interrupt()
+        thread?.interrupt()
         if (Util.SDK_INT >= 24) {
             releasePlayer()
         }
@@ -426,7 +433,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
         val post_btn = dialogView.findViewById(R.id.post_btn) as Button
         val comment_et = dialogView.findViewById(R.id.comment_et) as EditText
 
-        val storecomment= db?.getComment(videoModel!!.fileId.toString(),startDateTime)
+        val storecomment= dbBase?.getComment(videoModel!!.fileId.toString(),startDateTime)
         comment_et.setText(storecomment)
 
         cancel_btn.setOnClickListener({
@@ -446,7 +453,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
                 return@setOnClickListener
             }
 
-            db?.insertComment(comment_et.text.toString(), videoModel!!.fileId,startDateTime)
+            dbBase?.insertComment(comment_et.text.toString(), videoModel!!.fileId,startDateTime)
             fabComment?.setColorFilter(Color.WHITE)
             val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(dialogView.getWindowToken(), 0)
@@ -459,13 +466,13 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
         alertDialog.show()
     }
 
-    override fun onClickDisplayVisual(passingInterface: Int, brandID : Int,selectionType: Int) {
+    override fun onClickDisplayVisual(passingInterface: Int, brandIDInterface : Int,selectionType: Int) {
 
         mPlayer!!.setPlayWhenReady(false)
         mPlayer!!.stop()
         arrayVideo.clear()
 
-        for (itemParent in db.getAllDownloadedData(passingInterface) )
+        for (itemParent in dbBase.getAllDownloadedData(passingInterface) )
         {
 
             if(itemParent.downloadType.equals("VIDEO"))
@@ -489,12 +496,16 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
         playerView.player = mPlayer
         mPlayer!!.prepare(buildMediaSourceVideoArray(uris), false, false)
         mPlayer!!.seekTo(position, 0)
-        mPlayer!!.setPlayWhenReady(false)
+        mPlayer!!.setPlayWhenReady(true)
 
         setHorizontalAdapter(arrayVideo, position, videoModel!!)
 
         eDetailingId=passingInterface
         otherFileAdapter?.notifyDataSetChanged()
+
+        brandId=brandIDInterface
+        dbBase?.insertStartTimeSlide(startDateTime,doctorId,brandId, videoModel?.brandName,0,currentTime.toString())
+
 
         isCurrent=true
         otherProduct_btn?.setBackgroundColor(ContextCompat.getColor(this,R.color.gray))
@@ -506,18 +517,43 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
         fabComment?.visibility=View.VISIBLE
 
         likeCommentColor()
+        slideBrandWiseInsert(startDateTime,brandId)
     }
+
+    fun slideBrandWiseInsert(startDateTime: String,brandID:Int)
+    {
+        threadBrand?.interrupt()
+        var dbBaseTimer=dbBase?.getBrandTime(brandID.toString(),startDateTime)
+        threadBrand = object : Thread() {
+            override fun run() {
+                try {
+                    while (!this.isInterrupted) {
+                        sleep(1000)
+                        runOnUiThread {
+                            dbBaseTimer=dbBaseTimer!!+1
+
+                            Log.e("timerBrandWiseSlider",dbBaseTimer.toString())
+                            dbBase?.insertBrandTime(dbBaseTimer!!  ,startDateTime,brandID.toString())
+                        }
+                    }
+                } catch (e: InterruptedException) {
+                }
+            }
+        }
+        threadBrand?.start()
+    }
+
 
     @RequiresApi(Build.VERSION_CODES.N)
     fun getAllEdetailingProduct() : java.util.ArrayList<DevisionModel.Data.EDetailing>
     {
-        var  edetailingList = db.getAlleDetail() //fetch edetailing list from db
+        var  edetailingList = dbBase.getAlleDetail() //fetch edetailing list from db
         var  filteredList: ArrayList<DevisionModel.Data.EDetailing> = ArrayList()
         for (itemParent in edetailingList )
         {
             if(itemParent.isSaved==1)
             {
-                var downloadedList = db.getAllDownloadedData(itemParent.geteDetailId()!!)
+                var downloadedList = dbBase.getAllDownloadedData(itemParent.geteDetailId()!!)
 
                 if(downloadedList.stream().anyMatch({ o -> o.downloadType.equals("VIDEO") }))
                 {
@@ -531,9 +567,9 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
 
     fun likeCommentColor()
     {
-        db?.insertFileID(videoModel!!.fileId, startDateTime,brandId)
+        dbBase?.insertFileID(videoModel!!.fileId, startDateTime,brandId)
 
-        val isLike=db?.getLike(videoModel!!.fileId.toString(),startDateTime)
+        val isLike=dbBase?.getLike(videoModel!!.fileId.toString(),startDateTime)
 
         if(isLike!!)
         {
@@ -547,7 +583,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
         }
         setSlideViewTime()
 
-        val storecomment= db?.getComment(videoModel!!.fileId.toString(),startDateTime)
+        val storecomment= dbBase?.getComment(videoModel!!.fileId.toString(),startDateTime)
 
         if(storecomment!=null)
         {
@@ -566,7 +602,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
     fun setSlideViewTime()
     {
         thread?.interrupt()
-        var dbTimer=db?.getTime(videoModel!!.fileId.toString(),startDateTime)
+        var dbTimer=dbBase?.getTime(videoModel!!.fileId.toString(),startDateTime)
 
         thread = object : Thread() {
             override fun run() {
@@ -579,7 +615,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
                             {
                                 dbTimer=dbTimer!!+1
                                 Log.e("timerSlider",dbTimer.toString())
-                                db?.insertTime(dbTimer!!, videoModel!!.fileId ,startDateTime)
+                                dbBase?.insertTime(dbTimer!!, videoModel!!.fileId ,startDateTime)
                             }
 
                         }

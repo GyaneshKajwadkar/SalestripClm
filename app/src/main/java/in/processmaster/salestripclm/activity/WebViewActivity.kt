@@ -69,6 +69,8 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
     var pnlFlash:CoordinatorLayout?=null
     var position=0
     var isList=false
+    var threadBrand: Thread?= null
+
 
     var eDetailingId=0
     var isCurrent=true;
@@ -83,6 +85,8 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
 
     var thread: Thread?= null
     var productParent_ll: LinearLayout?=null
+    val currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
+
 
     companion object {
         var modelweb : DownloadFileModel?= null
@@ -245,10 +249,9 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
                         db?.updateendData(currentDate + " " + currentTime,startDateTime)
                         onBackPressed()
                         finish()
-
             })
 
-
+            likeCommentColor()
         }
 
         if(intent.getStringExtra("singleSelection")!=null)
@@ -666,7 +669,7 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
         return filteredList
     }
 
-    override fun onClickDisplayVisual(passingInterface: Int, brandId : Int,selectionType: Int)
+    override fun onClickDisplayVisual(passingInterface: Int, brandIDInterface : Int,selectionType: Int)
     {
         arrayweb.clear()
 
@@ -690,6 +693,11 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
         otherFileAdapter?.notifyDataSetChanged()
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
 
+        brandId=brandIDInterface
+        dbBase?.insertStartTimeSlide(startDateTime,doctorId,brandId,
+            PhotoSlideShowActivity.model?.brandName,0,currentTime.toString())
+
+
         isCurrent=true
         otherProduct_btn?.setBackgroundColor(ContextCompat.getColor(this,R.color.gray))
         currentProduct_btn?.setBackgroundColor(ContextCompat.getColor(this,R.color.appColor))
@@ -698,7 +706,7 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
         fabComment?.visibility=View.VISIBLE
 
         likeCommentColor()
-
+        slideBrandWiseInsert(startDateTime,brandId)
     }
 
 
@@ -803,6 +811,35 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
 
 */
         likeCommentColor()
+    }
+
+    fun slideBrandWiseInsert(startDateTime: String,brandID:Int)
+    {
+        threadBrand?.interrupt()
+        var dbBaseTimer=dbBase?.getBrandTime(brandID.toString(),startDateTime)
+        threadBrand = object : Thread() {
+            override fun run() {
+                try {
+                    while (!this.isInterrupted) {
+                        sleep(1000)
+                        runOnUiThread {
+                            dbBaseTimer=dbBaseTimer!!+1
+
+                            Log.e("timerBrandWiseSlider",dbBaseTimer.toString())
+                            dbBase?.insertBrandTime(dbBaseTimer!!  ,startDateTime,brandID.toString())
+                        }
+                    }
+                } catch (e: InterruptedException) {
+                }
+            }
+        }
+        threadBrand?.start()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        threadBrand?.interrupt()
+        thread?.interrupt()
     }
 
 }

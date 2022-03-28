@@ -28,7 +28,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     //=========================================hold api Data using static id===============================================
 
     //id=1 for sync api, id=2 for getScheduleMeetingApi, id=3 for getQuantityApi id=4 for getDoctorGraphApi
-    // id=5 for getDocCall api // id=6 for profile api
+    // id=5 for getDocCall api // id=6 for profile api //id=7 for save temp edetailing feeback form
 
     private static final String TABLE_SAVE_API = "apiData";
     private static final String KEY_DATA = "data";
@@ -183,6 +183,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     {  SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("delete from "+ TABLE_SAVE_API);
     }
+
+    public boolean  deleteApiData(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return  db.delete(TABLE_SAVE_API, KEY_ID + " = ?",
+                new String[] { String.valueOf(id) }) > 0;
+    }
+
     @SuppressLint("Range")
     public String getApiDetail(int id)
     {
@@ -597,6 +604,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     VisualAdsModel_Send visualModel  = new VisualAdsModel_Send();
                     visualModel.setId(id);
                     visualModel.setDoctorId(cursor.getString(1));
+
                     visualModel.setStartDate(startTime);
                     visualModel.setEndDate(cursor.getString(4));
                     visualModel.setBrandId(cursor.getString(2));

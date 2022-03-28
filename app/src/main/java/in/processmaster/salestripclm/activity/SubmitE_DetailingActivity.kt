@@ -15,10 +15,8 @@ import `in`.processmaster.salestripclm.interfaceCode.IdNameBoll_interface
 import `in`.processmaster.salestripclm.interfaceCode.PobProductTransfer
 import `in`.processmaster.salestripclm.interfaceCode.productTransfer
 import `in`.processmaster.salestripclm.models.*
-import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -28,7 +26,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.annotation.NonNull
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -39,7 +36,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup.OnButtonCheckedListener
 import com.google.gson.Gson
-import com.google.gson.JsonObject
 import kotlinx.android.synthetic.main.activity_submit_edetailing.*
 import kotlinx.android.synthetic.main.bottom_sheet_visualads.bottomSheet
 import kotlinx.android.synthetic.main.bottom_sheet_visualads.close_imv
@@ -55,7 +51,6 @@ import retrofit2.Response
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 
@@ -205,6 +200,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             if(intent.getStringExtra("apiDataDcr")?.isEmpty() == false)
             { getUpdateData()
             }
+            getResumeData()
             runOnUiThread {
                /* pobProductSelectAdapter=PobProductAdapter(unSelectedProductList, passingSchemeList,this)
                 pobProduct_rv.adapter= pobProductSelectAdapter
@@ -326,7 +322,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 return@setOnClickListener
             }
 
-            var saveModel=getSaveData()
+            var saveModel=getSaveData(false)
 
             val quantityModel=Gson().fromJson(dbBase.getApiDetail(3),CommonModel.QuantityModel.Data::class.java)
             var quantityArray=quantityModel.employeeSampleBalanceList!! as ArrayList<CommonModel.QuantityModel.Data.EmployeeSampleBalance>
@@ -748,7 +744,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         selectBtn.visibility=View.GONE
     }
 
-    fun getSaveData():DailyDocVisitModel.Data.DcrDoctor
+    fun getSaveData(isResume: Boolean):DailyDocVisitModel.Data.DcrDoctor
     {
         var saveModel= DailyDocVisitModel.Data.DcrDoctor()
         val c = Calendar.getInstance()
@@ -845,10 +841,13 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 val outputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
 
                 try {
-                    val dateStart: Date = inputFormat.parse(data.startDate)
-                    val dateEnd: Date = inputFormat.parse(data.endDate)
-                    data.startDate=outputFormat.format(dateStart)
-                    data.endDate=outputFormat.format(dateEnd)
+                    if(!isResume)
+                    {
+                        val dateStart: Date = inputFormat.parse(data.startDate)
+                        val dateEnd: Date = inputFormat.parse(data.endDate)
+                        data.startDate=outputFormat.format(dateStart)
+                        data.endDate=outputFormat.format(dateEnd)
+                    }
                     data.empId= loginModelHomePage.empId?.toString()
                     visualSendModel.set(index,data)
                 }
@@ -913,7 +912,6 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         call.enqueue(object : Callback<DailyDocVisitModel?> {
             override fun onResponse(call: Call<DailyDocVisitModel?>?, response: Response<DailyDocVisitModel?>) {
 
-                Log.e("gsuifgidsufhgi",response.body().toString())
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
                     if(response.body()?.getErrorObj()?.errorMessage?.isEmpty()==false)
                     {
@@ -928,6 +926,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                         val commonModel=CommonModel.QuantityModel.Data()
                         commonModel.employeeSampleBalanceList=quantityArray
                         dbBase.addAPIData(Gson().toJson(commonModel),3)
+                        dbBase.deleteApiData(7)
 
                     } } }
 
@@ -1011,6 +1010,8 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             }
             else
             {
+                holder.feeback_et.setText(objectDetailing.feedback)
+                holder.ratingBar.rating=objectDetailing.rating
                 val dateFormatter = SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
                 val dateFormatterSet = SimpleDateFormat("HH:mm:ss")
                 val startDate: Date = dateFormatter.parse(objectDetailing.startDate)
@@ -1249,15 +1250,159 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         totalProductPrice_tv.setText("Grand Total: "+String.format("%.2f", calculation))
     }
 
+    //===============================getResumeData==================================================
+    fun getResumeData()
+    {
+        val runnable = java.lang.Runnable {
+            val getDbstr= dbBase?.getApiDetail(7)
+            if (getDbstr != "") {
+                val edetailingEditModel = Gson().fromJson(getDbstr, DailyDocVisitModel.Data.DcrDoctor::class.java)
+               // doctorIdDisplayVisual=edetailingEditModel.doctorId!!
+               // visualSendModel.addAll(edetailingEditModel.eDetailList)
+                for((index,mainVisual) in visualSendModel.withIndex())
+                {
+                    for(dbVisual in edetailingEditModel.eDetailList)
+                    {
+                        Log.e("dsfdsffsdf",dbVisual.brandId.toString())
+                        Log.e("fihsfuisd",mainVisual.brandId.toString())
+                        if(mainVisual.brandId==dbVisual.brandId)
+                        {
+                            mainVisual.rating=dbVisual.rating
+                            mainVisual.feedback=dbVisual.feedback
+                            visualSendModel.set(index,mainVisual)
+                        }
+                    }
+                }
+
+
+                for(intentProduct in edetailingEditModel.sampleList!!)
+                {
+                    for( (index,getSample) in sampleArray.withIndex())
+                    {
+                        if(intentProduct.productId == getSample.id.toInt()){
+                            getSample.isChecked=true
+                            getSample.qty=intentProduct.qty!!
+                            sampleArray.set(index,getSample)
+                        }
+                    }
+                }
+                val passingSamples=sampleArray.filter { s -> (s.isChecked) }
+
+                for(intentGift in edetailingEditModel.giftList!!)
+                {
+                    for( (index,getGift) in giftArray.withIndex())
+                    {
+                        if(intentGift.productId == getGift.id.toInt()){
+                            getGift.isChecked=true
+                            getGift.qty=intentGift.qty!!
+                            giftArray.set(index,getGift)
+                        }
+                    }
+                }
+                val passingGift=giftArray.filter { s -> (s.isChecked) }
+
+                if(edetailingEditModel.workWith!=null && edetailingEditModel.workWith!="")
+                {
+                    val getWorkingList: List<String> = edetailingEditModel.workWith!!.split(",")
+                    for(workingWith in getWorkingList)
+                    {
+                        for( (index,getWorking) in workWithArray.withIndex())
+                        {
+                            if(workingWith.toInt() == getWorking.id.toInt()){
+                                getWorking.isChecked=true
+                                workWithArray.set(index,getWorking)
+                                workingWithRv.visibility=View.VISIBLE
+                            }
+                        }
+                    }
+                }
+                val passingWorking =workWithArray.filter { s -> (s.isChecked) }
+
+
+                for (pobProducts in edetailingEditModel.pobObject?.pobDetailList!!)
+                {
+                    for((index,availableProduct) in mainProductList.withIndex())
+                    {
+                        if(availableProduct.productId==pobProducts.productId)
+                        {
+                            availableProduct.notApi.amount=pobProducts.amount
+                            availableProduct.notApi.rate=pobProducts.rate
+                            availableProduct.notApi.qty=pobProducts.qty
+                            availableProduct.notApi.totalQty=pobProducts.totalQty
+                            availableProduct.notApi.scheme=pobProducts.schemeNameWithQty
+                            availableProduct.notApi.schemeId=pobProducts.schemeId
+                            availableProduct.notApi.salesQty=pobProducts.schemeSalesQty
+                            availableProduct.notApi.salesQtyMain=pobProducts.schemeSalesQty
+                            availableProduct.notApi.freeQty=pobProducts.freeQty
+                            availableProduct.notApi.freeQtyMain=pobProducts.schemeFreeQty
+                            availableProduct.notApi.insertedProductId=pobProducts.productId
+                            availableProduct.notApi.isSaved=true
+
+                            unSelectedProductList.removeAt(index)
+                            selectedProductList.add(availableProduct)
+                        }
+                    }
+                }
+
+                for (getEdetailing in edetailingEditModel.eDetailList)
+                {
+                    var eDetailingObj= VisualAdsModel_Send()
+                    eDetailingObj.startDate=getEdetailing.startDate
+                    eDetailingObj.brandName=getEdetailing.brandName
+                    eDetailingObj.feedback=getEdetailing.feedback
+                    eDetailingObj.rating=getEdetailing.rating
+                    eDetailingObj.duration=getEdetailing.duration
+                }
+
+                var spinnerSelect=0
+                for((index,visitPurpos) in CommonListGetClass().getWorkTypeForSpinner().withIndex())
+                {
+                    if(visitPurpos.workId==edetailingEditModel.visitPurpose)
+                    {
+                        spinnerSelect=index
+                    }
+                }
+
+                this.runOnUiThread(java.lang.Runnable {
+                    if(visualSendModel.size==0)nodata_gif.visibility=View.VISIBLE
+                    remark_Et.setText(edetailingEditModel.remark)
+                    workingWithRv.adapter = TextWithEditAdapter(passingWorking as ArrayList<IdNameBoll_model>, this, 0, this,selectionType)
+                    gift_rv.adapter = TextWithEditAdapter(passingGift as ArrayList<IdNameBoll_model>, this, 1, this,selectionType)
+                    sample_rv.adapter = TextWithEditAdapter(passingSamples as ArrayList<IdNameBoll_model>, this, 1, this,selectionType)
+                    visitPurpose_spinner.setSelection(spinnerSelect)
+                    edetailing_rv.adapter=EdetallingAdapter()
+                    stokistArray.forEachIndexed { index, element ->
+                        if(element.id.toInt() == edetailingEditModel.pobObject?.stockistId) {
+                            selectedStockist=element
+                            stockistName.visibility=View.VISIBLE
+                            stockistName.text="Stockist name - "+element.name
+                            element.isChecked=false
+                            stokistArray.set(index,element)}
+                    }
+                    if(visualSendModel.size!=0)nodata_gif.visibility=View.GONE
+
+                    setPobAdapter()
+                    calculateTotalProduct()
+                })
+            }
+
+
+
+
+        }
+        Thread(runnable).start()
+    }
+
+
     //=============================== onUpdate method===============================================
     fun getUpdateData()
     {
 
         val runnable = java.lang.Runnable {
+
             val edetailingEditModel=Gson().fromJson(intent.getStringExtra("apiDataDcr"),DailyDocVisitModel.Data.DcrDoctor::class.java)
             doctorIdDisplayVisual=edetailingEditModel.doctorId!!
             visualSendModel.addAll(edetailingEditModel.eDetailList)
-
 
             for(intentProduct in edetailingEditModel.sampleList!!)
             {
@@ -1355,6 +1500,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 gift_rv.adapter = TextWithEditAdapter(passingGift as ArrayList<IdNameBoll_model>, this, 1, this,selectionType)
                 sample_rv.adapter = TextWithEditAdapter(passingSamples as ArrayList<IdNameBoll_model>, this, 1, this,selectionType)
                 remark_Et.isEnabled=false
+                edetailing_rv.adapter=EdetallingAdapter()
                 visitPurpose_spinner.setSelection(spinnerSelect)
                 stokistArray.forEachIndexed { index, element ->
                     if(element.id.toInt() == edetailingEditModel.pobObject?.stockistId) {
@@ -1367,9 +1513,51 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 if(visualSendModel.size!=0)nodata_gif.visibility=View.GONE
 
                 setPobAdapter()
-                calculateTotalProduct()
+
             })
         }
         Thread(runnable).start()
     }
+
+    override fun onBackPressed() {
+        if(intent.getStringExtra("doctorName")?.isEmpty() == false)
+        {
+            var saveModel=getSaveData(true)
+
+            val filterSelectecd=selectedProductList.filter { s -> (s.notApi.isSaved==true) }
+
+            saveModel.pobObject = DailyDocVisitModel.Data.DcrDoctor.PobObj()
+            for(dataObj in filterSelectecd)
+            {
+                val pobObje=DailyDocVisitModel.Data.DcrDoctor.PobObj.PobDetailList()
+                pobObje.productId=dataObj.notApi.insertedProductId
+                pobObje.rate=dataObj.notApi.rate
+                pobObje.qty=dataObj.notApi.qty
+                pobObje.amount=dataObj.notApi.amount
+                pobObje.schemeId=dataObj.notApi.schemeId
+                pobObje.totalQty=dataObj.notApi.totalQty
+                pobObje.freeQty=dataObj.notApi.freeQty
+                saveModel.pobObject?.pobDetailList?.add(pobObje)
+            }
+
+            if(filterSelectecd.size!=0)
+            {
+                saveModel.pobObject?.pobId=0
+                saveModel.pobObject?.pobNo=""
+                saveModel.pobObject?.pobDate=generalClass.getCurrentDateTimeApiForamt()
+                saveModel.pobObject?.partyId=doctorIdDisplayVisual
+                saveModel.pobObject?.employeeId= loginModelHomePage.empId
+            }
+
+            if(selectedStockist.id!=null && selectedStockist.id!="" && filterSelectecd.size!=0)  saveModel.pobObject?.stockistId=selectedStockist.id.toInt()
+
+            dbBase?.addAPIData(Gson().toJson(saveModel), 7)
+            super.onBackPressed()
+        }
+        else
+        {
+            super.onBackPressed()
+        }
+    }
+
 }

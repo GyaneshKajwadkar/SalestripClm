@@ -164,8 +164,8 @@ interface APIInterface
         @Body arrayVisual: DailyDocVisitModel.Data.DcrDoctor
     ): Call<JsonObject?>?
 
-    @POST("api/dcr/mobile/complete-data")
-    suspend fun submitEdetailingApiCoo(@Header("Authorization") authorization: String, @Body arrayVisual: GetDcrToday.Data.DcrData): Response<GetDcrToday>
+    @POST("api/dcr/clm/doctor")
+    suspend fun submitEdetailingApiCoo(@Header("Authorization") authorization: String, @Body arrayVisual: DailyDocVisitModel.Data.DcrDoctor): Response<DailyDocVisitModel>
 
 
     @GET("api/gs-receive/employee-sample-balance")

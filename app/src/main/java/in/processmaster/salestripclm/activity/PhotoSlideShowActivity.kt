@@ -65,7 +65,6 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
     var parentRl: RelativeLayout? =null
     val currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
 
-
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var bottomSheetWeb: ConstraintLayout
     var end_btn: Button? =null
@@ -88,7 +87,6 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
     var fabComment : FloatingActionButton?= null
     var mViewPagerAdapter: ViewPagerAdapter? = null
     var productParent_ll: LinearLayout?=null
-
 
     companion object {
         var model : DownloadFileModel?= null
@@ -628,7 +626,6 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
                 mCallback.onClickString("callBack")
 
-
             })
 
             val circularProgressDrawable = CircularProgressDrawable(context)
@@ -745,9 +742,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
     override fun onClickString(passingInterface: String?)
     {
-
         likeCommentColor()
-
     }
 
     fun likeCommentColor()

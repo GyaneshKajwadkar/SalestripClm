@@ -135,7 +135,7 @@ class DownloadAdapter constructor() :
                 if(getAllfileList(dbdata.fileDirectoryPath,dbdata.fileName))
                 {
                     videoView.reDownload_rl.visibility=View.VISIBLE
-                    videoView.fav_iv.visibility=View.VISIBLE
+                //    videoView.fav_iv.visibility=View.VISIBLE
                     videoView.download_rl.visibility=View.GONE
 
                     val circularProgressDrawable = CircularProgressDrawable(context!!)
@@ -234,7 +234,7 @@ class DownloadAdapter constructor() :
                 if(getAllfileList(dbdata.fileDirectoryPath,dbdata.fileName))
                 {
                     videoView.reDownload_rl.visibility=View.VISIBLE
-                    videoView.fav_iv.visibility=View.VISIBLE
+                   // videoView.fav_iv.visibility=View.VISIBLE
                     videoView.download_rl.visibility=View.GONE
 
                     val circularProgressDrawable = CircularProgressDrawable(context!!)
@@ -331,7 +331,7 @@ class DownloadAdapter constructor() :
                 if(getAllfileList(dbdata.fileDirectoryPath,dbdata.fileName))
                 {
                     videoView.reDownload_rl.visibility=View.VISIBLE
-                    videoView.fav_iv.visibility=View.VISIBLE
+                  //  videoView.fav_iv.visibility=View.VISIBLE
                     videoView.html_wv.visibility=View.VISIBLE
                     videoView.download_rl.visibility=View.GONE
                     videoView.temppic_iv.visibility=View.GONE
@@ -628,6 +628,7 @@ class DownloadAdapter constructor() :
                         println("Directoryisnotcreated")
                     }
                 } catch (e: java.lang.Exception) {
+                    Log.e("gdfgdfgdre",e.message.toString())
                     e.printStackTrace()
                 }
 
@@ -727,13 +728,12 @@ class DownloadAdapter constructor() :
                 }
 
                 val extractFileName = fmd.absolutePath
-                val lowercaseName = extractFileName.toLowerCase()
+                val lowercaseName = extractFileName.lowercase()
 
                 //retrive html path
                 if (lowercaseName.endsWith(".html"))
                 {
                     htmlPath=lowercaseName
-
                 }
                 val fout = FileOutputStream(extractFileName)
                 while (zis.read(buffer).also { count = it } != -1) {
@@ -789,6 +789,10 @@ class DownloadAdapter constructor() :
                     notifyItemChanged(position)
 
                 })
+            }
+            else{
+                context?.alertClass?.commonAlert("Download error","Unable to download this file")
+                alertDialog?.dismiss()
             }
         }
 

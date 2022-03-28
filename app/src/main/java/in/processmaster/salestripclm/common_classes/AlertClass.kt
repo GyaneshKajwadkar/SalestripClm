@@ -31,6 +31,7 @@ class AlertClass(val context : Context)
         when(subTitleInput)
         {
             1-> { subtitleFull="Are you sure you want to $subtitleMessage" }
+            2 -> { subtitleFull=subtitleMessage}
         }
 
         val activity = context as Activity
@@ -40,7 +41,7 @@ class AlertClass(val context : Context)
         dialogBuilder.setView(dialogView)
 
         val alertDialog: AlertDialog = dialogBuilder.create()
-        alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+        alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         val mainHeading_tv = dialogView.findViewById<View>(R.id.mainHeading_tv) as TextView
         val message_tv = dialogView.findViewById<View>(R.id.message_tv) as TextView

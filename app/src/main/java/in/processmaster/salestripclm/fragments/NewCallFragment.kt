@@ -145,7 +145,6 @@ class NewCallFragment : Fragment() {
                 return@setOnClickListener
             }
 
-
             val intent = Intent(activity, OnlinePresentationActivity::class.java)
             intent.putExtra("doctorID", selectedDocID)
             intent.putExtra("doctorName", selectedDocName)
@@ -463,9 +462,10 @@ class NewCallFragment : Fragment() {
                     endPoint.latitude = fetch.latitude
                     endPoint.longitude = fetch.longitude
                     val distance = startPoint.distanceTo(endPoint).toInt()
-                  //  doctorListArray.add(fetch)
+                    doctorListArray.add(fetch)
                     if(distance <= getRadius){
-                        doctorListArray.add(fetch) }
+                       // doctorListArray.add(fetch)
+                    }
                 }
             }
             else

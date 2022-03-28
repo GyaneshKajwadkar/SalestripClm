@@ -1,6 +1,7 @@
 package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.fragments.PresentEDetailingFrag
 import `in`.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.other.MeetingCommonCallback
 import `in`.processmaster.salestripclm.zoom_sdk_code.inmeetingfunction.customizedmeetingui.share.MeetingShareHelper
@@ -27,6 +28,7 @@ import com.google.android.material.button.MaterialButton
 import kotlinx.android.synthetic.main.common_toolbar.*
 import us.zoom.sdk.*
 
+
 class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, LifecycleObserver,
     MeetingUserCallback.UserEvent, MeetingCommonCallback.CommonEvent {
 
@@ -35,6 +37,7 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
     private var meetingShareHelper: MeetingShareHelper? = null
     private var mMeetingService: MeetingService? = null
     private var mInMeetingService: InMeetingService? = null
+    var sendResumeString=""
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -55,6 +58,7 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
             ProcessLifecycleOwner.get().getLifecycle().addObserver(this)
         }
 
+        dbBase.deleteApiData(7)
         val fragment = PresentEDetailingFrag()
         openFragment(fragment)
 
@@ -94,6 +98,9 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
         bundle.putString("type", "present")
         bundle.putInt("doctorID", loadsPosition)
         bundle.putString("doctorName", doctorName_tv.text.toString())
+        if(!sendResumeString.isEmpty()) bundle.putString("apiDataDcr", sendResumeString)
+        Log.e("rertetfefddsfdsf",sendResumeString)
+
         fragment.setArguments(bundle)
 
         val transaction = supportFragmentManager.beginTransaction()
@@ -248,11 +255,27 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
         {
             if(meetingShareHelper?.isSharingOut!!) stopPresentationAlert()
         }
-        else{
-            super.onBackPressed()
-        }
+        else
+        {
+            val r: Runnable = object : Runnable {
+                override fun run() {
+                    if(AlertClass.retunDialog)
+                    {
+                        onBackPressSuper()
+                    }
+                }
+            }
+            AlertClass(this).twoButtonAlert("no","Yes",
+                2,"You want to cancel E-detailing","Are you sure?",r)
 
+        }
     }
+
+    fun onBackPressSuper()
+    {
+      super.onBackPressed()
+    }
+
     fun stopPresentationAlert()
     {
         val dialogBuilder = AlertDialog.Builder(this)
@@ -298,6 +321,11 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
         if(resultCode==2){
             setResult(3)
             finish();
+        }
+        if(resultCode==4){
+            Log.e("rertetfefddsfdsf",data?.getStringExtra("apiDataDcr").toString())
+                sendResumeString = data?.getStringExtra("apiDataDcr").toString()
+
         }
     }
 }

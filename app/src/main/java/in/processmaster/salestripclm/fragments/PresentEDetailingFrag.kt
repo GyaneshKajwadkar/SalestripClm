@@ -32,10 +32,8 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_display_visual.view.*
-import kotlinx.android.synthetic.main.activity_display_visual.view.noData_tv
 import kotlinx.android.synthetic.main.bottom_sheet_visualads.view.*
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDisplayVisual {
@@ -104,7 +102,7 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
             }
         })
 
-        setDoctorList()
+       // setDoctorList()
         setAdapter()
         setSelectorAdapter(downloadFilePathList)
         setUserFavAdapter()

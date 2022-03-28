@@ -55,13 +55,13 @@
         android:layout_height="wrap_content"
         android:id="@+id/multipleImage_rv"/>
 
-    <pl.droidsonroids.gif.GifImageView
+  <!--  <pl.droidsonroids.gif.GifImageView
         android:visibility="gone"
         android:id="@+id/nodata_gif"
         android:layout_centerInParent="true"
         android:layout_width="200dp"
         android:layout_height="200dp"
-        android:src="@drawable/nodata_gif" />
+        android:src="@drawable/nodata_gif" />-->
 
 
 

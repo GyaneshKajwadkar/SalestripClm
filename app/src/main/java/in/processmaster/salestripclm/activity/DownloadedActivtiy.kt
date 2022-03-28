@@ -100,16 +100,31 @@ class DownloadedActivtiy : BaseActivity() {
         }
 
         downloadAllVideos_ll?.setOnClickListener({
+            if(!generalClass.isInternetAvailable())
+            {
+                alertClass.networkAlert()
+                return@setOnClickListener
+            }
             progressDialog()
             progressBarAlert?.setIndeterminate(true)
             downloadSingleFolders(0,arraylistVideo)
         })
         downloadAllImages_ll?.setOnClickListener({
+            if(!generalClass.isInternetAvailable())
+            {
+                alertClass.networkAlert()
+                return@setOnClickListener
+            }
             progressDialog()
             progressBarAlert?.setIndeterminate(true)
             downloadSingleFolders(0,arraylistImages)
         })
         downloadAllWeb_ll?.setOnClickListener({
+            if(!generalClass.isInternetAvailable())
+            {
+                alertClass.networkAlert()
+                return@setOnClickListener
+            }
             progressDialog()
             progressBarAlert?.setIndeterminate(true)
             downloadSingleFolders(0,arraylistZip)

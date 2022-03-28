@@ -65,7 +65,6 @@ class ShowDownloadedFragment : Fragment() {
         {
             currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
             currentDate = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(Date())
-            Log.e("sfiousgfuisfgjsf", currentTime + " " + currentDate)
         }
 
         video_rv=view.findViewById(R.id.video_rv)
@@ -118,11 +117,11 @@ class ShowDownloadedFragment : Fragment() {
             var downloadList: ArrayList<DownloadFileModel> = ArrayList()
             if(selectionType==1)
             {
-                 downloadList=db!!.getAllDownloadedData(value)
+                downloadList= db?.getAllDownloadedData(value) as ArrayList<DownloadFileModel>
             }
             else
             {
-                 downloadList= db!!.getAllFavList()
+                 downloadList= db?.getAllFavList() as ArrayList<DownloadFileModel>
                 if(downloadList.size==0)
                 {
                     nodata_gif?.visibility=View.VISIBLE
@@ -133,7 +132,6 @@ class ShowDownloadedFragment : Fragment() {
 
                 }
             }
-
             for ((index, valueDownload) in downloadList?.withIndex()!!)
             {
                 if(valueDownload.downloadType.equals("VIDEO"))

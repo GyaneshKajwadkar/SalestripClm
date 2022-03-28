@@ -355,7 +355,8 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
             val quantityApi= async { getQuantityAPI() }
 
-            val sendEdetailing= async { submitDCRCo() }
+            val sendEdetailing= async {
+                submitDCRCo() }
 
             val doctorGraphApi= async { getDoctorGraphAPI() }
 
