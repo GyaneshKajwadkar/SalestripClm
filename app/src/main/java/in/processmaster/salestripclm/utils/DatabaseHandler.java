@@ -11,10 +11,13 @@ import android.util.Log;
 import in.processmaster.salestripclm.models.DailyDocVisitModel;
 import in.processmaster.salestripclm.models.DevisionModel;
 import in.processmaster.salestripclm.models.DownloadFileModel;
+import in.processmaster.salestripclm.models.SyncModel;
 import in.processmaster.salestripclm.models.VisualAdsModel_Send;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 //Java T point
@@ -24,6 +27,27 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "SalesTrip_CLM_db";
     private static final String KEY_ID = "id";
+
+    //=========================================hold sync api data==============================================
+    private static final String TABLE_SYNC_API = "syncDataTable";
+    private static final String SETTINGDCR = "settingDcrData";
+    private static final String WORKTYPELIST = "workTypeList";
+    private static final String PRODUCTLIST = "productList";
+    private static final String BRANDLIST = "brandList";
+    private static final String WORKINGWITHLIST = "workingWithList";
+    private static final String FIELDSTAFFTEAMLIST = "fieldStaffTeamList";
+    private static final String RETAILERFIELDCONFIGDICT = "retailerFieldConfigDict";
+    private static final String CONFIGURATIONSETTING = "configurationSetting";
+    private static final String SCHEMELIST = "schemeList";
+    private static final String RTPDETAILDATA = "rtpDetailData";
+    private static final String DOCTORLIST = "doctorList";
+            //===================================Create sync api route list=====================================
+            private static final String TABLE_SYNCROUTE_API = "syncRouteTable";
+            //===================================Create sync api Retailer list=====================================
+            private static final String TABLE_SYNCRETAILER_API = "syncRetailerTable";
+            //===================================Create sync api Docotor list=====================================
+            private static final String TABLE_SYNCPRODUCT_API = "syncDocotrTable";
+
 
     //=========================================hold api Data using static id===============================================
 
@@ -87,10 +111,32 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     // Creating Tables
     @Override
     public void onCreate(SQLiteDatabase db) {
-        //Sync database
-        String CREATE_SYNC_TABLE = "CREATE TABLE " + TABLE_SAVE_API + "("
-                + KEY_ID + " INTEGER PRIMARY KEY," + KEY_DATA + " TEXT" + ")";
+
+        // ==============================sync api table=====================================
+        //sync api database
+        String CREATE_SYNC_TABLE = "CREATE TABLE " + TABLE_SYNC_API + "("
+                + KEY_ID + " INTEGER PRIMARY KEY," + SETTINGDCR + " TEXT,"
+                + WORKTYPELIST + " TEXT," + PRODUCTLIST + " TEXT,"
+                + BRANDLIST + " TEXT,"  + WORKINGWITHLIST + " TEXT,"  + FIELDSTAFFTEAMLIST + " TEXT,"
+                + RETAILERFIELDCONFIGDICT + " TEXT," + DOCTORLIST + " TEXT," + CONFIGURATIONSETTING + " TEXT," + SCHEMELIST + " TEXT,"
+                + RTPDETAILDATA + " TEXT" +")";
         db.execSQL(CREATE_SYNC_TABLE);
+            // sync sub data tables
+        String CREATE_ROUTE_TABLE = "CREATE TABLE " + TABLE_SYNCROUTE_API + "("
+                + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_DATA + " TEXT" + ")";
+        db.execSQL(CREATE_ROUTE_TABLE);
+        String CREATE_RETAILER_TABLE = "CREATE TABLE " + TABLE_SYNCRETAILER_API + "("
+                + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_DATA + " TEXT" + ")";
+        db.execSQL(CREATE_RETAILER_TABLE);
+        String CREATE_DOCTOR_TABLE = "CREATE TABLE " + TABLE_SYNCPRODUCT_API + "("
+                + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_DATA + " TEXT" + ")";
+        db.execSQL(CREATE_DOCTOR_TABLE);
+
+
+        //Common api database
+        String CREATE_COMMONAPI_TABLE = "CREATE TABLE " + TABLE_SAVE_API + "("
+                + KEY_ID + " INTEGER PRIMARY KEY," + KEY_DATA + " TEXT" + ")";
+        db.execSQL(CREATE_COMMONAPI_TABLE);
 
         //eDetailing database
         String CREATE_EDETAILING_TABLE = "CREATE TABLE " + TABLE_EDETAILING + "("
@@ -143,6 +189,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
     {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_SAVE_API);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SYNC_API);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SYNCROUTE_API);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SYNCRETAILER_API);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SYNCPRODUCT_API);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_EDETAILING);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_SENDVISUALADS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_EDETAILINGDOWNLOAD);
@@ -152,7 +202,217 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    //=====================================Sync DataBase method=====================================
+    //====================================== add sync api data methods=============================
+
+    public void addSYNCAPIData(String setting, String workingType,String productlist, String brandList,
+            String workingWithList,String fieldStaffList, String retailerFieldList, String configSetting, String schemeList,
+            String rtpDetailList,int id,String  doctorList) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(SETTINGDCR, setting);
+        values.put(WORKTYPELIST, workingType);
+        values.put(PRODUCTLIST, productlist);
+        values.put(BRANDLIST, brandList);
+        values.put(WORKINGWITHLIST, workingWithList);
+        values.put(FIELDSTAFFTEAMLIST, fieldStaffList);
+        values.put(RETAILERFIELDCONFIGDICT, retailerFieldList);
+        values.put(CONFIGURATIONSETTING, configSetting);
+        values.put(SCHEMELIST, schemeList);
+        values.put(RTPDETAILDATA, rtpDetailList);
+        values.put(DOCTORLIST, doctorList);
+
+        int u = db.update(TABLE_SYNC_API, values, "id=?", new String[]{String.valueOf(id)});
+        if (u == 0) {
+            values.put(KEY_ID, id);
+            db.insert(TABLE_SYNC_API, null, values);
+        }
+        db.close();
+
+    }
+
+    @SuppressLint("Range")
+    public SyncModel.Data getSYNCApiData(int id)
+    {
+        String strData = "";
+        SyncModel.Data syncModel=new SyncModel.Data();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_SYNC_API, new String[] {
+                        SETTINGDCR, WORKTYPELIST,PRODUCTLIST,WORKINGWITHLIST,CONFIGURATIONSETTING,SCHEMELIST,FIELDSTAFFTEAMLIST,DOCTORLIST}, KEY_ID + "=?",
+                new String[] { String.valueOf(id) }, null, null, null, null);
+        if (cursor.moveToFirst()) {
+            do {
+
+                Gson gson= new Gson();
+                syncModel.setSettingDCR(gson.fromJson(cursor.getString(cursor.getColumnIndex(SETTINGDCR)), SyncModel.Data.SettingDCR.class));
+                syncModel.setConfigurationSetting(cursor.getString(cursor.getColumnIndex(CONFIGURATIONSETTING)));
+                Type typeWorkType = new TypeToken<ArrayList<SyncModel.Data.WorkType>>() {}.getType();
+                Type typeproduct = new TypeToken<ArrayList<SyncModel.Data.Product>>() {}.getType();
+                Type typeWorkingWith = new TypeToken<ArrayList<SyncModel.Data.WorkingWith>>() {}.getType();
+                Type typeschemeList = new TypeToken<ArrayList<SyncModel.Data.Scheme>>() {}.getType();
+                Type typeschemeFieldStaff = new TypeToken<ArrayList<SyncModel.Data.FieldStaffTeam>>() {}.getType();
+                Type typeDocotrList = new TypeToken<ArrayList<SyncModel.Data.Doctor>>() {}.getType();
+
+                syncModel.setWorkTypeList(gson.fromJson(cursor.getString(cursor.getColumnIndex(WORKTYPELIST)), typeWorkType));
+                syncModel.setProductList(gson.fromJson(cursor.getString(cursor.getColumnIndex(PRODUCTLIST)), typeproduct));
+                syncModel.setWorkingWithList(gson.fromJson(cursor.getString(cursor.getColumnIndex(WORKINGWITHLIST)), typeWorkingWith));
+                syncModel.setSchemeList(gson.fromJson(cursor.getString(cursor.getColumnIndex(SCHEMELIST)), typeschemeList));
+                syncModel.setFieldStaffTeamList(gson.fromJson(cursor.getString(cursor.getColumnIndex(FIELDSTAFFTEAMLIST)), typeschemeFieldStaff));
+                syncModel.setDoctorList(gson.fromJson(cursor.getString(cursor.getColumnIndex(DOCTORLIST)), typeDocotrList));
+                syncModel.setRetailerList(getAllRetailers());
+                syncModel.setRouteList(getAllRoutes());
+                syncModel.setProductList(getAllProduct());
+
+
+            } while (cursor.moveToNext());
+        }
+        return syncModel;
+    }
+
+    public void addRoutes(ArrayList< SyncModel.Data.Route> list) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            ContentValues values = new ContentValues();
+            for(int i=0 ; i<list.size();i++)
+            {
+                SyncModel.Data.Route route = list.get(i);
+                values.put(KEY_DATA, new Gson().toJson(route));
+                db.insert(TABLE_SYNCROUTE_API, null, values);
+                if(i==list.size()-1)
+                {
+                    Log.e("greaterThanaddRoutes","greater");
+                    db.setTransactionSuccessful();
+                }
+            }
+
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    public void addRetailer(ArrayList< SyncModel.Data.Retailer> list) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            ContentValues values = new ContentValues();
+            for(int i=0 ; i<list.size();i++)
+            {
+                SyncModel.Data.Retailer retail = list.get(i);
+                values.put(KEY_DATA, new Gson().toJson(retail));
+                db.insert(TABLE_SYNCRETAILER_API, null, values);
+                if(i==list.size()-1)
+                {
+                    Log.e("greaterThanaddRetailer","greater");
+                    db.setTransactionSuccessful();
+                }
+            }
+
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    public void addProduct(ArrayList< SyncModel.Data.Product> list) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            ContentValues values = new ContentValues();
+            for(int i=0 ; i<list.size();i++)
+            {
+                SyncModel.Data.Product product = list.get(i);
+                values.put(KEY_DATA, new Gson().toJson(product));
+                db.insert(TABLE_SYNCPRODUCT_API, null, values);
+                if(i==list.size()-1)
+                {
+                    Log.e("greaterThanaddProd","greater");
+                    db.setTransactionSuccessful();
+                }
+            }
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    @SuppressLint("Range")
+    public ArrayList<SyncModel.Data.Route> getAllRoutes() {
+        ArrayList<SyncModel.Data.Route> routeList = new ArrayList<SyncModel.Data.Route>();
+
+        String selectQuery = "SELECT  * FROM " + TABLE_SYNCROUTE_API;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()) {
+            do {
+               String data=cursor.getString(cursor.getColumnIndex(KEY_DATA));
+                Gson gson = new Gson();
+                SyncModel.Data.Route contact  = gson.fromJson(data, SyncModel.Data.Route.class);
+                routeList.add(contact);
+            } while (cursor.moveToNext());
+        }
+        db.close();
+        return routeList;
+    }
+
+
+    @SuppressLint("Range")
+    public ArrayList<SyncModel.Data.Retailer> getAllRetailers() {
+        ArrayList<SyncModel.Data.Retailer> retailerList = new ArrayList<SyncModel.Data.Retailer>();
+
+        String selectQuery = "SELECT  * FROM " + TABLE_SYNCRETAILER_API;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                String data=cursor.getString(cursor.getColumnIndex(KEY_DATA));
+                Gson gson = new Gson();
+                SyncModel.Data.Retailer contact  = gson.fromJson(data, SyncModel.Data.Retailer.class);
+                retailerList.add(contact);
+            } while (cursor.moveToNext());
+        }
+        db.close();
+        return retailerList;
+    }
+
+    @SuppressLint("Range")
+    public ArrayList<SyncModel.Data.Product> getAllProduct() {
+        ArrayList<SyncModel.Data.Product> productList = new ArrayList<SyncModel.Data.Product>();
+
+        String selectQuery = "SELECT  * FROM " + TABLE_SYNCRETAILER_API;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                String data=cursor.getString(cursor.getColumnIndex(KEY_DATA));
+                Gson gson = new Gson();
+                SyncModel.Data.Product contact  = gson.fromJson(data, SyncModel.Data.Product.class);
+                productList.add(contact);
+            } while (cursor.moveToNext());
+        }
+        db.close();
+        return productList;
+    }
+
+
+    // delete all data
+    public void deleteAll_SYNCAPI()
+    {  SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("delete from "+ TABLE_SYNC_API);
+        db.execSQL("delete from "+ TABLE_SYNCROUTE_API);
+        db.execSQL("delete from "+ TABLE_SYNCRETAILER_API);
+        db.execSQL("delete from "+ TABLE_SYNCPRODUCT_API);
+    }
+
+    public int getDatasCount() {
+        int countCursor=0;
+        String countQuery = "SELECT  * FROM " + TABLE_SYNC_API;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(countQuery, null);
+        countCursor=cursor.getCount();
+        cursor.close();
+        return countCursor;
+    }
+
+
+    //=====================================Common api DataBase method=====================================
     //add data to database as a string.
     public void addAPIData(String data,int id) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -167,22 +427,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     }
 
-    // Getting sync data Count
-    public int getDatasCount() {
-        int countCursor=0;
-        String countQuery = "SELECT  * FROM " + TABLE_SAVE_API;
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(countQuery, null);
-        countCursor=cursor.getCount();
-        cursor.close();
-        return countCursor;
-    }
-
     // delete all data
     public void deleteAll()
     {  SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("delete from "+ TABLE_SAVE_API);
     }
+
+    // Getting sync data Count
+
+
 
     public boolean  deleteApiData(int id) {
         SQLiteDatabase db = this.getWritableDatabase();

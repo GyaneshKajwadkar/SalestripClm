@@ -75,28 +75,29 @@ class AlertClass(val context : Context)
             alertDialog?.dismiss()
         }
         val activity = context as Activity
-        val dialogBuilder = AlertDialog.Builder(activity)
-        val inflater = activity.layoutInflater
-        dialogBuilder.setCancelable(false)
-        val dialogView: View = inflater.inflate(R.layout.progress_view, null)
-        dialogBuilder.setView(dialogView)
+        activity.runOnUiThread {
+            val dialogBuilder = AlertDialog.Builder(activity)
+            val inflater = activity.layoutInflater
+            dialogBuilder.setCancelable(false)
+            val dialogView: View = inflater.inflate(R.layout.progress_view, null)
+            dialogBuilder.setView(dialogView)
 
-        val progressMessage = dialogView.findViewById<View>(R.id.progressMessage_tv) as TextView
-        val parentRelative = dialogView.findViewById<View>(R.id.progressView_parentRv) as RelativeLayout
-        parentRelative.visibility=View.VISIBLE
+            val progressMessage = dialogView.findViewById<View>(R.id.progressMessage_tv) as TextView
+            val parentRelative = dialogView.findViewById<View>(R.id.progressView_parentRv) as RelativeLayout
+            parentRelative.visibility=View.VISIBLE
 
-        alertDialog= dialogBuilder.create()
-        alertDialog?.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+            alertDialog= dialogBuilder.create()
+            alertDialog?.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
 
-        progressMessage.setText(message)
+            progressMessage.setText(message)
 
-        activity.getWindow().setFlags(
-            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-        )
+            activity.getWindow().setFlags(
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+            )
 
-        alertDialog?.show()
-
+            alertDialog?.show()
+        }
     }
 
     fun hideAlert()
@@ -112,53 +113,59 @@ class AlertClass(val context : Context)
     //network alert
     fun networkAlert() {
         val activity = context as Activity
-        val dialogBuilder = AlertDialog.Builder(context)
-        val inflater = activity.layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.networkalert, null)
-        dialogBuilder.setView(dialogView)
+        activity.runOnUiThread{
+            val dialogBuilder = AlertDialog.Builder(context)
+            val inflater = activity.layoutInflater
+            val dialogView: View = inflater.inflate(R.layout.networkalert, null)
+            dialogBuilder.setView(dialogView)
 
-        val alertDialog: AlertDialog = dialogBuilder.create()
-        alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            val alertDialog: AlertDialog = dialogBuilder.create()
+            alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
-        val okBtn_rl = dialogView.findViewById<View>(R.id.okBtn_rl) as RelativeLayout
+            val okBtn_rl = dialogView.findViewById<View>(R.id.okBtn_rl) as RelativeLayout
 
-        okBtn_rl.setOnClickListener {
+            okBtn_rl.setOnClickListener {
 
-            if(context?.javaClass?.simpleName.toString().equals("SplashActivity"))
-            {
-                activity.finish()
+                if(context?.javaClass?.simpleName.toString().equals("SplashActivity"))
+                {
+                    activity.finish()
+                }
+                alertDialog.dismiss()
             }
-            alertDialog.dismiss()
+            alertDialog.show()
         }
-        alertDialog.show()
+
     }
 
     fun commonAlert(headerString: String, message: String) {
         context as Activity
-        val dialogBuilder = AlertDialog.Builder(context)
-        val inflater = context.layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.common_alert, null)
-        dialogBuilder.setView(dialogView)
 
-        val alertDialog: AlertDialog = dialogBuilder.create()
-        alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+        context.runOnUiThread{
+            val dialogBuilder = AlertDialog.Builder(context)
+            val inflater = context.layoutInflater
+            val dialogView: View = inflater.inflate(R.layout.common_alert, null)
+            dialogBuilder.setView(dialogView)
 
-        val okBtn_rl =
-            dialogView.findViewById<View>(R.id.ok_btn) as AppCompatButton
+            val alertDialog: AlertDialog = dialogBuilder.create()
+            alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
 
-        var headerTv =
-            dialogView.findViewById<View>(R.id.header_tv) as TextView
-        var messageTv =
-            dialogView.findViewById<View>(R.id.message_tv) as TextView
+            val okBtn_rl =
+                dialogView.findViewById<View>(R.id.ok_btn) as AppCompatButton
 
-        headerTv.setText(headerString)
-        messageTv.setText(message)
+            var headerTv =
+                dialogView.findViewById<View>(R.id.header_tv) as TextView
+            var messageTv =
+                dialogView.findViewById<View>(R.id.message_tv) as TextView
 
-        okBtn_rl.setOnClickListener {
-            alertDialog.dismiss()
+            headerTv.setText(headerString)
+            messageTv.setText(message)
+
+            okBtn_rl.setOnClickListener {
+                alertDialog.dismiss()
+            }
+
+            alertDialog.show()
         }
-
-        alertDialog.show()
     }
 
 

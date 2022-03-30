@@ -42,45 +42,47 @@ class LoginActivity : BaseActivity() {
         sharePreferance = PreferenceClass(this)
         apiInterface= APIClientKot().getClient(1, "").create(APIInterface::class.java)
 
-        mpin_tv!!.setOnClickListener(object : View.OnClickListener {
+        mpin_tv?.setOnClickListener(object : View.OnClickListener {
             override fun onClick(p0: View?) {
-                var setText: String = mpin_tv!!.getText().toString()
+                var setText: String = mpin_tv?.getText().toString()
                 if (setText.equals("Login with MPIN")) {
-                    mpin_tv!!.setText("Login with password")
-                    password_et!!.setHint("MPIN *")
+                    mpin_tv?.setText("Login with password")
+                    password_et?.setHint("MPIN *")
                 } else {
-                    mpin_tv!!.setText("Login with MPIN")
-                    password_et!!.setHint("Password *")
+                    mpin_tv?.setText("Login with MPIN")
+                    password_et?.setHint("Password *")
                 } } })
 
         //if user name exist then auto fill user name
-        if(!sharePreferance?.getPref("userName_login")?.isEmpty()!!)
+        if(sharePreferance?.getPref("userName_login")?.toString()?.isEmpty() == true)
         { userName_et?.setText(sharePreferance?.getPref("userName_login")) }
 
         //userName_et?.setText("shubham")
-         userName_et?.setText("NILESH")
+      //   userName_et?.setText("NILESH")
+         userName_et?.setText("MEDE0172")
        // password_et?.setText("jack@321")
-         password_et?.setText("NILESH")
+        // password_et?.setText("NILESH")
+         password_et?.setText("1@@@sanjaysahu")
         companyCode_et.setText("UAT2")
         //forgot click
-        forgotPass_tv!!.setOnClickListener {
+        forgotPass_tv?.setOnClickListener {
             val intent = Intent(this, ForgotActivity::class.java)
             startActivity(intent)
         }
 
         //SignIn Button Check
-        signIn_btn!!.setOnClickListener{
+        signIn_btn?.setOnClickListener{
 
-            if(userName_et!!.getText().toString().isEmpty())
+            if(userName_et?.getText().toString().isEmpty())
             {
-                userName_et!!.setError("Required")
-                userName_et!!.requestFocus()
+                userName_et?.setError("Required")
+                userName_et?.requestFocus()
                 return@setOnClickListener
             }
-            if(password_et!!.getText().toString().isEmpty())
+            if(password_et?.getText().toString().isEmpty())
             {
-                password_et!!.setError("Required")
-                password_et!!.requestFocus()
+                password_et?.setError("Required")
+                password_et?.requestFocus()
                 return@setOnClickListener
             }
             if(generalClass.isInternetAvailable())
@@ -90,12 +92,12 @@ class LoginActivity : BaseActivity() {
         }
 
         //Verify Button Check
-        verifyCompany_btn!!.setOnClickListener{
+        verifyCompany_btn?.setOnClickListener{
 
-            if(companyCode_et!!.getText().toString().isEmpty())
+            if(companyCode_et?.getText().toString().isEmpty())
             {
-                companyCode_et!!.setError("Required")
-                companyCode_et!!.requestFocus()
+                companyCode_et?.setError("Required")
+                companyCode_et?.requestFocus()
                 return@setOnClickListener
             }
             generalClass.hideKeyboard(this,it)
@@ -111,7 +113,7 @@ class LoginActivity : BaseActivity() {
         {
             companyVerfy_ll?.visibility = View.GONE
             login_ll?.visibility = View.VISIBLE
-            checkVersioin_api(sharePreferance?.getPref("companyCode")!!)
+            checkVersioin_api(sharePreferance?.getPref("companyCode").toString())
         }
     }
 
@@ -177,8 +179,8 @@ class LoginActivity : BaseActivity() {
             override fun onResponse(call: Call<String?>?, response: Response<String?>) {
                 Log.e("checkCC_api", response.code().toString() + "")
                 if (response.body().toString().isEmpty()) {
-                    companyCode_et!!.setError("Invalid Company code")
-                    companyCode_et!!.requestFocus()
+                    companyCode_et?.setError("Invalid Company code")
+                    companyCode_et?.requestFocus()
                 } else {
                     //check and save company code in sp
                     sharePreferance?.setPref("secondaryUrl", response.body().toString())

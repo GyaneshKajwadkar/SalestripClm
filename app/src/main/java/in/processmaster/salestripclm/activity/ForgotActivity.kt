@@ -35,9 +35,9 @@ class ForgotActivity : BaseActivity() {
     fun initView()
     {
 
-        signIn_tv!!.setOnClickListener{ onBackPressed() }
+        signIn_tv?.setOnClickListener{ onBackPressed() }
 
-        sendOtp_btn!!.setOnClickListener{
+        sendOtp_btn?.setOnClickListener{
 
             generalClass.HideKeyboard(currentFocus ?: View(this))
 
@@ -45,37 +45,37 @@ class ForgotActivity : BaseActivity() {
             {
                 if(password_et?.getText().toString().isEmpty())
                 {
-                    password_et!!.setError("Required")
-                    password_et!!.requestFocus()
+                    password_et?.setError("Required")
+                    password_et?.requestFocus()
                     return@setOnClickListener
                 }
                 if(conPass_et?.getText().toString().isEmpty())
                 {
-                    conPass_et!!.setError("Required")
-                    conPass_et!!.requestFocus()
+                    conPass_et?.setError("Required")
+                    conPass_et?.requestFocus()
                     return@setOnClickListener
                 }
 
                 if(!TextUtils.equals(conPass_et?.getText().toString(),password_et?.getText().toString()))
                 {
-                    password_et!!.setError("Password mismatch")
-                    password_et!!.requestFocus()
+                    password_et?.setError("Password mismatch")
+                    password_et?.requestFocus()
                     return@setOnClickListener
                 }
                 changePassword_api()
             }
             else
             {
-                if(userName_et!!.getText().toString().isEmpty())
+                if(userName_et?.getText().toString().isEmpty())
                 {
-                    userName_et!!.setError("Required")
-                    userName_et!!.requestFocus()
+                    userName_et?.setError("Required")
+                    userName_et?.requestFocus()
                     return@setOnClickListener
                 }
-                if(companyCode_et!!.getText().toString().isEmpty())
+                if(companyCode_et?.getText().toString().isEmpty())
                 {
-                    companyCode_et!!.setError("Required")
-                    companyCode_et!!.requestFocus()
+                    companyCode_et?.setError("Required")
+                    companyCode_et?.requestFocus()
                     return@setOnClickListener
                 }
                 generateOTP_api()
@@ -145,7 +145,7 @@ class ForgotActivity : BaseActivity() {
                     generateModel = response.body()
                     if(generateModel?.getData()?.userData == null)
                     {
-                        if(generateModel?.getErrorObj()?.errorMessage!!.equals("Invalid company code"))
+                        if(generateModel?.getErrorObj()?.errorMessage?.equals("Invalid company code") == true)
                         {
                             companyCode_et?.setError(generateModel?.getErrorObj()?.errorMessage)
                             companyCode_et?.requestFocus()

@@ -17,10 +17,8 @@ import androidx.appcompat.app.AlertDialog
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import us.zoom.sdk.ZoomSDK
 
 
 class SplashActivity : BaseActivity()
@@ -29,7 +27,7 @@ class SplashActivity : BaseActivity()
         @kotlin.jvm.JvmField
         var connectivityChangeReceiver= ConnectivityChangeReceiver()
         var alertDialogNetwork: AlertDialog? = null
-        var staticSyncData: SyncModel? =null
+        var staticSyncData: SyncModel.Data? =SyncModel.Data()
         var showNetworkAlert: Boolean =true
     }
     var sharePreferance: PreferenceClass?= null
@@ -54,16 +52,35 @@ class SplashActivity : BaseActivity()
                 Log.e("TOKEN",token)
             })*/
 
-        if(sharePreferance!!.getPrefBool("isLogin"))
+
+        if(sharePreferance?.getPrefBool("isLogin") == true)
         {
 //         //if no internet connection and database have sync data then open directly home page
             if(!generalClass.isInternetAvailable() && dbBase.getDatasCount() > 0)
             {
-                Handler(Looper.getMainLooper()).postDelayed({
+                generalClass.enableSimpleProgress(progressBar!!)
+                val coroutineScope= CoroutineScope(Dispatchers.IO).launch {
+                    val syncSmallData= async {  staticSyncData= dbBase?.getSYNCApiData(0)
+                        Log.e("sfsfsfsff", staticSyncData?.doctorList?.size.toString())}
+                 /*   val syncRouteData= async {  staticSyncData?.routeList=dbBase?.allRoutes
+                       }
+                    val syncRetailerData= async {  staticSyncData?.retailerList=dbBase?.allRetailers}
+                    val syncProductData= async {  staticSyncData?.productList=dbBase?.allProduct}*/
+
+                    syncSmallData.await()
+                   // syncRouteData.await()
+                   // syncRetailerData.await()
+                   // syncProductData.await()
+
+                }
+                coroutineScope.invokeOnCompletion {
+
+
+                    this.runOnUiThread(java.lang.Runnable { generalClass.disableSimpleProgress(progressBar!!) })
                     val intent = Intent(this@SplashActivity, HomePage::class.java)
                     startActivity(intent)
                     finish()
-                }, 2000)
+                }
             }
             else
             {
@@ -99,7 +116,7 @@ class SplashActivity : BaseActivity()
             var intent=Intent()
                 if (response?.code() == 200 && !response.body().toString().isEmpty())
                 {
-                    staticSyncData = response.body()
+                    staticSyncData = response.body()?.data
                     intent = Intent(this@SplashActivity, HomePage::class.java)
                 }
                 else {

@@ -359,7 +359,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
         var arrayListDoctor: ArrayList<String> = ArrayList()
         arrayListDoctor.add("Select Doctor")
 
-        for(item in SplashActivity.staticSyncData?.data?.doctorList!!)
+        for(item in SplashActivity.staticSyncData?.doctorList!!)
         {
             arrayListDoctor.add(item.doctorName!!)
 
@@ -375,7 +375,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
         })
 
 
-        for(item in SplashActivity.staticSyncData?.data?.doctorList!!)
+        for(item in SplashActivity.staticSyncData?.doctorList!!)
         {
             val selectorModel = DocManagerModel()
             selectorModel.name= item.doctorName.toString()
@@ -728,7 +728,6 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
                 if (response.code() == 200 && !response.body().toString().isEmpty())
                 {
                     var getTeamslist=response.body()
-                    Log.e("getTeamsResponse",Gson().toJson(getTeamslist))
 
                     for(singleItem in getTeamslist?.getData()?.employeeList!!)
                     {

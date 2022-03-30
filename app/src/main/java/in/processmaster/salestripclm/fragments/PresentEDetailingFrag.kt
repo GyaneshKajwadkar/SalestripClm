@@ -170,7 +170,7 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
     fun setDoctorList()
     {
         adapter = BottomSheetDoctorAdapter(
-            SplashActivity.staticSyncData?.data?.doctorList as ArrayList<SyncModel.Data.Doctor>,
+            SplashActivity.staticSyncData?.doctorList as ArrayList<SyncModel.Data.Doctor>,
             doctor_et!!,
             bottomSheetBehavior
         )

@@ -56,6 +56,10 @@ class DailyDocVisitModel {
             @Expose
             var dcrId: Int? = 0
 
+            @SerializedName("routeId")
+            @Expose
+            var routeId: String? = null
+
             @SerializedName("doctorId")
             @Expose
             var doctorId: Int? = 0

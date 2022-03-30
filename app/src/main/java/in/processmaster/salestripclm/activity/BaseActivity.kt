@@ -8,6 +8,7 @@ import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.alertDi
 import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.connectivityChangeReceiver
 import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
+import `in`.processmaster.salestripclm.fragments.HomeFragment
 import `in`.processmaster.salestripclm.models.*
 import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import `in`.processmaster.salestripclm.networkUtils.ConnectivityChangeReceiver
@@ -132,8 +133,8 @@ open class BaseActivity : AppCompatActivity(){
     //permission denied dialog
     fun permissionDenied_Dialog(context: Context, setButtonText: Boolean) {
         if (alertDialog != null) {
-            if (alertDialog?.isShowing!!) {
-                alertDialog!!.dismiss()
+            if (alertDialog?.isShowing == true) {
+                alertDialog?.dismiss()
             }
         }
         val dialogBuilder = AlertDialog.Builder(context)
@@ -142,8 +143,8 @@ open class BaseActivity : AppCompatActivity(){
         dialogBuilder.setView(dialogView)
 
         alertDialog = dialogBuilder.create()
-        alertDialog!!.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        alertDialog!!.setCanceledOnTouchOutside(false)
+        alertDialog?.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        alertDialog?.setCanceledOnTouchOutside(false)
 
         val ok_btn = dialogView.findViewById<View>(R.id.ok_btn) as AppCompatButton
         val retry_btn = dialogView.findViewById<View>(R.id.retry_btn) as AppCompatButton
@@ -159,13 +160,13 @@ open class BaseActivity : AppCompatActivity(){
                 intent.data = uri
                 startActivity(intent)
             } else { dexterPermission(context) }
-            alertDialog!!.dismiss()
+            alertDialog?.dismiss()
         }
         ok_btn.setOnClickListener {
             this.finish();
             System.exit(0);
-            alertDialog!!.dismiss() }
-        alertDialog!!.show()
+            alertDialog?.dismiss() }
+        alertDialog?.show()
     }
 
     //check version
@@ -285,11 +286,14 @@ open class BaseActivity : AppCompatActivity(){
 
     suspend fun getSheduleMeetingAPI()
     {
-        val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
-        ).getScheduledMeetingCoo("bearer " + loginModelHomePage.accessToken,loginModelHomePage.empId.toString())
+        val response =
+            sharePreferanceBase?.getPref("secondaryUrl")?.let {
+                APIClientKot().getUsersService(2, it
+                ).getScheduledMeetingCoo("bearer " + loginModelHomePage.accessToken,loginModelHomePage.empId.toString())
+            }
         withContext(Dispatchers.Main) {
             Log.e("getScheduleAPI",response.toString())
-            if (response!!.isSuccessful)
+            if (response?.isSuccessful == true)
             {
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
                     val gson = Gson()
@@ -299,18 +303,21 @@ open class BaseActivity : AppCompatActivity(){
                 { Log.e("elseGetScheduled", response.code().toString()) }
             }
             else
-            {   Log.e("scheduleERROR", response.errorBody().toString()) }
+            {   Log.e("scheduleERROR", response?.errorBody().toString()) }
         }
 
     }
 
     suspend fun getCredientailAPI(context: Activity)
     {
-        val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
-        ).getZoomCredientailCoo("bearer " + loginModelHomePage.accessToken,loginModelHomePage.empId.toString())
+        val response =
+            sharePreferanceBase?.getPref("secondaryUrl")?.let {
+                APIClientKot().getUsersService(2, it
+                ).getZoomCredientailCoo("bearer " + loginModelHomePage.accessToken,loginModelHomePage.empId.toString())
+            }
         withContext(Dispatchers.Main) {
             Log.e("getScheduleAPIII",response.toString())
-            if (response!!.isSuccessful)
+            if (response?.isSuccessful == true)
             {
                 if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage=="")
                 {
@@ -323,7 +330,7 @@ open class BaseActivity : AppCompatActivity(){
                     sharePreferanceBase?.setPrefBool("zoomCrediential", false)}
             }
             else
-            { Log.e("scheduleERROR", response.errorBody().toString())
+            { Log.e("scheduleERROR", response?.errorBody().toString())
                 sharePreferanceBase?.setPrefBool("zoomCrediential", false)}
         } }
 
@@ -355,14 +362,16 @@ open class BaseActivity : AppCompatActivity(){
 
     suspend fun submitDCRCo()
     {
+
      //   val dcrObj= sharePreferanceBase?.getPref("dcrObj")
         val eDetailingArray=dbBase.getAllSaveSend("feedback")
         if(eDetailingArray.size==0)
         {
-            CoroutineScope(Dispatchers.IO).launch {
-                val getDocCall= async { getDocCallAPI() }
+            getDocCallAPI()
+        /*    CoroutineScope(Dispatchers.IO).launch {
+                val getDocCall= async {  }
                 getDocCall.await()
-            }
+            }*/
             return
         }
 
@@ -375,10 +384,13 @@ open class BaseActivity : AppCompatActivity(){
        // Log.e("siofshfioswd", (getDcrObj.doctorDCRList)?.size.toString())
        // Log.e("trhtruhrtgrfg",Gson().toJson(getDcrObj))
 
-        val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
-        ).submitEdetailingApiCoo("bearer " + loginModelHomePage.accessToken,eDetailingArray.get(0))
+        val response =
+            sharePreferanceBase?.getPref("secondaryUrl")?.let {
+                APIClientKot().getUsersService(2, it
+                ).submitEdetailingApiCoo("bearer " + loginModelHomePage.accessToken,eDetailingArray.get(0))
+            }
         withContext(Dispatchers.Main) {
-            if (response!!.isSuccessful)
+            if (response?.isSuccessful == true)
             {
              //   Log.e("dfsdgtrertef", response.body().toString())
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
@@ -389,27 +401,32 @@ open class BaseActivity : AppCompatActivity(){
                     else {
                            Log.e("getSubmitEdetailingData", response.body().toString())
                         eDetailingArray.get(0).doctorId?.let { dbBase.deleteSaveSend(it) }
-                        CoroutineScope(Dispatchers.IO).launch {
-                            val getDocCall= async { submitDCRCo() }
+                        submitDCRCo()
+
+                      /*  CoroutineScope(Dispatchers.IO).launch {
+                            val getDocCall= async { }
                             getDocCall.await()
-                        }
+                        }*/
                     }
                 }
                 else Log.e("elsesubmitDCRCoAPI", response.code().toString())
             }
-            else Log.e("submitDCRCoAPIERROR", response.errorBody().toString())
+            else Log.e("submitDCRCoAPIERROR", response?.errorBody().toString())
         }
     }
 
      suspend fun getDocCallAPI()
     {
-        val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
-        ).dailyDocCallApi("bearer " + loginModelHomePage.accessToken,generalClass.currentDateMMDDYY())
+        val response =
+            sharePreferanceBase?.getPref("secondaryUrl")?.let {
+                APIClientKot().getUsersService(2, it
+                ).dailyDocCallApi("bearer " + loginModelHomePage.accessToken,generalClass.currentDateMMDDYY())
+            }
         withContext(Dispatchers.Main) {
-            Log.e("getDocCallAPI", response.body().toString()!!)
-            if (response!!.isSuccessful)
+            Log.e("getDocCallAPI", response?.body().toString())
+            if (response?.isSuccessful == true)
             {
-                if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage!!.isEmpty()) {
+                if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage?.isEmpty() == true) {
                     var model = response.body()
                     if(model?.getData()?.dcrDoctorlist?.size==0)
                     {
@@ -420,7 +437,7 @@ open class BaseActivity : AppCompatActivity(){
                 }
                 else Log.e("elsegetDocCallAPI", response.code().toString())
             }
-            else Log.e("getDocCallAPIERROR", response.errorBody().toString())
+            else Log.e("getDocCallAPIERROR", response?.errorBody().toString())
         }
     }
 

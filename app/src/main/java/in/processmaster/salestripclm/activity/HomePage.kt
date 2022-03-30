@@ -27,7 +27,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.core.content.ContextCompat
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -41,14 +40,13 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import org.json.JSONObject
 import us.zoom.sdk.ZoomSDK
-import java.io.File
+import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
 
 
 class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/*, UserLoginCallback.ZoomDemoAuthenticationListener , MeetingServiceListener, InitAuthSDKCallback*/
 {
-    var drawer_layout : DrawerLayout?=null
     var drawerProfileIv: ImageView?=null
     var bottomNavigation: BottomNavigationView? = null
     var openFragmentStr=""
@@ -76,7 +74,18 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             callingMultipleAPI()
         else {
             if (dbBase?.getApiDetail(1) != "") {
-                staticSyncData = Gson().fromJson(dbBase?.getApiDetail(1), SyncModel::class.java)
+                val coroutineScope= CoroutineScope(Dispatchers.IO).launch {
+                    val syncSmallData= async {  staticSyncData= dbBase?.getSYNCApiData(0)}
+                    val syncRouteData= async {  staticSyncData?.routeList=dbBase?.allRoutes}
+                    val syncRetailerData= async {  staticSyncData?.retailerList=dbBase?.allRetailers}
+                    val syncProductData= async {  staticSyncData?.productList=dbBase?.allProduct}
+
+                    syncSmallData.await()
+                    syncRouteData.await()
+                    syncRetailerData.await()
+                    syncProductData.await()
+
+                }
             }
             bottomNavigation?.selectedItemId= R.id.landingPage
         }
@@ -90,8 +99,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         bottomNavigation=findViewById(R.id.navigationView)
         bottomNavigation?.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
 
-        drawer_layout=findViewById(R.id.drawer_layout) as DrawerLayout
-        userName_tv?.setText(loginModelHomePage.userName!!)
+        userName_tv?.setText(loginModelHomePage.userName)
         //change status bar colour
         changeStatusBar()
 
@@ -110,7 +118,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             val menuBuilder = MenuBuilder(this)
             val inflater = MenuInflater(this)
             inflater.inflate(R.menu.menu_main, menuBuilder)
-            val optionsMenu = MenuPopupHelper(this, menuBuilder, menu_iv!!)
+            val optionsMenu = MenuPopupHelper(this, menuBuilder, menu_iv)
             optionsMenu.setForceShowIcon(true)
 
             // Set Item Click Listener
@@ -126,7 +134,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             // Display the menu
             optionsMenu.show()
         })
-        menu_img?.setOnClickListener({ drawer_layout!!.openDrawer(Gravity.LEFT) })
+        menu_img?.setOnClickListener({ drawer_layout.openDrawer(Gravity.LEFT) })
 
         val headerView: View = nav_view?.inflateHeaderView(R.layout.nav_header_main)!!
         var drawerTv=  headerView.findViewById(R.id.profileName_tv_drawer) as TextView
@@ -212,6 +220,8 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     //exit app alert
     fun logoutAppAlert()
     {
+        runOnUiThread(java.lang.Runnable {
+
         val dialogBuilder = AlertDialog.Builder(this)
         val inflater = this.layoutInflater
         val dialogView: View = inflater.inflate(R.layout.exitalert, null)
@@ -245,52 +255,58 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         }
 
         alertDialog.show()
+        })
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
 
-        drawer_layout!!.closeDrawers()
-        when (item.itemId) {
+        val runnable= java.lang.Runnable {
+            when (item.itemId) {
 
-            R.id.nav_home -> { }
+                R.id.nav_home -> { }
 
-            R.id.nav_profile -> {
-                var intent = Intent(this, ProfileeActivity::class.java)
-                startActivity(intent)
-                overridePendingTransition(0, 0)
-            }
+                R.id.nav_profile -> {
+                    var intent = Intent(this, ProfileeActivity::class.java)
+                    startActivity(intent)
+                    overridePendingTransition(0, 0)
+                }
 
-            R.id.nav_schedule -> {
-                var intent = Intent(this, SetSchedule_Activity::class.java)
-                startActivity(intent)
-                overridePendingTransition(0, 0)
-            }
+                R.id.nav_schedule -> {
+                    var intent = Intent(this, SetSchedule_Activity::class.java)
+                    startActivity(intent)
+                    overridePendingTransition(0, 0)
+                }
 
-            R.id.nav_screenshot -> {
-                var intent = Intent(this, ImageSelectorActivity::class.java)
-                intent.putExtra("filePath", getFilesDir()?.getAbsolutePath() + "/Screenshots/")
-                intent.putExtra("selection", "delete")
-                startActivity(intent)
-                overridePendingTransition(0, 0)
-            }
+                R.id.nav_screenshot -> {
+                    var intent = Intent(this, ImageSelectorActivity::class.java)
+                    intent.putExtra("filePath", getFilesDir()?.getAbsolutePath() + "/Screenshots/")
+                    intent.putExtra("selection", "delete")
+                    startActivity(intent)
+                    overridePendingTransition(0, 0)
+                }
 
-            R.id.sync_menu -> {
-                if (generalClass.isInternetAvailable()) callingMultipleAPI() //  sync_api()
-                else alertClass.networkAlert()
-            }
+                R.id.sync_menu -> {
+                    if (generalClass.isInternetAvailable()) callingMultipleAPI() //  sync_api()
+                    else alertClass.networkAlert()
+                }
 
-            R.id.nav_scheduled -> {
-                var intent = Intent(this, MeetingActivity::class.java)
-                startActivity(intent)
-                overridePendingTransition(0, 0)
-            }
+                R.id.nav_scheduled -> {
+                    var intent = Intent(this, MeetingActivity::class.java)
+                    startActivity(intent)
+                    overridePendingTransition(0, 0)
+                }
 
-            R.id.nav_logout ->
-            {
-                logoutAppAlert()
+                R.id.nav_logout ->
+                {
+                    logoutAppAlert()
+                }
             }
         }
+        Thread(runnable).start()
 
+        runOnUiThread{
+            drawer_layout?.closeDrawers()
+        }
         return true
     }
 
@@ -310,7 +326,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         val df = SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault())
         val formattedDate: String = df.format(c)
 
-        if(sharePreferanceBase?.getPref("SyncDate")==null || sharePreferanceBase?.getPref("SyncDate")!!.isEmpty())
+        if(sharePreferanceBase?.getPref("SyncDate")==null || sharePreferanceBase?.getPref("SyncDate").toString().isEmpty())
         {
             sharePreferanceBase?.setPref("SyncDate", formattedDate)
         }
@@ -323,7 +339,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                 sharePreferanceBase?.setPref("SyncDate", formattedDate)
                 if(generalClass.isInternetAvailable()) callingMultipleAPI()
                 else {
-                    if (dbBase?.getApiDetail(1) != "") staticSyncData = Gson().fromJson(dbBase?.getApiDetail(1), SyncModel::class.java)
+                  //  if (dbBase?.getApiDetail(1) != "") staticSyncData = Gson().fromJson(dbBase?.getApiDetail(1), SyncModel::class.java)
                 }
             }
 
@@ -342,9 +358,9 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     {
         alertClass.showProgressAlert("")
 
-        if (dbBase.getDatasCount() > 0) {
+      /*  if (dbBase.getDatasCount() > 0) {
             dbBase.deleteAll()
-        }
+        }*/
 
         val coroutineScope= CoroutineScope(IO).launch {
             val sync= async { callingSyncAPI() }
@@ -398,7 +414,8 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             .placeholder(android.R.mipmap.sym_def_app_icon)
             .error(android.R.mipmap.sym_def_app_icon)
 
-        Glide.with(this).load(loginModelHomePage.imageName).apply(options).into(drawerProfileIv!!)
+        drawerProfileIv?.let {
+            Glide.with(this).load(loginModelHomePage.imageName).apply(options).into(it) }
         Glide.with(this).load(loginModelHomePage.imageName).apply(options).into(profile_image)
     }
 
@@ -407,14 +424,17 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     {
         val jsonObject = JSONObject(loginModelHomePage.getEmployeeObj().toString())
 
-        val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
-        ).detailingApiCoo( "bearer " + loginModelHomePage.accessToken, jsonObject.getString(
-            "Division"
-        ))
+        val response =
+            sharePreferanceBase?.getPref("secondaryUrl")?.let {
+                APIClientKot().getUsersService(2, it
+                ).detailingApiCoo( "bearer " + loginModelHomePage.accessToken, jsonObject.getString(
+                    "Division"
+                ))
+            }
         withContext(Dispatchers.Main) {
-            if (response!!.isSuccessful)
+            if (response?.isSuccessful == true)
             {
-                if (response.code() == 200 && !response.body().toString().isEmpty())
+                if (response?.code() == 200 && !response.body().toString().isEmpty())
                 {
                     for ((index, value) in response.body()?.getData()?.geteDetailingList()?.withIndex()!!) {
                         //store edetailing data to db
@@ -426,7 +446,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                     }
 
                     // clear database
-                    for (dbList in dbBase.getAlleDetail()!!) {
+                    for (dbList in dbBase.getAlleDetail()) {
                         var isSet = false
                         for (mainList in response.body()?.getData()?.geteDetailingList()!!) {
                             if (mainList.geteDetailId() == dbList.geteDetailId()) {
@@ -439,10 +459,10 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                             dbBase.deleteEdetailingData(dbList.geteDetailId().toString())
 
                             var downloadModelArrayList =
-                                dbBase.getAllDownloadedData(dbList.geteDetailId()!!)
+                                dbBase.getAllDownloadedData(dbList.geteDetailId())
 
                             //Delete files from folder before erase db
-                            for (item in downloadModelArrayList!!) {
+                            for (item in downloadModelArrayList) {
                                 val someDir = File(item.fileDirectoryPath)
                                 someDir.deleteRecursively()
                             }
@@ -472,16 +492,34 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
     suspend fun callingSyncAPI()
     {
-        val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
-        ).syncApiCoo("bearer " + loginModelHomePage.accessToken)
+        val response =
+            sharePreferanceBase?.getPref("secondaryUrl")?.let {
+                APIClientKot().getUsersService(2, it
+                ).syncApiCoo("bearer " + loginModelHomePage.accessToken)
+            }
         withContext(Dispatchers.Main) {
-            if (response!!.isSuccessful)
+            if (response?.isSuccessful == true)
             {
-                if (response.code() == 200 && !response.body().toString().isEmpty())
+              //  alertClass.commonAlert("",Gson().toJson(response.body()))
+            if (response?.code() == 200 && !response.body().toString().isEmpty())
                 {
-                    dbBase?.addAPIData(Gson().toJson(response.body()),1)
-                    staticSyncData=response.body()
-                }
+                   // dbBase?.addAPIData(Gson().toJson(response.body()),1)
+
+                    staticSyncData=response.body()?.data
+                    val apiModel=response.body()?.data
+                    val gson=Gson()
+                    dbBase?.deleteAll_SYNCAPI()
+
+                    dbBase?.addSYNCAPIData(gson.toJson(apiModel?.settingDCR),
+                         gson.toJson(apiModel?.workTypeList),gson.toJson(apiModel?.productList),
+                         "",gson.toJson(apiModel?.workingWithList),gson.toJson(apiModel?.fieldStaffTeamList),""
+                         ,apiModel?.configurationSetting, gson.toJson(apiModel?.schemeList),
+                         "",0, gson.toJson(apiModel?.doctorList))
+                    dbBase?.addRoutes(apiModel?.routeList)
+                    dbBase?.addRetailer(apiModel?.retailerList)
+                    dbBase?.addProduct(apiModel?.productList)
+
+            }
 
                 // if token expire go to login page again
                 else{
@@ -493,22 +531,86 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                 }
             }
             else
-            {   Log.e("responseERROR", response.errorBody().toString())
+            {   Log.e("responseERROR", response?.errorBody().toString())
                 generalClass.checkInternet()
             }
         }
 
     }
 
+    fun longLog(str: String) {
+        if (str.length > 4000) {
+            Log.e("longString", str.substring(0, 4000))
+            longLog(str.substring(4000))
+        } else Log.e("longString", str)
+    }
+
+    private fun writeToFile(data: String) {
+        //  writeToFile(Gson().toJson(response.body()))
+        //  readFromFile("/storage/emulated/0/Android/data/in.processmaster.salestripclm/files/apiData.txt")?.let { Log.e("ghdsfidshfsdhpf", it) }
+
+        var folder = File(this.getExternalFilesDir(null)?.absolutePath + "/apiData")
+        try {
+            if (folder.mkdir()) {
+                println("Directorycreated")
+            } else {
+                println("Directoryisnotcreated")
+            }
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+            Log.e("downloadFirstError",e.message.toString())
+        }
+
+        try {
+
+
+            val file = File.createTempFile("config", ".txt")
+            Log.e("filehwifwhef",folder.getAbsolutePath() +".txt")
+            val writer = OutputStreamWriter(FileOutputStream(file))
+           // val outputStreamWriter = OutputStreamWriter(openFileOutput("config.txt", MODE_PRIVATE))
+            val outputStreamWriter = OutputStreamWriter(FileOutputStream(folder.getAbsolutePath() +".txt"))
+            outputStreamWriter.write(data)
+            outputStreamWriter.close()
+        } catch (e: IOException) {
+            Log.e("Exception", "Filewritefailed: " + e.toString())
+        }
+    }
+
+    fun readFromFile(path: String?): String? {
+        var ret = ""
+        try {
+            val inputStream: InputStream = FileInputStream(File(path))
+            if (inputStream != null) {
+                val inputStreamReader = InputStreamReader(inputStream)
+                val bufferedReader = BufferedReader(inputStreamReader)
+                var receiveString: String? = ""
+                val stringBuilder = StringBuilder()
+                while (bufferedReader.readLine().also { receiveString = it } != null) {
+                    stringBuilder.append(receiveString)
+                }
+                inputStream.close()
+                ret = stringBuilder.toString()
+            }
+        } catch (e: FileNotFoundException) {
+            Log.e("FileToJson", "File not found: " + e.toString())
+        } catch (e: IOException) {
+            Log.e("FileToJson", "Can not read file: $e")
+        }
+        return ret
+    }
+
     suspend fun getQuantityAPI()
     {
-        val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
-        ).getQuantiyApiCoo("bearer " + loginModelHomePage.accessToken)
+        val response =
+            sharePreferanceBase?.getPref("secondaryUrl")?.let {
+                APIClientKot().getUsersService(2, it
+                ).getQuantiyApiCoo("bearer " + loginModelHomePage.accessToken)
+            }
         withContext(Dispatchers.Main) {
             Log.e("quantitiveAPI",response.toString())
-            if (response!!.isSuccessful)
+            if (response?.isSuccessful == true)
             {
-                if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage?.isEmpty()!!) {
+                if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage?.isEmpty() == true) {
                     val gson = Gson()
                     var model = response.body()
 
@@ -517,7 +619,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                 }
                 else Log.e("elsequantitiveAPI", response.code().toString())
             }
-            else Log.e("quantitiveAPIERROR", response.errorBody().toString())
+            else Log.e("quantitiveAPIERROR", response?.errorBody().toString())
 
         }
 
@@ -569,39 +671,45 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         val c:Date=cal.time
         val df = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
 
-        val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
-        ).visitDoctorGraphApi("bearer " + loginModelHomePage.accessToken,df.format(c),generalClass.currentDateMMDDYY())
+        val response =
+            sharePreferanceBase?.getPref("secondaryUrl")?.let {
+                APIClientKot().getUsersService(2, it
+                ).visitDoctorGraphApi("bearer " + loginModelHomePage.accessToken,df.format(c),generalClass.currentDateMMDDYY())
+            }
         withContext(Dispatchers.Main) {
-            Log.e("getDoctorGraphAPI", response.body().toString()!!)
-            if (response!!.isSuccessful)
+            Log.e("getDoctorGraphAPI", response?.body().toString())
+            if (response?.isSuccessful == true)
             {
-                if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage!!.isEmpty()) {
+                if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage?.isEmpty() == true) {
                     var model = response.body()
                     dbBase?.addAPIData(Gson().toJson(model?.getData()), 4)
                   }
                 else Log.e("elseDoctorGraphAPI", response.code().toString())
             }
-            else Log.e("DoctorGraphERROR", response.errorBody().toString())
+            else Log.e("DoctorGraphERROR", response?.errorBody().toString())
         }
     }
 
 
     suspend fun profileApi()
     {
-        val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
-        ).getProfileData("bearer " + loginModelHomePage.accessToken,
-            loginModelHomePage.empId.toString())
+        val response =
+            sharePreferanceBase?.getPref("secondaryUrl")?.let {
+                APIClientKot().getUsersService(2, it
+                ).getProfileData("bearer " + loginModelHomePage.accessToken,
+                    loginModelHomePage.empId.toString())
+            }
         withContext(Dispatchers.Main) {
-            Log.e("getProfileAPI", response?.body().toString()!!)
-            if (response!!.isSuccessful)
+            Log.e("getProfileAPI", response?.body().toString())
+            if (response?.isSuccessful == true)
             {
-                if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage!!.isEmpty()) {
+                if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage?.isEmpty() == true) {
                     var model = response.body()
                     dbBase?.addAPIData(Gson().toJson(model?.getData()), 6)
                 }
                 else Log.e("elseProfileAPI", response.code().toString())
             }
-            else Log.e("getProfileAPIERROR", response.errorBody().toString())
+            else Log.e("getProfileAPIERROR", response?.errorBody().toString())
         }
     }
 

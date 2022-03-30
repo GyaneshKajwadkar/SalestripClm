@@ -510,7 +510,8 @@ class DownloadAdapter constructor() :
                 val output: OutputStream
 
                 //create file path
-                var folder = File(context!!.getExternalFilesDir(null)?.absolutePath + "/$brandName"+"/$category")
+              //  var folder = File(context!!.getExternalFilesDir(null)?.absolutePath + "/$brandName"+"/$category")
+                var folder = File(context?.getFilesDir() , "/$brandName"+"/$category")
 
                 try {
                     if (folder.mkdir()) {

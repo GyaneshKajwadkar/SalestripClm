@@ -23,31 +23,31 @@ class GetDcrToday {
              var dcrId: Int? = null
              @SerializedName("dcrDate")
              var dcrDate: String? = null
-             @SerializedName("dcrType")
+           /*  @SerializedName("dcrType")
              var dcrType: Int? = null
              @SerializedName("otherDCR")
-             var otherDCR: Int? = null
+             var otherDCR: Int? = null*/
              @SerializedName("empId")
              var empId: Int? = null
-             @SerializedName("employeeId")
-             var employeeId: Int? = null
+             /*@SerializedName("employeeId")
+             var employeeId: Int? = null*/
              @SerializedName("mode")
              var mode: Int? = null
              @SerializedName("routeId")
-             var routeId: Int? = null
+             var routeId: String? = null
              @SerializedName("remark")
              var remark: String? = null
-             @SerializedName("otherRemark")
+        /*     @SerializedName("otherRemark")
              var otherRemark: String? = null
              @SerializedName("transportMode")
-             var transportMode: Int? = null
+             var transportMode: Int? = null*/
              @SerializedName("routeName")
              var routeName: String? = null
-             @SerializedName("strDCRDate")
-             var strDCRDate: String? = null
+          /*   @SerializedName("strDCRDate")
+             var strDCRDate: String? = null*/
              @SerializedName("dataSaveType")
              var dataSaveType: String = "D"
-             @SerializedName("isRouteDeviated")
+          /*   @SerializedName("isRouteDeviated")
              var isRouteDeviated: Boolean? = null
              @SerializedName("concatEmployeeId")
              var concatEmployeeId: String? = null
@@ -79,8 +79,8 @@ class GetDcrToday {
              @SerializedName("dayCount")
              var dayCount: Int? = null
              @SerializedName("monthNo")
-             var monthNo: Int? = null
-             @SerializedName("year")
+             var monthNo: Int? = null*/
+           /*  @SerializedName("year")
              var year: Int? = null
              @SerializedName("monthName")
              var monthName: String? = null
@@ -173,10 +173,10 @@ class GetDcrToday {
              @SerializedName("hierarchyCode")
              var hierarchyCode: String? = null
              @SerializedName("linkedStateName")
-             var linkedStateName: String? = null
+             var linkedStateName: String? = null*/
              @SerializedName("headQuaterName")
              var headQuaterName: String? = null
-             @SerializedName("absolutePath")
+            /* @SerializedName("absolutePath")
              var absolutePath: String? = null
              @SerializedName("gender")
              var gender: Int? = null
@@ -239,8 +239,8 @@ class GetDcrToday {
              @SerializedName("empCode")
              var empCode: String? = null
              @SerializedName("designation")
-             var designation: String? = null
-             @SerializedName("division")
+             var designation: String? = null*/
+           /*  @SerializedName("division")
              var division: String? = null
              @SerializedName("region")
              var region: String? = null
@@ -273,7 +273,7 @@ class GetDcrToday {
              @SerializedName("totalHospVisit")
              var totalHospVisit: Int? = null
              @SerializedName("backDays")
-             var backDays: Int? = null
+             var backDays: Int? = null*/
 
          }
      }

@@ -59,7 +59,7 @@ class DownloadedActivtiy : BaseActivity() {
 
     fun initView()
     {
-        back_imv!!.setOnClickListener {
+        back_imv?.setOnClickListener {
             onBackPressed()
         }
 
@@ -83,7 +83,7 @@ class DownloadedActivtiy : BaseActivity() {
         var arraylistImages:ArrayList<DownloadEdetail_model.Data.EDetailingImages> = ArrayList()
         var arraylistZip:ArrayList<DownloadEdetail_model.Data.EDetailingImages> = ArrayList()
 
-        for ((index, value) in arrayList?.withIndex()!!)
+        for ((index, value) in arrayList?.withIndex())
         {
             if(value.fileType=="VIDEO")
             {
@@ -127,25 +127,42 @@ class DownloadedActivtiy : BaseActivity() {
             }
             progressDialog()
             progressBarAlert?.setIndeterminate(true)
+
+
             downloadSingleFolders(0,arraylistZip)
+        })
+
+        downloadAll_ll?.setOnClickListener({
+            if(!generalClass.isInternetAvailable())
+            {
+                alertClass.networkAlert()
+                return@setOnClickListener
+            }
+            progressDialog()
+            progressBarAlert?.setIndeterminate(true)
+            var addAddDownloaded:ArrayList<DownloadEdetail_model.Data.EDetailingImages> = ArrayList()
+            addAddDownloaded.addAll(arraylistVideo)
+            addAddDownloaded.addAll(arraylistImages)
+            addAddDownloaded.addAll(arraylistZip)
+
+            downloadSingleFolders(0,addAddDownloaded)
         })
 
         toolbarText_tv?.setText(brandName)
 
-        val mNoOfColumns = Utility.calculateNoOfColumns(this, 197F)
 
         adapterVideo= DownloadAdapter(this, "VIDEO", brandId,brandName,arraylistVideo,eDetailingId)
-        video_rv!!.layoutManager = GridLayoutManager(this, mNoOfColumns)
+        video_rv?.layoutManager = GridLayoutManager(this, 5)
         video_rv?.itemAnimator = DefaultItemAnimator()
         video_rv?.adapter = adapterVideo
 
         adapterImage= DownloadAdapter(this, "IMAGE", brandId,brandName,arraylistImages,eDetailingId)
-        images_rv!!.layoutManager = GridLayoutManager(this, mNoOfColumns)
+        images_rv?.layoutManager = GridLayoutManager(this, 5)
         images_rv?.itemAnimator = DefaultItemAnimator()
         images_rv?.adapter = adapterImage
 
         adapterWeb= DownloadAdapter(this, "ZIP", brandId,brandName,arraylistZip,eDetailingId)
-        html_rv!!.layoutManager = GridLayoutManager(this, mNoOfColumns)
+        html_rv?.layoutManager = GridLayoutManager(this, 5)
         html_rv?.itemAnimator = DefaultItemAnimator()
         html_rv?.adapter = adapterWeb
 
@@ -179,15 +196,6 @@ class DownloadedActivtiy : BaseActivity() {
            recyclerView?.adapter = adapter*/
 
 
-    }
-
-    //for dynamic grid view set no of column according to screen
-    object Utility {
-        fun calculateNoOfColumns(context: Context, columnWidthDp: Float): Int { // For example columnWidthdp=180
-            val displayMetrics: DisplayMetrics = context.getResources().getDisplayMetrics()
-            val screenWidthDp = displayMetrics.widthPixels / displayMetrics.density
-            return (screenWidthDp / columnWidthDp + 0.5).toInt()
-        }
     }
 
     fun downloadAll(
@@ -229,8 +237,8 @@ class DownloadedActivtiy : BaseActivity() {
         dialogBuilder.setView(dialogView)
 
         alertDialog= dialogBuilder.create()
-        alertDialog!!.setCanceledOnTouchOutside(false)
-        alertDialog!!.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+        alertDialog?.setCanceledOnTouchOutside(false)
+        alertDialog?.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
 
         progressBarAlert =
             dialogView.findViewById<View>(R.id.valueProgressBar) as ProgressBar
@@ -239,7 +247,7 @@ class DownloadedActivtiy : BaseActivity() {
 
         downloadItem_tv = dialogView.findViewById<View>(R.id.downloadItem_tv) as TextView
 
-        alertDialog!!.show()
+        alertDialog?.show()
 
     }
 
@@ -271,7 +279,8 @@ class DownloadedActivtiy : BaseActivity() {
                 val output: OutputStream
 
                 //create file path
-                var folder = File(this.getExternalFilesDir(null)?.absolutePath + "/$brandName"+"/$category")
+               // var folder = File(this.getExternalFilesDir(null)?.absolutePath + "/$brandName"+"/$category")
+                var folder = File(this.getFilesDir() , "/$brandName"+"/$category")
 
                 try {
                     if (folder.mkdir()) {
@@ -316,12 +325,12 @@ class DownloadedActivtiy : BaseActivity() {
                         fileModel.filePath=folder.absolutePath+extension
                         fileModel.model=model
                         fileModel.downloadType=category
-                        fileModel.fileId=model.fileId!!
+                        fileModel.fileId= model.fileId
                         fileModel.brandId=brandId
                         fileModel.brandName=brandName
 
 
-                        var downloadedModel=db.getSingleDownloadedData(model.fileId!!)
+                        var downloadedModel=db.getSingleDownloadedData(model.fileId)
 
                         if(downloadedModel.favFile)
                         {
@@ -331,7 +340,7 @@ class DownloadedActivtiy : BaseActivity() {
 
 
                         val gson = Gson()
-                        db.insertOrUpdateEDetailDownload(eDetailingId!!.toInt(), model.fileId!!,  gson.toJson(fileModel),category)
+                        db.insertOrUpdateEDetailDownload(eDetailingId.toInt(), model.fileId,  gson.toJson(fileModel),category)
                         db.insertFilePath(1,  gson.toJson(fileModel), eDetailingId.toString())
                         deleteAndsaveRedownloads(db,model,downloadedModel)
 
@@ -379,20 +388,12 @@ class DownloadedActivtiy : BaseActivity() {
 
                         //unzip file
                         unpackZipmethod(folder.getAbsolutePath(), zipName,position,model,downloadType,arrayListtype)
-
-
                     }
-
-
-
-
 
                 } else {
                     this.runOnUiThread(Runnable {
                         alertDialog?.dismiss()
                     })
-
-
                 }
                 input.close()
             } catch (e: Exception) {
@@ -424,19 +425,19 @@ class DownloadedActivtiy : BaseActivity() {
             try {
                 isInput = FileInputStream(path + zipname)
             } catch (e: Exception) {
-                Log.e("fileSaving", e.message!!)
+                e.message?.let { Log.e("fileSaving", it) }
             }
             zis = ZipInputStream(BufferedInputStream(isInput))
             var ze: ZipEntry? = null
             val buffer = ByteArray(1024)
             var count: Int
             while (zis.nextEntry.also { ze = it } != null) {
-                filename = ze!!.name
+                filename = ze?.name.toString()
 
                 //  create directories if not exists
                 val fmd = File("$path/$filename")
 
-                if (ze!!.isDirectory) {
+                if (ze?.isDirectory == true) {
                     fmd.mkdirs()
                     continue
                 }
@@ -464,7 +465,7 @@ class DownloadedActivtiy : BaseActivity() {
             zis.close()
         }
         catch (e: IOException) {
-            Log.e("zipException", e.message!!)
+            e.message?.let { Log.e("zipException", it) }
             this.runOnUiThread(Runnable {
                 alertDialog?.dismiss()
             })
@@ -486,11 +487,11 @@ class DownloadedActivtiy : BaseActivity() {
                     fileModel.filePath=htmlPath
                     fileModel.model=zipmodel
                     fileModel.downloadType="ZIP"
-                    fileModel.fileId=zipmodel.fileId!!
+                    fileModel.fileId=zipmodel.fileId
                     fileModel.brandId=brandId
                     fileModel.brandName=brandName
 
-                    var downloadedModel=db.getSingleDownloadedData(zipmodel.fileId!!)
+                    var downloadedModel=db.getSingleDownloadedData(zipmodel.fileId)
 
                     if(downloadedModel.favFile)
                     {
@@ -501,7 +502,7 @@ class DownloadedActivtiy : BaseActivity() {
 
 
                     val gson = Gson()
-                    db.insertOrUpdateEDetailDownload(eDetailingId!!.toInt(), zipmodel.fileId!!,  gson.toJson(fileModel),"ZIP")
+                    db.insertOrUpdateEDetailDownload(eDetailingId.toInt(), zipmodel.fileId,  gson.toJson(fileModel),"ZIP")
                     db.insertFilePath(1,  gson.toJson(fileModel), eDetailingId.toString())
                     deleteAndsaveRedownloads(db,zipmodel,downloadedModel)
 

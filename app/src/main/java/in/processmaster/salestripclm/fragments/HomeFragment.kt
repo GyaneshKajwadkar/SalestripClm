@@ -232,6 +232,19 @@ class HomeFragment : Fragment(), OnChartGestureListener {
     }
 
 
+    fun updateTodaysCall()
+    {
+        db= DatabaseHandler(activity)
+        val responseDocCall=db.getApiDetail(5)
+        val  docCallModel= Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
+        val docAdapter= activity?.let { CallDoctor_Adapter(docCallModel.dcrDoctorlist, it) }
+        activity?.runOnUiThread {
+            if(docCallModel.dcrDoctorlist?.size==0) { noDocCall_tv?.visibility = View.VISIBLE}
+            dailyDoctorCall_rv?.adapter=docAdapter
+            todaysCall_tv?.setText("Today's call- "+docCallModel.dcrDoctorlist?.size)
+        }
+    }
+
 
     fun createAlert(heading: String, buttonText: String, context: Activity)
     {
@@ -242,7 +255,7 @@ class HomeFragment : Fragment(), OnChartGestureListener {
 
         arrayListDoctor.add("Select Doctor")
 
-        for(item in SplashActivity.staticSyncData?.data?.doctorList!!)
+        for(item in SplashActivity.staticSyncData?.doctorList!!)
         {
             item.doctorName?.let { arrayListDoctor.add(it) }
         }

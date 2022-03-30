@@ -70,7 +70,7 @@ class DownloadEdetail_model : Serializable {
 
             @SerializedName("fileId")
             @Expose
-            var fileId: Int? = 0
+            var fileId: Int = 0
 
             @SerializedName("fileSize")
             @Expose

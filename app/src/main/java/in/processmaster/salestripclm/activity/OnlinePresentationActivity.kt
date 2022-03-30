@@ -85,7 +85,7 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
 
         if(intent.getStringExtra("doctorName")!=null)
         {
-            val doctorName: String = intent.getStringExtra("doctorName")!!
+            val doctorName: String = intent.getStringExtra("doctorName").toString()
 
             doctorName_tv.setText(doctorName)
             toolbarHeader_rl.visibility=View.VISIBLE
@@ -188,7 +188,7 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
     }
 
     override fun onMeetingLeaveComplete(ret: Long) {
-        meetingShareHelper!!.stopShare()
+        meetingShareHelper?.stopShare()
         if (!mMeetingFailed) finish()
     }
 
@@ -253,7 +253,7 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
 
         if(mMeetingService!=null && mInMeetingService == null)
         {
-            if(meetingShareHelper?.isSharingOut!!) stopPresentationAlert()
+            if(meetingShareHelper?.isSharingOut == true) stopPresentationAlert()
         }
         else
         {
@@ -297,7 +297,7 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
         mainHeading_tv.setText("Stop Presentation?")
 
         exit_btn.setOnClickListener{
-            meetingShareHelper!!.stopShare()
+            meetingShareHelper?.stopShare()
             MeetingWindowHelper.getInstance().hideOrshow(false)
             alertDialog.dismiss()
             super.onBackPressed()

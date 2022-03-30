@@ -137,9 +137,9 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
             position = intent.getIntExtra("position", 0)
 
-            setImageArray(arrayImage,position,model!!)
+            setImageArray(arrayImage,position,model)
 
-            if(!model?.favFileName?.isEmpty()!!)
+            if(model?.favFileName?.isEmpty() == true)
             {
                 productParent_ll?.visibility= GONE
             }
@@ -154,7 +154,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
             doctorId = intent.getIntExtra("doctorId", 0)
             //  val file = File(webUrlPath)
 
-            dbBase?.insertFileID(model!!.fileId,startDateTime,brandId)
+            model?.fileId?.let { dbBase?.insertFileID(it,startDateTime,brandId) }
 
             eDetailingId= model?.eDetailingId!!
 
@@ -201,12 +201,12 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
             fabLike?.setOnClickListener({
                 if (isList) {
-                    dbBase?.insertlike(0, model!!.fileId,startDateTime)
+                    model?.fileId?.let { it1 -> dbBase?.insertlike(0, it1,startDateTime) }
                     fabLike?.setColorFilter(Color.BLACK)
                     isList = false
                 }
                 else {
-                    dbBase?.insertlike(1,model!!.fileId,startDateTime)
+                    model?.fileId?.let { it1 -> dbBase?.insertlike(1, it1,startDateTime) }
                     fabLike?.setColorFilter(Color.WHITE)
                     isList = true
                 }
@@ -226,7 +226,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
                     fabLike?.visibility=View.VISIBLE
                     fabComment?.visibility=View.VISIBLE
 
-                    setHorizontalAdapter(arrayImage, position,model!!)
+                    setHorizontalAdapter(arrayImage, position,model)
 
                     isCurrent=true
                     isCurrent=true
@@ -266,7 +266,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
                 override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
                     model=arrayImage.get(position)
-                    setHorizontalAdapter(arrayImage, position, model!!)
+                    setHorizontalAdapter(arrayImage, position, model)
                     adapterVisualFile?.notifyDataSetChanged()
 
                     likeCommentColor()
@@ -298,7 +298,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
             val imageView = ImageView(this)
             val imbm = BitmapFactory.decodeFile(selection)
             imageView.setImageBitmap(imbm)
-            imageFrame!!.addView(imageView)
+            imageFrame?.addView(imageView)
 
             floating_action_button_image.visibility=View.VISIBLE
 
@@ -317,14 +317,14 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
     }
 
-    fun setImageArray(arrayImage: ArrayList<DownloadFileModel>, position: Int, model: DownloadFileModel)
+    fun setImageArray(arrayImage: ArrayList<DownloadFileModel>, position: Int, model: DownloadFileModel?)
     {
         if(arrayImage.size==1)
         {
             val imageView = ImageView(this)
             val imbm = BitmapFactory.decodeFile(arrayImage.get(0).filePath)
             imageView.setImageBitmap(imbm)
-            imageFrame!!.addView(imageView)
+            imageFrame?.addView(imageView)
 
             mViewPagerAdapter = ViewPagerAdapter(this, arrayImage)
             viewPagerMain.adapter = mViewPagerAdapter
@@ -332,16 +332,16 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
             if(intent.getSerializableExtra("imageArray")!=null)
             {
                 gestureDetector = GestureDetector(this,MyGestureDetector())
-                gestureListener = OnTouchListener { v, event -> if (gestureDetector!!.onTouchEvent(event)) true else false }
+                gestureListener = OnTouchListener { v, event -> if (gestureDetector?.onTouchEvent(event) == true) true else false }
                 setHorizontalAdapter(arrayImage, position,model)
-                imageFrame!!.setOnTouchListener(gestureListener)
-                imageFrame!!.setOnClickListener(this@PhotoSlideShowActivity)
+                imageFrame?.setOnTouchListener(gestureListener)
+                imageFrame?.setOnClickListener(this@PhotoSlideShowActivity)
             }
 
         }
         else
         {
-            addFlipperImages(imageFrame!!, arrayImage, position)
+            imageFrame?.let { addFlipperImages(it, arrayImage, position) }
 
             mViewPagerAdapter = ViewPagerAdapter(this, arrayImage)
             viewPagerMain.adapter = mViewPagerAdapter
@@ -349,11 +349,11 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
             viewPagerMain.setCurrentItem(position);
 
             gestureDetector = GestureDetector(this,MyGestureDetector())
-            gestureListener = OnTouchListener { v, event -> if (gestureDetector!!.onTouchEvent(event)) true else false }
+            gestureListener = OnTouchListener { v, event -> if (gestureDetector?.onTouchEvent(event) == true) true else false }
 
             handler = Handler(Looper.getMainLooper())
-            imageFrame!!.setOnClickListener(this@PhotoSlideShowActivity)
-            imageFrame!!.setOnTouchListener(gestureListener)
+            imageFrame?.setOnClickListener(this@PhotoSlideShowActivity)
+            imageFrame?.setOnTouchListener(gestureListener)
             //   slideShowBtn = findViewById<View>(R.id.slideShowBtn) as TextView
 
             /*    slideShowBtn!!.setOnClickListener({
@@ -373,13 +373,13 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
     {
         var  edetailingList = dbBase?.getAlleDetail() //fetch edetailing list from dbBase
         var  filteredList: ArrayList<DevisionModel.Data.EDetailing> = ArrayList()
-        for (itemParent in edetailingList!! )
+        for (itemParent in edetailingList )
         {
             if(itemParent.isSaved==1)
             {
-                var downloadedList = dbBase?.getAllDownloadedData(itemParent.geteDetailId()!!)
+                var downloadedList = dbBase?.getAllDownloadedData(itemParent.geteDetailId())
 
-                if(downloadedList?.stream()!!.anyMatch({ o -> o.downloadType.equals("IMAGE") }))
+                if(downloadedList?.stream()?.anyMatch({ o -> o.downloadType.equals("IMAGE") }) == true)
                 {
                     filteredList.add(itemParent)
                 }
@@ -466,12 +466,12 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
                         position= imageFrame?.getDisplayedChild()!!
                         model=arrayImage.get(position)
-                        setImageArray(arrayImage,position,model!!)
+                        setImageArray(arrayImage,position,model)
                         adapterVisualFile?.notifyDataSetChanged()
 
                         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
 
-                        dbBase?.insertFileID(model!!.fileId, startDateTime,brandId)
+                        model?.fileId?.let { dbBase?.insertFileID(it, startDateTime,brandId) }
                         setSlideViewTime()
                     }
                 }
@@ -484,7 +484,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
                     //mobilertc/
 
 
-                    if(imageFrame?.displayedChild!! == 0)
+                    if(imageFrame?.displayedChild == 0)
                     {
 
                     }
@@ -498,12 +498,12 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
                         position= imageFrame?.getDisplayedChild()!!
                         model=arrayImage.get(position)
-                        setImageArray(arrayImage,position,model!!)
+                        setImageArray(arrayImage,position,model)
                         adapterVisualFile?.notifyDataSetChanged()
 
                         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
 
-                        dbBase?.insertFileID(model!!.fileId, startDateTime,brandId)
+                        model?.fileId?.let { dbBase?.insertFileID(it, startDateTime,brandId) }
                         setSlideViewTime()
                     }
                 }
@@ -563,9 +563,10 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
         return outtoRight
     }
 
-    fun setHorizontalAdapter(list: ArrayList<DownloadFileModel>, position: Int, model: DownloadFileModel)
+    fun setHorizontalAdapter(list: ArrayList<DownloadFileModel>, position: Int, model: DownloadFileModel?)
     {
-        adapterVisualFile  = HorizontalImageViewAdapter(list, this, position,model,imageFrame,this)
+        adapterVisualFile  =
+            model?.let { HorizontalImageViewAdapter(list, this, position, it,imageFrame,this) }
         horizontal_rv?.adapter = adapterVisualFile
     }
 
@@ -620,7 +621,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
                 }
                 holder.parent_llImage.setBackgroundColor(ContextCompat.getColor(context, R.color.purple_500));
 
-                imageFrame!!.setDisplayedChild(position)
+                imageFrame?.setDisplayedChild(position)
                 model=downloadedfiles
                 viewPagerMain.setCurrentItem(position);
 
@@ -661,7 +662,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
         val post_btn = dialogView.findViewById(R.id.post_btn) as Button
         val comment_et = dialogView.findViewById(R.id.comment_et) as EditText
 
-        val storecomment= dbBase?.getComment(model!!.fileId.toString(),startDateTime)
+        val storecomment= dbBase?.getComment(model?.fileId.toString(),startDateTime)
         comment_et.setText(storecomment)
 
         cancel_btn.setOnClickListener({
@@ -681,7 +682,10 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
                 return@setOnClickListener
             }
 
-            dbBase?.insertComment(comment_et.text.toString(),model!!.fileId,startDateTime)
+            model?.fileId?.let { it1 ->
+                dbBase?.insertComment(comment_et.text.toString(),
+                    it1,startDateTime)
+            }
 
             val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(dialogView.getWindowToken(), 0)
@@ -699,7 +703,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
         arrayImage.clear()
 
-        for (itemParent in dbBase!!.getAllDownloadedData(passingInterface) )
+        for (itemParent in dbBase?.getAllDownloadedData(passingInterface) )
         {
 
             if(itemParent.downloadType.equals("IMAGE"))
@@ -714,7 +718,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
         imageFrame?.removeAllViews()
 
-        setImageArray(arrayImage,0,model!!)
+        setImageArray(arrayImage,0,model)
 
         isCurrent=true
         otherProduct_btn?.setBackgroundColor(ContextCompat.getColor(this,R.color.gray))
@@ -747,11 +751,11 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
     fun likeCommentColor()
     {
-        dbBase?.insertFileID(model!!.fileId, startDateTime,brandId)
+        model?.fileId?.let { dbBase?.insertFileID(it, startDateTime,brandId) }
 
-        val isLike=dbBase?.getLike(model!!.fileId.toString(),startDateTime)
+        val isLike=dbBase?.getLike(model?.fileId.toString(),startDateTime)
 
-        if(isLike!!)
+        if(isLike)
         {
             fabLike?.setColorFilter(Color.WHITE)
             isList = true
@@ -763,7 +767,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
         }
         setSlideViewTime()
 
-        val storecomment= dbBase?.getComment(model!!.fileId.toString(),startDateTime)
+        val storecomment= dbBase?.getComment(model?.fileId.toString(),startDateTime)
 
         if(storecomment!=null)
         {
@@ -787,10 +791,10 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
                     while (!this.isInterrupted) {
                         sleep(1000)
                         runOnUiThread {
-                            dbBaseTimer=dbBaseTimer!!+1
+                            dbBaseTimer=dbBaseTimer+1
                             Log.e("timerSlider",dbBaseTimer.toString())
                             model?.fileId?.let {
-                                dbBase?.insertTime(dbBaseTimer!!,
+                                dbBase?.insertTime(dbBaseTimer,
                                     it,startDateTime)
                             }
                         }
@@ -891,10 +895,10 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
                     while (!this.isInterrupted) {
                         sleep(1000)
                         runOnUiThread {
-                            dbBaseTimer=dbBaseTimer!!+1
+                            dbBaseTimer=dbBaseTimer+1
 
                             Log.e("timerBrandWiseSlider",dbBaseTimer.toString())
-                            dbBase?.insertBrandTime(dbBaseTimer!!  ,startDateTime,brandID.toString())
+                            dbBase?.insertBrandTime(dbBaseTimer  ,startDateTime,brandID.toString())
                         }
                     }
                 } catch (e: InterruptedException) {

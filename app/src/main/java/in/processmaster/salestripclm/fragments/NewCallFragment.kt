@@ -63,6 +63,7 @@ class NewCallFragment : Fragment() {
     private lateinit var adapter:BottomSheetDoctorAdapter
     var doctorListArray:ArrayList<SyncModel.Data.Doctor> = ArrayList()
     var routeList: ArrayList<SyncModel.Data.Route> = ArrayList()
+    var teamsList: ArrayList<SyncModel.Data.FieldStaffTeam> = ArrayList()
     var selectionType=0
     var selectedDocID=0
     var selectedDocName=""
@@ -91,18 +92,25 @@ class NewCallFragment : Fragment() {
         sharePreferance = PreferenceClass(activity)
         alertClass = AlertClass(requireActivity())
 
-        SplashActivity.staticSyncData?.data?.doctorList?.let { doctorListArray.addAll(it) }
-        SplashActivity.staticSyncData?.data?.routeList?.let { routeList.addAll(it) }
+        SplashActivity.staticSyncData?.doctorList?.let { doctorListArray.addAll(it) }
+        SplashActivity.staticSyncData?.routeList?.let { routeList.addAll(it) }
 
         bottomSheetBehavior = BottomSheetBehavior.from(views!!.bottomSheet)
         generalClassObject= GeneralClass(requireActivity())
 
-        if(SplashActivity.staticSyncData?.data?.settingDCR?.roleType=="FS") {
-            views?.selectTeamsCv?.visibility = View.GONE
-            views?.selectRoutesCv?.setEnabled(true) }
-        else
+        if(SplashActivity.staticSyncData?.settingDCR?.roleType=="MAN")
+        {
             views?.selectRoutesCv?.setEnabled(false)
-        views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
+        }
+        else if(SplashActivity.staticSyncData?.settingDCR?.roleType=="FS") {
+            views?.selectTeamsCv?.visibility = View.GONE
+            views?.selectTeamHeader_tv?.visibility = View.GONE
+            views?.selectRoutesCv?.setEnabled(true)
+            views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
+        }
+    /*    else
+            views?.selectRoutesCv?.setEnabled(false)*/
+        //  views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
 
 
         views?.selectTeamsCv?.setOnClickListener({
@@ -111,6 +119,8 @@ class NewCallFragment : Fragment() {
             openCloseModel() })
 
         views?.selectRoutesCv?.setOnClickListener({
+
+
             if(checkDCRusingShareP(1)){
                 views?.bottomSheetTitle_tv?.setText("Select route")
                 selectionType=1
@@ -159,11 +169,10 @@ class NewCallFragment : Fragment() {
             intent.putExtra("skip", true)
             startActivityForResult(intent,3)
         })
-
+        staticSyncData?.fieldStaffTeamList?.let { teamsList.addAll(it) }
         routeList = routeList?.filter { s -> s.headQuaterName !=""} as java.util.ArrayList<SyncModel.Data.Route>
       //  checkDCRusingShareP(0)
     }
-
 
     fun checkDCRusingShareP(i: Int):Boolean
     {
@@ -175,9 +184,7 @@ class NewCallFragment : Fragment() {
         else if( sharePreferance?.getPref("todayDate") != generalClassObject?.currentDateMMDDYY() || sharePreferance?.getPref("dcrId")=="0") {
             alertClass?.commonAlert("Alert!","DCR not submitted please connect to internet and fill DCR first.")
         return false}
-        else{
-            return true
-        }
+        else{ return true }
     }
 
     fun callCoroutineApi(i: Int) {
@@ -224,6 +231,7 @@ class NewCallFragment : Fragment() {
         RecyclerView.Adapter<BottomSheetDoctorAdapter.MyViewHolder>(),
         Filterable {
 
+        var filteredDataTeams:ArrayList<SyncModel.Data.FieldStaffTeam> = teamsList as ArrayList<SyncModel.Data.FieldStaffTeam>
         var filteredDataRoute:ArrayList<SyncModel.Data.Route> = routeList as ArrayList<SyncModel.Data.Route>
         var filteredDataDoctor:ArrayList<SyncModel.Data.Doctor> = doctorListArray as ArrayList<SyncModel.Data.Doctor>
 
@@ -244,19 +252,20 @@ class NewCallFragment : Fragment() {
         override fun onBindViewHolder(holder: MyViewHolder, position: Int)
         {
             if(selectionType==0)
-            {   if(filteredDataRoute.size<=0)  views?.noData_tv?.visibility=View.VISIBLE
+            {   if(filteredDataTeams.size<=0)  views?.noData_tv?.visibility=View.VISIBLE
                 else  views?.noData_tv?.visibility=View.GONE
 
-                val modeldata = filteredDataRoute?.get(position)
-                holder.headerDoctor_tv.setText(modeldata?.routeName)
+                val modeldata = filteredDataTeams?.get(position)
+                holder.headerDoctor_tv.setText(modeldata?.fullName)
                 holder.route_tv.setText("Head Quater Name- " + modeldata?.headQuaterName)
                 holder.speciality_tv.visibility=View.GONE
 
 
                 holder.parent_cv.setOnClickListener({
-                    views?.selectTeam_tv?.setText((modeldata?.routeName))
+                    views?.selectTeam_tv?.setText((modeldata?.fullName))
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
                     onSelection()
+                    modeldata.fieldStaffId?.let { it1 -> applySelectionFilter(it1) }
                 })
             }
 
@@ -300,7 +309,7 @@ class NewCallFragment : Fragment() {
         override fun getItemCount(): Int
         {
             if(selectionType==0)
-                return filteredDataDoctor?.size
+                return filteredDataTeams?.size
             else if(selectionType==1)
                 return filteredDataRoute?.size
             else
@@ -313,7 +322,7 @@ class NewCallFragment : Fragment() {
             return object : Filter() {
                 override fun publishResults(constraint: CharSequence?, results: FilterResults) {
                     if(selectionType==0)
-                    { filteredDataDoctor = results.values as ArrayList<SyncModel.Data.Doctor> }
+                    { filteredDataTeams = results.values as ArrayList<SyncModel.Data.FieldStaffTeam> }
                     else if(selectionType==1)
                     { filteredDataRoute = results.values as ArrayList<SyncModel.Data.Route> }
                     else
@@ -325,11 +334,11 @@ class NewCallFragment : Fragment() {
                     val results = FilterResults()
                     if(selectionType==0)
                     {
-                        val FilteredArrayNames: ArrayList<SyncModel.Data.Doctor> = ArrayList()
+                        val FilteredArrayNames: ArrayList<SyncModel.Data.FieldStaffTeam> = ArrayList()
                         constraint = constraint.toString().lowercase()
-                        for (i in 0 until doctorListArray?.size!!) {
-                            val dataNames: SyncModel.Data.Doctor = doctorListArray?.get(i)
-                            if (dataNames.doctorName?.lowercase()?.startsWith(constraint.toString()) == true) {
+                        for (i in 0 until teamsList?.size!!) {
+                            val dataNames: SyncModel.Data.FieldStaffTeam = teamsList?.get(i)
+                            if (dataNames.fullName?.lowercase()?.startsWith(constraint.toString()) == true) {
                                 FilteredArrayNames.add(dataNames)
                             }
                         }
@@ -380,7 +389,6 @@ class NewCallFragment : Fragment() {
         views?.qualifiction_tv?.setText(doctorDetailModel.qualificationName)
         selectedDocID= doctorDetailModel.doctorId!!
         selectedDocName= doctorDetailModel.doctorName.toString()
-
 
         if(doctorDetailModel.mobileNo?.isEmpty() == true)
             views?.mobileNumberParent?.visibility=View.GONE
@@ -435,13 +443,18 @@ class NewCallFragment : Fragment() {
     fun applySelectionFilter(id:Int)
     {
         if(selectionType==0)
-        { }
+        {    SplashActivity.staticSyncData?.routeList?.let { routeList.addAll(it) }
+            val filterRouteUsingFieldStaff= routeList.filter {  s -> s.fieldStaffId == id }
+            routeList.clear()
+            routeList.addAll(filterRouteUsingFieldStaff)
+
+        }
         else if(selectionType==1)
         {
-            if(staticSyncData?.data?.settingDCR?.isGeoLocationRequired == true)
+            if(staticSyncData?.settingDCR?.isGeoLocationRequired == true)
             {
                 val getGpsTracker=GPSTracker(requireActivity())
-                val jsonObj=JSONObject(staticSyncData?.data?.configurationSetting)
+                val jsonObj=JSONObject(staticSyncData?.configurationSetting)
                 val getRadius=jsonObj.getInt("SET011")
 
                 val startPoint = Location("locationA")
@@ -450,7 +463,7 @@ class NewCallFragment : Fragment() {
                 startPoint.setLongitude(getGpsTracker.longitude)
                // startPoint.setLongitude(75.90522484470453)
 
-                val docFirstFilter= SplashActivity.staticSyncData?.data?.doctorList?.filter { s -> s.routeId == id } as java.util.ArrayList<SyncModel.Data.Doctor>
+                val docFirstFilter= SplashActivity.staticSyncData?.doctorList?.filter { s -> s.routeId == id } as java.util.ArrayList<SyncModel.Data.Doctor>
 
 
             for(fetch in docFirstFilter)
@@ -470,7 +483,7 @@ class NewCallFragment : Fragment() {
             }
             else
             {
-                doctorListArray = SplashActivity.staticSyncData?.data?.doctorList?.filter { s -> s.routeId == id } as java.util.ArrayList<SyncModel.Data.Doctor>
+                doctorListArray = SplashActivity.staticSyncData?.doctorList?.filter { s -> s.routeId == id } as java.util.ArrayList<SyncModel.Data.Doctor>
             }
         }
     }
@@ -652,7 +665,7 @@ class NewCallFragment : Fragment() {
     }
 
     fun createDCRAlert(routeId: String)
-    { var activityId=0; var startingStation=0; var endingStation=0;
+    { var activityId=0; var startingStation=0; var endingStation=0; var fieldStaffId=0
 
         val dialogBuilder = AlertDialog.Builder(requireActivity()); val inflater = requireActivity().layoutInflater
         val dialogView: View = inflater.inflate(R.layout.dcr_entry, null)
@@ -682,9 +695,20 @@ class NewCallFragment : Fragment() {
         dialogView.startingStation_spin.setAdapter(startEndRoute)
         dialogView.ending_spin.setAdapter(startEndRoute)
 
+        val workingWithList: ArrayAdapter<SyncModel.Data.WorkingWith> = ArrayAdapter<SyncModel.Data.WorkingWith>(requireActivity(),
+            android.R.layout.simple_spinner_dropdown_item, CommonListGetClass().getAccListForSpinner())
+        dialogView.accomp_spin.setAdapter(workingWithList)
+
         val adapterField: ArrayAdapter<String> = ArrayAdapter<String>(requireActivity(),
             android.R.layout.simple_spinner_dropdown_item, fieldWorkingList)
         dialogView.workingArea_spin.setAdapter(adapterField)
+
+        if(SplashActivity.staticSyncData?.settingDCR?.roleType=="MAN")
+        {
+            dialogView.managerParent_ll.visibility=View.VISIBLE
+        }
+
+
 
         dialogView.workingArea_spin.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
@@ -715,6 +739,16 @@ class NewCallFragment : Fragment() {
             override fun onNothingSelected(parentView: AdapterView<*>?) {}
         })
 
+        dialogView.accomp_spin.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
+                if(position!=0)
+                    fieldStaffId = CommonListGetClass().getAccListForSpinner()[position].empId!!
+
+            }
+            override fun onNothingSelected(parentView: AdapterView<*>?) {}
+        })
+
         dialogView.activity_spin.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
@@ -735,8 +769,13 @@ class NewCallFragment : Fragment() {
         toggleSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
         if(isChecked) { selectActivityHeader.setText("Additional activity")
         if(!dialogView.activity_spin.getSelectedItem().toString().equals("Select")){dialogView.additionalParent.visibility=View.VISIBLE}
+            if(SplashActivity.staticSyncData?.settingDCR?.roleType=="MAN")
+            {
+                dialogView.managerParent_ll.visibility=View.VISIBLE
+            }
         }
         else{
+            dialogView.managerParent_ll.visibility=View.GONE
             selectActivityHeader.setText("Select activity")
             dialogView.additionalParent.visibility=View.GONE}
         }
@@ -746,11 +785,19 @@ class NewCallFragment : Fragment() {
             val endingSeletd: String = dialogView.ending_spin.getSelectedItem().toString()
             val workAreaSeletd: String = dialogView.workingArea_spin.getSelectedItem().toString()
             val startingSeletd: String = dialogView.startingStation_spin.getSelectedItem().toString()
+            val accompaniedstr: String = dialogView.accomp_spin.getSelectedItem().toString()
 
             if(workAreaSeletd.equals("Select")) {generalClassObject?.showSnackbar(it,"Working area not selected"); return@setOnClickListener}
             if(activitySeletd.equals("Select") && !toggleSwitch.isChecked) {generalClassObject?.showSnackbar(it,"Activity not selected"); return@setOnClickListener}
             if(startingSeletd.equals("Select") && dialogView.startEndParent.visibility==View.VISIBLE) {generalClassObject?.showSnackbar(it,"Start date not selected"); return@setOnClickListener}
             if(endingSeletd.equals("Select") && dialogView.startEndParent.visibility==View.VISIBLE) {generalClassObject?.showSnackbar(it,"End station not selected"); return@setOnClickListener}
+
+            if(SplashActivity.staticSyncData?.settingDCR?.roleType=="MAN")
+            {
+                if(dialogView.objDayEt.text.isEmpty() && toggleSwitch.isChecked) {generalClassObject?.showSnackbar(it,"Objective of day is empty"); return@setOnClickListener}
+                if(dialogView.fieldStaffEt.text.isEmpty() && toggleSwitch.isChecked) {generalClassObject?.showSnackbar(it,"Field staff is empty"); return@setOnClickListener}
+            }
+
             if(dialogView.remarkEt.text.isEmpty() && !toggleSwitch.isChecked) {generalClassObject?.showSnackbar(it,"Remark is empty"); return@setOnClickListener}
             if(dialogView.additionalEt.text.isEmpty() && toggleSwitch.isChecked && !activitySeletd.equals("Select")) {generalClassObject?.showSnackbar(it,"Additional activity remark is empty"); return@setOnClickListener}
             val i: Int = workAreaSeletd.indexOf(' ')
@@ -772,6 +819,13 @@ class NewCallFragment : Fragment() {
             commonSaveDcrModel.additionalActivityRemark=dialogView.additionalEt.text.toString()
             commonSaveDcrModel.dcrType=if(toggleSwitch.isChecked) 0  else 1
 
+            if(SplashActivity.staticSyncData?.settingDCR?.roleType=="MAN")
+            {
+                commonSaveDcrModel.accompaniedWith=fieldStaffId
+                commonSaveDcrModel.objectiveOfDay=dialogView.objDayEt.text.toString()
+                commonSaveDcrModel.feedBack=dialogView.fieldStaffEt.text.toString()
+            }
+
             if(dialogView.startEndParent.visibility==View.VISIBLE)
             {
                 commonSaveDcrModel.startingStation=startingStation
@@ -791,10 +845,11 @@ class NewCallFragment : Fragment() {
         val response = APIClientKot().getUsersService(2, sharePreferance?.getPref("secondaryUrl")!!).checkDCR_API(
             "bearer " + loginModelHomePage.accessToken,
             loginModelHomePage.empId,
-            generalClassObject!!.currentDateMMDDYY()
+            generalClassObject?.currentDateMMDDYY()
         )
         withContext(Dispatchers.Main) {
             if (response!!.isSuccessful) {
+
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
 
                    // val jsonObjError: JsonObject = response.body()?.get("errorObj") as JsonObject
@@ -802,7 +857,7 @@ class NewCallFragment : Fragment() {
                        // val data: JsonObject = response.body()?.get("data") as JsonObject
                       //  val dcrData: JsonObject = data?.get("dcrData") as JsonObject
                         val dcrData=response.body()?.data?.dcrData
-                        if (dcrData?.routeId==0) {
+                        if (dcrData?.routeId.toString()=="" || dcrData?.routeId==null || dcrData?.routeId=="0") {
 
                             alertClass?.commonAlert("Alert!", "Please submit tour program first")
                             alertClass?.hideAlert()
@@ -888,7 +943,7 @@ class NewCallFragment : Fragment() {
         call.enqueue(object : Callback<JsonObject?> {
             override fun onResponse(call: Call<JsonObject?>?, response: Response<JsonObject?>) {
                 alertClass?.hideAlert()
-
+                    Log.e("gsuifsdguifdgsf",Gson().toJson(response.body()))
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
                     val jsonObjError:JsonObject = response.body()?.get("errorObj") as JsonObject
                 if(!jsonObjError.get("errorMessage").asString.isEmpty())
@@ -901,6 +956,13 @@ class NewCallFragment : Fragment() {
                     sharePreferance?.setPref("todayDate",generalClassObject?.currentDateMMDDYY())
                     sharePreferance?.setPref("dcrId",jsonObjData.get("dcrId").asString)
 
+                   if(generalClassObject?.isInternetAvailable() == true)
+                   {
+                       CoroutineScope(Dispatchers.IO).launch {
+                           val api = async { checkCurrentDCR_API(1) }
+                           api.await()
+                       }
+                   }
 
                     alertDialog.cancel()
                     }

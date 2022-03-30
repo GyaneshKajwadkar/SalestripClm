@@ -47,7 +47,7 @@ class MeetingActivity : BaseActivity(), MeetingServiceListener, View.OnClickList
         setContentView(R.layout.join_activity_view)
 
 
-        if(!sharePreferanceBase?.getPrefBool("zoomCrediential")!!)
+        if(sharePreferanceBase?.getPrefBool("zoomCrediential") == true)
         {
             val r: Runnable = object : Runnable {
                 override fun run() {
@@ -86,13 +86,13 @@ class MeetingActivity : BaseActivity(), MeetingServiceListener, View.OnClickList
 
    public fun initilizeZoom() {
         registerListener()
-        if (zoomSDK!!.isInitialized) {
-            zoomSDK!!.meetingService.addListener(this)
-            zoomSDK!!.meetingSettingsHelper.enable720p(true)
+        if (zoomSDK?.isInitialized) {
+            zoomSDK?.meetingService.addListener(this)
+            zoomSDK?.meetingSettingsHelper.enable720p(true)
         }
-        mInMeetingService = zoomSDK!!.inMeetingService
-        if (zoomSDK!!.isInitialized) {
-            val preMeetingService = zoomSDK!!.preMeetingService
+        mInMeetingService = zoomSDK?.inMeetingService
+        if (zoomSDK?.isInitialized) {
+            val preMeetingService = zoomSDK?.preMeetingService
             if (preMeetingService != null) {
                 preMeetingService.listMeeting()
                 preMeetingService.addListener(this)
@@ -100,8 +100,8 @@ class MeetingActivity : BaseActivity(), MeetingServiceListener, View.OnClickList
                 Toast.makeText(this, "User not login.", Toast.LENGTH_LONG).show()
             }
         }
-        mMeetingService = zoomSDK!!.meetingService
-        zoomSDK!!.meetingSettingsHelper.isCustomizedMeetingUIEnabled = true
+        mMeetingService = zoomSDK?.meetingService
+        zoomSDK?.meetingSettingsHelper.isCustomizedMeetingUIEnabled = true
     }
 
 
@@ -119,28 +119,28 @@ class MeetingActivity : BaseActivity(), MeetingServiceListener, View.OnClickList
             )
             val meetinglist: ArrayList<GetScheduleModel.Data.Meeting> = ArrayList<GetScheduleModel.Data.Meeting>()
             if (getScheduleModel.getData()?.meetingList == null) {
-                scheduledProgess!!.visibility = View.GONE
+                scheduledProgess?.visibility = View.GONE
                 return
             }
-            for (i in getScheduleModel.getData()?.meetingList!!.indices) {
-                if (getScheduleModel.getData()?.meetingList!!.get(i).meetingType == "O") {
-                    meetinglist.add(getScheduleModel.getData()?.meetingList?.get(i)!!)
+            for (i in getScheduleModel.getData()?.meetingList?.indices!!) {
+                if (getScheduleModel.getData()?.meetingList?.get(i)?.meetingType == "O") {
+                    getScheduleModel.getData()?.meetingList?.get(i)?.let { meetinglist.add(it) }
                 }
             }
             if(meetinglist.size!=0){noData_tv.visibility=View.GONE}
 
-            adapterRecycler = ScheduleMeetingAdapter(this, 1, meetinglist, zoomSDK!!)
-            sheduled_rv!!.layoutManager = LinearLayoutManager(this)
-            sheduled_rv!!.adapter = adapterRecycler
-            adapterRecycler!!.notifyDataSetChanged()
-            scheduledProgess!!.visibility = View.GONE
+            adapterRecycler = ScheduleMeetingAdapter(this, 1, meetinglist, zoomSDK)
+            sheduled_rv?.layoutManager = LinearLayoutManager(this)
+            sheduled_rv?.adapter = adapterRecycler
+            adapterRecycler?.notifyDataSetChanged()
+            scheduledProgess?.visibility = View.GONE
         }
     }
 
 
     override fun onBackPressed() {
         if (mMeetingService != null) {
-            if (mMeetingService!!.getMeetingStatus() == MeetingStatus.MEETING_STATUS_INMEETING) {
+            if (mMeetingService?.getMeetingStatus() == MeetingStatus.MEETING_STATUS_INMEETING) {
                 showLeaveMeetingDialog()
                 return
             }
@@ -150,7 +150,7 @@ class MeetingActivity : BaseActivity(), MeetingServiceListener, View.OnClickList
 
 
     private fun registerListener() {
-        val meetingService = zoomSDK!!.meetingService
+        val meetingService = zoomSDK?.meetingService
         meetingService?.addListener(this)
     }
 
@@ -233,16 +233,16 @@ class MeetingActivity : BaseActivity(), MeetingServiceListener, View.OnClickList
     ) {
         if (meetingStatus == MeetingStatus.MEETING_STATUS_FAILED && errorCode == MeetingError.MEETING_ERROR_CLIENT_INCOMPATIBLE) {
             Toast.makeText(this, "Version of ZoomSDK is too low!", Toast.LENGTH_LONG).show()
-            parentToolbar!!.visibility = View.VISIBLE
-            meetingsDrawer!!.closeDrawer(Gravity.RIGHT)
-            zoomImageView!!.visibility = View.VISIBLE
-            frameZoom!!.visibility = View.GONE
+            parentToolbar?.visibility = View.VISIBLE
+            meetingsDrawer?.closeDrawer(Gravity.RIGHT)
+            zoomImageView?.visibility = View.VISIBLE
+            frameZoom?.visibility = View.GONE
         }
         if (meetingStatus == MeetingStatus.MEETING_STATUS_IDLE) {
-            meetingsDrawer!!.openDrawer(GravityCompat.END)
-            parentToolbar!!.visibility = View.VISIBLE
-            zoomImageView!!.visibility = View.VISIBLE
-            frameZoom!!.visibility = View.GONE
+            meetingsDrawer?.openDrawer(GravityCompat.END)
+            parentToolbar?.visibility = View.VISIBLE
+            zoomImageView?.visibility = View.VISIBLE
+            frameZoom?.visibility = View.GONE
             if (meetingItemGlobal != null) {
                 onClickBtnStart(meetingItemGlobal!!)
             }
@@ -255,9 +255,9 @@ class MeetingActivity : BaseActivity(), MeetingServiceListener, View.OnClickList
                 ZoomMeetingUISettingHelper.changeVideoSource(true)
             }
             showMeetingUi()
-            zoomImageView!!.visibility = View.GONE
-            meetingsDrawer!!.closeDrawer(Gravity.RIGHT)
-            frameZoom!!.visibility = View.VISIBLE
+            zoomImageView?.visibility = View.GONE
+            meetingsDrawer?.closeDrawer(Gravity.RIGHT)
+            frameZoom?.visibility = View.VISIBLE
         }
     }
 
@@ -308,7 +308,7 @@ class MeetingActivity : BaseActivity(), MeetingServiceListener, View.OnClickList
     override fun onZoomSDKLoginResult(result: Long) {
         if (result == ZoomAuthenticationError.ZOOM_AUTH_ERROR_SUCCESS.toLong()) {
             Toast.makeText(this, "Login successfully", Toast.LENGTH_SHORT).show()
-            scheduledProgess!!.visibility = View.GONE
+            scheduledProgess?.visibility = View.GONE
         } else {
             Toast.makeText(this, "Login failed result code = $result", Toast.LENGTH_SHORT).show()
         }
@@ -327,7 +327,7 @@ class MeetingActivity : BaseActivity(), MeetingServiceListener, View.OnClickList
     override fun onZoomAuthIdentityExpired() {}
 
     override fun onListMeeting(result: Int, meetingList: List<Long>?) {
-        Log.i(TAG, "onListMeeting, result =" + meetingList!!.size)
+        Log.i(TAG, "onListMeeting, result =" + meetingList?.size)
         meetingListMain.clear()
         val zoomSDK = ZoomSDK.getInstance()
         val preMeetingService = zoomSDK.preMeetingService
@@ -340,7 +340,7 @@ class MeetingActivity : BaseActivity(), MeetingServiceListener, View.OnClickList
                     }
                     Log.d(
                         TAG,
-                        item!!.meetingTopic + ":" + item.asyncGetInviteEmailContent()
+                        item?.meetingTopic + ":" + item.asyncGetInviteEmailContent()
                     )
                 }
             }
@@ -350,7 +350,7 @@ class MeetingActivity : BaseActivity(), MeetingServiceListener, View.OnClickList
         }
         if (meetingListMain.size == 0) {
         }
-        scheduledProgess!!.visibility = View.GONE
+        scheduledProgess?.visibility = View.GONE
     }
 
     override fun onScheduleMeeting(i: Int, l: Long) {}
@@ -363,8 +363,8 @@ class MeetingActivity : BaseActivity(), MeetingServiceListener, View.OnClickList
 
     private fun showLeaveMeetingDialog() {
         val builder = AlertDialog.Builder(this)
-        if (mInMeetingService!!.isMeetingConnected) {
-            if (mInMeetingService!!.isMeetingHost) {
+        if (mInMeetingService?.isMeetingConnected == true) {
+            if (mInMeetingService?.isMeetingHost == true) {
                 builder.setTitle("End or leave meeting")
                     .setPositiveButton(
                         "End"
@@ -383,7 +383,7 @@ class MeetingActivity : BaseActivity(), MeetingServiceListener, View.OnClickList
                     "Leave"
                 ) { dialog, which -> leave(false) }
         }
-        if (mInMeetingService!!.inMeetingBOController.isInBOMeeting) {
+        if (mInMeetingService?.inMeetingBOController?.isInBOMeeting == true) {
             builder.setNegativeButton(
                 "Leave BO"
             ) { dialog, which -> leaveBo() }
@@ -394,18 +394,18 @@ class MeetingActivity : BaseActivity(), MeetingServiceListener, View.OnClickList
     }
 
     private fun leaveBo() {
-        val boController = mInMeetingService!!.inMeetingBOController
-        val iboAssistant = boController.boAssistantHelper
+        val boController = mInMeetingService?.inMeetingBOController
+        val iboAssistant = boController?.boAssistantHelper
         if (iboAssistant != null) {
             iboAssistant.leaveBO()
         } else {
-            val boAttendee = boController.boAttendeeHelper
+            val boAttendee = boController?.boAttendeeHelper
             boAttendee?.leaveBo() ?: leave(false)
         }
     }
 
     private fun leave(end: Boolean) {
-        mInMeetingService!!.leaveCurrentMeeting(end)
+        mInMeetingService?.leaveCurrentMeeting(end)
     }
 
     fun onClickBtnStart(item: MeetingItem) {
@@ -427,10 +427,10 @@ class MeetingActivity : BaseActivity(), MeetingServiceListener, View.OnClickList
 
     fun enableFullScreen() {
         val layout = findViewById<LinearLayout>(R.id.parentToolbar)
-        if (parentToolbar!!.visibility == View.VISIBLE) {
-            parentToolbar!!.visibility = View.GONE
+        if (parentToolbar?.visibility == View.VISIBLE) {
+            parentToolbar?.visibility = View.GONE
         } else {
-            parentToolbar!!.visibility = View.VISIBLE
+            parentToolbar?.visibility = View.VISIBLE
         }
     }
 

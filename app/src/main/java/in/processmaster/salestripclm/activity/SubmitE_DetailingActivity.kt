@@ -99,7 +99,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             val quantityModel=Gson().fromJson(dbBase.getApiDetail(3),CommonModel.QuantityModel.Data::class.java)
 
             var listSample = quantityModel.employeeSampleBalanceList!!.filter { s -> s.productType == "Sample"}
-            var listStokist = staticSyncData?.data?.retailerList?.filter { s -> s.type == "STOCKIST" }
+            var listStokist = staticSyncData?.retailerList?.filter { s -> s.type == "STOCKIST" }
             var Gift = quantityModel.employeeSampleBalanceList!!.filter { s -> s.productType == "Gift"}
             var listGift = Gift!!.filter { s -> s.actualBalanceQty != 0}
 
@@ -112,7 +112,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 stokistArray.add(data)
             }
 
-            for(workWith in staticSyncData?.data?.workingWithList!!)
+            for(workWith in staticSyncData?.workingWithList!!)
             {
                 val data =IdNameBoll_model()
                 data.id= workWith.empId.toString()
@@ -138,15 +138,15 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 giftArray.add(data)
             }
 
-            val string = Gson().toJson(staticSyncData?.data)
+            val string = Gson().toJson(staticSyncData)
             val data= Gson().fromJson(string, SyncModel.Data::class.java)
             mainProductList.addAll(data.productList.filter { s -> (s.productType==1) } as ArrayList<SyncModel.Data.Product>)
             unSelectedProductList=ArrayList(mainProductList)
 
-            val getSchemeList=staticSyncData?.data?.schemeList
+            val getSchemeList=staticSyncData?.schemeList
             val filterByTypeSchemeList= getSchemeList?.filter { data -> (data?.schemeFor=="S" || data?.schemeFor=="H") }
 
-            val getDocDetail: SyncModel.Data.Doctor? = staticSyncData?.data?.doctorList?.find { it.doctorId == doctorIdDisplayVisual }
+            val getDocDetail: SyncModel.Data.Doctor? = staticSyncData?.doctorList?.find { it.doctorId == doctorIdDisplayVisual }
 
             getSchemeList?.clear()
             filterByTypeSchemeList?.sortedBy { it.schemeFor }?.let { getSchemeList?.addAll(it) }
@@ -367,7 +367,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 saveModel.pobObject?.partyId=doctorIdDisplayVisual
                 saveModel.pobObject?.employeeId= loginModelHomePage.empId
 
-                val jsonObj= JSONObject(staticSyncData?.data?.configurationSetting)
+                val jsonObj= JSONObject(staticSyncData?.configurationSetting)
                 val checkStockistRequired=jsonObj.getInt("SET014")
                 if(checkStockistRequired==1)
                 {
@@ -377,6 +377,10 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             }
 
             if(selectedStockist.id!=null && selectedStockist.id!="" && filterSelectecd.size!=0)  saveModel.pobObject?.stockistId=selectedStockist.id.toInt()
+
+            val dcrDetail= Gson().fromJson(sharePreferanceBase?.getPref("dcrObj"),GetDcrToday.Data.DcrData::class.java)
+                 saveModel.routeName=dcrDetail.routeName
+                 saveModel.routeId=dcrDetail.routeId
 
             if(!GeneralClass(this).isInternetAvailable())
             {   dbBase.insertOrUpdateSaveAPI(doctorIdDisplayVisual, Gson().toJson(saveModel),"feedback")

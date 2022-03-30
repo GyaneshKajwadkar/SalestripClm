@@ -71,13 +71,13 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
 
         //  var model = Gson().fromJson(dbBase.getAllData(), SyncModel::class.java)
 
-        for(item in SplashActivity.staticSyncData?.data?.doctorList!!)
+        for(item in SplashActivity.staticSyncData?.doctorList!!)
         {
             val selectorModel = DocManagerModel()
             selectorModel.name= item.doctorName.toString()
             selectorModel.routeName= item.routeName.toString()
             selectorModel.specialityName= item.specialityName.toString()
-            selectorModel.id=item.doctorId!!
+            selectorModel.id= item.doctorId!!
             arrayListSelectorDoctor.add(selectorModel)
         }
 
@@ -278,7 +278,7 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
         alertClass.showProgressAlert("")
 
         val selectedImage=retriveAttachment()
-        val surveyImagesParts = arrayOfNulls<MultipartBody.Part>(selectedImage!!.size)
+        val surveyImagesParts = selectedImage?.size?.let { arrayOfNulls<MultipartBody.Part>(it) }
 
         val arrAttachment = JSONArray()
 
@@ -293,9 +293,10 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
             objectAttachment.put("docName",value?.file?.name.toString())
             arrAttachment.put(objectAttachment)
 
-            surveyImagesParts[index] = MultipartBody.Part.createFormData("file"+index,
+            surveyImagesParts?.set(index, MultipartBody.Part.createFormData("file"+index,
                 value.file?.name.toString(),
                 surveyBody)
+            )
         }
 
         val paramObject = JSONObject()
@@ -340,10 +341,12 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
 
         var reqBody = RequestBody.create(MediaType.parse("text/plain"), paramObject.toString());
 
-        var call: Call<GenerateOTPModel> = apiInterface?.sendEmail(
-            "bearer " + loginModelHomePage.accessToken,
-            surveyImagesParts,reqBody
-        ) as Call<GenerateOTPModel>
+        var call: Call<GenerateOTPModel> = surveyImagesParts?.let {
+            apiInterface?.sendEmail(
+                "bearer " + loginModelHomePage.accessToken,
+                it,reqBody
+            )
+        } as Call<GenerateOTPModel>
 
         call.enqueue(object : Callback<GenerateOTPModel?> {
             override fun onResponse(
@@ -356,12 +359,16 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
                     {
 
                         generalClass.showSnackbar(window.decorView.rootView,
-                            response.body()!!.getErrorObj()!!.errorMessage!!
+                            response.body()?.getErrorObj()?.errorMessage.toString()
                         )
                     }
                     else
                     {
-                        generalClass.showSnackbar(window.decorView.rootView, response.body()?.getData()?.message!!)
+                        response.body()?.getData()?.message?.let {
+                            generalClass.showSnackbar(window.decorView.rootView,
+                                it
+                            )
+                        }
                         onBackPressed()
                     }
                 }

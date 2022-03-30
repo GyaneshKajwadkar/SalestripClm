@@ -46,9 +46,15 @@ class CommonModel {
         var dcrType=0
             get() = field
             set(value) { field = value }
-
-
-
+        var accompaniedWith=0
+            get() = field
+            set(value) { field = value }
+        var objectiveOfDay=""
+            get() = field
+            set(value) { field = value }
+        var feedBack=""
+            get() = field
+            set(value) { field = value }
 
     }
 
