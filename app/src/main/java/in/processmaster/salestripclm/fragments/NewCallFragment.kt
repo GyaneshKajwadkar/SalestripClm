@@ -147,8 +147,7 @@ class NewCallFragment : Fragment() {
 
         views?.startDetailing_btn?.setOnClickListener({
 
-            if(views?.lastVisitDate_tv?.text?.equals(generalClassObject?.getCurrentDate()) == true && db.isEDetailingAvailable(selectedDocID,
-                    generalClassObject?.getCurrentDate()
+            if(views?.lastVisitDate_tv?.text?.equals(generalClassObject?.getCurrentDate()) == true && db.isEDetailingAvailable(selectedDocID, generalClassObject?.getCurrentDate()
                 ))
             {
                 alertClass?.commonAlert("Alert!","Doctor e-detailing already done for today")
@@ -169,6 +168,7 @@ class NewCallFragment : Fragment() {
             intent.putExtra("skip", true)
             startActivityForResult(intent,3)
         })
+
         staticSyncData?.fieldStaffTeamList?.let { teamsList.addAll(it) }
         routeList = routeList?.filter { s -> s.headQuaterName !=""} as java.util.ArrayList<SyncModel.Data.Route>
       //  checkDCRusingShareP(0)
@@ -181,9 +181,17 @@ class NewCallFragment : Fragment() {
             callCoroutineApi(i)
             return false
         }
+
+        else if(sharePreferance?.checkKeyExist("empIdSp")==false  ||
+            sharePreferance?.checkKeyExist("todayDate")==false  || sharePreferance?.checkKeyExist("dcrId")==false || sharePreferance?.getPref("empIdSp") != loginModelHomePage.empId.toString())
+        {
+            alertClass?.commonAlert("Alert!","DCR not submitted please connect to internet and fill DCR first.")
+            return false
+        }
         else if( sharePreferance?.getPref("todayDate") != generalClassObject?.currentDateMMDDYY() || sharePreferance?.getPref("dcrId")=="0") {
             alertClass?.commonAlert("Alert!","DCR not submitted please connect to internet and fill DCR first.")
-        return false}
+        return false
+        }
         else{ return true }
     }
 
@@ -848,11 +856,12 @@ class NewCallFragment : Fragment() {
             generalClassObject?.currentDateMMDDYY()
         )
         withContext(Dispatchers.Main) {
+
+
             if (response!!.isSuccessful) {
 
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
-
-                   // val jsonObjError: JsonObject = response.body()?.get("errorObj") as JsonObject
+                    // val jsonObjError: JsonObject = response.body()?.get("errorObj") as JsonObject
                     if (response.body()?.errorObj?.errorMessage?.isEmpty() == true) {
                        // val data: JsonObject = response.body()?.get("data") as JsonObject
                       //  val dcrData: JsonObject = data?.get("dcrData") as JsonObject
@@ -868,11 +877,13 @@ class NewCallFragment : Fragment() {
                         sharePreferance?.setPref("dcrObj", Gson().toJson(dcrData))
 
                         if (dcrData?.dcrId == 0) {
+
                             createDCRAlert(dcrData?.routeId.toString())
                             sharePreferance?.setPref("dcrId", dcrData?.dcrId.toString())
                         } else {
                             sharePreferance?.setPref("todayDate", generalClassObject?.currentDateMMDDYY())
                             sharePreferance?.setPref("dcrId", dcrData?.dcrId.toString())
+                            sharePreferance?.setPref("empIdSp", loginModelHomePage.empId.toString())
                             if(i==1)
                             {
                                 views?.bottomSheetTitle_tv?.setText("Select route")
@@ -883,7 +894,9 @@ class NewCallFragment : Fragment() {
                     } else {
                         GeneralClass(requireActivity()).checkInternet() }
                 }
+
             }
+
         }
 
 

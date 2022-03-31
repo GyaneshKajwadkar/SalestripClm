@@ -12,9 +12,9 @@ class DownloadFileModel : Serializable {
         get() = field
         set(value) { field = value }
 
-    var fileUrl: String = ""
+  /*  var fileUrl: String = ""
         get() = field
-        set(value) { field = value }
+        set(value) { field = value }*/
 
     var downloadType: String = ""
         get() = field
@@ -32,9 +32,9 @@ class DownloadFileModel : Serializable {
         get() = field
         set(value) { field = value }
 
-    var setContentType: String = ""
+ /*   var setContentType: String = ""
         get() = field
-        set(value) { field = value }
+        set(value) { field = value }*/
 
     var fileId = 0
         get() = field
@@ -44,9 +44,9 @@ class DownloadFileModel : Serializable {
         get() = field
         set(value) { field = value }
 
-    var zipExtractFilePath: String? = null
+   /* var zipExtractFilePath: String? = null
         get() = field
-        set(value) { field = value }
+        set(value) { field = value }*/
 
     var favFilePath: String = ""
         get() = field

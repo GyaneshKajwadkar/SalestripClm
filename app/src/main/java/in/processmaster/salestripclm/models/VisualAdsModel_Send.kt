@@ -70,13 +70,13 @@ class VisualAdsModel_Send {
         get() = field
         set(value) { field = value }
 
-    var brandWiseStartTime :String?=null
+ /*   var brandWiseStartTime :String?=null
         get() = field
         set(value) { field = value }
 
     var brandWiseStopTime :String?=null
         get() = field
-        set(value) { field = value }
+        set(value) { field = value }*/
 
     var childDataArray= ArrayList<childData>()
         get() = field

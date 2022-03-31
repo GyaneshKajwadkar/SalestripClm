@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="in.processmaster.salestripclm.activity.LoginActivity"
+    tools:ignore="MissingDefaultResource">
+
+    <LinearLayout
+        android:layout_centerInParent="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <RelativeLayout
+            android:layout_weight="0.5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"/>
+
+        <LinearLayout
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_gravity="center"
+                android:layout_width="270dp"
+                android:layout_height="200dp"
+                android:background="@drawable/salestrip_final_logo_brochure" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/forgotParent_ll"
+                android:orientation="vertical">
+                <LinearLayout
+                    android:layout_marginTop="30dp"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+
+                    <ImageView
+                        android:layout_gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_login_edit"
+                        app:tint="@color/appDarkColor" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_marginLeft="5dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:hintAnimationEnabled="true"
+                        app:hintEnabled="false"
+                        app:boxStrokeWidth="0dp"
+                        app:boxStrokeWidthFocused="0dp"
+                        app:passwordToggleEnabled="false"
+                        android:layout_gravity="center"
+                        app:boxBackgroundColor="@android:color/transparent">
+
+                        <EditText
+                            android:id="@+id/userName_et"
+                            android:theme="@style/EditText_base"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="User name *"
+                            android:drawablePadding="10dp"
+                            android:singleLine="true"
+                            android:drawableTint="@color/appDarkColor"
+                            />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+
+                    <ImageView
+                        android:layout_gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_notebook"
+                        app:tint="@color/appDarkColor" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/layoutTextInput"
+                        android:layout_marginLeft="5dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:hintAnimationEnabled="true"
+                        app:hintEnabled="false"
+                        app:boxStrokeWidth="0dp"
+                        app:boxStrokeWidthFocused="0dp"
+                        app:passwordToggleEnabled="false"
+                        android:layout_gravity="center"
+                        app:boxBackgroundColor="@android:color/transparent">
+
+                        <EditText
+                            android:id="@+id/companyCode_et"
+                            android:theme="@style/EditText_base"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Company code *"
+                            android:drawablePadding="10dp"
+                            android:singleLine="true"
+                            android:drawableTint="@color/appDarkColor"
+                            />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/newPassParent_ll"
+                android:visibility="gone"
+                android:orientation="vertical">
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+
+                    <ImageView
+                        android:layout_gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@android:drawable/ic_lock_idle_lock"
+                        app:tint="@color/appDarkColor" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_marginLeft="5dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:hintAnimationEnabled="true"
+                        app:hintEnabled="false"
+                        app:boxStrokeWidth="0dp"
+                        app:boxStrokeWidthFocused="0dp"
+                        app:passwordToggleEnabled="false"
+                        android:layout_gravity="center"
+                        app:passwordToggleTint="@color/eye_selector"
+                        app:boxBackgroundColor="@android:color/transparent">
+
+                        <EditText
+                            android:maxLength="18"
+                            android:id="@+id/password_et"
+                            android:theme="@style/EditText_base"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Password *"
+                            android:drawablePadding="10dp"
+                            android:singleLine="true"
+                            android:inputType="textPassword"
+                            android:drawableTint="@color/appDarkColor"
+                            />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+
+                    <ImageView
+                        android:layout_gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@android:drawable/ic_lock_idle_lock"
+                        app:tint="@color/appDarkColor" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_marginLeft="5dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:hintAnimationEnabled="true"
+                        app:hintEnabled="false"
+                        app:boxStrokeWidth="0dp"
+                        app:boxStrokeWidthFocused="0dp"
+                        app:passwordToggleEnabled="true"
+                        android:layout_gravity="center"
+                        app:passwordToggleTint="@color/eye_selector"
+                        app:boxBackgroundColor="@android:color/transparent">
+
+                        <EditText
+                            android:maxLength="18"
+                            android:id="@+id/conPass_et"
+                            android:theme="@style/EditText_base"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Conform Password *"
+                            android:drawablePadding="10dp"
+                            android:singleLine="true"
+                            android:inputType="textPassword"
+                            android:drawableTint="@color/appDarkColor"
+                            />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:layout_marginTop="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/simpleBtnWith20LF"
+                app:cornerRadius="20dp"
+                android:text="Send OTP"
+                android:id="@+id/sendOtp_btn"
+                 />
+
+            <RelativeLayout
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:text="Sign In"
+                    android:id="@+id/signIn_tv"
+                    android:textColor="@color/black"/>
+
+            </RelativeLayout>
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_weight="0.5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+
+</RelativeLayout>

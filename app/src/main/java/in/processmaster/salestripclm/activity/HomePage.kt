@@ -70,10 +70,9 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
         initView()
 
-        if(generalClass.isInternetAvailable())
-            callingMultipleAPI()
+        if(generalClass.isInternetAvailable()) callingMultipleAPI()
         else {
-            if (dbBase?.getApiDetail(1) != "") {
+           /* if (dbBase?.getApiDetail(1) != "") {
                 val coroutineScope= CoroutineScope(Dispatchers.IO).launch {
                     val syncSmallData= async {  staticSyncData= dbBase?.getSYNCApiData(0)}
                     val syncRouteData= async {  staticSyncData?.routeList=dbBase?.allRoutes}
@@ -86,7 +85,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                     syncProductData.await()
 
                 }
-            }
+            }*/
             bottomNavigation?.selectedItemId= R.id.landingPage
         }
 
@@ -161,6 +160,12 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
     //set bottom navigation
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
+
+       /* if(staticSyncData?.configurationSetting==null)
+        {
+            alertClass?.commonAlert("Server error","Something went wrong please Sync data or try again later")
+            return@OnNavigationItemSelectedListener true
+        }*/
         when (item.itemId) {
             R.id.landingPage -> {
 
@@ -177,7 +182,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                 if (openFragmentStr.equals("EdetailingFragment")) {
                     return@OnNavigationItemSelectedListener true
                 }
-
                 val fragment = EdetailingDownloadFragment()
                 openFragment(fragment)
                 openFragmentStr = "EdetailingFragment"
@@ -436,6 +440,9 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             {
                 if (response?.code() == 200 && !response.body().toString().isEmpty())
                 {
+                    if(response.body()?.getData()?.geteDetailingList()==null)
+                    {  }
+                    else{
                     for ((index, value) in response.body()?.getData()?.geteDetailingList()?.withIndex()!!) {
                         //store edetailing data to db
                         val gson = Gson()
@@ -444,7 +451,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                             gson.toJson(value)
                         )
                     }
-
                     // clear database
                     for (dbList in dbBase.getAlleDetail()) {
                         var isSet = false
@@ -470,6 +476,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                             dbBase.deleteEdetailDownloada(dbList.geteDetailId().toString())
 
                         }
+                    }
                     }
                 }
 
@@ -504,7 +511,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             if (response?.code() == 200 && !response.body().toString().isEmpty())
                 {
                    // dbBase?.addAPIData(Gson().toJson(response.body()),1)
-
                     staticSyncData=response.body()?.data
                     val apiModel=response.body()?.data
                     val gson=Gson()

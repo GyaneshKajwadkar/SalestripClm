@@ -82,7 +82,7 @@ public class DevisionModel implements Serializable  {
             @SerializedName("brandId")
             @Expose
             private Integer brandId;
-            @SerializedName("empId")
+         /*   @SerializedName("empId")
             @Expose
             private Integer empId;
             @SerializedName("mode")
@@ -96,7 +96,7 @@ public class DevisionModel implements Serializable  {
             private Boolean isPublish;
             @SerializedName("eretailReferenceList")
             @Expose
-            private Object eretailReferenceList;
+            private Object eretailReferenceList;*/
             @SerializedName("brandName")
             @Expose
             private String brandName;
@@ -130,46 +130,46 @@ public class DevisionModel implements Serializable  {
                 this.brandId = brandId;
             }
 
-            public Integer getEmpId() {
+       /*     public Integer getEmpId() {
                 return empId;
             }
 
             public void setEmpId(Integer empId) {
                 this.empId = empId;
-            }
+            }*/
 
-            public Integer getMode() {
+         /*   public Integer getMode() {
                 return mode;
             }
 
             public void setMode(Integer mode) {
                 this.mode = mode;
-            }
+            }*/
 
-            public String getType() {
+     /*       public String getType() {
                 return type;
             }
 
             public void setType(String type) {
                 this.type = type;
-            }
+            }*/
 
-            public Boolean getIsPublish() {
+       /*     public Boolean getIsPublish() {
                 return isPublish;
             }
 
             public void setIsPublish(Boolean isPublish) {
                 this.isPublish = isPublish;
-            }
+            }*/
 
 
-            public Object getEretailReferenceList() {
+       /*     public Object getEretailReferenceList() {
                 return eretailReferenceList;
             }
 
             public void setEretailReferenceList(Object eretailReferenceList) {
                 this.eretailReferenceList = eretailReferenceList;
-            }
+            }*/
 
             public String getBrandName() {
                 return brandName;
@@ -187,22 +187,22 @@ public class DevisionModel implements Serializable  {
                 this.divisionName = divisionName;
             }
 
-            public Integer getReviseId() {
+         /*   public Integer getReviseId() {
                 return reviseId;
             }
 
             public void setReviseId(Integer reviseId) {
                 this.reviseId = reviseId;
-            }
+            }*/
 
-            public Boolean getIsReviseData() {
+      /*      public Boolean getIsReviseData() {
                 return isReviseData;
             }
 
             public void setIsReviseData(Boolean isReviseData) {
                 this.isReviseData = isReviseData;
             }
-
+*/
             public ArrayList<EretailDetail> getEretailDetailList() {
                 return eretailDetailList;
             }

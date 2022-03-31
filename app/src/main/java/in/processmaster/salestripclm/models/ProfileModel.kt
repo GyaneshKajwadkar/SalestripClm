@@ -70,13 +70,13 @@ public class ProfileModel
             @Expose
             var empId: Int? = null
 
-            @SerializedName("firstName")
+      /*      @SerializedName("firstName")
             @Expose
             var firstName: String? = null
 
             @SerializedName("lastName")
             @Expose
-            var lastName: String? = null
+            var lastName: String? = null*/
 
             @SerializedName("userName")
             @Expose
@@ -98,9 +98,9 @@ public class ProfileModel
             @Expose
             var dateOfBirth: String? = null
 
-            @SerializedName("doa")
+        /*    @SerializedName("doa")
             @Expose
-            var doa: String? = null
+            var doa: String? = null*/
 
             @SerializedName("gender")
             @Expose
@@ -114,9 +114,9 @@ public class ProfileModel
             @Expose
             var address2: String? = null
 
-            @SerializedName("cityId")
+         /*   @SerializedName("cityId")
             @Expose
-            var cityId: Int? = null
+            var cityId: Int? = null*/
 
             @SerializedName("stateId")
             @Expose
@@ -126,9 +126,9 @@ public class ProfileModel
             @Expose
             var stateName: String? = null
 
-            @SerializedName("countryId")
+       /*     @SerializedName("countryId")
             @Expose
-            var countryId: Int? = null
+            var countryId: Int? = null*/
 
             @SerializedName("countryName")
             @Expose
@@ -146,15 +146,15 @@ public class ProfileModel
             @Expose
             var division: String? = null
 
-            @SerializedName("headQuaterId")
+        /*    @SerializedName("headQuaterId")
             @Expose
-            var headQuaterId: String? = null
+            var headQuaterId: String? = null*/
 
             @SerializedName("headQuaterName")
             @Expose
             var headQuaterName: String? = null
 
-            @SerializedName("hierachyId")
+          /*  @SerializedName("hierachyId")
             @Expose
             var hierachyId: Int? = null
 
@@ -173,7 +173,7 @@ public class ProfileModel
             @SerializedName("qualificationId")
             @Expose
             var qualificationId: Int? = null
-
+*/
             @SerializedName("marriedStatus")
             @Expose
             var marriedStatus: Int? = null
@@ -182,7 +182,7 @@ public class ProfileModel
             @Expose
             var reportingManagerName: String? = null
 
-            @SerializedName("reportingManagerEmail")
+           /* @SerializedName("reportingManagerEmail")
             @Expose
             var reportingManagerEmail: String? = null
 
@@ -208,7 +208,7 @@ public class ProfileModel
 
             @SerializedName("deleteBy")
             @Expose
-            var deleteBy: Int? = null
+            var deleteBy: Int? = null*/
 
             @SerializedName("mode")
             @Expose
@@ -330,22 +330,22 @@ public class ProfileModel
             @Expose
             private var mPin: Any? = null
 
-            @SerializedName("fingerprint")
+           /* @SerializedName("fingerprint")
             @Expose
             var fingerprint: Any? = null
 
             @SerializedName("workingHeadQuarter")
             @Expose
             var workingHeadQuarter: String? = null
-
+*/
             @SerializedName("cityName")
             @Expose
             var cityName: String? = null
 
-            @SerializedName("canBeDeleted")
+           /* @SerializedName("canBeDeleted")
             @Expose
             var canBeDeleted: Boolean? = null
-
+*/
             @SerializedName("absolutePath")
             @Expose
             var absolutePath: String? = null
@@ -370,13 +370,13 @@ public class ProfileModel
             @Expose
             var fullName: String? = null
 
-            @SerializedName("headQuaterType")
+          /*  @SerializedName("headQuaterType")
             @Expose
             var headQuaterType: Int? = null
 
             @SerializedName("employeeCode")
             @Expose
-            var employeeCode: String? = null
+            var employeeCode: String? = null*/
 
             @SerializedName("joiningDate")
             @Expose
@@ -410,9 +410,9 @@ public class ProfileModel
             @Expose
             var hierDesc: String? = null
 
-            @SerializedName("teamLevel")
+         /*   @SerializedName("teamLevel")
             @Expose
-            var teamLevel: Int? = null
+            var teamLevel: Int? = null*/
 
             @SerializedName("divisionName")
             @Expose
@@ -438,9 +438,9 @@ public class ProfileModel
             @Expose
             var mainHeadQuarter: Int? = null
 */
-            @SerializedName("callDetails")
+           /* @SerializedName("callDetails")
             @Expose
-            var callDetails: Any? = null
+            var callDetails: Any? = null*/
 
         /*    @SerializedName("strDateOfBirth")
             @Expose
@@ -474,7 +474,7 @@ public class ProfileModel
             @Expose
             var year: Int? = null
 
-            @SerializedName("promotionDate")
+           /* @SerializedName("promotionDate")
             @Expose
             var promotionDate: String? = null
 
@@ -552,7 +552,7 @@ public class ProfileModel
 
             fun setmPin(mPin: Any?) {
                 this.mPin = mPin
-            }
+            }*/
         }
     }
 

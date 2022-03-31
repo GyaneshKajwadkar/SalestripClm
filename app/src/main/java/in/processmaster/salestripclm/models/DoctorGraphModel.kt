@@ -48,9 +48,9 @@ class DoctorGraphModel {
         var dcrCountList: List<DcrCount> = ArrayList()
 
         class DcrCount {
-            @SerializedName("day")
+         /*   @SerializedName("day")
             @Expose
-            var day: Int? = 0
+            var day: Int? = 0*/
 
             @SerializedName("visitedDoctor")
             @Expose
@@ -64,15 +64,15 @@ class DoctorGraphModel {
             @Expose
             var type: String = ""
 
-            @SerializedName("monthNo")
+    /*        @SerializedName("monthNo")
             @Expose
-            var monthNo: Int? = 0
+            var monthNo: Int? = 0*/
 
             @SerializedName("monthName")
             @Expose
             var monthName: String = ""
 
-            @SerializedName("total")
+         /*   @SerializedName("total")
             @Expose
             var total: Int? = 0
 
@@ -94,7 +94,7 @@ class DoctorGraphModel {
 
             @SerializedName("partyName")
             @Expose
-            var partyName: String = ""
+            var partyName: String = ""*/
         }
     }
 

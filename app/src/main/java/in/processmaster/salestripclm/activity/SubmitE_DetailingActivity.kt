@@ -17,6 +17,9 @@ import `in`.processmaster.salestripclm.interfaceCode.productTransfer
 import `in`.processmaster.salestripclm.models.*
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -28,6 +31,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.NonNull
+import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.forEach
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -393,7 +397,10 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             else{ submitDcr(saveModel,quantityArray) }
         })
 
-        pobProduct_btn.setOnClickListener({ closeBottomSheet() })
+        pobProduct_btn.setOnClickListener({
+            closeBottomSheet()
+          //  callPobSelectAlert()
+        })
 
         closePob_iv.setOnClickListener({closeBottomSheet()})
 
@@ -1563,5 +1570,41 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             super.onBackPressed()
         }
     }
+
+    fun callPobSelectAlert()
+    {
+        val dialogBuilder = AlertDialog.Builder(this)
+        val inflater = this.layoutInflater
+        val dialogView: View = inflater.inflate(R.layout.pobcreatealert, null)
+        dialogBuilder.setView(dialogView)
+
+        val alertDialog: AlertDialog = dialogBuilder.create()
+        alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        val closePob_iv = dialogView.findViewById<View>(R.id.closePob_iv) as ImageView
+        val okPob_iv = dialogView.findViewById<View>(R.id.okPob_iv) as ImageView
+        val pobProduct_rv = dialogView.findViewById<View>(R.id.pobProduct_rv) as RecyclerView
+            pobProduct_rv.layoutManager=LinearLayoutManager(this)
+
+      val pobProductSelectAdapter=PobProductAdapter(unSelectedProductList, passingSchemeList,this)
+        pobProduct_rv.adapter= pobProductSelectAdapter
+
+
+        okPob_iv.setOnClickListener{
+            runOnUiThread{
+                generalClass.hideKeyboard(this,it)
+            }
+            pobProductSelectAdapter.setSelction()
+            alertDialog.dismiss()
+        }
+
+        closePob_iv.setOnClickListener{
+
+            alertDialog.dismiss()
+        }
+        alertDialog.show()
+
+    }
+
 
 }

@@ -60,8 +60,7 @@ class SplashActivity : BaseActivity()
             {
                 generalClass.enableSimpleProgress(progressBar!!)
                 val coroutineScope= CoroutineScope(Dispatchers.IO).launch {
-                    val syncSmallData= async {  staticSyncData= dbBase?.getSYNCApiData(0)
-                        Log.e("sfsfsfsff", staticSyncData?.doctorList?.size.toString())}
+                    val syncSmallData= async {  staticSyncData= dbBase?.getSYNCApiData(0) }
                  /*   val syncRouteData= async {  staticSyncData?.routeList=dbBase?.allRoutes
                        }
                     val syncRetailerData= async {  staticSyncData?.retailerList=dbBase?.allRetailers}

@@ -62,9 +62,9 @@ class GetScheduleModel :Serializable {
             @Expose
             var meetingId: Int? = 0
 
-            @SerializedName("meetingLink")
+       /*     @SerializedName("meetingLink")
             @Expose
-            var meetingLink: String? = ""
+            var meetingLink: String? = ""*/
 
             @SerializedName("meetingDate")
             @Expose
@@ -86,25 +86,25 @@ class GetScheduleModel :Serializable {
             @Expose
             var meetingType: String? = ""
 
-            @SerializedName("entryDate")
+       /*     @SerializedName("entryDate")
             @Expose
             var entryDate: String? = ""
 
             @SerializedName("entryBy")
             @Expose
-            var entryBy: Int? = 0
+            var entryBy: Int? = 0*/
 
             @SerializedName("duration")
             @Expose
             var duration: Long? = 0
 
-            @SerializedName("updateDate")
+         /*   @SerializedName("updateDate")
             @Expose
             var updateDate: String? = ""
 
             @SerializedName("updateBy")
             @Expose
-            var updateBy: Int? = 0
+            var updateBy: Int? = 0*/
 
             @SerializedName("empId")
             @Expose
@@ -118,15 +118,15 @@ class GetScheduleModel :Serializable {
             @Expose
             var type: Int? = 0
 
-            @SerializedName("pre_Shedule")
+        /*    @SerializedName("pre_Shedule")
             @Expose
-            var preShedule: Boolean? = false
+            var preShedule: Boolean? = false*/
 
             @SerializedName("password")
             @Expose
             var password: String? = ""
 
-            @SerializedName("default_Password")
+        /*    @SerializedName("default_Password")
             @Expose
             var defaultPassword: Boolean? = false
 
@@ -136,7 +136,7 @@ class GetScheduleModel :Serializable {
 
             @SerializedName("agenda")
             @Expose
-            var agenda: String? = ""
+            var agenda: String? = ""*/
 
             @SerializedName("zoomMeetingId")
             @Expose
@@ -179,9 +179,9 @@ class GetScheduleModel :Serializable {
                 @Expose
                 var memberId: Int? = 0
 
-                @SerializedName("memberType")
+           /*     @SerializedName("memberType")
                 @Expose
-                var memberType: String? = ""
+                var memberType: String? = ""*/
 
                 @SerializedName("emailId")
                 @Expose
@@ -200,9 +200,9 @@ class GetScheduleModel :Serializable {
                 @Expose
                 var memberId: Int? = 0
 
-                @SerializedName("memberType")
+            /*    @SerializedName("memberType")
                 @Expose
-                var memberType: String? = ""
+                var memberType: String? = ""*/
 
                 @SerializedName("emailId")
                 @Expose

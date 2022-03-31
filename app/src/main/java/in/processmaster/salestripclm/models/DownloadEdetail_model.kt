@@ -54,13 +54,13 @@ class DownloadEdetail_model : Serializable {
     }
 
     class Data : Serializable {
-        @SerializedName("eDetailingImagesList")
+       /* @SerializedName("eDetailingImagesList")
         @Expose
          var eDetailingImagesList: List<EDetailingImages> = ArrayList()
 
         @SerializedName("eDetailingReferenceList")
         @Expose
-         var eDetailingReferenceList: List<Any> = ArrayList()
+         var eDetailingReferenceList: List<Any> = ArrayList()*/
 
         class EDetailingImages: Serializable {
 

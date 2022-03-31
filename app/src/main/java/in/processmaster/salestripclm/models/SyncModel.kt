@@ -92,7 +92,7 @@ class SyncModel {
 
         @SerializedName("configurationSetting")
         @Expose
-        var configurationSetting: String? = ""
+        var configurationSetting: String? = null
 
         /*  @SerializedName("holidayList")
           @Expose
@@ -475,13 +475,13 @@ class SyncModel {
             @Expose
             var empId: Int? = 0
 
-            @SerializedName("firstName")
+          /*  @SerializedName("firstName")
             @Expose
             var firstName: String? = ""
 
             @SerializedName("lastName")
             @Expose
-            var lastName: String? = ""
+            var lastName: String? = ""*/
 
             @SerializedName("userName")
             @Expose
@@ -495,7 +495,7 @@ class SyncModel {
             @Expose
             var emailId: String? = ""
 
-            @SerializedName("mobileNo")
+          /*  @SerializedName("mobileNo")
             @Expose
             var mobileNo: String? = ""
 
@@ -521,7 +521,7 @@ class SyncModel {
 
             @SerializedName("cityId")
             @Expose
-            var cityId: Int? = 0
+            var cityId: Int? = 0*/
 
             @SerializedName("stateId")
             @Expose
@@ -531,35 +531,35 @@ class SyncModel {
             @Expose
             var stateName: String? = ""
 
-            @SerializedName("countryId")
+       /*     @SerializedName("countryId")
             @Expose
             var countryId: Int? = 0
 
             @SerializedName("countryName")
             @Expose
-            var countryName: String? = ""
+            var countryName: String? = ""*/
 
             @SerializedName("pinCode")
             @Expose
             var pinCode: Int? = 0
 
-            @SerializedName("phone")
+         /*   @SerializedName("phone")
             @Expose
             var phone: String? = ""
-
+*/
             @SerializedName("division")
             @Expose
             var division: String? = ""
-
-            @SerializedName("headQuaterId")
-            @Expose
-            var headQuaterId: String? = ""
 
             @SerializedName("headQuaterName")
             @Expose
             var headQuaterName: String? = ""
 
-            @SerializedName("hierachyId")
+            @SerializedName("headQuaterId")
+            @Expose
+            var headQuaterId: String? = ""
+
+        /*    @SerializedName("hierachyId")
             @Expose
             var hierachyId: Int? = 0
 
@@ -614,12 +614,12 @@ class SyncModel {
             @SerializedName("deleteBy")
             @Expose
             var deleteBy: Int? = 0
-
+*/
             @SerializedName("mode")
             @Expose
             var mode: Int? = 0
 
-            @SerializedName("compKey")
+         /*   @SerializedName("compKey")
             @Expose
             var compKey: Int? = 0
 
@@ -730,12 +730,12 @@ class SyncModel {
             @SerializedName("canBeDeleted")
             @Expose
             var canBeDeleted: Boolean? = false
-
+*/
             @SerializedName("absolutePath")
             @Expose
             var absolutePath: String? = ""
 
-            @SerializedName("disableSMSNotification")
+           /* @SerializedName("disableSMSNotification")
             @Expose
             var disableSMSNotification: Boolean? = false
 
@@ -749,13 +749,13 @@ class SyncModel {
 
             @SerializedName("prevUserName")
             @Expose
-            var prevUserName: String? = ""
+            var prevUserName: String? = ""*/
 
             @SerializedName("fullName")
             @Expose
             var fullName: String? = ""
 
-            @SerializedName("headQuaterType")
+         /*   @SerializedName("headQuaterType")
             @Expose
             var headQuaterType: Int? = 0
 
@@ -797,13 +797,13 @@ class SyncModel {
 
             @SerializedName("teamLevel")
             @Expose
-            var teamLevel: Int? = 0
+            var teamLevel: Int? = 0*/
 
             @SerializedName("divisionName")
             @Expose
             var divisionName: String? = ""
 
-            @SerializedName("linkedStateName")
+         /*   @SerializedName("linkedStateName")
             @Expose
             var linkedStateName: String? = ""
 
@@ -869,13 +869,13 @@ class SyncModel {
 
             @SerializedName("fingerprint")
             @Expose
-            var fingerprint: String? = ""
+            var fingerprint: String? = ""*/
 
             @SerializedName("fieldStaffId")
             @Expose
             var fieldStaffId: Int? = 0
 
-            @SerializedName("baseHier")
+         /*   @SerializedName("baseHier")
             @Expose
             var baseHier: Int? = 0
 
@@ -1013,7 +1013,7 @@ class SyncModel {
 
             @SerializedName("weekOff")
             @Expose
-            var weekOff: String? = ""
+            var weekOff: String? = ""*/
 
         }
            /*   class Holiday {

@@ -49,13 +49,13 @@ class TeamsModel {
             @Expose
             var empId: Int = 0
 
-            @SerializedName("firstName")
+           /* @SerializedName("firstName")
             @Expose
             var firstName: String = ""
 
             @SerializedName("lastName")
             @Expose
-            var lastName: String = ""
+            var lastName: String = ""*/
 
             @SerializedName("userName")
             @Expose
@@ -69,7 +69,7 @@ class TeamsModel {
             @Expose
             var emailId: String = ""
 
-            @SerializedName("mobileNo")
+          /*  @SerializedName("mobileNo")
             @Expose
             var mobileNo: String = ""
 
@@ -96,7 +96,7 @@ class TeamsModel {
             @SerializedName("cityId")
             @Expose
             var cityId: Int = 0
-
+*/
             @SerializedName("stateId")
             @Expose
             var stateId: Int = 0
@@ -105,7 +105,7 @@ class TeamsModel {
             @Expose
             var stateName: String = ""
 
-            @SerializedName("countryId")
+          /*  @SerializedName("countryId")
             @Expose
             var countryId: Int = 0
 
@@ -120,20 +120,20 @@ class TeamsModel {
             @SerializedName("phone")
             @Expose
             var phone: String = ""
-
+*/
             @SerializedName("division")
             @Expose
             var division: String = ""
 
-            @SerializedName("headQuaterId")
+           /* @SerializedName("headQuaterId")
             @Expose
-            var headQuaterId: String = ""
+            var headQuaterId: String = ""*/
 
             @SerializedName("headQuaterName")
             @Expose
             var headQuaterName: String = ""
 
-            @SerializedName("hierachyId")
+          /*  @SerializedName("hierachyId")
             @Expose
             var hierachyId: Int = 0
 
@@ -188,12 +188,12 @@ class TeamsModel {
             @SerializedName("deleteBy")
             @Expose
             var deleteBy: Int = 0
-
+*/
             @SerializedName("mode")
             @Expose
             var mode: Int = 0
 
-            @SerializedName("compKey")
+        /*    @SerializedName("compKey")
             @Expose
             var compKey: Int = 0
 
@@ -324,12 +324,12 @@ class TeamsModel {
             @SerializedName("canBeDeleted")
             @Expose
             var canBeDeleted:  Boolean = false
-
+*/
             @SerializedName("absolutePath")
             @Expose
             var absolutePath:  String = ""
 
-            @SerializedName("disableSMSNotification")
+         /*   @SerializedName("disableSMSNotification")
             @Expose
             var disableSMSNotification:  Boolean = false
 
@@ -344,12 +344,12 @@ class TeamsModel {
             @SerializedName("prevUserName")
             @Expose
             var prevUserName:  String = ""
-
+*/
             @SerializedName("fullName")
             @Expose
             var fullName:  String = ""
 
-            @SerializedName("headQuaterType")
+         /*   @SerializedName("headQuaterType")
             @Expose
             var headQuaterType:  Int = 0
 
@@ -392,12 +392,12 @@ class TeamsModel {
             @SerializedName("teamLevel")
             @Expose
             var teamLevel:  Int = 0
-
+*/
             @SerializedName("divisionName")
             @Expose
             var divisionName:  String = ""
 
-            @SerializedName("linkedStateName")
+        /*    @SerializedName("linkedStateName")
             @Expose
             var linkedStateName:  String = ""
 
@@ -444,7 +444,7 @@ class TeamsModel {
             @SerializedName("previousHierarchyType")
             @Expose
             var previousHierarchyType:  String = ""
-
+*/
             @SerializedName("month")
             @Expose
             var month:  Int = 0
@@ -453,7 +453,7 @@ class TeamsModel {
             @Expose
             var year:  Int = 0
 
-            @SerializedName("promotionDate")
+         /*   @SerializedName("promotionDate")
             @Expose
             var promotionDate:  String = ""
 
@@ -515,7 +515,7 @@ class TeamsModel {
 
             @SerializedName("strDeactivationDate")
             @Expose
-            var strDeactivationDate:  String = ""
+            var strDeactivationDate:  String = ""*/
         }
     }
 

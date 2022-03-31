@@ -231,6 +231,7 @@ class LoginActivity : BaseActivity() {
                         val verionLower = namesList.get(0).replace(".","").toInt()
                         val versionHigher = namesList.get(1).replace(".","").toInt()
 
+
                         if(version<verionLower||version>versionHigher)
                         { needUpdateAlert() }
                     /*  if (updateLower) {

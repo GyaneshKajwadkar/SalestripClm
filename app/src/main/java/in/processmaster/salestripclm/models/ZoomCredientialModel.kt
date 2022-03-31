@@ -62,7 +62,7 @@ class ZoomCredientialModel {
         @Expose
         var empId: Int = 0
 
-        @SerializedName("secretKey")
+      /*  @SerializedName("secretKey")
         @Expose
         var secretKey: String = ""
 
@@ -84,7 +84,7 @@ class ZoomCredientialModel {
 
         @SerializedName("updateBy")
         @Expose
-        var updateBy: Int = 0
+        var updateBy: Int = 0*/
 
         @SerializedName("userName")
         @Expose
@@ -94,8 +94,8 @@ class ZoomCredientialModel {
         @Expose
         var password: String = ""
 
-        @SerializedName("jwtToken")
+  /*      @SerializedName("jwtToken")
         @Expose
-        var jwtToken: String = ""
+        var jwtToken: String = ""*/
     }
 }

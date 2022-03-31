@@ -36,7 +36,7 @@ class LoginModel {
     @Expose
     private var employeeObj: String? = null
 
-    @SerializedName("configurationSetting")
+ /*   @SerializedName("configurationSetting")
     @Expose
      var configurationSetting: String? = null
 
@@ -46,13 +46,13 @@ class LoginModel {
 
     @SerializedName("roleType")
     @Expose
-     var roleType: String? = null
+     var roleType: String? = null*/
 
     @SerializedName("imageName")
     @Expose
      var imageName: String? = null
 
-    @SerializedName("compName")
+    /*@SerializedName("compName")
     @Expose
      var compName: String? = null
 
@@ -66,13 +66,13 @@ class LoginModel {
 
     @SerializedName("compAddress")
     @Expose
-     var compAddress: String? = null
+     var compAddress: String? = null*/
 
-    @SerializedName("emailId")
+/*    @SerializedName("emailId")
     @Expose
-     var emailId: String? = null
+     var emailId: String? = null*/
 
-    @SerializedName("hierarchyId")
+  /*  @SerializedName("hierarchyId")
     @Expose
      var hierarchyId: Int? = null
 
@@ -94,13 +94,13 @@ class LoginModel {
 
     @SerializedName("as:client_id")
     @Expose
-     var asClientId: String? = null
+     var asClientId: String? = null*/
 
     @SerializedName("userName")
     @Expose
     var userName: String? = null
 
-    @SerializedName("compCode")
+   /* @SerializedName("compCode")
     @Expose
      var compCode: String? = null
 
@@ -114,7 +114,7 @@ class LoginModel {
 
     @SerializedName(".expires")
     @Expose
-     var expires: String? = null
+     var expires: String? = null*/
 
     fun getEmployeeObj(): String? {
         return employeeObj

@@ -72,21 +72,21 @@ class DailyDocVisitModel {
             @Expose
             var detailType: String? = ""
 
-            @SerializedName("isDelete")
+         /*   @SerializedName("isDelete")
             @Expose
             var isDelete: Boolean? = false
 
             @SerializedName("isNextFollowUp")
             @Expose
-            var isNextFollowUp: Boolean? = false
+            var isNextFollowUp: Boolean? = false*/
 
             @SerializedName("remark")
             @Expose
             var remark: String? = ""
 
-            @SerializedName("subject")
+           /* @SerializedName("subject")
             @Expose
-            var subject: String? = ""
+            var subject: String? = ""*/
 
             @SerializedName("dateAndTime")
             @Expose
@@ -100,9 +100,9 @@ class DailyDocVisitModel {
             @Expose
             var workWith: String? = ""
 
-            @SerializedName("metAtTime")
+        /*    @SerializedName("metAtTime")
             @Expose
-            var metAtTime: String? = ""
+            var metAtTime: String? = ""*/
 
             @SerializedName("latitude")
             @Expose
@@ -124,9 +124,9 @@ class DailyDocVisitModel {
             @Expose
             var addedThrough: String? = ""
 
-            @SerializedName("isDocumentAdd")
+        /*    @SerializedName("isDocumentAdd")
             @Expose
-            var isDocumentAdd: Boolean? = false
+            var isDocumentAdd: Boolean? = false*/
 
             @SerializedName("docName")
             @Expose
@@ -152,13 +152,13 @@ class DailyDocVisitModel {
             @Expose
             var doctorName: String? = ""
 
-            @SerializedName("qualificationName")
+       /*     @SerializedName("qualificationName")
             @Expose
             var qualificationName: String? = ""
 
             @SerializedName("cityName")
             @Expose
-            var cityName: String? = ""
+            var cityName: String? = ""*/
 
             @SerializedName("routeName")
             @Expose
@@ -171,10 +171,10 @@ class DailyDocVisitModel {
             @SerializedName("strDateAndTime")
             @Expose
             var strDateAndTime: String? = ""
-
+/*
             @SerializedName("visitFrequency")
             @Expose
-            var visitFrequency: Int? = 0
+            var visitFrequency: Int? = 0*/
 
             @SerializedName("visitPurpose")
             @Expose
@@ -188,7 +188,7 @@ class DailyDocVisitModel {
             @Expose
             var specialityName: String? = ""
 
-            @SerializedName("docExt")
+       /*     @SerializedName("docExt")
             @Expose
             var docExt: String? = ""
 
@@ -198,11 +198,11 @@ class DailyDocVisitModel {
 
             @SerializedName("urlPath")
             @Expose
-            var urlPath: String? = ""
+            var urlPath: String? = ""*/
 
-            @SerializedName("imageUrl")
+        /*    @SerializedName("imageUrl")
             @Expose
-            var imageUrl: String? = ""
+            var imageUrl: String? = ""*/
 
             @SerializedName("workWithName")
             @Expose
@@ -212,9 +212,9 @@ class DailyDocVisitModel {
             @Expose
             var visitPurposeName: String? = ""
 
-            @SerializedName("metAtTimeDisplay")
+/*            @SerializedName("metAtTimeDisplay")
             @Expose
-            var metAtTimeDisplay: String? = ""
+            var metAtTimeDisplay: String? = ""*/
 
             @SerializedName("isEDetailing")
             @Expose
@@ -228,9 +228,9 @@ class DailyDocVisitModel {
             @Expose
             var totalSampleValue: Double? = 0.0
 
-            @SerializedName("totalAchValue")
+        /*    @SerializedName("totalAchValue")
             @Expose
-            var totalAchValue: Double? = 0.0
+            var totalAchValue: Double? = 0.0*/
 
             @SerializedName("giftGivenCount")
             @Expose
@@ -244,9 +244,9 @@ class DailyDocVisitModel {
             @Expose
             var totalPrescriptionCount: Int? = 0
 
-            @SerializedName("freeMedicineCamp")
+        /*    @SerializedName("freeMedicineCamp")
             @Expose
-            var freeMedicineCamp: Boolean? = false
+            var freeMedicineCamp: Boolean? = false*/
 
             @SerializedName("dcrDate")
             @Expose
@@ -268,7 +268,7 @@ class DailyDocVisitModel {
             @Expose
             var dcrDetailId: Int? = 0
 
-            @SerializedName("fiscalYear")
+          /*  @SerializedName("fiscalYear")
             @Expose
             var fiscalYear: Int? = 0
 
@@ -291,12 +291,12 @@ class DailyDocVisitModel {
             @SerializedName("categoryId")
             @Expose
             var categoryId: Int? = 0
-
+*/
             @SerializedName("callTiming")
             @Expose
             var callTiming: String? = ""
 
-            @SerializedName("callTimingName")
+           /* @SerializedName("callTimingName")
             @Expose
             var callTimingName: String? = ""
 
@@ -310,7 +310,7 @@ class DailyDocVisitModel {
 
             @SerializedName("callMediumType")
             @Expose
-            var callMediumType: Int? = 0
+            var callMediumType: Int? = 0*/
 
             @SerializedName("callMediumTypeName")
             @Expose
@@ -320,7 +320,7 @@ class DailyDocVisitModel {
             @Expose
             var totalPOB: Double? = 0.0
 
-            @SerializedName("isOnLocationReported")
+           /* @SerializedName("isOnLocationReported")
             @Expose
             var isOnLocationReported: Boolean? = false
 
@@ -351,12 +351,12 @@ class DailyDocVisitModel {
             @SerializedName("hospCode")
             @Expose
             var hospCode: String? = ""
-
+*/
             @SerializedName("isFeedback")
             @Expose
             var isFeedback: String? = ""
 
-            @SerializedName("eDetailing")
+         /*   @SerializedName("eDetailing")
             @Expose
             private var eDetailing: String? = ""
 
@@ -367,7 +367,7 @@ class DailyDocVisitModel {
             @SerializedName("docGrade")
             @Expose
             var docGrade: String? = ""
-
+*/
             @SerializedName("pobObject")
             @Expose
 
@@ -383,30 +383,30 @@ class DailyDocVisitModel {
                 @SerializedName("remark")           var remark              : String?                = ""
                 @SerializedName("empId")            var empId               : Int?                   = 0
                 @SerializedName("mode")             var mode                : Int?                   = 0
-                @SerializedName("pobType")          var pobType             : String?                = "DOCTOR"
-                @SerializedName("address")          var address             : String?                = ""
-                @SerializedName("partyName")        var partyName           : String?                = ""
-                @SerializedName("employeeName")     var employeeName        : String?                = ""
+              //  @SerializedName("pobType")          var pobType             : String?                = "DOCTOR"
+              //  @SerializedName("address")          var address             : String?                = ""
+              //  @SerializedName("partyName")        var partyName           : String?                = ""
+              //  @SerializedName("employeeName")     var employeeName        : String?                = ""
                 @SerializedName("headQuaterName")   var headQuaterName      : String?                = ""
                 @SerializedName("routeName")        var routeName           : String?                = ""
-                @SerializedName("strPOBDate")       var strPOBDate          : String?                = ""
-                @SerializedName("isProductWisePOB") var isProductWisePOB    : Boolean?               = true
-                @SerializedName("totalPOB")         var totalPOB            : Double?                = null
-                @SerializedName("cityName")         var cityName            : String?                = ""
+              // @SerializedName("strPOBDate")       var strPOBDate          : String?                = ""
+              // @SerializedName("isProductWisePOB") var isProductWisePOB    : Boolean?               = true
+              // @SerializedName("totalPOB")         var totalPOB            : Double?                = null
+              // @SerializedName("cityName")         var cityName            : String?                = ""
                 @SerializedName("stockistId")       var stockistId          : Int?                   = null
-                @SerializedName("stockistName")     var stockistName        : String?                = ""
+               // @SerializedName("stockistName")     var stockistName        : String?                = ""
                 @SerializedName("status")           var status              : String?                = ""
-                @SerializedName("docName")          var docName             : String?                = ""
-                @SerializedName("hospitalName")     var hospitalName        : String?                = ""
-                @SerializedName("hospitalId")       var hospitalId          : Int?                   = 0
-                @SerializedName("dcrId")            var dcrId               : Int?                   = null
+              //  @SerializedName("docName")          var docName             : String?                = ""
+              //  @SerializedName("hospitalName")     var hospitalName        : String?                = ""
+              //  @SerializedName("hospitalId")       var hospitalId          : Int?                   = 0
+              //  @SerializedName("dcrId")            var dcrId               : Int?                   = null
                 @SerializedName("pobDetailList")    var pobDetailList       : ArrayList<PobDetailList> = arrayListOf()
 
                 class PobDetailList()
                 {
-                    @SerializedName("srNo")
+                  /*  @SerializedName("srNo")
                     @Expose
-                     var srNo: Int? = null
+                     var srNo: Int? = null*/
 
                     @SerializedName("productId")
                     @Expose
@@ -424,7 +424,7 @@ class DailyDocVisitModel {
                     @Expose
                      var amount: Double? = null
 
-                    @SerializedName("pobId")
+             /*       @SerializedName("pobId")
                     @Expose
                      var pobId: Int? = null
 
@@ -434,13 +434,13 @@ class DailyDocVisitModel {
 
                     @SerializedName("category")
                     @Expose
-                     var category: String? = null
+                     var category: String? = null*/
 
                     @SerializedName("productName")
                     @Expose
                      var productName: String? = null
 
-                    @SerializedName("pobNo")
+                /*    @SerializedName("pobNo")
                     @Expose
                      var pobNo: Any? = null
 
@@ -458,7 +458,7 @@ class DailyDocVisitModel {
 
                     @SerializedName("isProductWisePOB")
                     @Expose
-                     var isProductWisePOB: Boolean? = null
+                     var isProductWisePOB: Boolean? = null*/
 
                     @SerializedName("schemeId")
                     @Expose
@@ -472,9 +472,9 @@ class DailyDocVisitModel {
                     @Expose
                      var totalQty: Int? = null
 
-                    @SerializedName("schemeName")
+                  /*  @SerializedName("schemeName")
                     @Expose
-                     var schemeName: String? = null
+                     var schemeName: String? = null*/
 
                     @SerializedName("schemeSalesQty")
                     @Expose
@@ -484,9 +484,9 @@ class DailyDocVisitModel {
                     @Expose
                      var schemeFreeQty: Int? = null
 
-                    @SerializedName("isSchemeExists")
+                   /* @SerializedName("isSchemeExists")
                     @Expose
-                     var isSchemeExists: Boolean? = null
+                     var isSchemeExists: Boolean? = null*/
 
                     @SerializedName("schemeNameWithQty")
                     @Expose
@@ -495,8 +495,8 @@ class DailyDocVisitModel {
                     @SerializedName("isSaved")
                     @Expose
                     var isSaved=false;
-                    var freeQtyMain: Int?= 0
-                    var salesQtyMain: Int?= 0
+                  //  var freeQtyMain: Int?= 0
+                  //  var salesQtyMain: Int?= 0
                 }
             }
 

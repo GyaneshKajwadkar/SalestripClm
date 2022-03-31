@@ -17,6 +17,12 @@ public class PreferenceClass {
         return count;
     }
 
+    public Boolean checkKeyExist(String key)
+    {
+        Boolean exist = sharedpreferences.contains(key);
+        return exist;
+    }
+
     public Boolean getPrefBool(String key) {
         Boolean count = sharedpreferences.getBoolean(key, false);
         return count;
