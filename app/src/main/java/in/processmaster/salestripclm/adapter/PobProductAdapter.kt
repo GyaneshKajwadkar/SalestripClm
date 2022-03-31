@@ -203,7 +203,7 @@ class PobProductAdapter(
 
      fun setSelction()
     {
-        productFilteringList?.let { sendProductInterface?.onClickButtonProduct(it) }
+        productFilteringList?.let { sendProductInterface?.onClickButtonProduct(it,1) }
     }
 
 

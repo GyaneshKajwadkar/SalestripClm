@@ -5,6 +5,7 @@ import `in`.processmaster.salestripclm.activity.SplashActivity
 import `in`.processmaster.salestripclm.activity.SubmitE_DetailingActivity
 import `in`.processmaster.salestripclm.fragments.PresentEDetailingFrag
 import `in`.processmaster.salestripclm.interfaceCode.productTransfer
+import `in`.processmaster.salestripclm.interfaceCode.productTransferIndividual
 import `in`.processmaster.salestripclm.models.SyncModel
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -27,9 +28,9 @@ import com.google.android.material.button.MaterialButton
 
 class SelectedPobAdapter(
     var sendEDetailingArray: ArrayList<SyncModel.Data.Product>?,
-    var sendProductInterface: productTransfer?,
-    val submiteDetailingactivity: SubmitE_DetailingActivity?
-): RecyclerView.Adapter<SelectedPobAdapter.MyViewHolder>() {
+    var sendProductInterface: productTransferIndividual?,
+    val submiteDetailingactivity: SubmitE_DetailingActivity?,
+    ): RecyclerView.Adapter<SelectedPobAdapter.MyViewHolder>() {
 
     constructor() : this(null, null,null) {
     }
@@ -95,6 +96,11 @@ class SelectedPobAdapter(
 
         holder.close.setOnClickListener({
 
+            model?.let { it1 -> sendProductInterface?.onClickButtonProduct(it1,position) }
+          //  sendEDetailingArray?.removeAt(position)
+          //  notifyItemRemoved(position)
+
+/*
             submiteDetailingactivity?.alertClass?.showProgressAlert("")
 
             val runnable = java.lang.Runnable {
@@ -121,16 +127,16 @@ class SelectedPobAdapter(
 
                         }
 
-                        /* submiteDetailingactivity.runOnUiThread{
+                        *//* submiteDetailingactivity.runOnUiThread{
                              submiteDetailingactivity?.pobProductSelectAdapter?.notifyItemChanged(index)
                              notifyItemChanged(position)
                              submiteDetailingactivity?.calculateTotalProduct()
-                         }*/
+                         }*//*
                         break
                     }
                 }
             }
-            Thread(runnable).start()
+            Thread(runnable).start()*/
         })
 
         holder.qty_et.setOnFocusChangeListener(object : View.OnFocusChangeListener {

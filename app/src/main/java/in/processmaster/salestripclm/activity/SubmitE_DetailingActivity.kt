@@ -14,10 +14,10 @@ import `in`.processmaster.salestripclm.fragments.PresentEDetailingFrag.Companion
 import `in`.processmaster.salestripclm.interfaceCode.IdNameBoll_interface
 import `in`.processmaster.salestripclm.interfaceCode.PobProductTransfer
 import `in`.processmaster.salestripclm.interfaceCode.productTransfer
+import `in`.processmaster.salestripclm.interfaceCode.productTransferIndividual
 import `in`.processmaster.salestripclm.models.*
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -59,7 +59,8 @@ import java.util.concurrent.Executors
 
 
 class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProductTransfer,
-    productTransfer {
+    productTransferIndividual
+    ,productTransfer {
 
     var visualSendModel= ArrayList<VisualAdsModel_Send>()
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
@@ -398,8 +399,8 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         })
 
         pobProduct_btn.setOnClickListener({
-            closeBottomSheet()
-          //  callPobSelectAlert()
+        //    closeBottomSheet()
+            callPobSelectAlert()
         })
 
         closePob_iv.setOnClickListener({closeBottomSheet()})
@@ -1120,37 +1121,53 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
        // setSelectedPOBRecycler(selectedList)
     }
 
-    override fun onClickButtonProduct(selectedList: ArrayList<SyncModel.Data.Product>) {
+    override fun onClickButtonProduct(selectedList: ArrayList<SyncModel.Data.Product>, type: Int) {
 
-        alertClass.showProgressAlert("")
-        val runnable = java.lang.Runnable {
-          //  selectedProductList.clear()
+        if(type==1)
+        {
+            alertClass.showProgressAlert("")
+            val runnable = java.lang.Runnable {
+                //  selectedProductList.clear()
 
-            for ((index,selected) in selectedList.withIndex())
-            {
-                if(selected?.notApi?.insertedProductId!=0)
+                for ((index,selected) in selectedList.withIndex())
                 {
-                    selected.notApi.isSaved=true
-                    selectedProductList.add(selected)
-                    unSelectedProductList.removeAt(index)
-                    runOnUiThread {
-                        selectedPobAdapter.notifyItemChanged(index)
-                      //  pobProductSelectAdapter.notifyItemChanged(index)
+                    if(selected?.notApi?.insertedProductId!=0)
+                    {
+
+                        selected.notApi.isSaved=true
+                        selectedProductList.add(selected)
+
+                        val hashSet = HashSet<SyncModel.Data.Product>()
+                        hashSet.addAll(selectedProductList)
+                        selectedProductList.clear()
+                        selectedProductList.addAll(hashSet)
+
+                        unSelectedProductList.removeAt(index)
+                        runOnUiThread {
+                            //   selectedPobAdapter.notifyItemChanged(index)
+                            //  pobProductSelectAdapter.notifyItemChanged(index)
+                        }
                     }
                 }
-            }
-            runOnUiThread {
+                runOnUiThread {
 
-               // pobProductSelectAdapter.notifyDataSetChanged()
-                setPobAdapter()
-                //pobProduct_rv.scrollToPosition(0)
-                Handler(Looper.getMainLooper()).postDelayed({
-                    closeBottomSheet()
-                    alertClass.hideAlert()
-                }, 1)
+                    // pobProductSelectAdapter.notifyDataSetChanged()
+                    setPobAdapter()
+                    //pobProduct_rv.scrollToPosition(0)
+                    Handler(Looper.getMainLooper()).postDelayed({
+                     //   closeBottomSheet()
+                        alertClass.hideAlert()
+                    }, 1)
+                }
             }
+            Thread(runnable).start()
         }
-         Thread(runnable).start()
+        else
+        {
+
+        }
+
+
 
 
      /*   selectedProductList.clear()
@@ -1236,8 +1253,8 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
     fun setPobAdapter()
     {
         runOnUiThread{
-            pobProductSelectAdapter=PobProductAdapter(unSelectedProductList, passingSchemeList,this)
-            pobProduct_rv.adapter= pobProductSelectAdapter
+         /*   pobProductSelectAdapter=PobProductAdapter(unSelectedProductList, passingSchemeList,this)
+            pobProduct_rv.adapter= pobProductSelectAdapter*/
 
             selectedPobAdapter=SelectedPobAdapter(selectedProductList,this,this)
             selectedPob_rv.adapter= selectedPobAdapter
@@ -1274,8 +1291,6 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 {
                     for(dbVisual in edetailingEditModel.eDetailList)
                     {
-                        Log.e("dsfdsffsdf",dbVisual.brandId.toString())
-                        Log.e("fihsfuisd",mainVisual.brandId.toString())
                         if(mainVisual.brandId==dbVisual.brandId)
                         {
                             mainVisual.rating=dbVisual.rating
@@ -1586,6 +1601,9 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         val pobProduct_rv = dialogView.findViewById<View>(R.id.pobProduct_rv) as RecyclerView
             pobProduct_rv.layoutManager=LinearLayoutManager(this)
 
+        val productSearch_et = dialogView.findViewById<View>(R.id.productSearch_et) as EditText
+            productSearch_et?.addTextChangedListener(filterTextPobWatcher)
+
       val pobProductSelectAdapter=PobProductAdapter(unSelectedProductList, passingSchemeList,this)
         pobProduct_rv.adapter= pobProductSelectAdapter
 
@@ -1603,6 +1621,28 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             alertDialog.dismiss()
         }
         alertDialog.show()
+
+    }
+
+    override fun onClickButtonProduct(productModel: SyncModel.Data.Product, positon: Int) {
+
+
+            for ((index,data) in staticSyncData?.productList?.withIndex()!!)
+            {
+
+                if(productModel?.productId==data.productId)
+                {
+                    productModel.notApi=SyncModel.Data.Product.NotApiData()
+                    unSelectedProductList?.add(index, productModel)
+                    selectedProductList.removeAt(positon)
+
+                    runOnUiThread{
+                       setPobAdapter()
+                        alertClass?.hideAlert()
+                    }
+                }
+
+            }
 
     }
 

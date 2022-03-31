@@ -15,5 +15,9 @@ interface PobProductTransfer{
 }
 
 interface productTransfer{
-    fun onClickButtonProduct(selectedList: ArrayList<SyncModel.Data.Product>)
+    fun onClickButtonProduct(selectedList: ArrayList<SyncModel.Data.Product>, type:Int)
+}
+
+interface productTransferIndividual{
+    fun onClickButtonProduct(productModel: SyncModel.Data.Product,positon:Int)
 }
