@@ -20,6 +20,7 @@ import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -47,7 +48,7 @@ import kotlinx.android.synthetic.main.checkbox_bottom_sheet.*
 import kotlinx.android.synthetic.main.checkbox_bottom_sheet.noDataCheckAdapter_tv
 import kotlinx.android.synthetic.main.common_toolbar.*
 import kotlinx.android.synthetic.main.pob_product_bottom_sheet.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Runnable
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
@@ -1591,10 +1592,14 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         val dialogBuilder = AlertDialog.Builder(this)
         val inflater = this.layoutInflater
         val dialogView: View = inflater.inflate(R.layout.pobcreatealert, null)
+
         dialogBuilder.setView(dialogView)
 
         val alertDialog: AlertDialog = dialogBuilder.create()
-        alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+       // alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val back = ColorDrawable(Color.TRANSPARENT)
+        val inset = InsetDrawable(back, 25)
+        alertDialog.getWindow()?.setBackgroundDrawable(inset)
 
         val closePob_iv = dialogView.findViewById<View>(R.id.closePob_iv) as ImageView
         val okPob_iv = dialogView.findViewById<View>(R.id.okPob_iv) as ImageView
@@ -1604,9 +1609,18 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         val productSearch_et = dialogView.findViewById<View>(R.id.productSearch_et) as EditText
             productSearch_et?.addTextChangedListener(filterTextPobWatcher)
 
+
+
       val pobProductSelectAdapter=PobProductAdapter(unSelectedProductList, passingSchemeList,this)
         pobProduct_rv.adapter= pobProductSelectAdapter
 
+        productSearch_et.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                pobProductSelectAdapter?.getFilter()?.filter(s.toString())
+            }
+            override fun afterTextChanged(editable: Editable) {}
+        })
 
         okPob_iv.setOnClickListener{
             runOnUiThread{
@@ -1623,6 +1637,8 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         alertDialog.show()
 
     }
+
+
 
     override fun onClickButtonProduct(productModel: SyncModel.Data.Product, positon: Int) {
 
