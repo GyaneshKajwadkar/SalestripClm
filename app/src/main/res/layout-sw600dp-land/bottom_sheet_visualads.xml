@@ -79,6 +79,7 @@
                     tools:ignore="MissingConstraints">
 
                     <EditText
+                        android:inputType="text"
                         android:id="@+id/doctorSearch_et"
                         android:drawableTint="@color/appColor"
                         android:drawableLeft="@android:drawable/ic_menu_search"

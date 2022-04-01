@@ -36,6 +36,7 @@
                     android:text="Qty: "
                     android:layout_marginBottom="2dp"/>
                 <EditText
+                    android:maxLength="5"
                     android:id="@+id/alertqty_et"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

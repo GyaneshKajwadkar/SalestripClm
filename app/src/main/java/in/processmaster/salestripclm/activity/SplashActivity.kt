@@ -60,21 +60,11 @@ class SplashActivity : BaseActivity()
             {
                 generalClass.enableSimpleProgress(progressBar!!)
                 val coroutineScope= CoroutineScope(Dispatchers.IO).launch {
-                    val syncSmallData= async {  staticSyncData= dbBase?.getSYNCApiData(0) }
-                 /*   val syncRouteData= async {  staticSyncData?.routeList=dbBase?.allRoutes
-                       }
-                    val syncRetailerData= async {  staticSyncData?.retailerList=dbBase?.allRetailers}
-                    val syncProductData= async {  staticSyncData?.productList=dbBase?.allProduct}*/
-
+                    val syncSmallData= async {  staticSyncData= dbBase?.getSYNCApiData(0)
+                    }
                     syncSmallData.await()
-                   // syncRouteData.await()
-                   // syncRetailerData.await()
-                   // syncProductData.await()
-
                 }
                 coroutineScope.invokeOnCompletion {
-
-
                     this.runOnUiThread(java.lang.Runnable { generalClass.disableSimpleProgress(progressBar!!) })
                     val intent = Intent(this@SplashActivity, HomePage::class.java)
                     startActivity(intent)

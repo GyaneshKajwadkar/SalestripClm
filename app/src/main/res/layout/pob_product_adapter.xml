@@ -6,10 +6,15 @@
     android:layout_height="wrap_content">
 
     <androidx.cardview.widget.CardView
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+       android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         android:id="@+id/parentlinearL"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/generalCard">
+        app:cardCornerRadius="10dp"
+        app:cardElevation="7dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -21,7 +26,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_weight="1.3">
+                android:layout_weight="1.5">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -30,7 +35,7 @@
                     android:textColor="@color/appColor"
                     android:text="title"
                     android:textAlignment="textStart"
-                    android:padding="2dp"
+                    android:padding="1dp"
                     android:id="@+id/titlePobproduct_tv"
                     android:textStyle="bold"
                     android:textSize="18sp"/>
@@ -38,11 +43,13 @@
                 <TextView
                     android:layout_marginLeft="2dp"
                     android:id="@+id/uom_tv"
+
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="UOM"/>
 
                 <TextView
+                    android:visibility="gone"
                     android:id="@+id/division_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -64,11 +71,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/round_shape_edit"
-                android:layout_weight="0.7"
+                android:layout_weight="0.5"
                 android:padding="5dp"
                 android:layout_gravity="center"
                 android:inputType="number"
-                android:layout_margin="5dp"/>
+                android:layout_margin="2dp"/>
 
 
         </LinearLayout>

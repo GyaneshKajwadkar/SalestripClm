@@ -14,6 +14,8 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Handler
 import android.os.Looper
+import android.text.Editable
+import android.text.InputFilter
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -90,9 +92,7 @@ class SelectedPobAdapter(
 
         holder.editIv.setOnClickListener({
             callEditAlert(model,position)
-
         })
-
 
         holder.close.setOnClickListener({
 
@@ -139,7 +139,7 @@ class SelectedPobAdapter(
             Thread(runnable).start()*/
         })
 
-        holder.qty_et.setOnFocusChangeListener(object : View.OnFocusChangeListener {
+      /*  holder.qty_et.setOnFocusChangeListener(object : View.OnFocusChangeListener {
             override fun onFocusChange(v: View, hasFocus: Boolean) {
                 if (hasFocus) {
                     v.postDelayed({
@@ -149,7 +149,7 @@ class SelectedPobAdapter(
                     }, 200)
                 }
             }
-        })
+        })*/
 
     }
 
@@ -195,6 +195,8 @@ class SelectedPobAdapter(
         val ok_btn = dialogView.findViewById<View>(R.id.exit_btn) as MaterialButton
         val cancel_btn = dialogView.findViewById<View>(R.id.cancel_btn) as MaterialButton
         val alertqty_et = dialogView.findViewById<View>(R.id.alertqty_et) as EditText
+
+        alertqty_et.setFilters(arrayOf<InputFilter>(InputFilter.LengthFilter(5)))
 
         alertqty_et.setText(model?.notApi?.qty.toString())
 

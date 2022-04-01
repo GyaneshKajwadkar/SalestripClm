@@ -27,9 +27,7 @@ import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.*
 import androidx.annotation.NonNull
 import androidx.appcompat.app.AlertDialog
@@ -1589,7 +1587,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
     fun callPobSelectAlert()
     {
-        val dialogBuilder = AlertDialog.Builder(this)
+        val dialogBuilder = AlertDialog.Builder(this, R.style.my_dialog)
         val inflater = this.layoutInflater
         val dialogView: View = inflater.inflate(R.layout.pobcreatealert, null)
 
@@ -1601,8 +1599,13 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         val inset = InsetDrawable(back, 25)
         alertDialog.getWindow()?.setBackgroundDrawable(inset)
 
+        val wmlp: WindowManager.LayoutParams = alertDialog.getWindow()?.getAttributes()!!
+
+        wmlp.gravity = Gravity.TOP or Gravity.RIGHT
+
+
         val closePob_iv = dialogView.findViewById<View>(R.id.closePob_iv) as ImageView
-        val okPob_iv = dialogView.findViewById<View>(R.id.okPob_iv) as ImageView
+        val okPob_iv = dialogView.findViewById<View>(R.id.okPob_iv) as TextView
         val pobProduct_rv = dialogView.findViewById<View>(R.id.pobProduct_rv) as RecyclerView
             pobProduct_rv.layoutManager=LinearLayoutManager(this)
 

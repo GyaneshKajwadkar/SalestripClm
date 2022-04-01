@@ -229,8 +229,12 @@ class LoginActivity : BaseActivity() {
                         //   var updateHigher: Boolean = checkForUpdateHigher(version, namesList.get(1))
 
                         val verionLower = namesList.get(0).replace(".","").toInt()
-                        val versionHigher = namesList.get(1).replace(".","").toInt()
+                        var versionHigher = namesList.get(1).replace(".","").toInt()
 
+
+                      //  Log.e("version",version.toString())
+                      //  Log.e("verionLower",verionLower.toString())
+                      //  Log.e("versionHigher",versionHigher.toString())
 
                         if(version<verionLower||version>versionHigher)
                         { needUpdateAlert() }

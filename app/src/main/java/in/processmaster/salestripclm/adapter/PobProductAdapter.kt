@@ -5,6 +5,7 @@ import `in`.processmaster.salestripclm.interfaceCode.productTransfer
 import `in`.processmaster.salestripclm.models.SyncModel
 import android.annotation.SuppressLint
 import android.text.Editable
+import android.text.InputFilter
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
@@ -80,6 +81,8 @@ class PobProductAdapter(
 
         holder.qty_et.setTag(position)
         holder.setIsRecyclable(false)
+
+        holder.qty_et.setFilters(arrayOf<InputFilter>(InputFilter.LengthFilter(5)))
 
         holder.qty_et.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable) {

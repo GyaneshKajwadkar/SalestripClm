@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    android:layout_margin="20dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <LinearLayout
@@ -30,15 +29,25 @@
                     android:src="@drawable/ic_close"
                     app:tint="@color/white" />
 
-                <ImageButton
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Save"
                     android:id="@+id/okPob_iv"
-                    app:tint="@color/white"
+                    android:layout_alignParentEnd="true"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:padding="5dp"
+                    android:textSize="16sp"/>
+
+
+                <ImageButton
                     android:layout_width="35dp"
                     android:layout_height="35dp"
-                    android:layout_alignParentEnd="true"
+                    android:visibility="gone"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:padding="5dp"
-                    android:src="@drawable/zm_ic_tick" />
+                    android:src="@drawable/zm_ic_tick"
+                    app:tint="@color/white" />
 
 
                 <TextView
@@ -77,6 +86,7 @@
                     tools:ignore="MissingConstraints">
 
                     <EditText
+                        android:inputType="text"
                         android:id="@+id/productSearch_et"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
@@ -141,7 +151,6 @@
                     android:id="@+id/pobProduct_rv"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginTop="5dp"
                     android:background="@color/white"
                     android:padding="5dp"/>
             </LinearLayout>

@@ -23,9 +23,7 @@ class NewDownloadsFragment : Fragment() {
     var nodownload_tv: TextView?= null
     var getAlleDetailListDb: ArrayList<DevisionModel.Data.EDetailing> = ArrayList()
     var isFirstTimeOpen=true
-    companion object {
-        var adapter : Edetailing_Adapter?=null
-    }
+    companion object { var adapter : Edetailing_Adapter?=null }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,8 +39,7 @@ class NewDownloadsFragment : Fragment() {
         sharePreferance = PreferenceClass(activity)
         db = DatabaseHandler(requireActivity())
 
-        Handler(Looper.getMainLooper())
-            .postDelayed({
+        Handler(Looper.getMainLooper()).postDelayed({
 
         getAlleDetailListDb= db.getSelectedeDetail(false)
 

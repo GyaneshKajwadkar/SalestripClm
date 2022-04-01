@@ -253,7 +253,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 Type typeDocotrList = new TypeToken<ArrayList<SyncModel.Data.Doctor>>() {}.getType();
 
                 syncModel.setWorkTypeList(gson.fromJson(cursor.getString(cursor.getColumnIndex(WORKTYPELIST)), typeWorkType));
-                syncModel.setProductList(gson.fromJson(cursor.getString(cursor.getColumnIndex(PRODUCTLIST)), typeproduct));
+              //  syncModel.setProductList(gson.fromJson(cursor.getString(cursor.getColumnIndex(PRODUCTLIST)), typeproduct));
                 syncModel.setWorkingWithList(gson.fromJson(cursor.getString(cursor.getColumnIndex(WORKINGWITHLIST)), typeWorkingWith));
                 syncModel.setSchemeList(gson.fromJson(cursor.getString(cursor.getColumnIndex(SCHEMELIST)), typeschemeList));
                 syncModel.setFieldStaffTeamList(gson.fromJson(cursor.getString(cursor.getColumnIndex(FIELDSTAFFTEAMLIST)), typeschemeFieldStaff));
@@ -376,7 +376,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public ArrayList<SyncModel.Data.Product> getAllProduct() {
         ArrayList<SyncModel.Data.Product> productList = new ArrayList<SyncModel.Data.Product>();
 
-        String selectQuery = "SELECT  * FROM " + TABLE_SYNCRETAILER_API;
+        String selectQuery = "SELECT  * FROM " + TABLE_SYNCPRODUCT_API;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {

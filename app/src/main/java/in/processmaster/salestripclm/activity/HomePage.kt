@@ -161,11 +161,11 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     //set bottom navigation
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
 
-       /* if(staticSyncData?.configurationSetting==null)
+        if(staticSyncData?.configurationSetting==null)
         {
             alertClass?.commonAlert("Server error","Something went wrong please Sync data or try again later")
             return@OnNavigationItemSelectedListener true
-        }*/
+        }
         when (item.itemId) {
             R.id.landingPage -> {
 
@@ -198,6 +198,10 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
             R.id.callPage->{
                 toolbarTv?.setText("Create Calls")
+
+                if (openFragmentStr.equals("CallsFragment")) {
+                    return@OnNavigationItemSelectedListener true
+                }
                 val fragment = NewCallFragment()
                 openFragment(fragment)
                 openFragmentStr = "CallsFragment"
@@ -517,7 +521,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                     dbBase?.deleteAll_SYNCAPI()
 
                     dbBase?.addSYNCAPIData(gson.toJson(apiModel?.settingDCR),
-                         gson.toJson(apiModel?.workTypeList),gson.toJson(apiModel?.productList),
+                         gson.toJson(apiModel?.workTypeList),"",
                          "",gson.toJson(apiModel?.workingWithList),gson.toJson(apiModel?.fieldStaffTeamList),""
                          ,apiModel?.configurationSetting, gson.toJson(apiModel?.schemeList),
                          "",0, gson.toJson(apiModel?.doctorList))
@@ -568,7 +572,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         }
 
         try {
-
 
             val file = File.createTempFile("config", ".txt")
             Log.e("filehwifwhef",folder.getAbsolutePath() +".txt")
