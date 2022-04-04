@@ -165,10 +165,10 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
 
             val relativeParent = findViewById<RelativeLayout>(R.id.relativeParent)
 
-            if(!modelweb?.favFileName?.isEmpty()!!)
+         /*   if(!modelweb?.favFileName?.isEmpty()!!)
             {
                 productParent_ll?.visibility= View.GONE
-            }
+            }*/
 
             //  fab_send?.hide()
 

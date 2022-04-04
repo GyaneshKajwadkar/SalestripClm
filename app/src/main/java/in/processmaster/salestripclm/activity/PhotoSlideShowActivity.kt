@@ -139,10 +139,10 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
             setImageArray(arrayImage,position,model)
 
-            if(model?.favFileName?.isEmpty() == true)
+          /*  if(model?.favFileName?.isEmpty() == true)
             {
                 productParent_ll?.visibility= GONE
-            }
+            }*/
 
             //getData
             val intent = intent

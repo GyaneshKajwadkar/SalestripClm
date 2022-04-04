@@ -125,8 +125,8 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
             arrayVideo = intent.getSerializableExtra("videoArray") as ArrayList<DownloadFileModel>
             videoModel = intent.getSerializableExtra("model") as DownloadFileModel
 
-            if(!videoModel?.favFileName?.isEmpty()!!)
-            { productParent_ll?.visibility= View.GONE }
+      /*      if(!videoModel?.favFileName?.isEmpty()!!)
+            { productParent_ll?.visibility= View.GONE }*/
 
 
             position = intent.getIntExtra("position", 0)

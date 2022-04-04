@@ -35,6 +35,7 @@ import androidx.annotation.NonNull
 import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -111,6 +112,44 @@ class NewCallFragment : Fragment() {
     /*    else
             views?.selectRoutesCv?.setEnabled(false)*/
         //  views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
+
+        views?.docRetail_switch?.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
+                doctorHeader_tv.setTextColor(ContextCompat.getColorStateList(requireActivity(), R.color.darkBlue))
+                retailerHeader_tv.setTextColor(ContextCompat.getColorStateList(requireActivity(), R.color.gray))
+            } else {
+                retailerHeader_tv.setTextColor(ContextCompat.getColorStateList(requireActivity(), R.color.darkBlue))
+                doctorHeader_tv.setTextColor(ContextCompat.getColorStateList(requireActivity(), R.color.gray))
+
+            }
+            if(SplashActivity.staticSyncData?.settingDCR?.roleType=="MAN")
+            {
+                views?.selectRoutesCv?.setEnabled(false)
+                views?.selectTeam_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
+                views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#A9A9A9"))
+
+
+
+            }
+            else if(SplashActivity.staticSyncData?.settingDCR?.roleType=="FS") {
+                views?.selectTeamsCv?.visibility = View.GONE
+                views?.selectTeamHeader_tv?.visibility = View.GONE
+                views?.selectRoutesCv?.setEnabled(true)
+                views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
+            }
+
+            views?.doctorDetail_parent?.visibility=View.GONE
+            views?.precall_parent?.visibility=View.GONE
+            views?.parentButton?.visibility=View.GONE
+            views?.noData_gif?.visibility=View.VISIBLE
+
+            views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
+            views?.selectRoute_tv?.setText("Select route")
+            views?.selectDoctor_tv?.setBackgroundColor(Color.parseColor("#A9A9A9"))
+            views?.selectDoctor_tv?.setText("Select Doctor")
+            views?.selectTeam_tv?.setText("Select team")
+            views?.selectDoctorsCv?.setEnabled(false)
+        }
 
 
         views?.selectTeamsCv?.setOnClickListener({

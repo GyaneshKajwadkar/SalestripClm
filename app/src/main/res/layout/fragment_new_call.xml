@@ -24,6 +24,36 @@
                 android:layout_height="match_parent"
                 android:layout_weight="0.5">
 
+
+                <LinearLayout
+                    android:visibility="gone"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:textColor="@color/darkBlue"
+                        android:id="@+id/retailerHeader_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Retailer"/>
+
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/docRetail_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/doctorHeader_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Doctor"/>
+
+                </LinearLayout>
+
+
+
                 <TextView
                     android:id="@+id/selectTeamHeader_tv"
                     android:layout_width="wrap_content"
@@ -61,8 +91,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="3dp"
                     style="@style/generalCard"
-                    app:cardBackgroundColor="#A9A9A9"
-                    >
+                    app:cardBackgroundColor="#A9A9A9">
 
                     <TextView
                         android:layout_width="match_parent"
@@ -128,8 +157,8 @@
                                 android:layout_height="20dp"
                                 android:layout_width="20dp"
                                 android:layout_weight="0.2"
-                                android:tint="@color/orange"
-                                android:src="@drawable/ic_profile"/>
+                                android:src="@drawable/ic_profile"
+                                app:tint="@color/orange" />
 
                             <TextView
                                 android:layout_width="0dp"
@@ -156,8 +185,8 @@
                                 android:layout_height="20dp"
                                 android:layout_width="20dp"
                                 android:layout_weight="0.2"
-                                android:tint="@color/darkBlue"
-                                android:src="@drawable/ic_route"/>
+                                android:src="@drawable/ic_route"
+                                app:tint="@color/darkBlue" />
 
                             <TextView
                                 android:layout_width="0dp"
@@ -186,8 +215,8 @@
                                 android:layout_height="20dp"
                                 android:layout_width="20dp"
                                 android:layout_weight="0.2"
-                                android:tint="@color/zm_green"
-                                android:src="@drawable/ic_mobile"/>
+                                android:src="@drawable/ic_mobile"
+                                app:tint="@color/zm_green" />
 
                             <TextView
                                 android:layout_width="0dp"
@@ -215,8 +244,8 @@
                                 android:layout_height="20dp"
                                 android:layout_width="20dp"
                                 android:layout_weight="0.2"
-                                android:tint="@android:color/holo_purple"
-                                android:src="@drawable/ic_email"/>
+                                android:src="@drawable/ic_email"
+                                app:tint="@android:color/holo_purple" />
 
                             <TextView
                                 android:layout_width="0dp"
@@ -245,8 +274,8 @@
                                 android:layout_height="20dp"
                                 android:layout_width="20dp"
                                 android:layout_weight="0.2"
-                                android:tint="@color/orange"
-                                android:src="@drawable/ic_city"/>
+                                android:src="@drawable/ic_city"
+                                app:tint="@color/orange" />
 
                             <TextView
                                 android:layout_width="0dp"
@@ -274,8 +303,8 @@
                                 android:layout_height="20dp"
                                 android:layout_width="20dp"
                                 android:layout_weight="0.2"
-                                android:tint="@color/darkBlue"
-                                android:src="@drawable/ic_specility"/>
+                                android:src="@drawable/ic_specility"
+                                app:tint="@color/darkBlue" />
 
                             <TextView
                                 android:layout_width="0dp"
@@ -303,8 +332,8 @@
                                 android:layout_height="20dp"
                                 android:layout_width="20dp"
                                 android:layout_weight="0.2"
-                                android:tint="@color/zm_green"
-                                android:src="@drawable/ic_study"/>
+                                android:src="@drawable/ic_study"
+                                app:tint="@color/zm_green" />
 
                             <TextView
                                 android:layout_width="0dp"
@@ -763,17 +792,17 @@
                     android:layout_centerInParent="true"
                     android:src="@drawable/nodata_gif" />
 
-                    <TextView
-                        android:layout_below="@+id/noData_gif"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="10dp"
-                        android:id="@+id/noInternet_tv"
-                        android:text="No Internet connection"
-                        android:textSize="22sp"
-                        android:textAlignment="center"
-                        android:textColor="@color/zm_red"
-                        android:visibility="gone"/>
+                <TextView
+                    android:layout_below="@+id/noData_gif"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:id="@+id/noInternet_tv"
+                    android:text="No Internet connection"
+                    android:textSize="22sp"
+                    android:textAlignment="center"
+                    android:textColor="@color/zm_red"
+                    android:visibility="gone"/>
 
 
                 <ProgressBar
