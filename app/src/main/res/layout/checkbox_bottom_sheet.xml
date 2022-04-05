@@ -97,16 +97,6 @@
 
         </LinearLayout>
 
-        <TextView
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:text="No data available"
-            android:textSize="20sp"
-            android:gravity="center"
-            android:id="@+id/noData_tv"/>
-
         <LinearLayout
             android:layout_marginTop="3dp"
             android:weightSum="3"

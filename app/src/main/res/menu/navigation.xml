@@ -13,7 +13,7 @@
         android:title="Download Content"/>
 
     <item
-        android:visible="false"
+
         android:id="@+id/displayVisualPage"
         android:icon="@drawable/ic_display_visual"
         android:title="Presentation"/>

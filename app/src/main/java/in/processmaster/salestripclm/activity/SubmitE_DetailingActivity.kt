@@ -98,22 +98,23 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 dcrId= PreferenceClass(this).getPref("dcrId").toInt()
             }
 
-            if(intent.getIntExtra("doctorID",0)!=0) doctorIdDisplayVisual= intent.getIntExtra("doctorID",0)!!
+            if(intent.getIntExtra("doctorID",0)!=0) doctorIdDisplayVisual= intent.getIntExtra("doctorID",0)
 
             val quantityModel=Gson().fromJson(dbBase.getApiDetail(3),CommonModel.QuantityModel.Data::class.java)
 
-            var listSample = quantityModel.employeeSampleBalanceList!!.filter { s -> s.productType == "Sample"}
+            var listSample = quantityModel.employeeSampleBalanceList?.filter { s -> s.productType == "Sample"}
             var listStokist = staticSyncData?.retailerList?.filter { s -> s.type == "STOCKIST" }
-            var Gift = quantityModel.employeeSampleBalanceList!!.filter { s -> s.productType == "Gift"}
-            var listGift = Gift!!.filter { s -> s.actualBalanceQty != 0}
+            var Gift = quantityModel.employeeSampleBalanceList?.filter { s -> s.productType == "Gift"}
+            var listGift = Gift?.filter { s -> s.actualBalanceQty != 0}
 
-            for(stockist in listStokist!!)
-            {
-                val data =IdNameBoll_model()
-                data.id= stockist.retailerId.toString()
-                data.city= stockist.cityName.toString()
-                data.name= stockist.shopName.toString()
-                stokistArray.add(data)
+            if (listStokist != null) {
+                for(stockist in listStokist) {
+                    val data =IdNameBoll_model()
+                    data.id= stockist.retailerId.toString()
+                    data.city= stockist.cityName.toString()
+                    data.name= stockist.shopName.toString()
+                    stokistArray.add(data)
+                }
             }
 
             for(workWith in staticSyncData?.workingWithList!!)
@@ -124,22 +125,24 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 workWithArray.add(data)
             }
 
-            for(sample in listSample)
-            {
-                val data =IdNameBoll_model()
-                data.id= sample.productId.toString()
-                data.name=sample?.productName!!
-                data.availableQty=sample?.actualBalanceQty?.toInt()!!
-                sampleArray.add(data)
+            if (listSample != null) {
+                for(sample in listSample) {
+                    val data =IdNameBoll_model()
+                    data.id= sample.productId.toString()
+                    data.name=sample?.productName!!
+                    data.availableQty= sample?.actualBalanceQty?.toInt()!!
+                    sampleArray.add(data)
+                }
             }
 
-            for(gift in listGift)
-            {
-                val data =IdNameBoll_model()
-                data.id= gift.productId.toString()
-                data.name=gift?.productName!!
-                data.availableQty=gift?.actualBalanceQty?.toInt()!!
-                giftArray.add(data)
+            if (listGift != null) {
+                for(gift in listGift) {
+                    val data =IdNameBoll_model()
+                    data.id= gift.productId.toString()
+                    data.name=gift?.productName!!
+                    data.availableQty=gift?.actualBalanceQty?.toInt()!!
+                    giftArray.add(data)
+                }
             }
 
             val string = Gson().toJson(staticSyncData)
@@ -218,10 +221,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
 
                 Handler(Looper.getMainLooper()).postDelayed({
-                    alertClass.hideAlert()
-
-
-                }, 10)
+                    alertClass.hideAlert() }, 10)
 
             }
         }
@@ -311,11 +311,11 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
         submitDetailing_btn.setOnClickListener({
 
-            var firstSample=sampleArray!!.filter { s -> s.isChecked == true }
-            var sampleQTy = firstSample!!.filter { s -> s.qty == -1}
+            var firstSample=sampleArray?.filter { s -> s.isChecked == true }
+            var sampleQTy = firstSample?.filter { s -> s.qty == -1}
 
-            var firstGift=giftArray!!.filter { s -> s.isChecked == true }
-            var giftyQTy = firstGift!!.filter { s -> s.qty >= 0}
+            var firstGift=giftArray?.filter { s -> s.isChecked == true }
+            var giftyQTy = firstGift?.filter { s -> s.qty >= 0}
 
             if(sampleQTy.size>0 ) {
                 alertClass.commonAlert("","Sample quantity not be zero")
@@ -329,9 +329,9 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             var saveModel=getSaveData(false)
 
             val quantityModel=Gson().fromJson(dbBase.getApiDetail(3),CommonModel.QuantityModel.Data::class.java)
-            var quantityArray=quantityModel.employeeSampleBalanceList!! as ArrayList<CommonModel.QuantityModel.Data.EmployeeSampleBalance>
+            var quantityArray=quantityModel.employeeSampleBalanceList as ArrayList<CommonModel.QuantityModel.Data.EmployeeSampleBalance>
 
-            for((index, model) in quantityArray!!.withIndex())
+            for((index, model) in quantityArray?.withIndex())
             {
                 for (data in sampleArray)
                 {
@@ -793,7 +793,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             saveModel.dcrDate=generalClass.getCurrentDateTimeApiForamt()
         }
 
-        val workWithTemp=workWithArray!!.filter { s -> s.isChecked == true }
+        val workWithTemp=workWithArray?.filter { s -> s.isChecked == true }
         var workWithStr=""
         for (data in workWithTemp)
         {    if(workWithStr!="") workWithStr=workWithStr.plus(",")
@@ -801,7 +801,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         }
         saveModel.workWith=workWithStr
 
-        val tempGiftList=giftArray!!.filter { s -> s.isChecked == true }
+        val tempGiftList=giftArray?.filter { s -> s.isChecked == true }
         var giftList=ArrayList<DailyDocVisitModel.Data.DcrDoctor.GiftList>()
         for(data in tempGiftList)
         {
@@ -814,7 +814,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             giftList.add(giftModel)
         }
 
-        val tempSampleList=sampleArray!!.filter { s -> s.isChecked == true }
+        val tempSampleList=sampleArray?.filter { s -> s.isChecked == true }
         var sampleList=ArrayList<DailyDocVisitModel.Data.DcrDoctor.SampleList>()
         for(data in tempSampleList)
         {
@@ -1075,7 +1075,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
           workWithArray= ArrayList<IdNameBoll_model>()
           workWithArray.addAll(passingArrayList)
             if(isUpdate) {
-                var sendingList = workWithArray!!.filter { s -> s.isChecked == true }
+                var sendingList = workWithArray?.filter { s -> s.isChecked == true }
                 workingWithRv.adapter = TextWithEditAdapter(sendingList as ArrayList<IdNameBoll_model>, this,0,this,selectionType)
                 if(sendingList.size!=0)workingWithRv.visibility=View.VISIBLE
             }
@@ -1085,7 +1085,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             sampleArray= ArrayList<IdNameBoll_model>()
             sampleArray.addAll(passingArrayList)
             if(isUpdate) {
-                var sendingList = sampleArray!!.filter { s -> s.isChecked == true }
+                var sendingList = sampleArray?.filter { s -> s.isChecked == true }
                 sample_rv.adapter =TextWithEditAdapter(sendingList as ArrayList<IdNameBoll_model>, this, 1, this,selectionType)
                 if(sendingList.size!=0)sample_rv.visibility=View.VISIBLE
             }
@@ -1094,7 +1094,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         { giftArray= ArrayList<IdNameBoll_model>()
             giftArray.addAll(passingArrayList)
             if(isUpdate) {
-                var sendingList = giftArray!!.filter { s -> s.isChecked == true }
+                var sendingList = giftArray?.filter { s -> s.isChecked == true }
                 gift_rv.adapter = TextWithEditAdapter(sendingList as ArrayList<IdNameBoll_model>, this, 1, this,selectionType)
                 if(sendingList.size!=0)gift_rv.visibility=View.VISIBLE
             }
@@ -1300,20 +1300,20 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 }
 
 
-                for(intentProduct in edetailingEditModel.sampleList!!)
+                for(intentProduct in edetailingEditModel?.sampleList!!)
                 {
                     for( (index,getSample) in sampleArray.withIndex())
                     {
                         if(intentProduct.productId == getSample.id.toInt()){
                             getSample.isChecked=true
-                            getSample.qty=intentProduct.qty!!
+                            getSample.qty= intentProduct.qty!!
                             sampleArray.set(index,getSample)
                         }
                     }
                 }
                 val passingSamples=sampleArray.filter { s -> (s.isChecked) }
 
-                for(intentGift in edetailingEditModel.giftList!!)
+                for(intentGift in edetailingEditModel?.giftList!!)
                 {
                     for( (index,getGift) in giftArray.withIndex())
                     {
@@ -1328,15 +1328,15 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
                 if(edetailingEditModel.workWith!=null && edetailingEditModel.workWith!="")
                 {
-                    val getWorkingList: List<String> = edetailingEditModel.workWith!!.split(",")
-                    for(workingWith in getWorkingList)
-                    {
-                        for( (index,getWorking) in workWithArray.withIndex())
-                        {
-                            if(workingWith.toInt() == getWorking.id.toInt()){
-                                getWorking.isChecked=true
-                                workWithArray.set(index,getWorking)
-                                workingWithRv.visibility=View.VISIBLE
+                    val getWorkingList: List<String>? = edetailingEditModel.workWith?.split(",")
+                    if (getWorkingList != null) {
+                        for(workingWith in getWorkingList) {
+                            for( (index,getWorking) in workWithArray.withIndex()) {
+                                if(workingWith.toInt() == getWorking.id.toInt()){
+                                    getWorking.isChecked=true
+                                    workWithArray.set(index,getWorking)
+                                    workingWithRv.visibility=View.VISIBLE
+                                }
                             }
                         }
                     }
@@ -1426,7 +1426,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         val runnable = java.lang.Runnable {
 
             val edetailingEditModel=Gson().fromJson(intent.getStringExtra("apiDataDcr"),DailyDocVisitModel.Data.DcrDoctor::class.java)
-            doctorIdDisplayVisual=edetailingEditModel.doctorId!!
+            doctorIdDisplayVisual= edetailingEditModel.doctorId!!
             visualSendModel.addAll(edetailingEditModel.eDetailList)
 
             for(intentProduct in edetailingEditModel.sampleList!!)
@@ -1457,15 +1457,15 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
             if(edetailingEditModel.workWith!=null && edetailingEditModel.workWith!="")
             {
-                val getWorkingList: List<String> = edetailingEditModel.workWith!!.split(",")
-                for(workingWith in getWorkingList)
-                {
-                    for( (index,getWorking) in workWithArray.withIndex())
-                    {
-                        if(workingWith.toInt() == getWorking.id.toInt()){
-                            getWorking.isChecked=true
-                            workWithArray.set(index,getWorking)
-                            workingWithRv.visibility=View.VISIBLE
+                val getWorkingList: List<String>? = edetailingEditModel.workWith?.split(",")
+                if (getWorkingList != null) {
+                    for(workingWith in getWorkingList) {
+                        for( (index,getWorking) in workWithArray.withIndex()) {
+                            if(workingWith.toInt() == getWorking.id.toInt()){
+                                getWorking.isChecked=true
+                                workWithArray.set(index,getWorking)
+                                workingWithRv.visibility=View.VISIBLE
+                            }
                         }
                     }
                 }
@@ -1599,9 +1599,9 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         val inset = InsetDrawable(back, 25)
         alertDialog.getWindow()?.setBackgroundDrawable(inset)
 
-        val wmlp: WindowManager.LayoutParams = alertDialog.getWindow()?.getAttributes()!!
+        val wmlp: WindowManager.LayoutParams? = alertDialog.getWindow()?.getAttributes()
 
-        wmlp.gravity = Gravity.TOP or Gravity.RIGHT
+        wmlp?.gravity = Gravity.TOP or Gravity.RIGHT
 
 
         val closePob_iv = dialogView.findViewById<View>(R.id.closePob_iv) as ImageView

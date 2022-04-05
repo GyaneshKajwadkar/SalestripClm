@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="10dp"
+    tools:context=".fragments.RetailerFillFragment"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="1.5">
+            <LinearLayout
+                android:padding="2dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="0.5">
+                <TextView
+                    android:textColor="@color/appDarkColor"
+                    android:layout_marginLeft="3dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Visit purpose" />
+
+                <Spinner
+                    android:textColor="@color/white"
+                    android:background="@drawable/spinner_back"
+                    android:id="@+id/visitPurpose_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:padding="2dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/remarkHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@+id/remark_cv"
+                    android:text="Remark"
+                    android:textColor="@color/appDarkColor"
+                    android:layout_marginLeft="10dp"
+                    />
+
+                <EditText
+                    android:layout_margin="3dp"
+                    style="@style/editTextWithRound"
+                    android:background="@drawable/round_shape_edit"
+                    android:id="@+id/remark_Et"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:lines="3" />
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+
+
+
+
+        <RelativeLayout
+            android:padding="2dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:id="@+id/toggleButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:weightSum="4"
+                    app:checkedButton="@+id/workingWith_btn"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/workingWith_btn"
+                        style="@style/ToggleButtonGroupStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:insetLeft="2dp"
+                        android:insetRight="2dp"
+                        android:text="Working with" />
+
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/samples_btn"
+                        style="@style/ToggleButtonGroupStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:insetLeft="2dp"
+                        android:insetRight="2dp"
+                        android:text="Samples" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/gifts_btn"
+                        style="@style/ToggleButtonGroupStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:insetLeft="2dp"
+                        android:insetRight="2dp"
+                        android:text="Gifts"
+
+                        />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/pob_btn"
+                        style="@style/ToggleButtonGroupStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:insetLeft="2dp"
+                        android:insetRight="2dp"
+                        android:text="POB" />
+
+
+                </com.google.android.material.button.MaterialButtonToggleGroup>
+
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/selectBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:backgroundTint="@color/appColorlight"
+                    android:text="Select Working with"
+                    android:textAllCaps="false"
+                    app:cornerRadius="7dp" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/workingWithRv"
+                    style="@style/marginTenLeftRight"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/box_boarder"
+                    android:visibility="gone" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/sample_rv"
+                    style="@style/marginTenLeftRight"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/box_boarder"
+                    android:visibility="gone" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/gift_rv"
+                    style="@style/marginTenLeftRight"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/box_boarder"
+                    android:visibility="gone" />
+
+                <LinearLayout
+                    android:id="@+id/pobParent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/assignStockist"
+                        style="@style/materialButtonWithImage"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/darkBlue"
+                        android:drawableTint="@color/white"
+                        android:text="Assign Stockist"
+                        android:textColor="@color/white"
+                        app:cornerRadius="20dp"
+                        app:icon="@drawable/zm_ic_im_search"
+                        app:iconTint="@color/white" />
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp">
+
+                        <TextView
+                            android:id="@+id/totalProductPrice_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:text="Order total: 00"
+                            android:textColor="@color/black" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/pobProduct_btn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:layout_alignParentEnd="true"
+                            android:backgroundTint="@color/lightred"
+                            android:text="Product"
+                            android:textAllCaps="false"
+                            android:textColor="@color/white"
+                            app:icon="@drawable/zm_ic_im_search" />
+
+                    </RelativeLayout>
+
+                    <TextView
+                        android:id="@+id/stockistName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:textAlignment="center"
+                        android:textColor="@color/black"
+                        android:textSize="18sp"
+                        android:visibility="gone" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/gray" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/selectedPob_rv"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </LinearLayout>
+        </RelativeLayout>
+    </LinearLayout>
+
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:elevation="3dp">
+
+        <include layout="@layout/checkbox_bottom_sheet" />
+
+        <include layout="@layout/pob_product_bottom_sheet" />
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+</RelativeLayout>

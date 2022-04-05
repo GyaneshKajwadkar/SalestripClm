@@ -5,6 +5,7 @@ import `in`.processmaster.salestripclm.activity.SubmitE_DetailingActivity
 import `in`.processmaster.salestripclm.interfaceCode.IdNameBoll_interface
 import `in`.processmaster.salestripclm.models.IdNameBoll_model
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -17,7 +18,7 @@ class TextWithEditAdapter(
     var mainList: ArrayList<IdNameBoll_model>?,
     var callback: IdNameBoll_interface?,
     var showEdit: Int?,
-    val context: SubmitE_DetailingActivity?,
+    val context: Activity?,
     var selectionType: Int,
 ) : RecyclerView.Adapter<TextWithEditAdapter.MyViewHolder>(), Filterable {
 

@@ -63,6 +63,7 @@ class NewCallFragment : Fragment() {
     var views:View?=null
     private lateinit var adapter:BottomSheetDoctorAdapter
     var doctorListArray:ArrayList<SyncModel.Data.Doctor> = ArrayList()
+    var retailerListArray:ArrayList<SyncModel.Data.Retailer> = ArrayList()
     var routeList: ArrayList<SyncModel.Data.Route> = ArrayList()
     var teamsList: ArrayList<SyncModel.Data.FieldStaffTeam> = ArrayList()
     var selectionType=0
@@ -95,6 +96,7 @@ class NewCallFragment : Fragment() {
 
         SplashActivity.staticSyncData?.doctorList?.let { doctorListArray.addAll(it) }
         SplashActivity.staticSyncData?.routeList?.let { routeList.addAll(it) }
+        SplashActivity.staticSyncData?.retailerList?.let { retailerListArray.addAll(it) }
 
         bottomSheetBehavior = BottomSheetBehavior.from(views!!.bottomSheet)
         generalClassObject= GeneralClass(requireActivity())
@@ -113,11 +115,16 @@ class NewCallFragment : Fragment() {
             views?.selectRoutesCv?.setEnabled(false)*/
         //  views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
 
+
         views?.docRetail_switch?.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {
+                views?.selectDoctor_tv?.setText("Select Doctor")
+                views?.selectionDocRet_tv?.setText("Select Doctor")
                 doctorHeader_tv.setTextColor(ContextCompat.getColorStateList(requireActivity(), R.color.darkBlue))
                 retailerHeader_tv.setTextColor(ContextCompat.getColorStateList(requireActivity(), R.color.gray))
             } else {
+                views?.selectDoctor_tv?.setText("Select Retailer")
+                views?.selectionDocRet_tv?.setText("Select Retailer")
                 retailerHeader_tv.setTextColor(ContextCompat.getColorStateList(requireActivity(), R.color.darkBlue))
                 doctorHeader_tv.setTextColor(ContextCompat.getColorStateList(requireActivity(), R.color.gray))
 
@@ -127,9 +134,6 @@ class NewCallFragment : Fragment() {
                 views?.selectRoutesCv?.setEnabled(false)
                 views?.selectTeam_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
                 views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#A9A9A9"))
-
-
-
             }
             else if(SplashActivity.staticSyncData?.settingDCR?.roleType=="FS") {
                 views?.selectTeamsCv?.visibility = View.GONE
@@ -142,11 +146,10 @@ class NewCallFragment : Fragment() {
             views?.precall_parent?.visibility=View.GONE
             views?.parentButton?.visibility=View.GONE
             views?.noData_gif?.visibility=View.VISIBLE
+            views?.frameRetailer_view?.visibility=View.GONE
 
-            views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
             views?.selectRoute_tv?.setText("Select route")
             views?.selectDoctor_tv?.setBackgroundColor(Color.parseColor("#A9A9A9"))
-            views?.selectDoctor_tv?.setText("Select Doctor")
             views?.selectTeam_tv?.setText("Select team")
             views?.selectDoctorsCv?.setEnabled(false)
         }
@@ -160,20 +163,33 @@ class NewCallFragment : Fragment() {
         views?.selectRoutesCv?.setOnClickListener({
 
 
-            if(checkDCRusingShareP(1)){
+         //   if(checkDCRusingShareP(1)){
                 views?.bottomSheetTitle_tv?.setText("Select route")
                 selectionType=1
                 openCloseModel()
-            }
+          //  }
         })
 
         views?.selectDoctorsCv?.setOnClickListener({
-            views?.bottomSheetTitle_tv?.setText("Select Doctor")
+
             selectionType=2
-            if(doctorListArray.size<=0)
+
+            if(view?.docRetail_switch?.isChecked == true)
             {
-                alertClass?.commonAlert("This route has no doctor","")
-                return@setOnClickListener
+                views?.bottomSheetTitle_tv?.setText("Select Doctor")
+                if(doctorListArray.size<=0)
+                {
+                    alertClass?.commonAlert("This route has no doctor","")
+                    return@setOnClickListener
+                }
+            }
+            else{
+                views?.bottomSheetTitle_tv?.setText("Select Retailer")
+                if(retailerListArray.size<=0)
+                {
+                    alertClass?.commonAlert("This route has no Retailer","")
+                    return@setOnClickListener
+                }
             }
             openCloseModel()})
 
@@ -181,7 +197,9 @@ class NewCallFragment : Fragment() {
 
         adapter =BottomSheetDoctorAdapter()
 
-        views?.close_imv?.setOnClickListener({ bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)})
+        views?.close_imv?.setOnClickListener({
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)})
+
         views?.doctorSearch_et?.addTextChangedListener(filterTextWatcher)
 
         views?.startDetailing_btn?.setOnClickListener({
@@ -211,6 +229,11 @@ class NewCallFragment : Fragment() {
         staticSyncData?.fieldStaffTeamList?.let { teamsList.addAll(it) }
         routeList = routeList?.filter { s -> s.headQuaterName !=""} as java.util.ArrayList<SyncModel.Data.Route>
       //  checkDCRusingShareP(0)
+
+        val transaction = requireActivity().supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.frameRetailer_view, RetailerFillFragment())
+        transaction.disallowAddToBackStack()
+        transaction.commit()
     }
 
     fun checkDCRusingShareP(i: Int):Boolean
@@ -250,6 +273,8 @@ class NewCallFragment : Fragment() {
 
     fun openCloseModel()
     {
+        views?.doctorSearch_et?.setText("")
+
         adapter =BottomSheetDoctorAdapter()
         views?.doctorList_rv?.setLayoutManager(GridLayoutManager(requireActivity(), 3))
         views?.doctorList_rv?.adapter = adapter
@@ -269,6 +294,7 @@ class NewCallFragment : Fragment() {
         }
 
         override fun afterTextChanged(s: Editable) {
+
             // TODO Auto-generated method stub
         }
     }
@@ -281,6 +307,7 @@ class NewCallFragment : Fragment() {
         var filteredDataTeams:ArrayList<SyncModel.Data.FieldStaffTeam> = teamsList as ArrayList<SyncModel.Data.FieldStaffTeam>
         var filteredDataRoute:ArrayList<SyncModel.Data.Route> = routeList as ArrayList<SyncModel.Data.Route>
         var filteredDataDoctor:ArrayList<SyncModel.Data.Doctor> = doctorListArray as ArrayList<SyncModel.Data.Doctor>
+        var filteredDataRetailer:ArrayList<SyncModel.Data.Retailer> = retailerListArray as ArrayList<SyncModel.Data.Retailer>
 
 
         inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -327,6 +354,7 @@ class NewCallFragment : Fragment() {
 
                 holder.parent_cv.setOnClickListener({
                     doctorListArray.clear()
+                    retailerListArray.clear()
                     views?.selectRoute_tv?.setText((modeldata?.routeName))
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
                     onSelection()
@@ -339,17 +367,41 @@ class NewCallFragment : Fragment() {
                 if(filteredDataDoctor.size<=0)  views?.noData_tv?.visibility=View.VISIBLE
                 else  views?.noData_tv?.visibility=View.GONE
 
-                val modeldata = filteredDataDoctor?.get(position)
-                holder.headerDoctor_tv.setText(modeldata?.doctorName)
-                holder.route_tv.setText("Route- " + modeldata?.routeName)
-                holder.speciality_tv.setText("Speciality- " + modeldata?.specialityName)
+                if( views?.docRetail_switch?.isChecked==true)
+                {
+                    val modeldata = filteredDataDoctor?.get(position)
+                    holder.headerDoctor_tv.setText(modeldata?.doctorName)
+                    holder.route_tv.setText("Route- " + modeldata?.routeName)
+                    holder.speciality_tv.setText("Speciality- " + modeldata?.specialityName)
 
-                holder.parent_cv.setOnClickListener({
-                    views?.selectDoctor_tv?.setText((modeldata?.doctorName))
-                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
-                    setDoctor(modeldata)
-                    onSelection()
-                })
+                    holder.parent_cv.setOnClickListener({
+                        views?.selectDoctor_tv?.setText((modeldata?.doctorName))
+                        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
+                        setDoctor(modeldata)
+                        onSelection()
+                    })
+                }
+                else{
+                    val modeldata = filteredDataRetailer?.get(position)
+                    holder.headerDoctor_tv.setText(modeldata?.shopName)
+                    holder.route_tv.setText("Route- " + modeldata?.routeName)
+                    holder.speciality_tv.setText("Headquater- " + modeldata?.headQuaterName)
+
+                    holder.parent_cv.setOnClickListener({
+                        views?.selectDoctor_tv?.setText((modeldata?.shopName))
+                        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
+                        views?.noData_gif?.visibility=View.GONE
+
+                        views?.frameRetailer_view?.visibility=View.VISIBLE
+
+
+
+                    })
+                }
+
+
+
+
             }
 
         }
@@ -360,7 +412,9 @@ class NewCallFragment : Fragment() {
             else if(selectionType==1)
                 return filteredDataRoute?.size
             else
-                return filteredDataDoctor?.size
+                if(view?.docRetail_switch?.isChecked == true) return filteredDataDoctor?.size
+                else return filteredDataRetailer.size
+
         }
 
 
@@ -405,18 +459,36 @@ class NewCallFragment : Fragment() {
                         results.count = FilteredArrayNames.size
                         results.values = FilteredArrayNames
                         return results }
-                    else
-                    {   val FilteredArrayNames: ArrayList<SyncModel.Data.Doctor> = ArrayList()
+                    else {
                         constraint = constraint.toString().lowercase()
-                        for (i in 0 until doctorListArray?.size!!) {
-                            val docNames: SyncModel.Data.Doctor = doctorListArray?.get(i)
-                            if (docNames.doctorName?.lowercase()?.startsWith(constraint.toString()) == true) {
-                                FilteredArrayNames.add(docNames)
+
+                        if (views?.docRetail_switch?.isChecked == true)
+                        {
+                            val FilteredArrayNames: ArrayList<SyncModel.Data.Doctor> = ArrayList()
+
+                            for (i in 0 until doctorListArray?.size!!) {
+                                val docNames: SyncModel.Data.Doctor = doctorListArray?.get(i)
+                                if (docNames.doctorName?.lowercase()?.startsWith(constraint.toString()) == true) {
+                                    FilteredArrayNames.add(docNames)
+                                }
                             }
+                            results.count = FilteredArrayNames.size
+                            results.values = FilteredArrayNames
+                            return results
                         }
-                        results.count = FilteredArrayNames.size
-                        results.values = FilteredArrayNames
-                        return results}
+                        else
+                        {
+                            val FilteredArrayNames: ArrayList<SyncModel.Data.Retailer> = ArrayList()
+                            for (i in 0 until retailerListArray?.size!!) {
+                                val docNames: SyncModel.Data.Retailer = retailerListArray?.get(i)
+                                if (docNames.shopName?.lowercase()?.startsWith(constraint.toString()) == true) {
+                                    FilteredArrayNames.add(docNames) } }
+                            results.count = FilteredArrayNames.size
+                            results.values = FilteredArrayNames
+                            return results
+                        }
+
+                    }
                 }
             }
         }
@@ -478,7 +550,9 @@ class NewCallFragment : Fragment() {
          views?.noData_gif?.visibility=View.VISIBLE
          views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#3CB371"))
          views?.selectDoctor_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
-         views?.selectDoctor_tv?.setText("Select Doctor")
+         if(views?.docRetail_switch?.isChecked==true) views?.selectDoctor_tv?.setText("Select Doctor")
+             else  views?.selectDoctor_tv?.setText("Select Retailer")
+
          views?.selectDoctorsCv?.setEnabled(true)
      }
      else
@@ -490,10 +564,11 @@ class NewCallFragment : Fragment() {
     fun applySelectionFilter(id:Int)
     {
         if(selectionType==0)
-        {    SplashActivity.staticSyncData?.routeList?.let { routeList.addAll(it) }
-            val filterRouteUsingFieldStaff= routeList.filter {  s -> s.fieldStaffId == id }
+        {
             routeList.clear()
-            routeList.addAll(filterRouteUsingFieldStaff)
+           // SplashActivity.staticSyncData?.routeList?.let { routeList.addAll(it) }
+            val filterRouteUsingFieldStaff= SplashActivity.staticSyncData?.routeList?.filter {  s -> s.fieldStaffId == id }
+            filterRouteUsingFieldStaff?.let { routeList.addAll(it) }
 
         }
         else if(selectionType==1)
@@ -510,27 +585,62 @@ class NewCallFragment : Fragment() {
                 startPoint.setLongitude(getGpsTracker.longitude)
                // startPoint.setLongitude(75.90522484470453)
 
-                val docFirstFilter= SplashActivity.staticSyncData?.doctorList?.filter { s -> s.routeId == id } as java.util.ArrayList<SyncModel.Data.Doctor>
 
 
-            for(fetch in docFirstFilter)
+                if(views?.docRetail_switch?.isChecked==true)
                 {
+                    val docFirstFilter= SplashActivity.staticSyncData?.doctorList?.filter { s -> s.routeId == id } as java.util.ArrayList<SyncModel.Data.Doctor>
 
-                   if(fetch.latitude==0.00 || fetch.longitude==0.00) { continue }
+                    for(fetch in docFirstFilter)
+                    {
 
-                    val endPoint = Location("locationB")
-                    endPoint.latitude = fetch.latitude
-                    endPoint.longitude = fetch.longitude
-                    val distance = startPoint.distanceTo(endPoint).toInt()
-                    doctorListArray.add(fetch)
-                    if(distance <= getRadius){
+                        if(fetch.latitude==0.00 || fetch.longitude==0.00) { continue }
+
+                        val endPoint = Location("locationB")
+                        endPoint.latitude = fetch.latitude
+                        endPoint.longitude = fetch.longitude
+                        val distance = startPoint.distanceTo(endPoint).toInt()
                        // doctorListArray.add(fetch)
+                        if(distance <= getRadius){
+                           doctorListArray.add(fetch)
+                        }
                     }
                 }
+                else
+                {
+
+                    val retailFirstFilter= SplashActivity.staticSyncData?.retailerList?.filter { s -> s.routeId == id } as java.util.ArrayList<SyncModel.Data.Retailer>
+
+                    for(fetch in retailFirstFilter)
+                    {
+
+                        if(fetch.latitude==0.00 || fetch.longitude==0.00) { continue }
+
+                        val endPoint = Location("locationB")
+                        endPoint.latitude = fetch.latitude
+                        endPoint.longitude = fetch.longitude
+                        val distance = startPoint.distanceTo(endPoint).toInt()
+                      //  retailerListArray.add(fetch)
+                        if(distance <= getRadius){
+                           retailerListArray.add(fetch)
+                        }
+                    }
+                }
+
+
+
             }
             else
             {
-                doctorListArray = SplashActivity.staticSyncData?.doctorList?.filter { s -> s.routeId == id } as java.util.ArrayList<SyncModel.Data.Doctor>
+                if(views?.docRetail_switch?.isChecked==true)
+                {
+                    doctorListArray = SplashActivity.staticSyncData?.doctorList?.filter { s -> s.routeId == id } as java.util.ArrayList<SyncModel.Data.Doctor>
+                }
+                else
+                {
+                    retailerListArray = SplashActivity.staticSyncData?.retailerList?.filter { s -> s.routeId == id } as java.util.ArrayList<SyncModel.Data.Retailer>
+                }
+
             }
         }
     }

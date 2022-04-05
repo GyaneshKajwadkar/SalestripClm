@@ -89,17 +89,17 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
         views!!.submitBtn?.setOnClickListener({
 
             val bundle = arguments
-            if(bundle !=null)
-            {
+           /* if(bundle !=null)
+            {*/
                   val intent = Intent(activity, SubmitE_DetailingActivity::class.java)
                   intent.putExtra("doctorID", doctorIdDisplayVisual)
                   intent.putExtra("doctorName", doctorName)
                   startActivityForResult(intent,2)
-            }
+           /* }
             else{
                 Toast.makeText(context,"Data save successfully",Toast.LENGTH_LONG).show()
                 views!!.submitBtn?.visibility=View.INVISIBLE
-            }
+            }*/
         })
 
        // setDoctorList()
@@ -165,6 +165,8 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
 
         db.deleteAllVisualAds()
         db.deleteAllChildVisual()
+
+        setDoctorList()
     }
 
     fun setDoctorList()
