@@ -26,7 +26,7 @@
 
 
                 <LinearLayout
-
+                    android:visibility="gone"
                     android:gravity="center"
                     android:orientation="horizontal"
                     android:layout_width="wrap_content"
@@ -67,7 +67,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:cardBackgroundColor="#FA8072"
-                    android:layout_marginTop="5dp"
+                    android:layout_margin="1dp"
                     style="@style/generalCard"
                     android:id="@+id/selectTeamsCv">
                     <TextView
@@ -90,7 +90,7 @@
                     android:id="@+id/selectRoutesCv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
+                    android:layout_margin="1dp"
                     style="@style/generalCard"
                     app:cardBackgroundColor="#A9A9A9">
 
@@ -114,7 +114,7 @@
                     android:enabled="false"
                     app:cardBackgroundColor="#A9A9A9"
                     style="@style/generalCard"
-                    android:layout_marginTop="3dp"
+                    android:layout_margin="1dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/selectDoctorsCv">
@@ -787,24 +787,26 @@
                     </ScrollView>
                 </RelativeLayout>
 
-                <pl.droidsonroids.gif.GifImageView
+                <ImageView
                     android:id="@+id/noData_gif"
                     android:layout_width="250dp"
                     android:layout_height="250dp"
                     android:layout_centerInParent="true"
-                    android:src="@drawable/nodata_gif" />
+                    android:src="@drawable/no_data_found" />
 
-                    <TextView
-                        android:layout_below="@+id/noData_gif"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="10dp"
-                        android:id="@+id/noInternet_tv"
-                        android:text="No Internet connection"
-                        android:textSize="22sp"
-                        android:textAlignment="center"
-                        android:textColor="@color/zm_red"
-                        android:visibility="gone"/>
+                <TextView
+                    android:id="@+id/noInternet_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/noData_gif"
+                    android:layout_centerHorizontal="true"
+                    android:text="No Internet connection"
+                    android:textAlignment="center"
+                    android:textColor="@color/zm_red"
+                    android:textSize="22sp"
+                    android:visibility="gone"
+
+                    />
 
 
                 <ProgressBar

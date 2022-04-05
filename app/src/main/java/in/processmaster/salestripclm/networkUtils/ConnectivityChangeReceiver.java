@@ -35,7 +35,7 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver {
         }
         else {
              SplashActivity.Companion.setShowNetworkAlert(true);
-            baseActivity.disableNetworkAlert();
+            baseActivity.disableNetworkAlert(activity);
         }
     }
 

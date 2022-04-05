@@ -1,6 +1,5 @@
 package `in`.processmaster.salestripclm.fragments
 import `in`.processmaster.salestripclm.R
-import `in`.processmaster.salestripclm.activity.HomePage
 import `in`.processmaster.salestripclm.activity.HomePage.Companion.apiInterface
 import `in`.processmaster.salestripclm.activity.HomePage.Companion.loginModelHomePage
 import `in`.processmaster.salestripclm.activity.OnlinePresentationActivity
@@ -12,10 +11,7 @@ import `in`.processmaster.salestripclm.adapter.SimpleListAdapter
 import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.common_classes.CommonListGetClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
-import `in`.processmaster.salestripclm.models.CommonModel
-import `in`.processmaster.salestripclm.models.LoginModel
-import `in`.processmaster.salestripclm.models.PreCallModel
-import `in`.processmaster.salestripclm.models.SyncModel
+import `in`.processmaster.salestripclm.models.*
 import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import `in`.processmaster.salestripclm.networkUtils.GPSTracker
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
@@ -53,7 +49,6 @@ import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import us.zoom.sdk.ZoomSDK
 import java.util.*
 
 
@@ -73,6 +68,7 @@ class NewCallFragment : Fragment() {
     var generalClassObject:GeneralClass?=null
     var routeIdGetDCR=""
     var alertClass:AlertClass?=null
+    lateinit var  docCallModel : DailyDocVisitModel.Data
 
 
     override fun onCreateView(
@@ -162,12 +158,11 @@ class NewCallFragment : Fragment() {
 
         views?.selectRoutesCv?.setOnClickListener({
 
-
-         //   if(checkDCRusingShareP(1)){
+            if(checkDCRusingShareP()){
                 views?.bottomSheetTitle_tv?.setText("Select route")
                 selectionType=1
                 openCloseModel()
-          //  }
+          }
         })
 
         views?.selectDoctorsCv?.setOnClickListener({
@@ -204,9 +199,9 @@ class NewCallFragment : Fragment() {
 
         views?.startDetailing_btn?.setOnClickListener({
 
-            if(views?.lastVisitDate_tv?.text?.equals(generalClassObject?.getCurrentDate()) == true && db.isEDetailingAvailable(selectedDocID, generalClassObject?.getCurrentDate()
-                ))
-            {
+            val isAlreadyContain=docCallModel.dcrDoctorlist?.any{ s -> s.doctorId == selectedDocID }
+            if(isAlreadyContain == true) {
+                views?.parentButton?.visibility=View.GONE
                 alertClass?.commonAlert("Alert!","Doctor e-detailing already done for today")
                 return@setOnClickListener
             }
@@ -230,17 +225,23 @@ class NewCallFragment : Fragment() {
         routeList = routeList?.filter { s -> s.headQuaterName !=""} as java.util.ArrayList<SyncModel.Data.Route>
       //  checkDCRusingShareP(0)
 
-        val transaction = requireActivity().supportFragmentManager.beginTransaction()
+       /* val transaction = requireActivity().supportFragmentManager.beginTransaction()
         transaction.replace(R.id.frameRetailer_view, RetailerFillFragment())
         transaction.disallowAddToBackStack()
-        transaction.commit()
+        transaction.commit()*/
+
+
+        val responseDocCall=db.getApiDetail(5)
+        if(!responseDocCall.equals("")) {
+            docCallModel = Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
+        }
     }
 
-    fun checkDCRusingShareP(i: Int):Boolean
+    fun checkDCRusingShareP():Boolean
     {
         if(generalClassObject?.isInternetAvailable() == true)
         {
-            callCoroutineApi(i)
+            callCoroutineApi()
             return false
         }
 
@@ -257,10 +258,10 @@ class NewCallFragment : Fragment() {
         else{ return true }
     }
 
-    fun callCoroutineApi(i: Int) {
+    fun callCoroutineApi() {
         alertClass?.showProgressAlert("")
         val coroutineScope = CoroutineScope(Dispatchers.IO).launch {
-            val api = async { checkCurrentDCR_API(i) }
+            val api = async { checkCurrentDCR_API() }
             api.await()
         }
 
@@ -497,7 +498,6 @@ class NewCallFragment : Fragment() {
     fun setDoctor(doctorDetailModel: SyncModel.Data.Doctor)
     {
         views?.precall_parent?.visibility=View.GONE
-
         views?.doctorDetail_parent?.visibility=View.VISIBLE
         views?.doctorName_tv?.setText(doctorDetailModel.doctorName)
         views?.routeName_tv?.setText(doctorDetailModel.routeName)
@@ -516,9 +516,11 @@ class NewCallFragment : Fragment() {
         if(doctorDetailModel.cityName?.isEmpty() == true)
             views?.cityParent?.visibility=View.GONE
 
+
+
         if(generalClassObject?.isInternetAvailable() == true) {
             noInternet_tv.visibility = View.GONE
-            preCallAnalysisApi()
+            preCallAnalysisApi(doctorDetailModel)
         }
         else noInternet_tv.visibility=View.VISIBLE; views?.parentButton?.visibility=View.VISIBLE
 
@@ -645,7 +647,7 @@ class NewCallFragment : Fragment() {
         }
     }
 
-    private fun preCallAnalysisApi() {
+    private fun preCallAnalysisApi(doctorDetailModel: SyncModel.Data.Doctor) {
 
         views?.noData_gif?.visibility=View.GONE
         views?.analysisProgress?.visibility=View.VISIBLE
@@ -730,6 +732,12 @@ class NewCallFragment : Fragment() {
 
                         var adapterSampleGiven=SimpleListAdapter(mainList,subList)
                         views?.sampleGiven_rv?.adapter=adapterSampleGiven
+
+                        val isAlreadyContain=docCallModel.dcrDoctorlist?.any{ s -> s.doctorId == doctorDetailModel.doctorId }
+                        if(isAlreadyContain == true) {
+                            views?.parentButton?.visibility=View.GONE
+                            alertClass?.commonAlert("Alert!","Doctor e-detailing already done for today")
+                        }
 
                     }
                     else
@@ -997,7 +1005,7 @@ class NewCallFragment : Fragment() {
 
     }
 
-    suspend fun checkCurrentDCR_API(i: Int) {
+    suspend fun checkCurrentDCR_API() {
 
         val response = APIClientKot().getUsersService(2, sharePreferance?.getPref("secondaryUrl")!!).checkDCR_API(
             "bearer " + loginModelHomePage.accessToken,
@@ -1033,12 +1041,11 @@ class NewCallFragment : Fragment() {
                             sharePreferance?.setPref("todayDate", generalClassObject?.currentDateMMDDYY())
                             sharePreferance?.setPref("dcrId", dcrData?.dcrId.toString())
                             sharePreferance?.setPref("empIdSp", loginModelHomePage.empId.toString())
-                            if(i==1)
-                            {
-                                views?.bottomSheetTitle_tv?.setText("Select route")
+
+                            views?.bottomSheetTitle_tv?.setText("Select route")
                                 selectionType=1
                                 openCloseModel()
-                            }
+
                             }
                     } else {
                         GeneralClass(requireActivity()).checkInternet() }
@@ -1121,7 +1128,7 @@ class NewCallFragment : Fragment() {
                    if(generalClassObject?.isInternetAvailable() == true)
                    {
                        CoroutineScope(Dispatchers.IO).launch {
-                           val api = async { checkCurrentDCR_API(1) }
+                           val api = async { checkCurrentDCR_API() }
                            api.await()
                        }
                    }

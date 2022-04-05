@@ -96,8 +96,30 @@ open class BaseActivity : AppCompatActivity(){
         }
     }
 
-    fun disableNetworkAlert() {
+    fun disableNetworkAlert(activity: Activity) {
         if (alertDialogNetwork != null) { alertDialogNetwork?.dismiss() }
+
+        //check if db have edetailing and send to network when internet enable
+        dbBase= DatabaseHandler(activity)
+        sharePreferanceBase = PreferenceClass(activity)
+        val eDetailingArray=dbBase.getAllSaveSend("feedback")
+
+        if(eDetailingArray.size!=0)
+        {
+            val coroutineScope= CoroutineScope(Dispatchers.IO).launch {
+                val sendEdetailing= async {
+                    submitDCRCo() }
+                sendEdetailing.await()
+            }
+            coroutineScope.invokeOnCompletion {
+
+                if (activity is HomePage) {
+                    // ...
+                }
+
+            }
+        }
+
     }
 
     //check permission
@@ -363,26 +385,11 @@ open class BaseActivity : AppCompatActivity(){
     suspend fun submitDCRCo()
     {
 
-     //   val dcrObj= sharePreferanceBase?.getPref("dcrObj")
         val eDetailingArray=dbBase.getAllSaveSend("feedback")
         if(eDetailingArray.size==0)
-        {
-            getDocCallAPI()
-        /*    CoroutineScope(Dispatchers.IO).launch {
-                val getDocCall= async {  }
-                getDocCall.await()
-            }*/
-            return
-        }
+        { getDocCallAPI()
+            return }
 
-       // if(dcrObj==null || dcrObj=="" || eDetailingArray.size==0) { return }
-     //   var getDcrObj = Gson().fromJson(dcrObj.toString(), GetDcrToday.Data.DcrData::class.java)
-      //  if(getDcrObj==null) {return}
-       // getDcrObj.doctorDCRList=eDetailingArray
-       // getDcrObj.mode=2
-
-       // Log.e("siofshfioswd", (getDcrObj.doctorDCRList)?.size.toString())
-       // Log.e("trhtruhrtgrfg",Gson().toJson(getDcrObj))
 
         val response =
             sharePreferanceBase?.getPref("secondaryUrl")?.let {
@@ -402,11 +409,6 @@ open class BaseActivity : AppCompatActivity(){
                            Log.e("getSubmitEdetailingData", response.body().toString())
                         eDetailingArray.get(0).doctorId?.let { dbBase.deleteSaveSend(it) }
                         submitDCRCo()
-
-                      /*  CoroutineScope(Dispatchers.IO).launch {
-                            val getDocCall= async { }
-                            getDocCall.await()
-                        }*/
                     }
                 }
                 else Log.e("elsesubmitDCRCoAPI", response.code().toString())

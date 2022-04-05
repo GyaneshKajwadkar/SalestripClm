@@ -232,7 +232,7 @@ class PobProductAdapter(
                     constraint = constraint.toString().lowercase()
                     for (i in 0 until productList?.size!!) {
                         val docNames: SyncModel.Data.Product = productList?.get(i)
-                        if (docNames.productName?.lowercase()?.startsWith(constraint.toString()) == true) {
+                        if (docNames.productName?.lowercase()?.contains(constraint.toString()) == true) {
                             FilteredArrayNames.add(docNames)
                         }
                     }
