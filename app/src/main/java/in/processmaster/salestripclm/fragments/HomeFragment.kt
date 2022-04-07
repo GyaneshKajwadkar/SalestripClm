@@ -1,5 +1,6 @@
 package `in`.processmaster.salestripclm.fragments
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.activity.HomePage
 import `in`.processmaster.salestripclm.activity.SplashActivity
 import `in`.processmaster.salestripclm.adapter.CallDoctor_Adapter
 import `in`.processmaster.salestripclm.adapter.MeetingExpandableHeaderAdapter
@@ -17,12 +18,9 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.SpannableString
 import android.text.style.RelativeSizeSpan
 import android.text.style.StyleSpan
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -61,8 +59,6 @@ import java.text.DecimalFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 
 
 class HomeFragment : Fragment(), OnChartGestureListener {
@@ -127,6 +123,24 @@ class HomeFragment : Fragment(), OnChartGestureListener {
 
         }
 
+
+        //Refresh fragment from home page
+        (activity as HomePage?)?.setFragmentRefreshListener(object : HomePage.FragmentRefreshListener {
+            override fun onRefresh() {
+                val responseDocCall=db.getApiDetail(5)
+                if(!responseDocCall.equals(""))
+                {
+                    val  docCallModel= Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
+                    val docAdapter= activity?.let { CallDoctor_Adapter(docCallModel.dcrDoctorlist, it) }
+
+                    activity?.runOnUiThread {
+                        if(docCallModel.dcrDoctorlist?.size==0) { noDocCall_tv?.visibility = View.VISIBLE}
+                        dailyDoctorCall_rv?.adapter=docAdapter
+                        todaysCall_tv?.setText("Today's call- "+docCallModel.dcrDoctorlist?.size)
+                    }
+                }
+            }
+        })
 
         return root
     }

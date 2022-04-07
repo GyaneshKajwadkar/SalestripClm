@@ -5,15 +5,15 @@ import `in`.processmaster.salestripclm.adapter.DownloadAdapter
 import `in`.processmaster.salestripclm.models.DownloadEdetail_model
 import `in`.processmaster.salestripclm.models.DownloadFileModel
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
-import android.content.Context
+import android.app.Activity
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.DisplayMetrics
 import android.util.Log
 import android.view.View
+import android.widget.AbsListView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -49,6 +49,10 @@ class DownloadedActivtiy : BaseActivity() {
     var adapterImage =DownloadAdapter()
     var adapterWeb =DownloadAdapter()
 
+    var arraylistVideo:ArrayList<DownloadEdetail_model.Data.EDetailingImages> = ArrayList()
+    var arraylistImages:ArrayList<DownloadEdetail_model.Data.EDetailingImages> = ArrayList()
+    var arraylistZip:ArrayList<DownloadEdetail_model.Data.EDetailingImages> = ArrayList()
+
     var brandId =0;
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,10 +82,6 @@ class DownloadedActivtiy : BaseActivity() {
 
         val args = intent.getBundleExtra("BUNDLE");
         arrayList = args?.getSerializable("ARRAYLIST") as (ArrayList<DownloadEdetail_model.Data.EDetailingImages>)
-
-        var arraylistVideo:ArrayList<DownloadEdetail_model.Data.EDetailingImages> = ArrayList()
-        var arraylistImages:ArrayList<DownloadEdetail_model.Data.EDetailingImages> = ArrayList()
-        var arraylistZip:ArrayList<DownloadEdetail_model.Data.EDetailingImages> = ArrayList()
 
         for ((index, value) in arrayList?.withIndex())
         {
@@ -150,7 +150,6 @@ class DownloadedActivtiy : BaseActivity() {
 
         toolbarText_tv?.setText(brandName)
 
-
         adapterVideo= DownloadAdapter(this, "VIDEO", brandId,brandName,arraylistVideo,eDetailingId)
         video_rv?.layoutManager = GridLayoutManager(this, 5)
         video_rv?.itemAnimator = DefaultItemAnimator()
@@ -165,6 +164,7 @@ class DownloadedActivtiy : BaseActivity() {
         html_rv?.layoutManager = GridLayoutManager(this, 5)
         html_rv?.itemAnimator = DefaultItemAnimator()
         html_rv?.adapter = adapterWeb
+
 
         if(arraylistVideo.size==0)
         {
@@ -194,6 +194,8 @@ class DownloadedActivtiy : BaseActivity() {
            recyclerView!!.layoutManager = GridLayoutManager(this, mNoOfColumns)
            recyclerView?.itemAnimator = DefaultItemAnimator()
            recyclerView?.adapter = adapter*/
+
+
 
 
     }
@@ -576,4 +578,33 @@ class DownloadedActivtiy : BaseActivity() {
         super.onPause()
         stopConnectivity(this)
     }
+
+
+    inner class MyScrollListener : AbsListView.OnScrollListener {
+        override fun onScrollStateChanged(p0: AbsListView?, p1: Int) {
+            if (AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL == p1) {
+                val currentFocus= (this as Activity).getCurrentFocus()
+                if (currentFocus != null) {
+                    currentFocus.clearFocus()
+                }
+            }
+        }
+
+        override fun onScroll(p0: AbsListView?, p1: Int, p2: Int, p3: Int) {
+
+        }
+
+    }
+
+    fun notifyDataChange(type:String, position: Int)
+    {
+        runOnUiThread {
+            adapterVideo= DownloadAdapter(this, "VIDEO", brandId,brandName,arraylistVideo,eDetailingId)
+            video_rv?.layoutManager = GridLayoutManager(this, 5)
+            video_rv?.itemAnimator = DefaultItemAnimator()
+            video_rv?.adapter = adapterVideo
+        }
+    }
+
+
 }

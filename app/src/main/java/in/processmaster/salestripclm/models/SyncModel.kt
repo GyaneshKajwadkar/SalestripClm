@@ -1592,17 +1592,47 @@ class SyncModel {
             class NotApiData()
             {
                 var rate: Double?= 0.0
+                    get() = field
+                    set(value) { field = value }
                 var qty: Int?= null
+                    get() = field
+                    set(value) { field = value }
                 var amount: Double?= 0.0
+                    get() = field
+                    set(value) { field = value }
                 var totalQty: Int?= 0
+                    get() = field
+                    set(value) { field = value }
                 var freeQtyMain: Int?= 0
+                    get() = field
+                    set(value) { field = value }
                 var salesQtyMain: Int?= 0
                 var scheme: String?= ""
+                    get() = field
+                    set(value) { field = value }
                 var schemeId: Int? = 0
+                    get() = field
+                    set(value) { field = value }
                 var salesQty: Int? = 0
+                    get() = field
+                    set(value) { field = value }
                 var freeQty: Int? = 0
+                    get() = field
+                    set(value) { field = value }
                 var insertedProductId: Int? = 0
-                var isSaved=false;
+                    get() = field
+                    set(value) { field = value }
+                var isSaved=false
+                    get() = field
+                    set(value) { field = value }
+                var pobId=0
+                   get() = field
+                   set(value) { field = value }
+                var pobNo=""
+                   get() = field
+                   set(value) { field = value }
+
+
             }
 
 

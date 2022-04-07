@@ -9,9 +9,9 @@
         android:resizeable="true" />-->
     <supports-screens
         android:largeScreens="true"
-        android:smallScreens="false"
+        android:smallScreens="true"
         android:xlargeScreens="false"
-        android:normalScreens="false" />
+        android:normalScreens="true" />
 
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -95,7 +95,7 @@
             android:name=".activity.DownloadedActivtiy"
             android:launchMode="singleTop"
             android:screenOrientation="landscape"
-            android:windowSoftInputMode="stateHidden" />
+            android:windowSoftInputMode="adjustResize" />
         <activity android:name=".activity.BaseActivity" />
         <activity
             android:name=".activity.HomePage"

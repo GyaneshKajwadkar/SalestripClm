@@ -55,6 +55,16 @@ class CommonModel {
         var feedBack=""
             get() = field
             set(value) { field = value }
+        var additionalActivityName=""
+            get() = field
+            set(value) { field = value }
+        var additionalActivityId=0
+            get() = field
+            set(value) { field = value }
+
+        var OtherDCR=0
+            get() = field
+            set(value) { field = value }
 
     }
 

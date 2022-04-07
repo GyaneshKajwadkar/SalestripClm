@@ -107,6 +107,16 @@ class NewCallFragment : Fragment() {
             views?.selectRoutesCv?.setEnabled(true)
             views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
         }
+
+        if(sharePreferance?.getPref("otherActivitySelected").equals("1") && sharePreferance?.checkKeyExist("todayDate")==true && sharePreferance?.getPref("todayDate") == generalClassObject?.currentDateMMDDYY() )
+        {
+            if(generalClassObject?.isInternetAvailable()==false)
+            {
+                setOtherActivityView()
+            }
+
+        }
+
     /*    else
             views?.selectRoutesCv?.setEnabled(false)*/
         //  views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
@@ -975,11 +985,22 @@ class NewCallFragment : Fragment() {
             commonSaveDcrModel.dcrDate= generalClassObject?.currentDateMMDDYY().toString()
             commonSaveDcrModel.empId= loginModelHomePage.empId?:0
             commonSaveDcrModel.employeeId= loginModelHomePage.empId?:0
-            commonSaveDcrModel.workingType=workAreaSeletd.substring(0, i)
+            commonSaveDcrModel.workingType=workAreaSeletd.substring(0, i).toString().uppercase()
             commonSaveDcrModel.remark=dialogView.remarkEt.text.toString()
             commonSaveDcrModel.routeId=routeId
             commonSaveDcrModel.monthNo=month+1
             commonSaveDcrModel.year=year
+            commonSaveDcrModel.dayCount="0"
+
+            if(toggleSwitch.isChecked)
+            {
+                commonSaveDcrModel.additionalActivityId=activityId
+                commonSaveDcrModel.additionalActivityName=activitySeletd
+            }
+            else
+            {
+                commonSaveDcrModel.OtherDCR=activityId
+            }
             commonSaveDcrModel.dayCount="0"
             commonSaveDcrModel.additionalActivityRemark=dialogView.additionalEt.text.toString()
             commonSaveDcrModel.dcrType=if(toggleSwitch.isChecked) 0  else 1
@@ -996,9 +1017,7 @@ class NewCallFragment : Fragment() {
                 commonSaveDcrModel.startingStation=startingStation
                 commonSaveDcrModel.endingStation=endingStation
             }
-
-            saveDCR_API(commonSaveDcrModel,alertDialog)
-
+            saveDCR_API(commonSaveDcrModel,alertDialog,toggleSwitch.isChecked)
         })
 
         alertDialog.show()
@@ -1029,12 +1048,12 @@ class NewCallFragment : Fragment() {
                             alertClass?.hideAlert()
                             return@withContext
                         }
+
                         routeIdGetDCR = dcrData?.routeId.toString()
                         dcrData?.dataSaveType="D"
                         sharePreferance?.setPref("dcrObj", Gson().toJson(dcrData))
 
                         if (dcrData?.dcrId == 0) {
-
                             createDCRAlert(dcrData?.routeId.toString())
                             sharePreferance?.setPref("dcrId", dcrData?.dcrId.toString())
                         } else {
@@ -1044,8 +1063,16 @@ class NewCallFragment : Fragment() {
 
                             views?.bottomSheetTitle_tv?.setText("Select route")
                                 selectionType=1
-                                openCloseModel()
 
+                            if(dcrData?.otherDCR!=0)
+                            {
+                                setOtherActivityView()
+                                sharePreferance?.setPref("otherActivitySelected","1")
+                                return@withContext
+                            }
+
+
+                                openCloseModel()
                             }
                     } else {
                         GeneralClass(requireActivity()).checkInternet() }
@@ -1106,7 +1133,7 @@ class NewCallFragment : Fragment() {
 
     }
 
-    fun saveDCR_API(dcrObject: CommonModel.SaveDcrModel, alertDialog: AlertDialog) {
+    fun saveDCR_API(dcrObject: CommonModel.SaveDcrModel, alertDialog: AlertDialog, checked: Boolean) {
         alertClass?.showProgressAlert("")
         var call: Call<JsonObject> = apiInterface?.saveDCS("bearer " + loginModelHomePage.accessToken,dcrObject) as Call<JsonObject>
         call.enqueue(object : Callback<JsonObject?> {
@@ -1121,11 +1148,22 @@ class NewCallFragment : Fragment() {
                     }
                     else {
                     val jsonObjData:JsonObject = response.body()?.get("data") as JsonObject
-                    alertClass?.commonAlert("",jsonObjData.get("message").asString)
+
+                    if(!checked)
+                    {
+                        alertClass?.commonAlert("",jsonObjData.get("message").asString + "And kindly moved to Salestrip to submit DCR")
+
+                    }
+                    else
+                    {
+                        alertClass?.commonAlert("",jsonObjData.get("message").asString)
+                    }
                     sharePreferance?.setPref("todayDate",generalClassObject?.currentDateMMDDYY())
                     sharePreferance?.setPref("dcrId",jsonObjData.get("dcrId").asString)
 
-                   if(generalClassObject?.isInternetAvailable() == true)
+                    if(!checked) sharePreferance?.setPref("otherActivitySelected","1")
+
+                   if(generalClassObject?.isInternetAvailable() == true && checked)
                    {
                        CoroutineScope(Dispatchers.IO).launch {
                            val api = async { checkCurrentDCR_API() }
@@ -1147,6 +1185,15 @@ class NewCallFragment : Fragment() {
         })
     }
 
+    fun setOtherActivityView()
+    {
+        alertClass?.commonAlert("Alert!","You have not planned field working today. Kindly save it from Salestrip app")
+
+        views?.selectRoutesCv?.setEnabled(false)
+        views?.selectTeamsCv?.setEnabled(false)
+        views?.selectTeam_tv?.setBackgroundColor(Color.parseColor("#A9A9A9"))
+        views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#A9A9A9"))
+    }
 
 
 }

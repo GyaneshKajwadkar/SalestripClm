@@ -114,12 +114,12 @@ open class BaseActivity : AppCompatActivity(){
             coroutineScope.invokeOnCompletion {
 
                 if (activity is HomePage) {
-                    // ...
+                    if(activity.getFragmentRefreshListener()!=null){
+                        activity?.getFragmentRefreshListener()?.onRefresh()
+                    }
                 }
-
             }
         }
-
     }
 
     //check permission

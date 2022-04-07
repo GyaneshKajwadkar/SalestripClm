@@ -1,15 +1,17 @@
 package `in`.processmaster.salestripclm.adapter
 
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.activity.DownloadedActivtiy
 import `in`.processmaster.salestripclm.activity.PhotoSlideShowActivity
 import `in`.processmaster.salestripclm.activity.VideoPlayerActivity
 import `in`.processmaster.salestripclm.activity.WebViewActivity
-import `in`.processmaster.salestripclm.activity.DownloadedActivtiy
 import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.models.DownloadEdetail_model
 import `in`.processmaster.salestripclm.models.DownloadFileModel
+import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
+import android.app.Activity
 import android.content.Context
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.content.Intent
@@ -34,9 +36,17 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.button.MaterialButton
 import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
+import okhttp3.ResponseBody
 import org.apache.commons.io.FileUtils
+import retrofit2.Retrofit
 import java.io.*
 import java.net.URL
+import java.net.URLConnection
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.zip.ZipEntry
@@ -134,33 +144,38 @@ class DownloadAdapter constructor() :
             {
                 if(getAllfileList(dbdata.fileDirectoryPath,dbdata.fileName))
                 {
-                    videoView.reDownload_rl.visibility=View.VISIBLE
-                //    videoView.fav_iv.visibility=View.VISIBLE
-                    videoView.download_rl.visibility=View.GONE
 
                     val circularProgressDrawable = CircularProgressDrawable(context!!)
                     circularProgressDrawable.strokeWidth = 5f
                     circularProgressDrawable.centerRadius = 30f
                     circularProgressDrawable.start()
 
-                    val requestOptions = RequestOptions()
-                    requestOptions.isMemoryCacheable
-                    Glide.with(context!!).setDefaultRequestOptions(requestOptions)
-                        .load(Uri.fromFile(File(dbdata.fileDirectoryPath,dbdata.fileName)))
-                        .placeholder(circularProgressDrawable)
-                        .into(videoView.videoThumb_iv)
+                    context?.runOnUiThread {
+                        videoView.reDownload_rl.visibility=View.VISIBLE
+                        //    videoView.fav_iv.visibility=View.VISIBLE
+                        videoView.download_rl.visibility=View.GONE
 
-                    if(dbdata.favFile!!)
-                    {
-                        videoView.fav_iv.setColorFilter(ContextCompat.getColor(context!!, R.color.zm_red));
-                        videoView.fav_iv.setTag("set")
-                    }
-                    else
-                    {
-                        videoView.fav_iv.setColorFilter(ContextCompat.getColor(context!!, R.color.gray));
-                        videoView.fav_iv.setTag("not")
-                    }
+                        val requestOptions = RequestOptions()
+                        requestOptions.isMemoryCacheable
+                        Glide.with(context!!).setDefaultRequestOptions(requestOptions)
+                            .load(Uri.fromFile(File(dbdata.fileDirectoryPath,dbdata.fileName)))
+                            .placeholder(circularProgressDrawable)
+                            .into(videoView.videoThumb_iv)
 
+                        if(dbdata.favFile!!)
+                        {
+                            videoView.fav_iv.setColorFilter(ContextCompat.getColor(context!!, R.color.zm_red));
+                            videoView.fav_iv.setTag("set")
+                        }
+                        else
+                        {
+                            videoView.fav_iv.setColorFilter(ContextCompat.getColor(context!!, R.color.gray));
+                            videoView.fav_iv.setTag("not")
+                        }
+
+                        videoView.videoTitle.setText(videomodel.fileName)
+                        videoView.videoTitle.setSelected(true)
+                    }
 
                     videoView.videoThumb_iv.setOnClickListener({
                         if(videoView.reDownload_rl.visibility==View.VISIBLE)
@@ -192,8 +207,7 @@ class DownloadAdapter constructor() :
                 checkIsItemIsFav(db)
             })
 
-            videoView.videoTitle.setText(videomodel.fileName)
-            videoView.videoTitle.setSelected(true)
+
 
             videoView.download_rl.setOnClickListener({
                 if(!GeneralClass(context!!).isInternetAvailable())
@@ -204,7 +218,30 @@ class DownloadAdapter constructor() :
 
                 progressDialog()
                 progressBarAlert?.setIndeterminate(true)
-                downloadUrl(videomodel.filePath!!,position,"VIDEO",videomodel)
+
+                val remainingurl: String = videomodel.filePath?.replace("https://salestrip.blob.core.windows.net/", "").toString()
+
+                val downloadService: APIInterface =
+                    createService(APIInterface::class.java, "https://salestrip.blob.core.windows.net/")
+
+                val coroutineScope= CoroutineScope(Dispatchers.IO).launch {
+                    val sendEdetailing= async {
+                        val responseBody=downloadService.downloadFile(remainingurl).body()
+                        responseBody?.let { it1 -> saveFile(it1,"VIDEO",position,videomodel,videomodel.filePath!!) }
+                    }
+                    sendEdetailing.await()
+                }
+                coroutineScope.invokeOnCompletion {
+
+                    context?.notifyDataChange("VIDEO",position)
+
+                   // context?.runOnUiThread { notifyItemChanged(position) }
+                }
+
+
+
+
+             //  downloadUrl(videomodel.filePath!!,position,"VIDEO",videomodel)
             })
 
             videoView.reDownload_rl.setOnClickListener({
@@ -215,7 +252,7 @@ class DownloadAdapter constructor() :
                 }
                 progressDialog()
                 progressBarAlert?.setIndeterminate(true)
-                downloadUrl(videomodel.filePath!!,position,"VIDEO",videomodel)
+             //   downloadUrl(videomodel.filePath!!,position,"VIDEO",videomodel)
 
             })
         }
@@ -493,14 +530,17 @@ class DownloadAdapter constructor() :
         category: String,
         model: DownloadEdetail_model.Data.EDetailingImages)
     {
-
         val extension: String = urlMain.substring(urlMain.lastIndexOf("/"))
         val executor: ExecutorService = Executors.newSingleThreadExecutor()
         val handler = Handler(Looper.getMainLooper())
 
+        Log.e("fhsiohfuisdfhidsfidf",urlMain)
+
         executor.execute(Runnable {
             var count: Int
             try {
+               // val temp: String = URLEncoder.encode(urlMain, "UTF-8")
+
                 val url = URL(urlMain)
                 //establish connection
                 val conection = url.openConnection()
@@ -578,24 +618,114 @@ class DownloadAdapter constructor() :
                         //     progressBarAlert?.setIndeterminate(true)
                         alertDialog?.dismiss()
                         notifyItemChanged(position)
-
-
                     })
-
+//895533366810
                 } else {
                     Log.e("notSuccessfull","hsidhfidsh")
                     alertDialog?.dismiss()
                 }
                 input.close()
             } catch (e: Exception) {
-                Log.e("Error: ", e.message.toString())
+                Log.e("Error:single ",Log.getStackTraceString(e)    )
                 alertDialog?.dismiss()
-            }
-
-
-        })
+            }})
     }
 
+    fun saveFile(
+        body: ResponseBody,
+        category: String,
+        position: Int,
+        model: DownloadEdetail_model.Data.EDetailingImages,
+        urlMain: String
+    ):String{
+        val extension: String = urlMain.substring(urlMain.lastIndexOf("/"))
+
+        var folder = File(context?.getFilesDir() , "/$brandName"+"/$category")
+    //    val folder =Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        try {
+            folder.mkdirs();
+            if (folder.mkdir()) {
+                println("Directorycreated")
+            } else {
+                println("Directoryisnotcreated")
+            }
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+            Log.e("firstCatch",e.message.toString())
+        }
+
+        var success = true
+        if (!folder.exists()) {
+            success = folder.mkdirs()
+        }
+
+
+        if (body==null && success)
+            return ""
+        var input: InputStream? = null
+        try {
+            input = body?.byteStream()
+            val lenghtOfFile =body?.contentLength()
+            //val file = File(getCacheDir(), "cacheFileAppeal.srl")
+            val fos = FileOutputStream(folder.getAbsolutePath() + extension)
+            var total: Long = 0
+            fos.use { output ->
+                val buffer = ByteArray(4 * 1024) // or other buffer size
+                var read: Int
+                while (input.read(buffer).also { read = it } != -1) {
+                    total += read.toLong()
+
+                    context!!.runOnUiThread(Runnable {
+                        progressBarAlert?.setIndeterminate(false)
+                        progressBarAlert?.setProgress(((total * 100 / lenghtOfFile).toInt()))
+                        textViewAlert?.setText(((total * 100 / lenghtOfFile).toInt()).toString())
+                    })
+                    output.write(buffer, 0, read)
+                }
+                var db = DatabaseHandler(context!!)
+
+                var fileModel= DownloadFileModel()
+                fileModel.fileName=extension.replace("/","")
+                fileModel.fileDirectoryPath=folder.absolutePath
+                fileModel.filePath=folder.absolutePath+extension
+                fileModel.model=model
+                fileModel.downloadType=category
+                fileModel.fileId=model.fileId!!
+                fileModel.brandId=parentId
+                fileModel.brandName=brandName
+
+                var downloadedModel=db.getSingleDownloadedData(model.fileId!!)
+
+                if(downloadedModel.favFile)
+                {
+                    fileModel.favFilePath=downloadedModel.favFilePath
+                    fileModel.favFileName=downloadedModel.favFileName
+                }
+
+                val gson = Gson()
+                db.insertOrUpdateEDetailDownload(eDetailingId!!.toInt(), model.fileId!!,  gson.toJson(fileModel),category)
+                db.insertFilePath(1,  gson.toJson(fileModel), eDetailingId.toString())
+                deleteAndsaveRedownloads(db,model,downloadedModel)
+
+
+                context?.runOnUiThread(Runnable {
+                    //     progressBarAlert?.setIndeterminate(true)
+                    alertDialog?.dismiss()
+                    (context as Activity).currentFocus?.clearFocus()
+                })
+
+                output.flush()
+                Log.e("itsSucess","success")
+            }
+            return folder.getAbsolutePath() + "extension"
+        }catch (e:Exception){
+            Log.e("saveFile",e.toString())
+        }
+        finally {
+            input?.close()
+        }
+        return ""
+    }
 
     //download files
     fun downloadHtmlZip(
@@ -616,6 +746,7 @@ class DownloadAdapter constructor() :
                 val conection = url.openConnection()
                 conection.connect()
                 val lenghtOfFile = conection.contentLength
+             //   val input: InputStream = BufferedInputStream(url.openStream(), 8192)
                 val input: InputStream = BufferedInputStream(url.openStream(), 8192)
                 val output: OutputStream
 
@@ -1081,5 +1212,14 @@ class DownloadAdapter constructor() :
         val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
+
+    fun <T> createService(serviceClass: Class<T>?, baseUrl: String?): T {
+        val retrofit = Retrofit.Builder()
+            .baseUrl(baseUrl)
+            .client(OkHttpClient.Builder().build())
+            .build()
+        return retrofit.create(serviceClass)
+    }
+
 
 }

@@ -424,9 +424,11 @@ class DailyDocVisitModel {
                     @Expose
                      var amount: Double? = null
 
-             /*       @SerializedName("pobId")
+                    @SerializedName("pobId")
                     @Expose
-                     var pobId: Int? = null
+                    var pobId: Int? = null
+
+             /*
 
                     @SerializedName("packingTypeName")
                     @Expose
@@ -440,9 +442,11 @@ class DailyDocVisitModel {
                     @Expose
                      var productName: String? = null
 
-                /*    @SerializedName("pobNo")
+                    @SerializedName("pobNo")
                     @Expose
-                     var pobNo: Any? = null
+                    var pobNo: Any? = null
+
+                /*
 
                     @SerializedName("pobType")
                     @Expose

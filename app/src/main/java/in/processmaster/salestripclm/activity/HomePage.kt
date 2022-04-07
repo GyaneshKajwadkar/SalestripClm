@@ -7,7 +7,6 @@ import `in`.processmaster.salestripclm.fragments.HomeFragment
 import `in`.processmaster.salestripclm.fragments.NewCallFragment
 import `in`.processmaster.salestripclm.fragments.PresentEDetailingFrag
 import `in`.processmaster.salestripclm.models.LoginModel
-import `in`.processmaster.salestripclm.models.SyncModel
 import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.utils.PreferenceClass
@@ -50,6 +49,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     var drawerProfileIv: ImageView?=null
     var bottomNavigation: BottomNavigationView? = null
     var openFragmentStr=""
+    private var fragmentRefreshListener: FragmentRefreshListener? = null
 
 
     companion object {
@@ -720,6 +720,18 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             }
             else Log.e("getProfileAPIERROR", response?.errorBody().toString())
         }
+    }
+
+    fun getFragmentRefreshListener(): FragmentRefreshListener? {
+        return fragmentRefreshListener
+    }
+
+    fun setFragmentRefreshListener(fragmentRefreshListener: FragmentRefreshListener?) {
+        this.fragmentRefreshListener = fragmentRefreshListener
+    }
+
+    interface FragmentRefreshListener {
+        fun onRefresh()
     }
 
 }

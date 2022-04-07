@@ -3,9 +3,9 @@ package `in`.processmaster.salestripclm.activity
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.adapter.OtherFileAdapter
 import `in`.processmaster.salestripclm.interfaceCode.ItemClickDisplayVisual
+import `in`.processmaster.salestripclm.interfaceCode.StoreVisualInterface
 import `in`.processmaster.salestripclm.models.DevisionModel
 import `in`.processmaster.salestripclm.models.DownloadFileModel
-import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import android.app.Activity
 import android.content.Context
 import android.graphics.Color
@@ -33,6 +33,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
@@ -47,10 +48,10 @@ import kotlinx.android.synthetic.main.web_bottom_sheet.*
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 
-class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerControlView.VisibilityListener
+class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerControlView.VisibilityListener,
+    StoreVisualInterface
 {
     private var mPlayer: SimpleExoPlayer? = null
     private var playWhenReady = true
@@ -74,7 +75,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
     var thread: Thread?= null
     var threadBrand: Thread?= null
     val currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
-
+    lateinit var adapterVisualFile : HorizontalVideoViewAdapter
 
     companion object {
         var videoModel : DownloadFileModel?= null
@@ -117,8 +118,8 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
     private fun initPlayer() {
         mPlayer = SimpleExoPlayer.Builder(this).build()
         playerView.player = mPlayer
-        mPlayer!!.playWhenReady = true
-        mPlayer!!.seekTo(playbackPosition)
+        mPlayer?.playWhenReady = true
+        mPlayer?.seekTo(playbackPosition)
 
         if(intent.getSerializableExtra("videoArray")!=null)
         {
@@ -137,16 +138,20 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
                     var myFile = File(filePath.filePath)
                     uris.add(Uri.fromFile(myFile))
                 }
-                mPlayer!!.prepare(buildMediaSourceVideoArray(uris), false, false)
-                mPlayer!!.seekTo(position, 0)
-                mPlayer!!.setPlayWhenReady(true)
+                mPlayer?.prepare(buildMediaSourceVideoArray(uris), false, false)
+                mPlayer?.seekTo(position, 0)
+                mPlayer?.setPlayWhenReady(true)
 
-                setHorizontalAdapter(arrayVideo,position, videoModel!!)
+                setHorizontalAdapter(arrayVideo)
 
-                mPlayer!!.addListener(object : Player.EventListener {
+                mPlayer?.addListener(object : Player.EventListener {
                     override fun onPlayerStateChanged(playWhenReady: Boolean,playbackState: Int) {
 
                     }
+
+                    override fun onPositionDiscontinuity(reason: Int) {
+                        adapterVisualFile.notifyDataSetChanged()
+                                          }
                 })
 
                 eDetailingId= videoModel?.eDetailingId!!
@@ -161,7 +166,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
                 //  val file = File(webUrlPath)
 
 
-                dbBase?.insertFileID(videoModel!!.fileId,startDateTime,brandId)
+                videoModel?.fileId?.let { dbBase?.insertFileID(it,startDateTime,brandId) }
                 setSlideViewTime()
 
                 end_btn?.setOnClickListener({
@@ -206,7 +211,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
                         fabLike?.visibility=View.VISIBLE
                         fabComment?.visibility=View.VISIBLE
 
-                        setHorizontalAdapter(arrayVideo, position, videoModel!!)
+                        setHorizontalAdapter(arrayVideo)
 
                         isCurrent=true
                     }
@@ -236,11 +241,12 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
 
                 if(doubleclick)
                 {
-                    mPlayer!!.setPlayWhenReady(false)
+                    mPlayer?.setPlayWhenReady(false)
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED)
                 }
                 else
                 {
+                    mPlayer?.setPlayWhenReady(true)
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
                 }
 
@@ -265,9 +271,9 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
             val myFile=File(selection)
           var  videoUrl = Uri.fromFile(myFile).toString()
           val uri = Uri.parse(videoUrl)
-          val mediaSource: MediaSource = buildMediaSourceSingle(uri)!!
+          val mediaSource: MediaSource? = buildMediaSourceSingle(uri)
 
-          mPlayer!!.prepare(mediaSource, false, false)
+            mediaSource?.let { mPlayer?.prepare(it, false, false) }
 
         }
 
@@ -318,10 +324,10 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
         if (mPlayer == null) {
             return
         }
-        playWhenReady = mPlayer!!.playWhenReady
-        playbackPosition = mPlayer!!.currentPosition
-        currentWindow = mPlayer!!.currentWindowIndex
-        mPlayer!!.release()
+        playWhenReady = mPlayer?.playWhenReady == true
+        playbackPosition = mPlayer?.currentPosition!!
+        currentWindow = mPlayer?.currentWindowIndex!!
+        mPlayer?.release()
         mPlayer = null
     }
 
@@ -347,10 +353,10 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
                 DefaultDataSourceFactory(this, "Exoplayer-local")).createMediaSource(uri)
     }
 
-    fun setHorizontalAdapter(list: ArrayList<DownloadFileModel>, position: Int, videoModel: DownloadFileModel)
+    fun setHorizontalAdapter(list: ArrayList<DownloadFileModel>)
     {
 
-        val adapterVisualFile = HorizontalVideoViewAdapter(list, this, this.position)
+        adapterVisualFile = HorizontalVideoViewAdapter(list, this, this.position,this)
         horizontal_rv?.setLayoutManager(
                 LinearLayoutManager(
                         this,
@@ -363,10 +369,11 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
     }
 
     //====================================== Video view bottom sheet =================================================
-    class HorizontalVideoViewAdapter(
+    inner class HorizontalVideoViewAdapter(
             var list: ArrayList<DownloadFileModel>,
             var context: Context,
-            var positionConst: Int
+            var positionConst: Int,
+            var stringInterface: StoreVisualInterface,
     ) : RecyclerView.Adapter<HorizontalVideoViewAdapter.MyViewHolder>() {
 
         var relativeViewList: ArrayList<LinearLayout> =  ArrayList();
@@ -376,7 +383,6 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
             var videoThumb_iv: ImageView = view.findViewById(R.id.videoThumb_iv)
             var parent_llVideo: LinearLayout = view.findViewById(R.id.parent_llVideo)
             var videoTitle: TextView = view.findViewById(R.id.videoTitle)
-
         }
 
         @NonNull
@@ -397,7 +403,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
 
             if(positionConst==position)
             {
-                holder.parent_llVideo.setBackgroundColor(ContextCompat.getColor(context, R.color.purple_500));
+             //   holder.parent_llVideo.setBackgroundColor(ContextCompat.getColor(context, R.color.purple_500));
             }
 
             val circularProgressDrawable = CircularProgressDrawable(context)
@@ -411,10 +417,43 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
                     .load(Uri.fromFile(File(downloadedfiles.fileDirectoryPath,downloadedfiles.fileName)))
                     .placeholder(circularProgressDrawable)
                     .into(holder.videoThumb_iv)
+
+            if( mPlayer?.currentWindowIndex==position)
+            {
+                holder.parent_llVideo.setBackgroundColor(ContextCompat.getColor(context, R.color.purple_500))
+                videoModel=downloadedfiles
+                likeCommentColor()
+            }
+            else{
+                holder.parent_llVideo.setBackgroundColor(Color.TRANSPARENT)
+
+            }
+
+
+            holder.parent_llVideo.setOnClickListener({
+                for (currentList in relativeViewList) {
+                    currentList.setBackgroundColor(Color.TRANSPARENT)
+                }
+                holder.parent_llVideo.setBackgroundColor(ContextCompat.getColor(context, R.color.purple_500));
+                var filePath=File(downloadedfiles.filePath)
+
+
+                mPlayer?.playWhenReady=false
+                mPlayer?.stop()
+
+                mPlayer?.prepare(buildMediaSourceVideoArray(uris), true, true)
+                mPlayer?.seekTo(position, C.TIME_UNSET)
+                mPlayer?.setPlayWhenReady(true)
+
+                videoModel=downloadedfiles
+                stringInterface.onClickString(filePath)
+
+
+            })
         }
 
         override fun getItemCount(): Int {
-            return list?.size!!
+            return list?.size
         }
     }
 
@@ -433,7 +472,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
         val post_btn = dialogView.findViewById(R.id.post_btn) as Button
         val comment_et = dialogView.findViewById(R.id.comment_et) as EditText
 
-        val storecomment= dbBase?.getComment(videoModel!!.fileId.toString(),startDateTime)
+        val storecomment= dbBase?.getComment(videoModel?.fileId.toString(),startDateTime)
         comment_et.setText(storecomment)
 
         cancel_btn.setOnClickListener({
@@ -453,7 +492,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
                 return@setOnClickListener
             }
 
-            dbBase?.insertComment(comment_et.text.toString(), videoModel!!.fileId,startDateTime)
+            videoModel?.let { it1 -> dbBase?.insertComment(comment_et.text.toString(), it1?.fileId,startDateTime) }
             fabComment?.setColorFilter(Color.WHITE)
             val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(dialogView.getWindowToken(), 0)
@@ -468,8 +507,8 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
 
     override fun onClickDisplayVisual(passingInterface: Int, brandIDInterface : Int,selectionType: Int) {
 
-        mPlayer!!.setPlayWhenReady(false)
-        mPlayer!!.stop()
+        mPlayer?.setPlayWhenReady(false)
+        mPlayer?.stop()
         arrayVideo.clear()
 
         for (itemParent in dbBase.getAllDownloadedData(passingInterface) )
@@ -494,11 +533,11 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
 
         mPlayer = SimpleExoPlayer.Builder(this).build()
         playerView.player = mPlayer
-        mPlayer!!.prepare(buildMediaSourceVideoArray(uris), false, false)
-        mPlayer!!.seekTo(position, 0)
-        mPlayer!!.setPlayWhenReady(true)
+        mPlayer?.prepare(buildMediaSourceVideoArray(uris), false, false)
+        mPlayer?.seekTo(position, 0)
+        mPlayer?.setPlayWhenReady(true)
 
-        setHorizontalAdapter(arrayVideo, position, videoModel!!)
+        setHorizontalAdapter(arrayVideo)
 
         eDetailingId=passingInterface
         otherFileAdapter?.notifyDataSetChanged()
@@ -530,10 +569,12 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
                     while (!this.isInterrupted) {
                         sleep(1000)
                         runOnUiThread {
-                            dbBaseTimer=dbBaseTimer!!+1
-
-                            Log.e("timerBrandWiseSlider",dbBaseTimer.toString())
-                            dbBase?.insertBrandTime(dbBaseTimer!!  ,startDateTime,brandID.toString())
+                            if(mPlayer?.isPlaying == true)
+                            {
+                                dbBaseTimer=dbBaseTimer+1
+                                Log.e("timerBrandWiseSlider",dbBaseTimer.toString())
+                                dbBase?.insertBrandTime(dbBaseTimer  ,startDateTime,brandID.toString())
+                            }
                         }
                     }
                 } catch (e: InterruptedException) {
@@ -553,7 +594,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
         {
             if(itemParent.isSaved==1)
             {
-                var downloadedList = dbBase.getAllDownloadedData(itemParent.geteDetailId()!!)
+                var downloadedList = dbBase.getAllDownloadedData(itemParent.geteDetailId())
 
                 if(downloadedList.stream().anyMatch({ o -> o.downloadType.equals("VIDEO") }))
                 {
@@ -567,11 +608,11 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
 
     fun likeCommentColor()
     {
-        dbBase?.insertFileID(videoModel!!.fileId, startDateTime,brandId)
+        videoModel?.fileId?.let { dbBase?.insertFileID(it, startDateTime,brandId) }
 
-        val isLike=dbBase?.getLike(videoModel!!.fileId.toString(),startDateTime)
+        val isLike=dbBase?.getLike(videoModel?.fileId.toString(),startDateTime)
 
-        if(isLike!!)
+        if(isLike)
         {
             fabLike?.setColorFilter(Color.WHITE)
             isList = true
@@ -583,17 +624,15 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
         }
         setSlideViewTime()
 
-        val storecomment= dbBase?.getComment(videoModel!!.fileId.toString(),startDateTime)
+        val storecomment= dbBase?.getComment(videoModel?.fileId.toString(),startDateTime)
 
         if(storecomment!=null)
         {
             fabComment?.setColorFilter(Color.WHITE)
-
         }
         else
         {
             fabComment?.setColorFilter(Color.BLACK)
-
         }
 
     }
@@ -602,7 +641,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
     fun setSlideViewTime()
     {
         thread?.interrupt()
-        var dbTimer=dbBase?.getTime(videoModel!!.fileId.toString(),startDateTime)
+        var dbTimer=dbBase?.getTime(videoModel?.fileId.toString(),startDateTime)
 
         thread = object : Thread() {
             override fun run() {
@@ -613,9 +652,12 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
 
                             if(mPlayer?.isPlaying == true)
                             {
-                                dbTimer=dbTimer!!+1
+                                dbTimer=dbTimer+1
                                 Log.e("timerSlider",dbTimer.toString())
-                                dbBase?.insertTime(dbTimer!!, videoModel!!.fileId ,startDateTime)
+                                videoModel?.fileId?.let {
+                                    dbBase?.insertTime(dbTimer,
+                                        it,startDateTime)
+                                }
                             }
 
                         }
@@ -635,12 +677,12 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
     }
 
     override fun onVisibilityChange(visibility: Int) {
-
-
     }
 
-
-
+    override fun onClickString(filePath: File?) {
+        likeCommentColor()
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
+    }
 
 
 }

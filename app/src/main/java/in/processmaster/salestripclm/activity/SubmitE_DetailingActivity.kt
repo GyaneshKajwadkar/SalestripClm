@@ -51,6 +51,7 @@ import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -349,7 +350,20 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
             val filterSelectecd=selectedProductList.filter { s -> (s.notApi.isSaved==true) }
 
-            saveModel.pobObject = DailyDocVisitModel.Data.DcrDoctor.PobObj()
+
+            if(intent.getStringExtra("apiDataDcr")?.isEmpty() == false)
+            {
+                val edetailingEditModel=Gson().fromJson(intent.getStringExtra("apiDataDcr"),DailyDocVisitModel.Data.DcrDoctor::class.java)
+                saveModel.pobObject=edetailingEditModel.pobObject
+            }
+            else
+            {
+                saveModel.pobObject = DailyDocVisitModel.Data.DcrDoctor.PobObj()
+                saveModel.pobObject?.pobDate=generalClass.getCurrentDateTimeApiForamt()
+                saveModel.pobObject?.partyId=doctorIdDisplayVisual
+                saveModel.pobObject?.employeeId= loginModelHomePage.empId
+            }
+
             for(dataObj in filterSelectecd)
             {
                 val pobObje=DailyDocVisitModel.Data.DcrDoctor.PobObj.PobDetailList()
@@ -360,17 +374,15 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 pobObje.schemeId=dataObj.notApi.schemeId
                 pobObje.totalQty=dataObj.notApi.totalQty
                 pobObje.freeQty=dataObj.notApi.freeQty
+                pobObje.pobId=dataObj.notApi.pobId
+                pobObje.pobNo=dataObj.notApi.pobNo
                 saveModel.pobObject?.pobDetailList?.add(pobObje)
             }
 
             if(filterSelectecd.size!=0)
             {
-                saveModel.pobObject?.pobId=0
-                saveModel.pobObject?.pobNo=""
-                saveModel.pobObject?.pobDate=generalClass.getCurrentDateTimeApiForamt()
-                saveModel.pobObject?.partyId=doctorIdDisplayVisual
-                saveModel.pobObject?.employeeId= loginModelHomePage.empId
-
+              //  saveModel.pobObject?.pobId=0
+               // saveModel.pobObject?.pobNo=""
                 val jsonObj= JSONObject(staticSyncData?.configurationSetting)
                 val checkStockistRequired=jsonObj.getInt("SET014")
                 if(checkStockistRequired==1)
@@ -760,8 +772,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         var saveModel= DailyDocVisitModel.Data.DcrDoctor()
         val c = Calendar.getInstance()
         val year = c[Calendar.YEAR]
-        val month = c[Calendar.MONTH]
-
+        val month = c[Calendar.MONTH]+1
 
         saveModel.detailType="DOCTOR"
         saveModel.remark=remark_Et.text.toString()
@@ -916,7 +927,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         quantityArray: ArrayList<CommonModel.QuantityModel.Data.EmployeeSampleBalance>
     ) {
         Log.e("isgfuiosgfiosgfuisf",Gson().toJson(saveModel))
-       // return
+      //  return
 
         alertClass?.showProgressAlert("")
         var call: Call<DailyDocVisitModel> = HomePage.apiInterface?.submitEdetailingApiAndGet("bearer " + loginModelHomePage.accessToken,saveModel) as Call<DailyDocVisitModel>
@@ -1426,6 +1437,9 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         val runnable = java.lang.Runnable {
 
             val edetailingEditModel=Gson().fromJson(intent.getStringExtra("apiDataDcr"),DailyDocVisitModel.Data.DcrDoctor::class.java)
+
+        Log.e("sdhifhspfhsdpfids",Gson().toJson(edetailingEditModel))
+
             doctorIdDisplayVisual= edetailingEditModel.doctorId!!
             visualSendModel.addAll(edetailingEditModel.eDetailList)
 
@@ -1491,6 +1505,8 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                         availableProduct.notApi.freeQtyMain=pobProducts.schemeFreeQty
                         availableProduct.notApi.insertedProductId=pobProducts.productId
                         availableProduct.notApi.isSaved=true
+                        availableProduct.notApi.pobId= pobProducts?.pobId!!
+                        availableProduct.notApi.pobNo= pobProducts?.pobNo.toString()
 
                         unSelectedProductList.removeAt(index)
                         selectedProductList.add(availableProduct)
@@ -1567,7 +1583,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
             if(filterSelectecd.size!=0)
             {
-                saveModel.pobObject?.pobId=0
+              //  saveModel.pobObject?.pobId=0
                 saveModel.pobObject?.pobNo=""
                 saveModel.pobObject?.pobDate=generalClass.getCurrentDateTimeApiForamt()
                 saveModel.pobObject?.partyId=doctorIdDisplayVisual

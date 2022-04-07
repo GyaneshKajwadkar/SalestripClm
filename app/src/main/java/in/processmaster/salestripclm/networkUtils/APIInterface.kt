@@ -4,6 +4,7 @@ import `in`.processmaster.salestripclm.models.*
 import com.google.gson.JsonObject
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import okhttp3.ResponseBody
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.http.*
@@ -194,5 +195,9 @@ interface APIInterface
         @Header("Authorization") authorization: String?,
         @Body arrayVisual: DailyDocVisitModel.Data.DcrDoctor
     ): Call<DailyDocVisitModel?>?
+
+    @Streaming
+    @GET
+    suspend fun downloadFile(@Url fileUrl:String): Response<ResponseBody>
 
 }

@@ -23,10 +23,11 @@ class GetDcrToday {
              var dcrId: Int? = null
              @SerializedName("dcrDate")
              var dcrDate: String? = null
+             @SerializedName("otherDCR")
+             var otherDCR: Int? = null
            /*  @SerializedName("dcrType")
              var dcrType: Int? = null
-             @SerializedName("otherDCR")
-             var otherDCR: Int? = null*/
+             */
              @SerializedName("empId")
              var empId: Int? = null
              /*@SerializedName("employeeId")
