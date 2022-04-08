@@ -104,12 +104,13 @@ class EdetailingDownloadFragment : Fragment() {
                 Log.e("division_api", response.code().toString() + "")
                 if (response.code() == 200 && !response.body().toString().isEmpty())
                 {
-                    for ((index, value) in db.getAlleDetail()?.withIndex()!!) {
+
+                    for ((index, value) in response.body()?.getData()?.geteDetailingList()?.withIndex()!!) {
                         val gson = Gson()
                         db.insertOrUpdateEDetail(value.geteDetailId().toString(), gson.toJson(value))
 
                         if (index == response.body()?.getData()?.geteDetailingList()!!.size - 1)
-                        { calladapter() }
+                        {  }
                     }
 
                     // clear database
@@ -134,7 +135,10 @@ class EdetailingDownloadFragment : Fragment() {
                             }
                             db.deleteEdetailDownloada(dbList.geteDetailId().toString())
 
-                        }}}
+                        }}
+                    calladapter()
+                    Log.e("sifugsfgsdifs","dgfdfggfdfg")
+                }
                 AlertClass(requireActivity()).hideAlert()
             }
 

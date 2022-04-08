@@ -355,6 +355,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             {
                 val edetailingEditModel=Gson().fromJson(intent.getStringExtra("apiDataDcr"),DailyDocVisitModel.Data.DcrDoctor::class.java)
                 saveModel.pobObject=edetailingEditModel.pobObject
+                saveModel.pobObject?.pobDetailList?.clear()
             }
             else
             {
@@ -927,7 +928,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         quantityArray: ArrayList<CommonModel.QuantityModel.Data.EmployeeSampleBalance>
     ) {
         Log.e("isgfuiosgfiosgfuisf",Gson().toJson(saveModel))
-      //  return
+       // return
 
         alertClass?.showProgressAlert("")
         var call: Call<DailyDocVisitModel> = HomePage.apiInterface?.submitEdetailingApiAndGet("bearer " + loginModelHomePage.accessToken,saveModel) as Call<DailyDocVisitModel>

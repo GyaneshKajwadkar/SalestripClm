@@ -16,6 +16,7 @@ import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import `in`.processmaster.salestripclm.networkUtils.GPSTracker
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
+import android.R.attr.data
 import android.content.Intent
 import android.graphics.Color
 import android.location.Location
@@ -162,17 +163,17 @@ class NewCallFragment : Fragment() {
 
 
         views?.selectTeamsCv?.setOnClickListener({
-            views?.bottomSheetTitle_tv?.setText("Select Team")
             selectionType=0
-            openCloseModel() })
+            views?.bottomSheetTitle_tv?.setText("Select Team")
+            if(checkDCRusingShareP())
+            { openCloseModel() }
+    })
 
         views?.selectRoutesCv?.setOnClickListener({
-
-            if(checkDCRusingShareP()){
-                views?.bottomSheetTitle_tv?.setText("Select route")
-                selectionType=1
-                openCloseModel()
-          }
+            selectionType=1
+            views?.bottomSheetTitle_tv?.setText("Select route")
+            if(!SplashActivity.staticSyncData?.settingDCR?.roleType.equals("MAN") && checkDCRusingShareP() ){ }
+            else{ openCloseModel() }
         })
 
         views?.selectDoctorsCv?.setOnClickListener({
@@ -212,7 +213,7 @@ class NewCallFragment : Fragment() {
             val isAlreadyContain=docCallModel.dcrDoctorlist?.any{ s -> s.doctorId == selectedDocID }
             if(isAlreadyContain == true) {
                 views?.parentButton?.visibility=View.GONE
-                alertClass?.commonAlert("Alert!","Doctor e-detailing already done for today")
+                alertClass?.commonAlert("Alert!","The DCR is already submitted please raise an unlock request")
                 return@setOnClickListener
             }
 
@@ -233,7 +234,30 @@ class NewCallFragment : Fragment() {
 
         staticSyncData?.fieldStaffTeamList?.let { teamsList.addAll(it) }
         routeList = routeList?.filter { s -> s.headQuaterName !=""} as java.util.ArrayList<SyncModel.Data.Route>
-      //  checkDCRusingShareP(0)
+
+        if(staticSyncData?.settingDCR?.isRestrictedParty==true)
+        {
+            if(sharePreferance?.getPref("dcrObj")?.isEmpty() == false) {
+                var dcrModel = Gson().fromJson(sharePreferance?.getPref("dcrObj"), GetDcrToday.Data.DcrData::class.java)
+
+                var routeListPartList: ArrayList<SyncModel.Data.Route> = ArrayList()
+                val items: List<String>? = dcrModel?.routeId?.split(",")
+                if (items != null) {
+                    for (data in items) {
+                           for(route in routeList)
+                           {
+                               if(route.routeId==data.toInt())
+                               { routeListPartList.add(route) }
+                           } }}
+                routeList.clear()
+                routeList.addAll(routeListPartList)
+
+            }
+
+        }
+
+
+        //  checkDCRusingShareP(0)
 
        /* val transaction = requireActivity().supportFragmentManager.beginTransaction()
         transaction.replace(R.id.frameRetailer_view, RetailerFillFragment())
@@ -577,10 +601,19 @@ class NewCallFragment : Fragment() {
     {
         if(selectionType==0)
         {
-            routeList.clear()
-           // SplashActivity.staticSyncData?.routeList?.let { routeList.addAll(it) }
-            val filterRouteUsingFieldStaff= SplashActivity.staticSyncData?.routeList?.filter {  s -> s.fieldStaffId == id }
-            filterRouteUsingFieldStaff?.let { routeList.addAll(it) }
+            if(staticSyncData?.settingDCR?.isRestrictedParty==false)
+            {
+                routeList.clear()
+                // SplashActivity.staticSyncData?.routeList?.let { routeList.addAll(it) }
+                val filterRouteUsingFieldStaff= SplashActivity.staticSyncData?.routeList?.filter {  s -> s.fieldStaffId == id }
+                filterRouteUsingFieldStaff?.let { routeList.addAll(it) }
+            }
+            else
+            {
+                val filterRouteUsingFieldStaff= routeList?.filter {  s -> s.fieldStaffId == id }
+                routeList.clear()
+                filterRouteUsingFieldStaff?.let { routeList.addAll(it) }
+            }
 
         }
         else if(selectionType==1)
@@ -596,7 +629,6 @@ class NewCallFragment : Fragment() {
                // startPoint.setLatitude(22.724177793056885)
                 startPoint.setLongitude(getGpsTracker.longitude)
                // startPoint.setLongitude(75.90522484470453)
-
 
 
                 if(views?.docRetail_switch?.isChecked==true)
@@ -638,9 +670,6 @@ class NewCallFragment : Fragment() {
                         }
                     }
                 }
-
-
-
             }
             else
             {
@@ -909,7 +938,6 @@ class NewCallFragment : Fragment() {
                 parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
                 if(position!=0)
                     endingStation = CommonListGetClass().getRouteListForSpinner()[position].routeId!!
-
             }
             override fun onNothingSelected(parentView: AdapterView<*>?) {}
         })
@@ -1061,8 +1089,7 @@ class NewCallFragment : Fragment() {
                             sharePreferance?.setPref("dcrId", dcrData?.dcrId.toString())
                             sharePreferance?.setPref("empIdSp", loginModelHomePage.empId.toString())
 
-                            views?.bottomSheetTitle_tv?.setText("Select route")
-                                selectionType=1
+                            views?.bottomSheetTitle_tv?.setText(if(selectionType==1)"Select route" else "Select team")
 
                             if(dcrData?.otherDCR!=0)
                             {

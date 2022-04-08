@@ -109,6 +109,7 @@ class HomeFragment : Fragment(), OnChartGestureListener {
             parent_ll?.visibility = View.VISIBLE
             progressHomeFrag?.visibility = View.GONE
 
+
        /*     val handler = Handler(Looper.getMainLooper())
             val executorAdapter: ExecutorService = Executors.newSingleThreadExecutor()
             executorAdapter.execute(Runnable {
@@ -417,14 +418,14 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         dataSets.add(visitRetail!!)
 
         val data = BarData(dataSets)
-        chart?.setTouchEnabled(true);
+        chart?.setTouchEnabled(true)
         chart?.setData(data)
         chart?.getAxisLeft()?.setAxisMinimum(0f)
         chart?.getDescription()?.setEnabled(false)
         chart?.getAxisRight()?.setAxisMinimum(0f)
         chart?.setDrawBarShadow(false)
         chart?.setDrawValueAboveBar(true)
-        chart?.setMaxVisibleValueCount(10)
+        chart?.setMaxVisibleValueCount(6)
         chart?.setPinchZoom(false)
         chart?.setDrawGridBackground(false)
 
@@ -446,8 +447,9 @@ class HomeFragment : Fragment(), OnChartGestureListener {
 
         xAxis.axisMaximum = filteredList.size.toFloat()+0.2F!!
 
-        xAxis.textSize=12f
+        xAxis.textSize=10f
         xAxis.textColor=Color.BLUE
+
 
         // chart?.getXAxis()?.setDrawGridLines(false);
         // chart?.getXAxis()?.setDrawLabels(false);

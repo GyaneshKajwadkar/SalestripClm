@@ -78,13 +78,17 @@
                                     android:text="Visits"
                                     android:textStyle="bold"
                                     android:id="@+id/duration_tv"/>
+
                                 <com.github.mikephil.charting.charts.BarChart
                                     android:id="@+id/chart1"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_above="@+id/month_tv"
                                     android:layout_below="@+id/duration_tv"
-                                    android:layout_margin="2dp" />
+                                    android:layout_marginStart="2dp"
+                                    android:layout_marginTop="2dp"
+                                    android:layout_marginEnd="2dp"
+                                    android:layout_marginBottom="2dp" />
                                 <TextView
                                     android:textSize="14dp"
                                     android:textColor="@color/zm_red"

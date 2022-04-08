@@ -1609,7 +1609,10 @@ class SyncModel {
                 var salesQtyMain: Int?= 0
                 var scheme: String?= ""
                     get() = field
-                    set(value) { field = value }
+                    set(value) {
+                        if(value==null || value.isEmpty())field = ""
+                        else field = value
+                         }
                 var schemeId: Int? = 0
                     get() = field
                     set(value) { field = value }
@@ -1630,7 +1633,10 @@ class SyncModel {
                    set(value) { field = value }
                 var pobNo=""
                    get() = field
-                   set(value) { field = value }
+                    set(value) {
+                        if(value==null || value.isEmpty())field = ""
+                        else field = value
+                    }
 
 
             }
@@ -2375,9 +2381,11 @@ class SyncModel {
             @Expose
             private var isAllowBackDate: Boolean? = false
 
-            /* @SerializedName("isRestrictedParty")
-             @Expose
-             var isRestrictedParty: Boolean? = false
+            @SerializedName("isRestrictedParty")
+            @Expose
+            var isRestrictedParty: Boolean? = false
+
+            /*
 
              @SerializedName("minCallPerDayDoc")
              @Expose

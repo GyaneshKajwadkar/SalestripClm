@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-
     <item
         android:id="@+id/landingPage"
         android:icon="@drawable/ic_login_edit"
@@ -13,7 +12,7 @@
         android:title="Download Content"/>
 
     <item
-
+        android:visible="false"
         android:id="@+id/displayVisualPage"
         android:icon="@drawable/ic_display_visual"
         android:title="Presentation"/>
