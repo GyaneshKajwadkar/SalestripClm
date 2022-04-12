@@ -14,6 +14,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -132,6 +133,34 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
                 doctorIdDisplayVisual=requireArguments().getInt("doctorID")
                 doctorName= requireArguments().getString("doctorName").toString()
             }
+
+            val doctorObj = requireArguments().getString("doctorObj")
+            if(doctorObj!=null)
+            {
+                var doctorObj= Gson().fromJson(doctorObj, SyncModel.Data.Doctor::class.java)
+                if(doctorObj.product1Id!=0)
+                {
+                    setDoctorFavBrand(doctorObj.product1Id,0)
+
+                    if(doctorObj.product2Id!=0)
+                    {
+                        setDoctorFavBrand(doctorObj.product2Id,1)
+                        if(doctorObj.product3Id!=0)
+                        {
+                            setDoctorFavBrand(doctorObj.product3Id,2)
+                            if(doctorObj.product4Id!=0)
+                            {
+                                setDoctorFavBrand(doctorObj.product4Id,3)
+                                if(doctorObj.product5Id!=0)
+                                {
+                                    setDoctorFavBrand(doctorObj.product5Id,4)
+                                }
+                            }
+                        }
+                    }
+                }
+                setDownloadListAdapter(storedDownloadedList)
+            }
         }
 
 
@@ -167,6 +196,17 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
         db.deleteAllChildVisual()
 
         setDoctorList()
+    }
+
+    fun setDoctorFavBrand(product1Id: Int?, i1: Int)
+    {
+        val index = storedDownloadedList.indexOfFirst { it.brandId == product1Id}
+        if(index==-1)return
+
+        val tempData=storedDownloadedList.get(index)
+         tempData.isFav=true
+         storedDownloadedList.removeAt(index)
+         storedDownloadedList.add(i1,tempData)
     }
 
     fun setDoctorList()

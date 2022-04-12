@@ -16,7 +16,6 @@ import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import `in`.processmaster.salestripclm.networkUtils.GPSTracker
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
-import android.R.attr.data
 import android.content.Intent
 import android.graphics.Color
 import android.location.Location
@@ -70,6 +69,8 @@ class NewCallFragment : Fragment() {
     var routeIdGetDCR=""
     var alertClass:AlertClass?=null
     lateinit var  docCallModel : DailyDocVisitModel.Data
+    var isSecondTime = false
+    var doctorObject=SyncModel.Data.Doctor()
 
 
     override fun onCreateView(
@@ -213,7 +214,7 @@ class NewCallFragment : Fragment() {
             val isAlreadyContain=docCallModel.dcrDoctorlist?.any{ s -> s.doctorId == selectedDocID }
             if(isAlreadyContain == true) {
                 views?.parentButton?.visibility=View.GONE
-                alertClass?.commonAlert("Alert!","The DCR is already submitted please raise an unlock request")
+                alertClass?.commonAlert("Alert!","This doctor DCR is already submitted")
                 return@setOnClickListener
             }
 
@@ -221,6 +222,7 @@ class NewCallFragment : Fragment() {
             intent.putExtra("doctorID", selectedDocID)
             intent.putExtra("doctorName", selectedDocName)
             intent.putExtra("skip", false)
+            intent.putExtra("doctorObj", Gson().toJson(doctorObject))
             startActivityForResult(intent,3)
         })
 
@@ -268,6 +270,8 @@ class NewCallFragment : Fragment() {
         val responseDocCall=db.getApiDetail(5)
         if(!responseDocCall.equals("")) {
             docCallModel = Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
+            Log.e("fhsidhf",docCallModel.dcrDoctorlist?.size.toString())
+
         }
     }
 
@@ -542,6 +546,7 @@ class NewCallFragment : Fragment() {
         views?.qualifiction_tv?.setText(doctorDetailModel.qualificationName)
         selectedDocID= doctorDetailModel.doctorId!!
         selectedDocName= doctorDetailModel.doctorName.toString()
+        doctorObject=doctorDetailModel;
 
         if(doctorDetailModel.mobileNo?.isEmpty() == true)
             views?.mobileNumberParent?.visibility=View.GONE
@@ -1065,13 +1070,21 @@ class NewCallFragment : Fragment() {
             if (response!!.isSuccessful) {
 
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
-                    // val jsonObjError: JsonObject = response.body()?.get("errorObj") as JsonObject
                     if (response.body()?.errorObj?.errorMessage?.isEmpty() == true) {
-                       // val data: JsonObject = response.body()?.get("data") as JsonObject
-                      //  val dcrData: JsonObject = data?.get("dcrData") as JsonObject
                         val dcrData=response.body()?.data?.dcrData
-                        if (dcrData?.routeId.toString()=="" || dcrData?.routeId==null || dcrData?.routeId=="0") {
 
+                        if(staticSyncData?.settingDCR?.isCallPlanMandatoryForDCR==true && response.body()?.data?.isCPExiest == true)
+                        {
+                            alertClass?.commonAlert("Alert!","Please submit you day plan first")
+                            return@withContext
+                        }
+
+                        if (dcrData?.dataSaveType?.lowercase() == "s") {
+                            alertClass?.commonAlert("Alert!","The DCR is already submitted please raise an unlock request")
+                            return@withContext
+                        }
+
+                        if (dcrData?.routeId.toString()=="" || dcrData?.routeId==null || dcrData?.routeId=="0") {
                             alertClass?.commonAlert("Alert!", "Please submit tour program first")
                             alertClass?.hideAlert()
                             return@withContext
@@ -1082,7 +1095,8 @@ class NewCallFragment : Fragment() {
                         sharePreferance?.setPref("dcrObj", Gson().toJson(dcrData))
 
                         if (dcrData?.dcrId == 0) {
-                            createDCRAlert(dcrData?.routeId.toString())
+                           // createDCRAlert(dcrData?.routeId.toString())
+                               alertClass?.createDCRAlert(dcrData?.routeId.toString(),dcrData?.routeName.toString())
                             sharePreferance?.setPref("dcrId", dcrData?.dcrId.toString())
                         } else {
                             sharePreferance?.setPref("todayDate", generalClassObject?.currentDateMMDDYY())
@@ -1097,9 +1111,7 @@ class NewCallFragment : Fragment() {
                                 sharePreferance?.setPref("otherActivitySelected","1")
                                 return@withContext
                             }
-
-
-                                openCloseModel()
+                            openCloseModel()
                             }
                     } else {
                         GeneralClass(requireActivity()).checkInternet() }
@@ -1190,14 +1202,14 @@ class NewCallFragment : Fragment() {
 
                     if(!checked) sharePreferance?.setPref("otherActivitySelected","1")
 
-                   if(generalClassObject?.isInternetAvailable() == true && checked)
+                 /*  if(generalClassObject?.isInternetAvailable() == true && checked)
                    {
                        CoroutineScope(Dispatchers.IO).launch {
                            val api = async { checkCurrentDCR_API() }
                            api.await()
                        }
                    }
-
+*/
                     alertDialog.cancel()
                     }
                 }
@@ -1222,5 +1234,24 @@ class NewCallFragment : Fragment() {
         views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#A9A9A9"))
     }
 
+
+    override fun onResume() {
+        super.onResume()
+        if(isSecondTime) {
+            if(views==null) return
+            views?.selectDoctor_tv?.setBackgroundColor(Color.parseColor("#A9A9A9"))
+            views?.doctorDetail_parent?.visibility=View.GONE
+            views?.precall_parent?.visibility=View.GONE
+            views?.parentButton?.visibility=View.GONE
+            views?.noData_gif?.visibility=View.VISIBLE
+
+            val responseDocCall=db.getApiDetail(5)
+            if(!responseDocCall.equals("")) {
+                docCallModel = Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
+                Log.e("fhsidhf",docCallModel.dcrDoctorlist?.size.toString())
+            }
+        }
+        else isSecondTime=true
+    }
 
 }

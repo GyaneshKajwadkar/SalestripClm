@@ -264,7 +264,6 @@ class DownloadedActivtiy : BaseActivity() {
     )
     {
 
-
         val extension: String = urlMain.substring(urlMain.lastIndexOf("/"))
         val executor: ExecutorService = Executors.newSingleThreadExecutor()
         val handler = Handler(Looper.getMainLooper())
@@ -282,7 +281,11 @@ class DownloadedActivtiy : BaseActivity() {
 
                 //create file path
                // var folder = File(this.getExternalFilesDir(null)?.absolutePath + "/$brandName"+"/$category")
-                var folder = File(this.getFilesDir() , "/$brandName"+"/$category")
+                var folder = File(this@DownloadedActivtiy.getFilesDir() , "/$brandName"+"/$category")
+                if(category.equals("ZIP"))
+                {
+                     folder = File(getExternalFilesDir(null)?.absolutePath + "/zipFiles")
+                }
 
                 try {
                     if (folder.mkdir()) {
@@ -449,13 +452,12 @@ class DownloadedActivtiy : BaseActivity() {
                 }
 
                 val extractFileName = fmd.absolutePath
-                val lowercaseName = extractFileName.toLowerCase()
+                val lowercaseName = extractFileName.lowercase()
 
                 //retrive html path
                 if (lowercaseName.endsWith(".html"))
                 {
                     htmlPath=lowercaseName
-
                 }
                 val fout = FileOutputStream("$path/$filename")
                 while (zis.read(buffer).also { count = it } != -1) {

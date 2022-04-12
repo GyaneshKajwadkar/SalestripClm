@@ -51,7 +51,6 @@ import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -83,6 +82,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
     var mainProductList:ArrayList<SyncModel.Data.Product> = ArrayList()
     var selectedProductList:ArrayList<SyncModel.Data.Product> = ArrayList()
     var unSelectedProductList:ArrayList<SyncModel.Data.Product> = ArrayList()
+    var checkIsDcrSave=false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -277,21 +277,25 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 hideAllSelection()
                 selectBtn.setText("Select Samples")
                 sample_rv.visibility=View.VISIBLE
-                selectBtn.visibility=View.VISIBLE
+                if(checkIsDcrSave)selectBtn.visibility=View.GONE
+                else selectBtn.visibility=View.VISIBLE
             }
             else if(isChecked && R.id.workingWith_btn == checkedId)
             {
                 hideAllSelection()
                 selectBtn.setText("Select Working with")
                 workingWithRv.visibility=View.VISIBLE
-                selectBtn.visibility=View.VISIBLE
+                if(checkIsDcrSave)selectBtn.visibility=View.GONE
+                else selectBtn.visibility=View.VISIBLE
+
             }
             else if(isChecked && R.id.gifts_btn == checkedId)
             {
                 hideAllSelection()
                 selectBtn.setText("Select Gifts")
                 gift_rv.visibility=View.VISIBLE
-                selectBtn.visibility=View.VISIBLE
+                if(checkIsDcrSave)selectBtn.visibility=View.GONE
+                else selectBtn.visibility=View.VISIBLE
             }
             else if(isChecked && R.id.pob_btn == checkedId)
             {
@@ -1088,7 +1092,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
           workWithArray.addAll(passingArrayList)
             if(isUpdate) {
                 var sendingList = workWithArray?.filter { s -> s.isChecked == true }
-                workingWithRv.adapter = TextWithEditAdapter(sendingList as ArrayList<IdNameBoll_model>, this,0,this,selectionType)
+                workingWithRv.adapter = TextWithEditAdapter(sendingList as ArrayList<IdNameBoll_model>, this,0,this,selectionType,checkIsDcrSave)
                 if(sendingList.size!=0)workingWithRv.visibility=View.VISIBLE
             }
         }
@@ -1098,7 +1102,14 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             sampleArray.addAll(passingArrayList)
             if(isUpdate) {
                 var sendingList = sampleArray?.filter { s -> s.isChecked == true }
-                sample_rv.adapter =TextWithEditAdapter(sendingList as ArrayList<IdNameBoll_model>, this, 1, this,selectionType)
+                sample_rv.adapter =TextWithEditAdapter(
+                    sendingList as ArrayList<IdNameBoll_model>,
+                    this,
+                    1,
+                    this,
+                    selectionType,
+                    checkIsDcrSave
+                )
                 if(sendingList.size!=0)sample_rv.visibility=View.VISIBLE
             }
         }
@@ -1107,7 +1118,14 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             giftArray.addAll(passingArrayList)
             if(isUpdate) {
                 var sendingList = giftArray?.filter { s -> s.isChecked == true }
-                gift_rv.adapter = TextWithEditAdapter(sendingList as ArrayList<IdNameBoll_model>, this, 1, this,selectionType)
+                gift_rv.adapter = TextWithEditAdapter(
+                    sendingList as ArrayList<IdNameBoll_model>,
+                    this,
+                    1,
+                    this,
+                    selectionType,
+                    checkIsDcrSave
+                )
                 if(sendingList.size!=0)gift_rv.visibility=View.VISIBLE
             }
         }
@@ -1267,7 +1285,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
          /*   pobProductSelectAdapter=PobProductAdapter(unSelectedProductList, passingSchemeList,this)
             pobProduct_rv.adapter= pobProductSelectAdapter*/
 
-            selectedPobAdapter=SelectedPobAdapter(selectedProductList,this,this)
+            selectedPobAdapter=SelectedPobAdapter(selectedProductList,this,this,checkIsDcrSave)
             selectedPob_rv.adapter= selectedPobAdapter
 
             calculateTotalProduct()
@@ -1403,9 +1421,30 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 this.runOnUiThread(java.lang.Runnable {
                     if(visualSendModel.size==0)nodata_gif.visibility=View.VISIBLE
                     remark_Et.setText(edetailingEditModel.remark)
-                    workingWithRv.adapter = TextWithEditAdapter(passingWorking as ArrayList<IdNameBoll_model>, this, 0, this,selectionType)
-                    gift_rv.adapter = TextWithEditAdapter(passingGift as ArrayList<IdNameBoll_model>, this, 1, this,selectionType)
-                    sample_rv.adapter = TextWithEditAdapter(passingSamples as ArrayList<IdNameBoll_model>, this, 1, this,selectionType)
+                    workingWithRv.adapter = TextWithEditAdapter(
+                        passingWorking as ArrayList<IdNameBoll_model>,
+                        this,
+                        0,
+                        this,
+                        selectionType,
+                        checkIsDcrSave
+                    )
+                    gift_rv.adapter = TextWithEditAdapter(
+                        passingGift as ArrayList<IdNameBoll_model>,
+                        this,
+                        1,
+                        this,
+                        selectionType,
+                        checkIsDcrSave
+                    )
+                    sample_rv.adapter = TextWithEditAdapter(
+                        passingSamples as ArrayList<IdNameBoll_model>,
+                        this,
+                        1,
+                        this,
+                        selectionType,
+                        checkIsDcrSave
+                    )
                     visitPurpose_spinner.setSelection(spinnerSelect)
                     edetailing_rv.adapter=EdetallingAdapter()
                     stokistArray.forEachIndexed { index, element ->
@@ -1422,10 +1461,6 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                     calculateTotalProduct()
                 })
             }
-
-
-
-
         }
         Thread(runnable).start()
     }
@@ -1439,10 +1474,18 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
             val edetailingEditModel=Gson().fromJson(intent.getStringExtra("apiDataDcr"),DailyDocVisitModel.Data.DcrDoctor::class.java)
 
-        Log.e("sdhifhspfhsdpfids",Gson().toJson(edetailingEditModel))
-
             doctorIdDisplayVisual= edetailingEditModel.doctorId!!
             visualSendModel.addAll(edetailingEditModel.eDetailList)
+
+            if(edetailingEditModel.dataSaveType?.lowercase().equals("s"))
+            {
+               checkIsDcrSave=true
+               selectBtn.visibility=View.GONE
+               pobProduct_btn.visibility=View.GONE
+               assignStockist.visibility=View.GONE
+               visitPurpose_spinner.isEnabled=false
+               submitDetailing_btn.visibility=View.INVISIBLE
+            }
 
             for(intentProduct in edetailingEditModel.sampleList!!)
             {
@@ -1538,9 +1581,30 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 if(visualSendModel.size==0)nodata_gif.visibility=View.VISIBLE
                 remark_Et.setText(edetailingEditModel.remark)
                 doctorName_tv.setText(edetailingEditModel.doctorName)
-                workingWithRv.adapter = TextWithEditAdapter(passingWorking as ArrayList<IdNameBoll_model>, this, 0, this,selectionType)
-                gift_rv.adapter = TextWithEditAdapter(passingGift as ArrayList<IdNameBoll_model>, this, 1, this,selectionType)
-                sample_rv.adapter = TextWithEditAdapter(passingSamples as ArrayList<IdNameBoll_model>, this, 1, this,selectionType)
+                workingWithRv.adapter = TextWithEditAdapter(
+                    passingWorking as ArrayList<IdNameBoll_model>,
+                    this,
+                    0,
+                    this,
+                    selectionType,
+                    checkIsDcrSave
+                )
+                gift_rv.adapter = TextWithEditAdapter(
+                    passingGift as ArrayList<IdNameBoll_model>,
+                    this,
+                    1,
+                    this,
+                    selectionType,
+                    checkIsDcrSave
+                )
+                sample_rv.adapter = TextWithEditAdapter(
+                    passingSamples as ArrayList<IdNameBoll_model>,
+                    this,
+                    1,
+                    this,
+                    selectionType,
+                    checkIsDcrSave
+                )
                 remark_Et.isEnabled=false
                 edetailing_rv.adapter=EdetallingAdapter()
                 visitPurpose_spinner.setSelection(spinnerSelect)
@@ -1553,9 +1617,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                         stokistArray.set(index,element)}
                 }
                 if(visualSendModel.size!=0)nodata_gif.visibility=View.GONE
-
                 setPobAdapter()
-
             })
         }
         Thread(runnable).start()
@@ -1658,8 +1720,6 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
     }
 
-
-
     override fun onClickButtonProduct(productModel: SyncModel.Data.Product, positon: Int) {
 
 
@@ -1681,6 +1741,5 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             }
 
     }
-
 
 }

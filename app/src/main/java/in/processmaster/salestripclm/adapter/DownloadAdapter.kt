@@ -752,7 +752,9 @@ class DownloadAdapter constructor() :
 
                 //create file path
                 var folder = File(context!!.getExternalFilesDir(null)?.absolutePath + "/zipFiles")
-
+              //  folder = File(context?.getFilesDir()?.getAbsolutePath() + File.separator +"zipFiles")
+                if (!folder.exists())
+                    folder.mkdirs()
                 try {
                     if (folder.mkdir()) {
                         println("Directorycreated")

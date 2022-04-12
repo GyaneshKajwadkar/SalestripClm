@@ -16,6 +16,8 @@ class GetDcrToday {
      class Data {
          @SerializedName("dcrData")
          var dcrData: DcrData? = DcrData()
+         @SerializedName("isCPExiest")
+         var isCPExiest: Boolean? = false
 
          class DcrData {
 

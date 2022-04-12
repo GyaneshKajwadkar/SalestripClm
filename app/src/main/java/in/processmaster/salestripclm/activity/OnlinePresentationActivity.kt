@@ -96,10 +96,14 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
 
         val bundle = Bundle()
         bundle.putString("type", "present")
+        if(intent.getStringExtra("doctorObj")!=null) {
+            bundle.putString("doctorObj", intent.getStringExtra("doctorObj"))
+        }
+
+
         bundle.putInt("doctorID", loadsPosition)
         bundle.putString("doctorName", doctorName_tv.text.toString())
         if(!sendResumeString.isEmpty()) bundle.putString("apiDataDcr", sendResumeString)
-        Log.e("rertetfefddsfdsf",sendResumeString)
 
         fragment.setArguments(bundle)
 

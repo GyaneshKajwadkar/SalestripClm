@@ -301,7 +301,25 @@ class SyncModel {
             @Expose
             var fieldStaffId: Int? = 0
 
+            @SerializedName("product1Id")
+            @Expose
+            var product1Id: Int? = 0
 
+            @SerializedName("product2Id")
+            @Expose
+            var product2Id: Int? = 0
+
+            @SerializedName("product3Id")
+            @Expose
+            var product3Id: Int? = 0
+
+            @SerializedName("product4Id")
+            @Expose
+            var product4Id: Int? = 0
+
+            @SerializedName("product5Id")
+            @Expose
+            var product5Id: Int? = 0
           /*  @SerializedName("entryBy")
             @Expose
             var entryBy: Int? = 0
@@ -370,25 +388,7 @@ class SyncModel {
             @Expose
             var routeType: String? = ""
 
-            @SerializedName("product1Id")
-            @Expose
-            var product1Id: Int? = 0
 
-            @SerializedName("product2Id")
-            @Expose
-            var product2Id: Int? = 0
-
-            @SerializedName("product3Id")
-            @Expose
-            var product3Id: Int? = 0
-
-            @SerializedName("product4Id")
-            @Expose
-            var product4Id: Int? = 0
-
-            @SerializedName("product5Id")
-            @Expose
-            var product5Id: Int? = 0
 
             @SerializedName("product1Name")
             @Expose
@@ -2385,6 +2385,10 @@ class SyncModel {
             @Expose
             var isRestrictedParty: Boolean? = false
 
+            @SerializedName("isCallPlanMandatoryForDCR")
+            @Expose
+            var isCallPlanMandatoryForDCR: Boolean? = false
+
             /*
 
              @SerializedName("minCallPerDayDoc")
@@ -2423,9 +2427,6 @@ class SyncModel {
              @Expose
              var callPlanBackDays: Int? = 0
 
-             @SerializedName("isCallPlanMandatoryForDCR")
-             @Expose
-             var isCallPlanMandatoryForDCR: Boolean? = false
 
              @SerializedName("isSelfieAttendanceRequired")
              @Expose

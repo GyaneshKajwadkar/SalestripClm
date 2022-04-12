@@ -86,9 +86,7 @@ class ShowDownloadedFragment : Fragment() {
         var arraylistImages:ArrayList<DownloadFileModel> = ArrayList()
         var arraylistZip:ArrayList<DownloadFileModel> = ArrayList()
 
-
         val bundle = arguments
-
 
         if(doctor_et?.text.toString().isEmpty())
         {
@@ -109,7 +107,6 @@ class ShowDownloadedFragment : Fragment() {
             nodata_gif?.visibility=View.GONE
             selection_tv?.setText("Please wait...")
 
-
             val value = requireArguments().getInt("eDetailingID")
             val brandID = requireArguments().getInt("brandId")
             val selectionType = requireArguments().getInt("selectionType")
@@ -129,7 +126,6 @@ class ShowDownloadedFragment : Fragment() {
                 else
                 {
                     topSearchParent?.visibility=View.VISIBLE
-
                 }
             }
             for ((index, valueDownload) in downloadList?.withIndex()!!)
@@ -144,7 +140,6 @@ class ShowDownloadedFragment : Fragment() {
                     valueDownload.eDetailingId=value
                     arraylistImages.add(valueDownload)
                 }
-
                 else
                 {
                     valueDownload.eDetailingId=value
@@ -171,17 +166,17 @@ class ShowDownloadedFragment : Fragment() {
 
             val sendtext = requireArguments().getString("type")
 
-             adapterVideo= DownloadedFolderAdapter(sendtext,"VIDEO",arraylistVideo, requireActivity(),doctorIdDisplayVisual,brandID)
+            adapterVideo= DownloadedFolderAdapter(sendtext,"VIDEO",arraylistVideo, requireActivity(),doctorIdDisplayVisual,brandID)
             video_rv!!.layoutManager = GridLayoutManager(activity, 4)
             video_rv?.itemAnimator = DefaultItemAnimator()
             video_rv?.adapter = adapterVideo
 
-             adapterImage= DownloadedFolderAdapter(sendtext,"IMAGE", arraylistImages, requireActivity(), doctorIdDisplayVisual, brandID)
+            adapterImage= DownloadedFolderAdapter(sendtext,"IMAGE", arraylistImages, requireActivity(), doctorIdDisplayVisual, brandID)
             images_rv!!.layoutManager = GridLayoutManager(activity, 4)
             images_rv?.itemAnimator = DefaultItemAnimator()
             images_rv?.adapter = adapterImage
 
-             adapterWeb= DownloadedFolderAdapter(sendtext,"ZIP", arraylistZip, requireActivity(), doctorIdDisplayVisual, brandID)
+            adapterWeb= DownloadedFolderAdapter(sendtext,"ZIP", arraylistZip, requireActivity(), doctorIdDisplayVisual, brandID)
             html_rv!!.layoutManager = GridLayoutManager(activity, 4)
             html_rv?.itemAnimator = DefaultItemAnimator()
             html_rv?.adapter = adapterWeb

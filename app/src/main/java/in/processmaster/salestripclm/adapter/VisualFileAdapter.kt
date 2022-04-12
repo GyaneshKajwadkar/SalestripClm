@@ -43,7 +43,10 @@ class VisualFileAdapter(
     override fun onBindViewHolder(holder: MyViewHolder, position: Int)
     {
         val modeldata = downloadList?.get(position)
-        holder.filePathName_tv.setText(modeldata?.brandName)
+        if(modeldata?.isFav==true)holder.filePathName_tv.setText(modeldata?.brandName+"*")
+        else holder.filePathName_tv.setText(modeldata?.brandName)
+
+
         holder.division_tv.setText("Division: " + modeldata?.downloadType)
 
         if(selectedPosition==position)

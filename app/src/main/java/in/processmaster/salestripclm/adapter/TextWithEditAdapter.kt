@@ -20,6 +20,7 @@ class TextWithEditAdapter(
     var showEdit: Int?,
     val context: Activity?,
     var selectionType: Int,
+    val checkIsDcrSave: Boolean,
 ) : RecyclerView.Adapter<TextWithEditAdapter.MyViewHolder>(), Filterable {
 
     override fun onCreateViewHolder(
@@ -47,6 +48,8 @@ class TextWithEditAdapter(
             holder.quantity_et.visibility = View.GONE
             holder.availableQtyTv.visibility = View.GONE
         }
+        if(checkIsDcrSave)holder.quantity_et.isEnabled=false
+
         if(model?.qty!=-1) holder.quantity_et.setText(model?.qty.toString())
 
         holder.availableQtyTv.setText(model?.availableQty.toString() +" QTY")

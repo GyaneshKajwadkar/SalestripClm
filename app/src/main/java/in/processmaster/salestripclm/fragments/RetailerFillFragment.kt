@@ -18,7 +18,6 @@ import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -249,7 +248,14 @@ class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfe
 
                 var sendingList = workWithArray?.filter { s -> s.isChecked == true }
 
-                views.workingWithRv.adapter = TextWithEditAdapter(sendingList as ArrayList<IdNameBoll_model>, this,0,requireActivity(),selectionType)
+                views.workingWithRv.adapter = TextWithEditAdapter(
+                    sendingList as ArrayList<IdNameBoll_model>,
+                    this,
+                    0,
+                    requireActivity(),
+                    selectionType,
+                    false
+                )
                 if(sendingList.size!=0)views.workingWithRv.visibility=View.VISIBLE
         }
         if(localSelection==2)
@@ -258,7 +264,14 @@ class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfe
             sampleArray.addAll(passingArrayList)
 
                 var sendingList = sampleArray?.filter { s -> s.isChecked == true }
-                views.sample_rv.adapter = TextWithEditAdapter(sendingList as ArrayList<IdNameBoll_model>, this, 1, requireActivity(),selectionType)
+                views.sample_rv.adapter = TextWithEditAdapter(
+                    sendingList as ArrayList<IdNameBoll_model>,
+                    this,
+                    1,
+                    requireActivity(),
+                    selectionType,
+                    false
+                )
                 if(sendingList.size!=0)views.sample_rv.visibility=View.VISIBLE
 
         }
@@ -267,7 +280,14 @@ class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfe
             giftArray.addAll(passingArrayList)
 
                 var sendingList = giftArray?.filter { s -> s.isChecked == true }
-                views.gift_rv.adapter = TextWithEditAdapter(sendingList as ArrayList<IdNameBoll_model>, this, 1, requireActivity(),selectionType)
+                views.gift_rv.adapter = TextWithEditAdapter(
+                    sendingList as ArrayList<IdNameBoll_model>,
+                    this,
+                    1,
+                    requireActivity(),
+                    selectionType,
+                    false
+                )
                 if(sendingList.size!=0)views.gift_rv.visibility=View.VISIBLE
 
         }

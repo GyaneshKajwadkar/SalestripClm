@@ -12,6 +12,10 @@ class DownloadFileModel : Serializable {
         get() = field
         set(value) { field = value }
 
+    var isFav: Boolean = false
+        get() = field
+        set(value) { field = value }
+
   /*  var fileUrl: String = ""
         get() = field
         set(value) { field = value }*/

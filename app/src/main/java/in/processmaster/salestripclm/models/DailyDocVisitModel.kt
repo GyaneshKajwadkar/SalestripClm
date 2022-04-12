@@ -52,6 +52,10 @@ class DailyDocVisitModel {
             @Expose
             var isOfflineSave: Boolean? = false
 
+            @SerializedName("dataSaveType")
+            @Expose
+            var dataSaveType: String? = ""
+
             @SerializedName("dcrId")
             @Expose
             var dcrId: Int? = 0
@@ -296,9 +300,12 @@ class DailyDocVisitModel {
             @Expose
             var callTiming: String? = ""
 
-           /* @SerializedName("callTimingName")
+
+            @SerializedName("callTimingName")
             @Expose
             var callTimingName: String? = ""
+
+           /*
 
             @SerializedName("routeType")
             @Expose

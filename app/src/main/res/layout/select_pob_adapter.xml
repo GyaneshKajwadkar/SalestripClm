@@ -114,9 +114,9 @@
                         android:id="@+id/close"
                         android:layout_width="27dp"
                         android:layout_height="27dp"
+                        android:layout_alignParentTop="true"
                         android:layout_alignParentEnd="true"
                         android:padding="5dp"
-                        android:layout_alignParentTop="true"
                         android:src="@drawable/ic_close" />
 
                     <EditText
@@ -135,7 +135,6 @@
                         android:padding="5dp" />
 
                     <ImageButton
-                        android:layout_centerVertical="true"
                         android:id="@+id/editIv"
                         android:layout_width="30dp"
                         android:layout_height="30dp"

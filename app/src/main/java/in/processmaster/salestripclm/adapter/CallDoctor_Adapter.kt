@@ -36,9 +36,15 @@ class CallDoctor_Adapter(
         holder.doctorPlace_tv.setText( modeldata?.routeName)
         holder.speciality_tv.setText( modeldata?.specialityName)
         holder.reportedTime_tv.setText( modeldata?.strReportedTime)
-        holder.workWithName_tv.setText( modeldata?.workWithName)
-        holder.visitPurpose_tv.setText( modeldata?.visitPurposeName)
+        holder.workWithName_tv.setText(if(modeldata?.workWithName?.isEmpty()==false) modeldata?.workWithName else "-")
+        holder.visitPurpose_tv.setText(if(modeldata?.visitPurposeName?.isEmpty()==false) modeldata?.visitPurposeName else "-" )
         holder.meetingAt_tv.setText( modeldata?.callMediumTypeName)
+        holder.callTime_tv.setText( modeldata?.callTimingName)
+
+        if(modeldata?.dataSaveType?.lowercase().equals("s"))
+        {
+            holder.editDoctorCall_mb.setText("View")
+        }
 
         holder.editDoctorCall_mb.setOnClickListener({
 
@@ -62,6 +68,7 @@ class CallDoctor_Adapter(
     var visitPurpose_tv=view.findViewById<TextView>(R.id.visitPurpose_tv)
     var meetingAt_tv=view.findViewById<TextView>(R.id.meetingAt_tv)
     var editDoctorCall_mb=view.findViewById<TextView>(R.id.editDoctorCall_mb)
+    var callTime_tv=view.findViewById<TextView>(R.id.callTime_tv)
     }
 
 

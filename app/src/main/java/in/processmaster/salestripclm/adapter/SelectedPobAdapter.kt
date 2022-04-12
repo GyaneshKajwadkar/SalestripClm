@@ -32,9 +32,10 @@ class SelectedPobAdapter(
     var sendEDetailingArray: ArrayList<SyncModel.Data.Product>?,
     var sendProductInterface: productTransferIndividual?,
     val submiteDetailingactivity: SubmitE_DetailingActivity?,
+    val checkIsDcrSave:Boolean
     ): RecyclerView.Adapter<SelectedPobAdapter.MyViewHolder>() {
 
-    constructor() : this(null, null,null) {
+    constructor() : this(null, null,null,false) {
     }
 
     override fun onCreateViewHolder(
@@ -93,6 +94,11 @@ class SelectedPobAdapter(
         holder.editIv.setOnClickListener({
             callEditAlert(model,position)
         })
+
+        if(checkIsDcrSave) {
+            holder.editIv.visibility=View.INVISIBLE
+            holder.close.visibility=View.INVISIBLE
+        }
 
         holder.close.setOnClickListener({
 
