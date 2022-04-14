@@ -357,7 +357,7 @@ class AlertClass(val context : Context)
             if(SplashActivity.staticSyncData?.settingDCR?.roleType=="MAN")
             {
                 if(dialogView.objDayEt.text.isEmpty() && toggleSwitch.isChecked) {generalClass?.showSnackbar(it,"Objective of day is empty"); return@setOnClickListener}
-                if(dialogView.fieldStaffEt.text.isEmpty() && toggleSwitch.isChecked) {generalClass?.showSnackbar(it,"Field staff is empty"); return@setOnClickListener}
+              //  if(dialogView.fieldStaffEt.text.isEmpty() && toggleSwitch.isChecked) {generalClass?.showSnackbar(it,"Field staff is empty"); return@setOnClickListener}
             }
 
             if(dialogView.remarkEt.text.isEmpty() && !toggleSwitch.isChecked) {generalClass?.showSnackbar(it,"Remark is empty"); return@setOnClickListener}

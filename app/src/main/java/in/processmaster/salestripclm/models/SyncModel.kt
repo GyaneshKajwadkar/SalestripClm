@@ -2333,6 +2333,10 @@ class SyncModel {
             @Expose
             var empId: Int? = 0
 
+            @SerializedName("isDoctorFencingRequired")
+            @Expose
+            var isDoctorFencingRequired: Boolean? = false
+
             /*  @SerializedName("hqType")
               @Expose
               var hqType: Int? = 0
@@ -2345,9 +2349,7 @@ class SyncModel {
               @Expose
               var isRouteDeviationApproval: Boolean? = false
 
-              @SerializedName("isDoctorFencingRequired")
-              @Expose
-              var isDoctorFencingRequired: Boolean? = false
+
 
               @SerializedName("isRetailerFencingRequired")
               @Expose

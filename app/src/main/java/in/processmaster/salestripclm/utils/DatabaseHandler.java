@@ -864,11 +864,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     visualModel.setBrandName(cursor.getString(6));
                     visualModel.setMonitorTime(cursor.getInt(7));
                     visualModel.setEnd(true);
-                    visualModel.setChildDataArray(getAllChildBy_ID(startTime,Integer.parseInt(visualModel.getBrandId())));
+                    visualModel.setFileTransList(getAllChildBy_ID(startTime,Integer.parseInt(visualModel.getBrandId())));
                     int durationCount=0;
-                    for(int i=0 ; i < visualModel.getChildDataArray().size() ;i++)
+                    for(int i=0 ; i < visualModel.getFileTransList().size() ;i++)
                     {
-                        VisualAdsModel_Send.childData childData = visualModel.getChildDataArray().get(i);
+                        VisualAdsModel_Send.childData childData = visualModel.getFileTransList().get(i);
                         if(childData.getViewTime()!=null && !childData.getViewTime().isEmpty())
                         {
                             durationCount= durationCount+Integer.parseInt(childData.getViewTime());

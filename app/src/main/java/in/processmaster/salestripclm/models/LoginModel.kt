@@ -36,9 +36,11 @@ class LoginModel {
     @Expose
     private var employeeObj: String? = null
 
- /*   @SerializedName("configurationSetting")
+    @SerializedName("configurationSetting")
     @Expose
-     var configurationSetting: String? = null
+    var configurationSetting: String? = null
+
+ /*
 
     @SerializedName("expiredAt")
     @Expose

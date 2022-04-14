@@ -46,7 +46,6 @@ import org.apache.commons.io.FileUtils
 import retrofit2.Retrofit
 import java.io.*
 import java.net.URL
-import java.net.URLConnection
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.zip.ZipEntry
@@ -751,7 +750,7 @@ class DownloadAdapter constructor() :
                 val output: OutputStream
 
                 //create file path
-                var folder = File(context!!.getExternalFilesDir(null)?.absolutePath + "/zipFiles")
+                var folder = File(context?.getExternalFilesDir(null)?.absolutePath + "/zipFiles")
               //  folder = File(context?.getFilesDir()?.getAbsolutePath() + File.separator +"zipFiles")
                 if (!folder.exists())
                     folder.mkdirs()
@@ -851,8 +850,10 @@ class DownloadAdapter constructor() :
                 filename = ze!!.name
 
                 //  create directories if not exists
+              //  val fmd = File(context?.getFilesDir()?.getAbsolutePath() + File.separator+filename)
                 val fmd = File("$path/$filename")
                 if (ze!!.isDirectory) {
+
                     fmd.mkdirs()
                     continue
                 }
@@ -923,6 +924,11 @@ class DownloadAdapter constructor() :
                     notifyItemChanged(position)
 
                 })
+
+                var folder = File(context?.getExternalFilesDir(null)?.absolutePath + "/zipFiles")
+
+                val file = File(folder, zipname)
+                val deleted = file.delete()
             }
             else{
                 context?.alertClass?.commonAlert("Download error","Unable to download this file")

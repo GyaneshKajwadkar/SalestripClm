@@ -21,6 +21,7 @@ import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.progress_view.*
 import kotlinx.coroutines.*
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -59,11 +60,11 @@ class LoginActivity : BaseActivity() {
 
         //userName_et?.setText("shubham")
       //   userName_et?.setText("NILESH")
-     //    userName_et?.setText("MEDE0172")
+         userName_et?.setText("MEDE0172")
        // password_et?.setText("jack@321")
         // password_et?.setText("NILESH")
-       //  password_et?.setText("1@@@sanjaysahu")
-       // companyCode_et.setText("UAT2")
+         password_et?.setText("1@@@sanjaysahu")
+         companyCode_et.setText("UAT2")
         //forgot click
         forgotPass_tv?.setOnClickListener {
             val intent = Intent(this, ForgotActivity::class.java)
@@ -134,6 +135,15 @@ class LoginActivity : BaseActivity() {
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
 
                     var loginModel = response.body()
+
+                    val jsonObj= JSONObject(loginModel?.configurationSetting)
+                    val checkCLM=jsonObj.getInt("SET056")
+                    if(checkCLM==0)
+                    {
+                        alertClass?.commonAlert("Alert!","Salestrip CLM is not enable for this credential. Please contact to administration")
+                        alertClass.hideAlert()
+                        return
+                    }
 
                     sharePreferance?.setPref("userName_login", userName_et?.getText().toString())
                     sharePreferance?.setPrefBool("isLogin", true)

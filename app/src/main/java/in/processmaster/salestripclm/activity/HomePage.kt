@@ -824,12 +824,12 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
                         if(staticSyncData?.settingDCR?.isCallPlanMandatoryForDCR==true && response.body()?.data?.isCPExiest == true)
                         {
-                            alertClass?.commonAlert("Alert!","Please submit you day plan first")
+                            alertClass?.commonAlert("Alert!","Please submit your day plan first")
                             return@withContext
                         }
 
                         if (dcrData?.dataSaveType?.lowercase() == "s") {
-                            alertClass?.commonAlert("Alert!","The DCR is already submitted please raise an unlock request")
+                            alertClass?.commonAlert("Alert!","The DCR is submitted it cannot be unlocked please connect with your admin")
                             onMenuItemClickListener.setCheckable(false)
                             onMenuItemClickListener.setChecked(false)
                             return@withContext

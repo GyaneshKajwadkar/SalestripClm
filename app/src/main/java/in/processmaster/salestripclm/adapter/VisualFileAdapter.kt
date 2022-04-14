@@ -31,6 +31,7 @@ class VisualFileAdapter(
     inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var division_tv: TextView = view.findViewById(R.id.division_tv)
         var filePathName_tv: TextView = view.findViewById(R.id.filePathName_tv)
+        var favBrand_tv: TextView = view.findViewById(R.id.favBrand_tv)
         var parentCard: CardView = view.findViewById(R.id.parentCard)
     }
     @NonNull
@@ -43,7 +44,10 @@ class VisualFileAdapter(
     override fun onBindViewHolder(holder: MyViewHolder, position: Int)
     {
         val modeldata = downloadList?.get(position)
-        if(modeldata?.isFav==true)holder.filePathName_tv.setText(modeldata?.brandName+"*")
+        if(modeldata?.isFav==true) {
+            holder.filePathName_tv.setText(modeldata?.brandName)
+            holder.favBrand_tv.visibility=View.VISIBLE
+        }
         else holder.filePathName_tv.setText(modeldata?.brandName)
 
 

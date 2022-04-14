@@ -200,13 +200,20 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
 
     fun setDoctorFavBrand(product1Id: Int?, i1: Int)
     {
-        val index = storedDownloadedList.indexOfFirst { it.brandId == product1Id}
-        if(index==-1)return
+        var indexMain = -1
+        for((index,data) in storedDownloadedList.withIndex())
+        {
+            if(data.brandId==product1Id)
+            { indexMain=index }
+        }
 
-        val tempData=storedDownloadedList.get(index)
+        if(indexMain==-1)return
+
+        val tempData=storedDownloadedList.get(indexMain)
          tempData.isFav=true
-         storedDownloadedList.removeAt(index)
-         storedDownloadedList.add(i1,tempData)
+         storedDownloadedList.removeAt(indexMain)
+        if(storedDownloadedList.size>=i1)  storedDownloadedList.add(i1,tempData)
+        else storedDownloadedList.add(tempData)
     }
 
     fun setDoctorList()

@@ -78,7 +78,9 @@ class VisualAdsModel_Send {
         get() = field
         set(value) { field = value }*/
 
-    var childDataArray= ArrayList<childData>()
+    @SerializedName("fileTransList")
+    @Expose
+    var fileTransList= ArrayList<childData>()
         get() = field
         set(value) { field = value }
 

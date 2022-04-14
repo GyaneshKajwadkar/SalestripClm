@@ -931,8 +931,8 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         saveModel: DailyDocVisitModel.Data.DcrDoctor,
         quantityArray: ArrayList<CommonModel.QuantityModel.Data.EmployeeSampleBalance>
     ) {
-        Log.e("isgfuiosgfiosgfuisf",Gson().toJson(saveModel))
-       // return
+      //  Log.e("isgfuiosgfiosgfuisf",Gson().toJson(saveModel))
+        //return
 
         alertClass?.showProgressAlert("")
         var call: Call<DailyDocVisitModel> = HomePage.apiInterface?.submitEdetailingApiAndGet("bearer " + loginModelHomePage.accessToken,saveModel) as Call<DailyDocVisitModel>

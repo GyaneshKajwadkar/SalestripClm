@@ -270,8 +270,6 @@ class NewCallFragment : Fragment() {
         val responseDocCall=db.getApiDetail(5)
         if(!responseDocCall.equals("")) {
             docCallModel = Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
-            Log.e("fhsidhf",docCallModel.dcrDoctorlist?.size.toString())
-
         }
     }
 
@@ -623,7 +621,7 @@ class NewCallFragment : Fragment() {
         }
         else if(selectionType==1)
         {
-            if(staticSyncData?.settingDCR?.isGeoLocationRequired == true)
+            if(staticSyncData?.settingDCR?.isDoctorFencingRequired == true)
             {
                 val getGpsTracker=GPSTracker(requireActivity())
                 val jsonObj=JSONObject(staticSyncData?.configurationSetting)
@@ -1080,7 +1078,7 @@ class NewCallFragment : Fragment() {
                         }
 
                         if (dcrData?.dataSaveType?.lowercase() == "s") {
-                            alertClass?.commonAlert("Alert!","The DCR is already submitted please raise an unlock request")
+                            alertClass?.commonAlert("Alert!","The DCR is submitted it cannot be unlocked please connect with your admin")
                             return@withContext
                         }
 
