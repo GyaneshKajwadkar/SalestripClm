@@ -48,9 +48,9 @@ class DailyDocVisitModel {
         var dcrDoctorlist: List<DcrDoctor>? = ArrayList()
 
         class DcrDoctor {
-            @SerializedName("isOfflineSave")
+            @SerializedName("isOffline")
             @Expose
-            var isOfflineSave: Boolean? = false
+            var isOffline: Boolean? = false
 
             @SerializedName("dataSaveType")
             @Expose
@@ -305,6 +305,19 @@ class DailyDocVisitModel {
             @Expose
             var callTimingName: String? = ""
 
+            @SerializedName("partyLatitude")
+            @Expose
+            var partyLatitude: Double? = 0.0
+
+            @SerializedName("partyLongitude")
+            @Expose
+            var partyLongitude: Double? = 0.0
+
+            @SerializedName("partyDistance")
+            @Expose
+            var partyDistance: Int? = 0
+
+
            /*
 
             @SerializedName("routeType")
@@ -334,18 +347,6 @@ class DailyDocVisitModel {
             @SerializedName("otherLocReportRemark")
             @Expose
             var otherLocReportRemark: String? = ""
-
-            @SerializedName("partyLatitude")
-            @Expose
-            var partyLatitude: Double? = 0.0
-
-            @SerializedName("partyLongitude")
-            @Expose
-            var partyLongitude: Double? = 0.0
-
-            @SerializedName("partyDistance")
-            @Expose
-            var partyDistance: Int? = 0
 
             @SerializedName("hospitalId")
             @Expose

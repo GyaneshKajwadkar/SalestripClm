@@ -16,11 +16,13 @@ import `in`.processmaster.salestripclm.interfaceCode.PobProductTransfer
 import `in`.processmaster.salestripclm.interfaceCode.productTransfer
 import `in`.processmaster.salestripclm.interfaceCode.productTransferIndividual
 import `in`.processmaster.salestripclm.models.*
+import `in`.processmaster.salestripclm.networkUtils.GPSTracker
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.InsetDrawable
+import android.location.Location
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -786,6 +788,28 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         saveModel.visitPurpose=selectedPurposeID
         saveModel.productDetailCount=visualSendModel.size
         saveModel.empId=loginModelHomePage.empId
+
+        val getGpsTracker= GPSTracker(this)
+        saveModel.latitude=getGpsTracker.latitude
+        saveModel.longitude=getGpsTracker.longitude
+
+        if(intent.getStringExtra("doctorObj")?.isEmpty() == false)
+        {
+            var doctorObj= Gson().fromJson(intent.getStringExtra("doctorObj"), SyncModel.Data.Doctor::class.java)
+            saveModel.partyLatitude= doctorObj.latitude
+            saveModel.partyLongitude=doctorObj.longitude
+
+            val startPoint = Location("locationA")
+            startPoint.latitude=getGpsTracker.latitude
+            startPoint.longitude=getGpsTracker.longitude
+            val endPoint = Location("locationB")
+            endPoint.latitude =  doctorObj.latitude
+            endPoint.longitude = doctorObj.longitude
+            if(doctorObj.latitude!=0.00 && doctorObj.longitude!=0.00) {
+                val distance = startPoint.distanceTo(endPoint).toInt()
+                saveModel.partyDistance=distance
+            }
+        }
 
 
         if(intent.getStringExtra("apiDataDcr")?.isEmpty() == false)

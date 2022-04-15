@@ -13,16 +13,23 @@ import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.annotation.SuppressLint
+import android.app.DownloadManager
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.view.*
-import android.widget.*
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
@@ -55,7 +62,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     var bottomNavigation: BottomNavigationView? = null
     var openFragmentStr=""
     private var fragmentRefreshListener: FragmentRefreshListener? = null
-
+    var downloadID :Long =0
 
     companion object {
         var loginModelHomePage= LoginModel()
@@ -94,8 +101,14 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             bottomNavigation?.selectedItemId= R.id.landingPage
         }
 
+     //   registerReceiver(onDownloadComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
+     //   downloadFile("https://salestrip.blob.core.windows.net/uat2-container/1637854248316535652_53f648fc-01f1-4ed8-89a4-264b113c6a36.jpg","1")
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(onDownloadComplete)
+    }
 
     @SuppressLint("RestrictedApi")
     fun initView()
@@ -785,7 +798,12 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             onMenuItemClickListener.setCheckable(false)
             onMenuItemClickListener.setChecked(false)
         }
-        else{ onMenuItemClickListener.setCheckable(true)
+        else{
+            toolbarTv?.setText("Create Calls")
+            val fragment = NewCallFragment()
+            openFragment(fragment)
+            openFragmentStr = "CallsFragment"
+            onMenuItemClickListener.setCheckable(true)
             onMenuItemClickListener.setChecked(true)}
     }
 
@@ -898,8 +916,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
     }
 
-
-
     fun saveDCR_API(dcrObject: CommonModel.SaveDcrModel, alertDialog: AlertDialog, checked: Boolean) {
         alertClass?.showProgressAlert("")
         var call: Call<JsonObject> = apiInterface?.saveDCS("bearer " + loginModelHomePage.accessToken,dcrObject) as Call<JsonObject>
@@ -948,4 +964,33 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         })
     }
 
+    private fun downloadFile(url : String, name:String){
+        // fileName -> fileName with extension
+        val request = DownloadManager.Request(Uri.parse(url))
+            .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
+            .setTitle(name)
+            .setDescription("desc")
+            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
+            .setAllowedOverMetered(true)
+            .setAllowedOverRoaming(false)
+            .setMimeType("image/*")
+            .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,name)
+        val downloadManager= getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+         downloadID = downloadManager.enqueue(request)
+    }
+
+
+    private val onDownloadComplete: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent) {
+            //Fetching the download id received with the broadcast
+            val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
+            //Checking if the received broadcast is for our enqueued download by matching download id
+                if(downloadID==id){
+                    Log.e("sdfhsdohfdosiffsf",downloadID.toString()+" "+ id.toString())
+                    Toast.makeText(this@HomePage, "Download Completed", Toast.LENGTH_SHORT).show()
+
+                }
+
+        }
+    }
 }

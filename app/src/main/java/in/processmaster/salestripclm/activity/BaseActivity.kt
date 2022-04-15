@@ -112,12 +112,14 @@ open class BaseActivity : AppCompatActivity(){
                 sendEdetailing.await()
             }
             coroutineScope.invokeOnCompletion {
+                AlertClass(activity).commonAlert("","Offline DCR submit successfully")
 
                 if (activity is HomePage) {
                     if(activity.getFragmentRefreshListener()!=null){
                         activity?.getFragmentRefreshListener()?.onRefresh()
                     }
                 }
+
             }
         }
     }
