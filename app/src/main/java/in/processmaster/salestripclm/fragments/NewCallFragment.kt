@@ -173,7 +173,21 @@ class NewCallFragment : Fragment() {
         views?.selectRoutesCv?.setOnClickListener({
             selectionType=1
             views?.bottomSheetTitle_tv?.setText("Select route")
-            if(!SplashActivity.staticSyncData?.settingDCR?.roleType.equals("MAN") && checkDCRusingShareP() ){ }
+            if(!SplashActivity.staticSyncData?.settingDCR?.roleType.equals("MAN") ){
+                if(generalClassObject?.isInternetAvailable() == true)
+                {
+                    callCoroutineApi()
+                }
+                else if(sharePreferance?.checkKeyExist("empIdSp")==false  ||
+                    sharePreferance?.checkKeyExist("todayDate")==false  || sharePreferance?.checkKeyExist("dcrId")==false || sharePreferance?.getPref("empIdSp") != loginModelHomePage.empId.toString())
+                {
+                    alertClass?.commonAlert("Alert!","DCR not submitted please connect to internet and fill DCR first.")
+                }
+                else if( sharePreferance?.getPref("todayDate") != generalClassObject?.currentDateMMDDYY() || sharePreferance?.getPref("dcrId")=="0") {
+                    alertClass?.commonAlert("Alert!","DCR not submitted please connect to internet and fill DCR first.")
+                }
+                else{ openCloseModel() }
+            }
             else{ openCloseModel() }
         })
 

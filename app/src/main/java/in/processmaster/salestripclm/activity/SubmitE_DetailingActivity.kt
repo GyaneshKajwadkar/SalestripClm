@@ -212,20 +212,15 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             }
             getResumeData()
             runOnUiThread {
-               /* pobProductSelectAdapter=PobProductAdapter(unSelectedProductList, passingSchemeList,this)
-                pobProduct_rv.adapter= pobProductSelectAdapter
-
-                selectedPobAdapter=SelectedPobAdapter(selectedProductList,this,this)
-                selectedPob_rv.adapter= selectedPobAdapter*/
-
                 setPobAdapter()
-
                 visitPurpose_spinner.setAdapter(adapterVisit)
-
+                if(sharePreferanceBase?.checkKeyExist("dcrObj")==false)
+                {
+                    submitDetailing_btn.visibility=View.INVISIBLE
+                }
 
                 Handler(Looper.getMainLooper()).postDelayed({
                     alertClass.hideAlert() }, 10)
-
             }
         }
         Thread(runnable).start()
@@ -402,8 +397,11 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             if(selectedStockist.id!=null && selectedStockist.id!="" && filterSelectecd.size!=0)  saveModel.pobObject?.stockistId=selectedStockist.id.toInt()
 
             val dcrDetail= Gson().fromJson(sharePreferanceBase?.getPref("dcrObj"),GetDcrToday.Data.DcrData::class.java)
-                 saveModel.routeName=dcrDetail.routeName
-                 saveModel.routeId=dcrDetail.routeId
+              if(dcrDetail?.routeId!=null)
+              {
+                  saveModel.routeName=dcrDetail.routeName
+                  saveModel.routeId=dcrDetail.routeId
+              }
 
             if(!GeneralClass(this).isInternetAvailable())
             {   dbBase.insertOrUpdateSaveAPI(doctorIdDisplayVisual, Gson().toJson(saveModel),"feedback")
@@ -1546,7 +1544,10 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                             if(workingWith.toInt() == getWorking.id.toInt()){
                                 getWorking.isChecked=true
                                 workWithArray.set(index,getWorking)
-                                workingWithRv.visibility=View.VISIBLE
+                                runOnUiThread {
+                                    workingWithRv.visibility=View.VISIBLE
+                                }
+
                             }
                         }
                     }

@@ -107,7 +107,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(onDownloadComplete)
+      //  unregisterReceiver(onDownloadComplete)
     }
 
     @SuppressLint("RestrictedApi")
