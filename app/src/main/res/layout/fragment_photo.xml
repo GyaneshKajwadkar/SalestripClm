@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@color/white"
+    tools:context=".activity.PhotoSlideShowActivity">
+
+    <RelativeLayout
+        android:id="@+id/parentRl"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/floating_action_button_image"
+            android:elevation="7dp"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_margin="16dp"
+            app:tint="@android:color/white"
+            app:srcCompat="@drawable/ic_back"/>
+
+
+        <ViewFlipper
+            android:visibility="invisible"
+            android:layout_above="@+id/slideShowBtn"
+            android:id="@+id/imageFrames"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:drawable/screen_background_dark" >
+        </ViewFlipper>
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/viewPagerMain"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:background="@color/appColor"
+            android:id="@+id/slideShowBtn"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:text="Start Slides"
+            android:layout_alignParentBottom="true"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:visibility="gone">
+
+        </TextView>
+
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/fab_send"
+            android:elevation="3dp"
+            android:layout_alignParentBottom="true"
+            app:tint="@color/white"
+            android:layout_alignParentRight="true"
+            android:src="@android:drawable/ic_menu_send"
+            android:layout_margin="10dp"/>
+
+    </RelativeLayout>
+
+    <include layout="@layout/web_bottom_sheet" />
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

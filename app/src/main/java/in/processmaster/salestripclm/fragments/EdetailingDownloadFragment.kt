@@ -12,6 +12,8 @@ import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
@@ -23,6 +25,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
@@ -35,9 +38,9 @@ import java.io.File
 
 class EdetailingDownloadFragment : Fragment() {
 
-    var recyclerView:RecyclerView?=null
+   // var recyclerView:RecyclerView?=null
     var sharePreferance: PreferenceClass?= null
-    var adapter : Edetailing_Adapter?=null
+  //  var adapter : Edetailing_Adapter?=null
     var position:Int=0
     var viewPager: ViewPager?=null
     var tabs: TabLayout? = null
@@ -60,7 +63,7 @@ class EdetailingDownloadFragment : Fragment() {
 
     fun initView(view: View)
     {
-        recyclerView=view.findViewById(R.id.recyclerView)as RecyclerView
+       // recyclerView=view.findViewById(R.id.recyclerView)as RecyclerView
         filter_et=view.findViewById(R.id.filter_et)as EditText
         syncData_ll=view.findViewById(R.id.syncData_ll)as LinearLayout
         sharePreferance = PreferenceClass(activity)
@@ -68,11 +71,12 @@ class EdetailingDownloadFragment : Fragment() {
         viewPager = view.findViewById<View>(R.id.viewpager) as ViewPager
         tabs = view.findViewById<View>(R.id.result_tabs) as TabLayout
 
-        calladapter()
+
         filter_et!!.addTextChangedListener(filterTextWatcher)
 
         syncData_ll?.setOnClickListener({ division_api()})
 
+        AlertClass(requireActivity()).showProgressAlert("")
     }
 
     val filterTextWatcher: TextWatcher = object : TextWatcher {
@@ -137,7 +141,6 @@ class EdetailingDownloadFragment : Fragment() {
 
                         }}
                     calladapter()
-                    Log.e("sifugsfgsdifs","dgfdfggfdfg")
                 }
                 AlertClass(requireActivity()).hideAlert()
             }
@@ -154,7 +157,8 @@ class EdetailingDownloadFragment : Fragment() {
     fun calladapter()
     {
         setupViewPager(viewPager!!)
-        tabs!!.setupWithViewPager(viewPager)
+        tabs?.setupWithViewPager(viewPager)
+        AlertClass(requireActivity()).hideAlert()
     }
 
     // Add Fragments to Tabs
@@ -189,9 +193,9 @@ class EdetailingDownloadFragment : Fragment() {
         override fun getItem(position: Int): Fragment {
             var fragment: Fragment? = null
             if (position == 0) {
-                fragment = NewDownloadsFragment()
-            } else if (position == 1) {
                 fragment = DownloadedFragment()
+            } else if (position == 1) {
+                fragment = NewDownloadsFragment()
             }
             return fragment!!
         }
@@ -205,11 +209,12 @@ class EdetailingDownloadFragment : Fragment() {
             var title: String? = null
             if (position == 0)
             {
-                title = "Download files"
+                title = "Downloaded files"
             }
             else if (position == 1)
             {
-                title = "Downloaded files"
+                title = "Download files"
+
             }
             return title
         }
@@ -233,6 +238,16 @@ class EdetailingDownloadFragment : Fragment() {
         override fun onInterceptTouchEvent(event: MotionEvent?): Boolean {
             return isPagingEnabled && super.onInterceptTouchEvent(event)
         }
+
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            calladapter()
+        }, 10)
+
 
     }
 

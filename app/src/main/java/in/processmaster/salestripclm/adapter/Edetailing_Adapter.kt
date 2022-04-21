@@ -3,7 +3,6 @@ package `in`.processmaster.salestripclm.adapter
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.DownloadedActivtiy
 import `in`.processmaster.salestripclm.models.DevisionModel
-import `in`.processmaster.salestripclm.models.DownloadEdetail_model
 import `in`.processmaster.salestripclm.models.DownloadFileModel
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
@@ -60,14 +59,23 @@ class Edetailing_Adapter(
             holder.download_rl?.visibility = View.GONE
             holder.reDownload_rl?.visibility = View.VISIBLE
 
-            val checkDownloadStatus= db.getDownloadStatus(modeldata?.eretailDetailList!!)
+           val runnable= Runnable {
+               val checkDownloadStatus= db.getDownloadStatus(modeldata?.eretailDetailList!!)
 
-            if(!checkDownloadStatus)
-            {
-                    holder.reDownload_rl.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.orange)));
-                    holder.headerTv.setText("Pending Download")
-                    holder.isPending_iv.setImageResource(R.drawable.ic_download)
-            }
+               context.runOnUiThread {
+                   if(!checkDownloadStatus)
+                   {
+                       holder.reDownload_rl.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.orange)));
+                       holder.headerTv.setText("Pending Download")
+                       holder.isPending_iv.setImageResource(R.drawable.ic_download)
+                   }
+               }
+
+           }
+            Thread(runnable).start()
+
+
+
         }
 
       holder.header_tv.text = modeldata?.brandName
@@ -140,12 +148,20 @@ class Edetailing_Adapter(
         modeldata: DevisionModel.Data.EDetailing?
     )
     {
-        var arrayList:ArrayList<DownloadEdetail_model.Data.EDetailingImages> = ArrayList()
+        var arrayListDownloadFileModel:ArrayList<DownloadFileModel> = ArrayList()
 
 
         for(iteams in modeldata?.eretailDetailList!!)
         {
-            var modelClass=DownloadEdetail_model.Data.EDetailingImages()
+            var fileModel=DownloadFileModel()
+            fileModel.fileId=iteams.fileId
+            fileModel.fileName=iteams.fileName
+            fileModel.filePath=iteams.filePath
+
+            fileModel.downloadType=iteams.fileType
+            fileModel.eDetailingId=iteams.geteDetailId()
+
+           /* var modelClass=DownloadEdetail_model.Data.EDetailingImages()
             modelClass.fileId=iteams.fileId
             modelClass.fileName=iteams.fileName
             modelClass.fileOrder=iteams.fileOrder
@@ -153,7 +169,8 @@ class Edetailing_Adapter(
             modelClass.fileSize=iteams.fileSize
             modelClass.fileType=iteams.fileType
             modelClass.eDetailId=iteams.geteDetailId()
-            arrayList.add(modelClass)
+            arrayList.add(modelClass)*/
+            arrayListDownloadFileModel.add(fileModel)
         }
 
         //get eDetailing Image list
@@ -163,7 +180,7 @@ class Edetailing_Adapter(
         intent.putExtra("eDetailingId", eDetailId)
 
         val args = Bundle()
-        args.putSerializable("ARRAYLIST", arrayList as Serializable?)
+        args.putSerializable("ARRAYLIST", arrayListDownloadFileModel as Serializable?)
         intent.putExtra("BUNDLE",args);
 
         context.startActivity(intent)

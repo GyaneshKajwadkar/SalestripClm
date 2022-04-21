@@ -68,9 +68,9 @@ class DownloadFileModel : Serializable {
         get() = field
         set(value) { field = value }
 
-    var model: DownloadEdetail_model.Data.EDetailingImages? = null
+/*    var model: DownloadEdetail_model.Data.EDetailingImages? = null
         get() = field
-        set(value) { field = value }
+        set(value) { field = value }*/
 
 
 

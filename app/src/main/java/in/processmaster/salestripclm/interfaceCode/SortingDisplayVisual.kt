@@ -21,3 +21,7 @@ interface productTransfer{
 interface productTransferIndividual{
     fun onClickButtonProduct(productModel: SyncModel.Data.Product,positon:Int)
 }
+
+interface EditInterface{
+    fun onClickEdit(productModel: SyncModel.Data.Product,positon:Int)
+}

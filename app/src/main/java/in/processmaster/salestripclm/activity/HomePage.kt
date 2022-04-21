@@ -8,23 +8,22 @@ import `in`.processmaster.salestripclm.fragments.HomeFragment
 import `in`.processmaster.salestripclm.fragments.NewCallFragment
 import `in`.processmaster.salestripclm.fragments.PresentEDetailingFrag
 import `in`.processmaster.salestripclm.models.CommonModel
+import `in`.processmaster.salestripclm.models.DevisionModel
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import `in`.processmaster.salestripclm.networkUtils.APIInterface
+import `in`.processmaster.salestripclm.utils.DownloadManagerClass
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.annotation.SuppressLint
 import android.app.DownloadManager
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.database.Cursor
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.util.Log
 import android.view.*
 import android.widget.ImageView
@@ -54,6 +53,7 @@ import us.zoom.sdk.ZoomSDK
 import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/*, UserLoginCallback.ZoomDemoAuthenticationListener , MeetingServiceListener, InitAuthSDKCallback*/
@@ -62,7 +62,9 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     var bottomNavigation: BottomNavigationView? = null
     var openFragmentStr=""
     private var fragmentRefreshListener: FragmentRefreshListener? = null
-    var downloadID :Long =0
+    var stopDownload =false
+    lateinit var downloadManager :DownloadManager
+    lateinit var objDownloadManager : DownloadManagerClass
 
     companion object {
         var loginModelHomePage= LoginModel()
@@ -101,13 +103,11 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             bottomNavigation?.selectedItemId= R.id.landingPage
         }
 
-     //   registerReceiver(onDownloadComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
-     //   downloadFile("https://salestrip.blob.core.windows.net/uat2-container/1637854248316535652_53f648fc-01f1-4ed8-89a4-264b113c6a36.jpg","1")
     }
+
 
     override fun onDestroy() {
         super.onDestroy()
-      //  unregisterReceiver(onDownloadComplete)
     }
 
     @SuppressLint("RestrictedApi")
@@ -173,12 +173,8 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         window.setStatusBarColor(ContextCompat.getColor(this, R.color.appColor))
     }
 
-
-
-
     //set bottom navigation
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
-
 
         if(staticSyncData?.configurationSetting==null)
         {
@@ -195,6 +191,15 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             }
 
             R.id.downloadVisualPage -> {
+
+                if(::objDownloadManager.isInitialized && generalClass.isInternetAvailable())
+                {
+                    if(objDownloadManager?.getNumber<objDownloadManager?.allProductList.size)
+                    {
+                        objDownloadManager.downloadProgressAlert()
+                        return@OnNavigationItemSelectedListener false
+                    }
+                }
                 toolbarTv?.setText("Download Content")
 
                 if (openFragmentStr.equals("EdetailingFragment")) {
@@ -215,7 +220,14 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             }
 
             R.id.callPage->{
-
+                if(::objDownloadManager.isInitialized && generalClass.isInternetAvailable())
+                {
+                    if(objDownloadManager?.getNumber<objDownloadManager?.allProductList.size)
+                    {
+                        objDownloadManager.downloadProgressAlert()
+                        return@OnNavigationItemSelectedListener false
+                    }
+                }
 
                 if (openFragmentStr.equals("CallsFragment")) {
                     return@OnNavigationItemSelectedListener true
@@ -282,6 +294,8 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         mainHeading_tv.setText("Logout!")
 
         exit_btn.setOnClickListener{
+
+            stopDownload=true
 
             sharePreferanceBase?.setPrefBool("isLogin", false)
 
@@ -412,8 +426,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
             val quantityApi= async { getQuantityAPI() }
 
-            val sendEdetailing= async {
-                submitDCRCo() }
+            val sendEdetailing= async { submitDCRCo() }
 
             val doctorGraphApi= async { getDoctorGraphAPI() }
 
@@ -480,15 +493,16 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                     if(response.body()?.getData()?.geteDetailingList()==null)
                     {  }
                     else{
+
                     for ((index, value) in response.body()?.getData()?.geteDetailingList()?.withIndex()!!) {
                         //store edetailing data to db
-                        val gson = Gson()
-                        dbBase.insertOrUpdateEDetail(
+                            val gson = Gson()
+                            dbBase.insertOrUpdateEDetail(
                             value.geteDetailId().toString(),
                             gson.toJson(value)
                         )
                     }
-                    // clear database
+                        // clear database
                     for (dbList in dbBase.getAlleDetail()) {
                         var isSet = false
                         for (mainList in response.body()?.getData()?.geteDetailingList()!!) {
@@ -509,11 +523,17 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                                 val someDir = File(item.fileDirectoryPath)
                                 someDir.deleteRecursively()
                             }
-
                             dbBase.deleteEdetailDownloada(dbList.geteDetailId().toString())
-
                         }
                     }
+
+                     //get all remaining download file
+                     val list= dbBase.getAlleDetail().filter { s-> s.isSaved==0} as ArrayList<DevisionModel.Data.EDetailing>
+                        if(list.size!=0 && generalClass.isInternetAvailable())
+                        {
+                            objDownloadManager= DownloadManagerClass(this@HomePage,dbBase,list)
+                            objDownloadManager.startDownloading()
+                        }
                     }
                 }
 
@@ -579,66 +599,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             }
         }
 
-    }
-
-    fun longLog(str: String) {
-        if (str.length > 4000) {
-            Log.e("longString", str.substring(0, 4000))
-            longLog(str.substring(4000))
-        } else Log.e("longString", str)
-    }
-
-    private fun writeToFile(data: String) {
-        //  writeToFile(Gson().toJson(response.body()))
-        //  readFromFile("/storage/emulated/0/Android/data/in.processmaster.salestripclm/files/apiData.txt")?.let { Log.e("ghdsfidshfsdhpf", it) }
-
-        var folder = File(this.getExternalFilesDir(null)?.absolutePath + "/apiData")
-        try {
-            if (folder.mkdir()) {
-                println("Directorycreated")
-            } else {
-                println("Directoryisnotcreated")
-            }
-        } catch (e: java.lang.Exception) {
-            e.printStackTrace()
-            Log.e("downloadFirstError",e.message.toString())
-        }
-
-        try {
-
-            val file = File.createTempFile("config", ".txt")
-            Log.e("filehwifwhef",folder.getAbsolutePath() +".txt")
-            val writer = OutputStreamWriter(FileOutputStream(file))
-           // val outputStreamWriter = OutputStreamWriter(openFileOutput("config.txt", MODE_PRIVATE))
-            val outputStreamWriter = OutputStreamWriter(FileOutputStream(folder.getAbsolutePath() +".txt"))
-            outputStreamWriter.write(data)
-            outputStreamWriter.close()
-        } catch (e: IOException) {
-            Log.e("Exception", "Filewritefailed: " + e.toString())
-        }
-    }
-
-    fun readFromFile(path: String?): String? {
-        var ret = ""
-        try {
-            val inputStream: InputStream = FileInputStream(File(path))
-            if (inputStream != null) {
-                val inputStreamReader = InputStreamReader(inputStream)
-                val bufferedReader = BufferedReader(inputStreamReader)
-                var receiveString: String? = ""
-                val stringBuilder = StringBuilder()
-                while (bufferedReader.readLine().also { receiveString = it } != null) {
-                    stringBuilder.append(receiveString)
-                }
-                inputStream.close()
-                ret = stringBuilder.toString()
-            }
-        } catch (e: FileNotFoundException) {
-            Log.e("FileToJson", "File not found: " + e.toString())
-        } catch (e: IOException) {
-            Log.e("FileToJson", "Can not read file: $e")
-        }
-        return ret
     }
 
     suspend fun getQuantityAPI()
@@ -964,33 +924,8 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         })
     }
 
-    private fun downloadFile(url : String, name:String){
-        // fileName -> fileName with extension
-        val request = DownloadManager.Request(Uri.parse(url))
-            .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
-            .setTitle(name)
-            .setDescription("desc")
-            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
-            .setAllowedOverMetered(true)
-            .setAllowedOverRoaming(false)
-            .setMimeType("image/*")
-            .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,name)
-        val downloadManager= getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-         downloadID = downloadManager.enqueue(request)
-    }
 
 
-    private val onDownloadComplete: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent) {
-            //Fetching the download id received with the broadcast
-            val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
-            //Checking if the received broadcast is for our enqueued download by matching download id
-                if(downloadID==id){
-                    Log.e("sdfhsdohfdosiffsf",downloadID.toString()+" "+ id.toString())
-                    Toast.makeText(this@HomePage, "Download Completed", Toast.LENGTH_SHORT).show()
 
-                }
 
-        }
-    }
 }

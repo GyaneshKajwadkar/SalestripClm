@@ -1747,13 +1747,13 @@ class SyncModel {
             @Expose
             var stateId: Int? = 0
 
-            @SerializedName("isError")
+         /*   @SerializedName("isError")
             @Expose
             var isError: Boolean? = false
 
             @SerializedName("errorMessage")
             @Expose
-            var errorMessage: String? = ""
+            var errorMessage: String? = ""*/
 
             @SerializedName("code")
             @Expose
@@ -1777,9 +1777,18 @@ class SyncModel {
             var longitude: Double = 0.0
 
 
-            /*   @SerializedName("contactPerson")
-               @Expose
-               var contactPerson: String? = ""
+            @SerializedName("contactPerson")
+            @Expose
+            var contactPerson: String? = ""
+
+            @SerializedName("employeeName")
+            @Expose
+            var employeeName: String? = ""
+
+            @SerializedName("mobileNo")
+            @Expose
+            var mobileNo: String? = ""
+            /*
 
                @SerializedName("address1")
                @Expose
@@ -1802,9 +1811,7 @@ class SyncModel {
                @Expose
                var phoneNo: String? = ""
 
-               @SerializedName("mobileNo")
-               @Expose
-               var mobileNo: String? = ""
+
 
                @SerializedName("isHospitalChemist")
                @Expose
@@ -1924,9 +1931,7 @@ class SyncModel {
                @Expose
                var canBeEdited: Boolean? = false
 
-               @SerializedName("employeeName")
-               @Expose
-               var employeeName: String? = ""
+
 
                @SerializedName("isImageAdd")
                @Expose

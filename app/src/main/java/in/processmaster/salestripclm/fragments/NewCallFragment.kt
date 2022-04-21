@@ -155,6 +155,7 @@ class NewCallFragment : Fragment() {
             views?.parentButton?.visibility=View.GONE
             views?.noData_gif?.visibility=View.VISIBLE
             views?.frameRetailer_view?.visibility=View.GONE
+            views?.retailer_parent?.visibility=View.GONE
 
             views?.selectRoute_tv?.setText("Select route")
             views?.selectDoctor_tv?.setBackgroundColor(Color.parseColor("#A9A9A9"))
@@ -275,10 +276,11 @@ class NewCallFragment : Fragment() {
 
         //  checkDCRusingShareP(0)
 
-       /* val transaction = requireActivity().supportFragmentManager.beginTransaction()
+
+        val transaction = requireActivity().supportFragmentManager.beginTransaction()
         transaction.replace(R.id.frameRetailer_view, RetailerFillFragment())
         transaction.disallowAddToBackStack()
-        transaction.commit()*/
+        transaction.commit()
 
 
         val responseDocCall=db.getApiDetail(5)
@@ -441,18 +443,10 @@ class NewCallFragment : Fragment() {
                     holder.parent_cv.setOnClickListener({
                         views?.selectDoctor_tv?.setText((modeldata?.shopName))
                         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
-                        views?.noData_gif?.visibility=View.GONE
-
-                        views?.frameRetailer_view?.visibility=View.VISIBLE
-
-
-
+                        setRetailer(modeldata)
+                        onSelection()
                     })
                 }
-
-
-
-
             }
 
         }
@@ -545,6 +539,31 @@ class NewCallFragment : Fragment() {
         }
     }
 
+    fun setRetailer(retailerModel:SyncModel.Data.Retailer)
+    {
+        views?.noData_gif?.visibility=View.GONE
+        views?.frameRetailer_view?.visibility=View.VISIBLE
+        views?.retailer_parent?.visibility=View.VISIBLE
+        views?.routeNameRetailer_tv?.setText(retailerModel.routeName)
+        views?.mobileRetailer_tv?.setText(retailerModel.contactPerson)
+        views?.emailIdRetail_tv?.setText(retailerModel.emailId)
+        views?.cityRetail_tv?.setText(retailerModel.cityName)
+        views?.shopNameRetail_tv?.setText(retailerModel.shopName)
+      //  views?.qualifiction_tv?.setText(retailerModel.qualificationName)
+     //   selectedDocID= retailerModel.retailerId!!
+        //selectedDocName= retailerModel.doctorName.toString()
+       // doctorObject=retailerModel;
+
+        if(retailerModel.mobileNo?.isEmpty() == true)
+            views?.mobileParent_tr?.visibility=View.GONE
+        if(retailerModel.emailId?.isEmpty() == true)
+            views?.emailParentRetail?.visibility=View.GONE
+        if(retailerModel.cityName?.isEmpty() == true)
+            views?.cityParentRetailer?.visibility=View.GONE
+
+    }
+
+
     fun setDoctor(doctorDetailModel: SyncModel.Data.Doctor)
     {
         views?.precall_parent?.visibility=View.GONE
@@ -594,6 +613,8 @@ class NewCallFragment : Fragment() {
          views?.selectDoctor_tv?.setText("Select Doctor")
          views?.selectRoutesCv?.setEnabled(true)
          views?.selectDoctorsCv?.setEnabled(false)
+         views?.frameRetailer_view?.visibility=View.GONE
+         views?.retailer_parent?.visibility=View.GONE
      }
      else if(selectionType==1)
      {
@@ -607,6 +628,8 @@ class NewCallFragment : Fragment() {
              else  views?.selectDoctor_tv?.setText("Select Retailer")
 
          views?.selectDoctorsCv?.setEnabled(true)
+         views?.frameRetailer_view?.visibility=View.GONE
+         views?.retailer_parent?.visibility=View.GONE
      }
      else
      {
@@ -1249,7 +1272,7 @@ class NewCallFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        if(isSecondTime) {
+        if(isSecondTime && docRetail_switch.isChecked) {
             if(views==null) return
             views?.selectDoctor_tv?.setBackgroundColor(Color.parseColor("#A9A9A9"))
             views?.doctorDetail_parent?.visibility=View.GONE
@@ -1260,7 +1283,6 @@ class NewCallFragment : Fragment() {
             val responseDocCall=db.getApiDetail(5)
             if(!responseDocCall.equals("")) {
                 docCallModel = Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
-                Log.e("fhsidhf",docCallModel.dcrDoctorlist?.size.toString())
             }
         }
         else isSecondTime=true

@@ -58,7 +58,7 @@ class NewDownloadsFragment : Fragment() {
         }
 
         isFirstTimeOpen=false
-            }, 100)
+            }, 10)
         return view
     }
 
@@ -78,7 +78,7 @@ class NewDownloadsFragment : Fragment() {
                 getAlleDetailListDb, sharePreferance, requireActivity(), db
             )
             recyclerView?.adapter = adapter
-            adapter?.notifyDataSetChanged()
+            //adapter?.notifyDataSetChanged()
         }
     }
 

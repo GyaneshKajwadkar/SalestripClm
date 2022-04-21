@@ -1,35 +1,46 @@
 package `in`.processmaster.salestripclm.fragments
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.SplashActivity
+import `in`.processmaster.salestripclm.activity.SubmitE_DetailingActivity
 import `in`.processmaster.salestripclm.adapter.CheckboxSpinnerAdapter
 import `in`.processmaster.salestripclm.adapter.PobProductAdapter
 import `in`.processmaster.salestripclm.adapter.SelectedPobAdapter
 import `in`.processmaster.salestripclm.adapter.TextWithEditAdapter
 import `in`.processmaster.salestripclm.common_classes.CommonListGetClass
-import `in`.processmaster.salestripclm.interfaceCode.IdNameBoll_interface
-import `in`.processmaster.salestripclm.interfaceCode.PobProductTransfer
-import `in`.processmaster.salestripclm.interfaceCode.productTransfer
-import `in`.processmaster.salestripclm.interfaceCode.productTransferIndividual
+import `in`.processmaster.salestripclm.common_classes.GeneralClass
+import `in`.processmaster.salestripclm.interfaceCode.*
 import `in`.processmaster.salestripclm.models.CommonModel
 import `in`.processmaster.salestripclm.models.DailyDocVisitModel
 import `in`.processmaster.salestripclm.models.IdNameBoll_model
 import `in`.processmaster.salestripclm.models.SyncModel
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.Editable
+import android.text.InputFilter
+import android.text.TextWatcher
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.forEach
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.gson.Gson
+import com.zipow.videobox.confapp.ConfMgr.getApplicationContext
 import kotlinx.android.synthetic.main.checkbox_bottom_sheet.*
 import kotlinx.android.synthetic.main.checkbox_bottom_sheet.view.*
 import kotlinx.android.synthetic.main.fragment_retailer_fill.*
@@ -40,8 +51,7 @@ import java.util.HashSet
 
 class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfer,
     productTransferIndividual
-    , productTransfer {
-
+    , productTransfer, EditInterface {
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var bottomSheetPobProduct: BottomSheetBehavior<ConstraintLayout>
@@ -51,13 +61,15 @@ class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfe
     var stokistArray=ArrayList<IdNameBoll_model>()
     var selectionType=0
     var pobProductSelectAdapter= PobProductAdapter()
-    var selectedPobAdapter= SelectedPobAdapter()
+    lateinit var selectedPobAdapter: SelectedPobAdapter
     var commonSlectionAdapter=CheckboxSpinnerAdapter(ArrayList(),this)
     var mainProductList:ArrayList<SyncModel.Data.Product> = ArrayList()
     var selectedProductList:ArrayList<SyncModel.Data.Product> = ArrayList()
     var unSelectedProductList:ArrayList<SyncModel.Data.Product> = ArrayList()
     var selectedStockist=IdNameBoll_model()
     lateinit var views:View
+    var passingSchemeList:ArrayList<SyncModel.Data.Scheme> = ArrayList()
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -151,8 +163,109 @@ class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfe
             }
         }
 
+        views.pobProduct_btn.setOnClickListener({
+            //    closeBottomSheet()
+            callPobSelectAlert()
+        })
+
+        val string = Gson().toJson(SplashActivity.staticSyncData)
+        val data= Gson().fromJson(string, SyncModel.Data::class.java)
+        mainProductList.addAll(data.productList.filter { s -> (s.productType==1) } as ArrayList<SyncModel.Data.Product>)
+        unSelectedProductList=ArrayList(mainProductList)
+
+        val getSchemeList= SplashActivity.staticSyncData?.schemeList
+        val filterByTypeSchemeList= getSchemeList?.filter { data -> (data?.schemeFor=="S" || data?.schemeFor=="H") }
+        filterByTypeSchemeList?.sortedBy { it.schemeFor }?.let { getSchemeList?.addAll(it) }
+        val getDocDetail: SyncModel.Data.Doctor? = SplashActivity.staticSyncData?.doctorList?.find { it.doctorId == PresentEDetailingFrag.doctorIdDisplayVisual }
+
+        getSchemeList?.let { passingSchemeList.addAll(it)}
+
+        getSchemeList?.forEachIndexed { indexH, hElement ->
+
+            val separated: Array<String>? = hElement.schemeForId?.split(",")?.toTypedArray()
+            val event: String? = separated?.find { it ==getDocDetail?.fieldStaffId?.toString() }
+
+            if(hElement.schemeFor.equals("H") && event!="")
+            {
+                getSchemeList?.forEachIndexed { indexS, SElement ->
+
+                    val separated: Array<String>? = SElement.schemeForId?.split(",")?.toTypedArray()
+                    val event: String? = separated?.find { it ==getDocDetail?.stateId?.toString() }
+                    if(SElement.schemeFor.equals("S") && event!="")
+                    {
+                        if(hElement.productId==SElement.productId) {
+                            passingSchemeList.removeAt(indexS)
+                        }
+                    }
+                }
+            }
+        }
 
         return views
+    }
+
+    fun callPobSelectAlert()
+    {
+        val dialogBuilder = AlertDialog.Builder(requireActivity(), R.style.my_dialog)
+        val inflater = this.layoutInflater
+        val dialogView: View = inflater.inflate(R.layout.pobcreatealert, null)
+
+        dialogBuilder.setView(dialogView)
+
+        val alertDialog: AlertDialog = dialogBuilder.create()
+        // alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val back = ColorDrawable(Color.TRANSPARENT)
+        val inset = InsetDrawable(back, 25)
+        alertDialog.getWindow()?.setBackgroundDrawable(inset)
+
+        val wmlp: WindowManager.LayoutParams? = alertDialog.getWindow()?.getAttributes()
+
+        wmlp?.gravity = Gravity.TOP or Gravity.RIGHT
+
+
+        val closePob_iv = dialogView.findViewById<View>(R.id.closePob_iv) as ImageView
+        val okPob_iv = dialogView.findViewById<View>(R.id.okPob_iv) as TextView
+        val pobProduct_rv = dialogView.findViewById<View>(R.id.pobProduct_rv) as RecyclerView
+        pobProduct_rv.layoutManager=LinearLayoutManager(requireActivity())
+
+        val productSearch_et = dialogView.findViewById<View>(R.id.productSearch_et) as EditText
+        productSearch_et?.addTextChangedListener(filterTextPobWatcher)
+
+
+
+        val pobProductSelectAdapter=PobProductAdapter(unSelectedProductList, passingSchemeList,this)
+        pobProduct_rv.adapter= pobProductSelectAdapter
+
+        productSearch_et.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                pobProductSelectAdapter?.getFilter()?.filter(s.toString())
+            }
+            override fun afterTextChanged(editable: Editable) {}
+        })
+
+        okPob_iv.setOnClickListener{
+            requireActivity().runOnUiThread{
+                GeneralClass(requireActivity()).hideKeyboard(requireActivity(),it)
+            }
+            pobProductSelectAdapter.setSelction()
+            alertDialog.dismiss()
+        }
+
+        closePob_iv.setOnClickListener{
+
+            alertDialog.dismiss()
+        }
+        alertDialog.show()
+
+    }
+
+    val filterTextPobWatcher: TextWatcher = object : TextWatcher {
+        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+            pobProductSelectAdapter?.getFilter()?.filter(s.toString())
+        }
+        override fun afterTextChanged(editable: Editable) {}
     }
 
     fun openCloseModel(type: Int)
@@ -199,9 +312,6 @@ class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfe
 
         }
         Thread(runnable).start()
-
-
-
     }
 
     fun hideAllSelection()
@@ -319,12 +429,19 @@ class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfe
             /*   pobProductSelectAdapter=PobProductAdapter(unSelectedProductList, passingSchemeList,this)
                pobProduct_rv.adapter= pobProductSelectAdapter*/
 
-       /*     selectedPobAdapter=SelectedPobAdapter(selectedProductList,this,requireActivity())
-            selectedPob_rv.adapter= selectedPobAdapter*/
+            selectedPobAdapter=SelectedPobAdapter(selectedProductList,this,this,requireActivity(),false)
+            selectedPob_rv.adapter= selectedPobAdapter
 
             calculateTotalProduct()
         }
     }
+
+    fun updateSpecificElement(returnModel: SyncModel.Data.Product?, position: Int)
+    {
+        returnModel?.let { selectedProductList.set(position, it) }
+        calculateTotalProduct()
+    }
+
 
     fun calculateTotalProduct()
     {
@@ -382,6 +499,12 @@ class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfe
         }
 
 
+    }
+
+
+    override fun onClickEdit(productModel: SyncModel.Data.Product, positon: Int) {
+        productModel?.let { selectedProductList.set(positon, it) }
+        calculateTotalProduct()
     }
 
 }

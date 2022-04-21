@@ -23,11 +23,19 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/headerTv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="App Needs To Be Updated"
                 android:textColor="#000"
+                />
+            <TextView
+                android:id="@+id/downloadNumber_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textColor="@color/zm_red"
                 />
 
 

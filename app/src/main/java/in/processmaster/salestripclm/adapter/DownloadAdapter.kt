@@ -7,7 +7,6 @@ import `in`.processmaster.salestripclm.activity.VideoPlayerActivity
 import `in`.processmaster.salestripclm.activity.WebViewActivity
 import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
-import `in`.processmaster.salestripclm.models.DownloadEdetail_model
 import `in`.processmaster.salestripclm.models.DownloadFileModel
 import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
@@ -60,9 +59,9 @@ class DownloadAdapter constructor() :
     var eDetailingId=""
     var brandName=""
     var parentId=0
-    var arraylistVideo: ArrayList<DownloadEdetail_model.Data.EDetailingImages> = ArrayList()
+    var arraylistVideo: ArrayList<DownloadFileModel> = ArrayList()
 
-    constructor(context: DownloadedActivtiy, downloadedType: String, parentId: Int, brandName: String, arraylistVideo: ArrayList<DownloadEdetail_model.Data.EDetailingImages>, eDetailingId: String) : this()
+    constructor(context: DownloadedActivtiy, downloadedType: String, parentId: Int, brandName: String, arraylistVideo: ArrayList<DownloadFileModel>, eDetailingId: String) : this()
     {
         this.context=context
         this.downloadedType=downloadedType
@@ -158,6 +157,8 @@ class DownloadAdapter constructor() :
                         requestOptions.isMemoryCacheable
                         Glide.with(context!!).setDefaultRequestOptions(requestOptions)
                             .load(Uri.fromFile(File(dbdata.fileDirectoryPath,dbdata.fileName)))
+                            .skipMemoryCache( true )
+                            .thumbnail(0.1f)
                             .placeholder(circularProgressDrawable)
                             .into(videoView.videoThumb_iv)
 
@@ -283,6 +284,8 @@ class DownloadAdapter constructor() :
                     Glide.with(context!!).setDefaultRequestOptions(requestOptions)
                         .load(Uri.fromFile(File(dbdata.fileDirectoryPath,dbdata.fileName)))
                         .placeholder(circularProgressDrawable)
+                        .skipMemoryCache( true )
+                        .thumbnail(0.1f)
                         .into(videoView.pics_iv)
 
                     videoView.pics_iv.setOnClickListener({
@@ -527,7 +530,7 @@ class DownloadAdapter constructor() :
         urlMain: String,
         position: Int,
         category: String,
-        model: DownloadEdetail_model.Data.EDetailingImages)
+        model: DownloadFileModel)
     {
         val extension: String = urlMain.substring(urlMain.lastIndexOf("/"))
         val executor: ExecutorService = Executors.newSingleThreadExecutor()
@@ -593,7 +596,7 @@ class DownloadAdapter constructor() :
                     fileModel.fileName=extension.replace("/","")
                     fileModel.fileDirectoryPath=folder.absolutePath
                     fileModel.filePath=folder.absolutePath+extension
-                    fileModel.model=model
+                   // fileModel.model=model
                     fileModel.downloadType=category
                     fileModel.fileId=model.fileId!!
                     fileModel.brandId=parentId
@@ -634,7 +637,7 @@ class DownloadAdapter constructor() :
         body: ResponseBody,
         category: String,
         position: Int,
-        model: DownloadEdetail_model.Data.EDetailingImages,
+        model: DownloadFileModel,
         urlMain: String
     ):String{
         val extension: String = urlMain.substring(urlMain.lastIndexOf("/"))
@@ -687,7 +690,7 @@ class DownloadAdapter constructor() :
                 fileModel.fileName=extension.replace("/","")
                 fileModel.fileDirectoryPath=folder.absolutePath
                 fileModel.filePath=folder.absolutePath+extension
-                fileModel.model=model
+              //  fileModel.model=model
                 fileModel.downloadType=category
                 fileModel.fileId=model.fileId!!
                 fileModel.brandId=parentId
@@ -730,7 +733,7 @@ class DownloadAdapter constructor() :
     fun downloadHtmlZip(
         urlMain: String,
         position: Int,
-        zipmodel: DownloadEdetail_model.Data.EDetailingImages)
+        zipmodel: DownloadFileModel)
     {
 
         val extension: String = urlMain.substring(urlMain.lastIndexOf("/"))
@@ -824,7 +827,7 @@ class DownloadAdapter constructor() :
 
 
     //unzip file path
-    fun unpackZipmethod(path: String, zipname: String, position: Int, zipmodel: DownloadEdetail_model.Data.EDetailingImages) {
+    fun unpackZipmethod(path: String, zipname: String, position: Int, zipmodel: DownloadFileModel) {
         var htmlPath =""
         var isInput: InputStream? = null
         val zis: ZipInputStream
@@ -900,7 +903,7 @@ class DownloadAdapter constructor() :
                     fileModel.fileName=extension.replace("/","")
                     fileModel.fileDirectoryPath=path+"/"+filename.substring(0, filename.lastIndexOf('/'))
                     fileModel.filePath=htmlPath
-                    fileModel.model=zipmodel
+                    //fileModel.model=zipmodel
                     fileModel.fileId=zipmodel.fileId!!
                     fileModel.downloadType="ZIP"
                     fileModel.brandId=parentId
@@ -967,7 +970,7 @@ class DownloadAdapter constructor() :
 
 
     //alert dialog for video views
-    fun favAlertVideo(videoView: ViewHoldersVideo, videomodel: DownloadEdetail_model.Data.EDetailingImages, db: DatabaseHandler)
+    fun favAlertVideo(videoView: ViewHoldersVideo, videomodel: DownloadFileModel, db: DatabaseHandler)
     {
         val dialogBuilder = AlertDialog.Builder(context!!)
         val inflater = context!!.layoutInflater
@@ -1015,7 +1018,7 @@ class DownloadAdapter constructor() :
     }
 
     //alert dialog for image views
-    fun favAlertImage(videoView: ViewHoldersImage, videomodel: DownloadEdetail_model.Data.EDetailingImages, db: DatabaseHandler)
+    fun favAlertImage(videoView: ViewHoldersImage, videomodel: DownloadFileModel, db: DatabaseHandler)
     {
         val dialogBuilder = AlertDialog.Builder(context!!)
         val inflater = context!!.layoutInflater
@@ -1065,7 +1068,7 @@ class DownloadAdapter constructor() :
     }
 
     //alert dialog for heml pages
-    fun favAlertHTML(videoView: ViewHoldersWeb, videomodel: DownloadEdetail_model.Data.EDetailingImages, db: DatabaseHandler)
+    fun favAlertHTML(videoView: ViewHoldersWeb, videomodel: DownloadFileModel, db: DatabaseHandler)
     {
         val dialogBuilder = AlertDialog.Builder(context!!)
         val inflater = context!!.layoutInflater
@@ -1120,7 +1123,7 @@ class DownloadAdapter constructor() :
 
 
     //save and rename files method
-    fun saveRenamedFiles(db: DatabaseHandler, filename: String, videomodel: DownloadEdetail_model.Data.EDetailingImages):Boolean
+    fun saveRenamedFiles(db: DatabaseHandler, filename: String, videomodel: DownloadFileModel):Boolean
     {
 
         var folder = File(context!!.getExternalFilesDir(null)?.absolutePath + "/$brandName"+"/favrouteFolder")
@@ -1184,7 +1187,7 @@ class DownloadAdapter constructor() :
         }
     }
 
-    fun deleteAndsaveRedownloads(db: DatabaseHandler, videomodel: DownloadEdetail_model.Data.EDetailingImages, downloadedModel: DownloadFileModel)
+    fun deleteAndsaveRedownloads(db: DatabaseHandler, videomodel: DownloadFileModel, downloadedModel: DownloadFileModel)
     {
         if(downloadedModel.favFile)
         {

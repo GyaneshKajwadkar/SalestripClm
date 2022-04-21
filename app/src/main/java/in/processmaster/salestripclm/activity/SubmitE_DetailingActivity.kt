@@ -11,10 +11,7 @@ import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.common_classes.CommonListGetClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.fragments.PresentEDetailingFrag.Companion.doctorIdDisplayVisual
-import `in`.processmaster.salestripclm.interfaceCode.IdNameBoll_interface
-import `in`.processmaster.salestripclm.interfaceCode.PobProductTransfer
-import `in`.processmaster.salestripclm.interfaceCode.productTransfer
-import `in`.processmaster.salestripclm.interfaceCode.productTransferIndividual
+import `in`.processmaster.salestripclm.interfaceCode.*
 import `in`.processmaster.salestripclm.models.*
 import `in`.processmaster.salestripclm.networkUtils.GPSTracker
 import `in`.processmaster.salestripclm.utils.PreferenceClass
@@ -61,7 +58,7 @@ import java.util.concurrent.Executors
 
 class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProductTransfer,
     productTransferIndividual
-    ,productTransfer {
+    ,productTransfer, EditInterface {
 
     var visualSendModel= ArrayList<VisualAdsModel_Send>()
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
@@ -74,7 +71,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
     var selectedPurposeID=0
     var dcrId=0
     var pobProductSelectAdapter=PobProductAdapter()
-    var selectedPobAdapter=SelectedPobAdapter()
+    lateinit var selectedPobAdapter : SelectedPobAdapter
     var passingSchemeList:ArrayList<SyncModel.Data.Scheme> = ArrayList()
     var selectedStockist=IdNameBoll_model()
     var commonSlectionAdapter=CheckboxSpinnerAdapter(ArrayList(),this)
@@ -1307,7 +1304,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
          /*   pobProductSelectAdapter=PobProductAdapter(unSelectedProductList, passingSchemeList,this)
             pobProduct_rv.adapter= pobProductSelectAdapter*/
 
-            selectedPobAdapter=SelectedPobAdapter(selectedProductList,this,this,checkIsDcrSave)
+            selectedPobAdapter=SelectedPobAdapter(selectedProductList,this,this,this,checkIsDcrSave)
             selectedPob_rv.adapter= selectedPobAdapter
 
             calculateTotalProduct()
@@ -1764,6 +1761,10 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 }
 
             }
+
+    }
+
+    override fun onClickEdit(productModel: SyncModel.Data.Product, positon: Int) {
 
     }
 

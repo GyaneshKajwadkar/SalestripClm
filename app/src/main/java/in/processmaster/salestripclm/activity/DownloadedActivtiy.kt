@@ -2,7 +2,6 @@ package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.adapter.DownloadAdapter
-import `in`.processmaster.salestripclm.models.DownloadEdetail_model
 import `in`.processmaster.salestripclm.models.DownloadFileModel
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import android.app.Activity
@@ -40,7 +39,8 @@ class DownloadedActivtiy : BaseActivity() {
 
     var db = DatabaseHandler(this)
 
-    var arrayList: ArrayList<DownloadEdetail_model.Data.EDetailingImages> = ArrayList()
+   // var arrayList: ArrayList<DownloadEdetail_model.Data.EDetailingImages> = ArrayList()
+    var arrayListD: ArrayList<DownloadFileModel> = ArrayList()
 
     var brandName =""
     var eDetailingId =""
@@ -49,9 +49,12 @@ class DownloadedActivtiy : BaseActivity() {
     var adapterImage =DownloadAdapter()
     var adapterWeb =DownloadAdapter()
 
-    var arraylistVideo:ArrayList<DownloadEdetail_model.Data.EDetailingImages> = ArrayList()
-    var arraylistImages:ArrayList<DownloadEdetail_model.Data.EDetailingImages> = ArrayList()
-    var arraylistZip:ArrayList<DownloadEdetail_model.Data.EDetailingImages> = ArrayList()
+   // var arraylistVideo:ArrayList<DownloadEdetail_model.Data.EDetailingImages> = ArrayList()
+    var arraylistVideoD:ArrayList<DownloadFileModel> = ArrayList()
+   // var arraylistImages:ArrayList<DownloadEdetail_model.Data.EDetailingImages> = ArrayList()
+    var arraylistImagesD:ArrayList<DownloadFileModel> = ArrayList()
+   // var arraylistZip:ArrayList<DownloadEdetail_model.Data.EDetailingImages> = ArrayList()
+    var arraylistZipD:ArrayList<DownloadFileModel> = ArrayList()
 
     var brandId =0;
 
@@ -68,11 +71,11 @@ class DownloadedActivtiy : BaseActivity() {
         }
 
         downloadAll_ll?.setOnClickListener({
-            if(arrayList.size!=0)
+            if(arrayListD.size!=0)
             {
                 progressDialog()
                 progressBarAlert?.setIndeterminate(true)
-                downloadAll(0, arrayList)
+                downloadAll(0, arrayListD)
             }
         })
 
@@ -81,21 +84,21 @@ class DownloadedActivtiy : BaseActivity() {
         eDetailingId = intent.getStringExtra("eDetailingId").toString()
 
         val args = intent.getBundleExtra("BUNDLE");
-        arrayList = args?.getSerializable("ARRAYLIST") as (ArrayList<DownloadEdetail_model.Data.EDetailingImages>)
+        arrayListD = args?.getSerializable("ARRAYLIST") as (ArrayList<DownloadFileModel>)
 
-        for ((index, value) in arrayList?.withIndex())
+        for ((index, value) in arrayListD?.withIndex())
         {
-            if(value.fileType=="VIDEO")
+            if(value.downloadType=="VIDEO")
             {
-                arraylistVideo.add(value)
+                arraylistVideoD.add(value)
             }
-            else if(value.fileType=="IMAGE")
+            else if(value.downloadType=="IMAGE")
             {
-                arraylistImages.add(value)
+                arraylistImagesD.add(value)
             }
-            else if(value.fileType=="ZIP")
+            else if(value.downloadType=="ZIP")
             {
-                arraylistZip.add(value)
+                arraylistZipD.add(value)
             }
         }
 
@@ -107,7 +110,7 @@ class DownloadedActivtiy : BaseActivity() {
             }
             progressDialog()
             progressBarAlert?.setIndeterminate(true)
-            downloadSingleFolders(0,arraylistVideo)
+            downloadSingleFolders(0,arraylistVideoD)
         })
         downloadAllImages_ll?.setOnClickListener({
             if(!generalClass.isInternetAvailable())
@@ -117,7 +120,7 @@ class DownloadedActivtiy : BaseActivity() {
             }
             progressDialog()
             progressBarAlert?.setIndeterminate(true)
-            downloadSingleFolders(0,arraylistImages)
+            downloadSingleFolders(0,arraylistImagesD)
         })
         downloadAllWeb_ll?.setOnClickListener({
             if(!generalClass.isInternetAvailable())
@@ -129,7 +132,7 @@ class DownloadedActivtiy : BaseActivity() {
             progressBarAlert?.setIndeterminate(true)
 
 
-            downloadSingleFolders(0,arraylistZip)
+            downloadSingleFolders(0,arraylistZipD)
         })
 
         downloadAll_ll?.setOnClickListener({
@@ -140,41 +143,41 @@ class DownloadedActivtiy : BaseActivity() {
             }
             progressDialog()
             progressBarAlert?.setIndeterminate(true)
-            var addAddDownloaded:ArrayList<DownloadEdetail_model.Data.EDetailingImages> = ArrayList()
-            addAddDownloaded.addAll(arraylistVideo)
-            addAddDownloaded.addAll(arraylistImages)
-            addAddDownloaded.addAll(arraylistZip)
+            var addAddDownloaded:ArrayList<DownloadFileModel> = ArrayList()
+            addAddDownloaded.addAll(arraylistVideoD)
+            addAddDownloaded.addAll(arraylistImagesD)
+            addAddDownloaded.addAll(arraylistZipD)
 
             downloadSingleFolders(0,addAddDownloaded)
         })
 
         toolbarText_tv?.setText(brandName)
 
-        adapterVideo= DownloadAdapter(this, "VIDEO", brandId,brandName,arraylistVideo,eDetailingId)
+        adapterVideo= DownloadAdapter(this, "VIDEO", brandId,brandName,arraylistVideoD,eDetailingId)
         video_rv?.layoutManager = GridLayoutManager(this, 5)
         video_rv?.itemAnimator = DefaultItemAnimator()
         video_rv?.adapter = adapterVideo
 
-        adapterImage= DownloadAdapter(this, "IMAGE", brandId,brandName,arraylistImages,eDetailingId)
+        adapterImage= DownloadAdapter(this, "IMAGE", brandId,brandName,arraylistImagesD,eDetailingId)
         images_rv?.layoutManager = GridLayoutManager(this, 5)
         images_rv?.itemAnimator = DefaultItemAnimator()
         images_rv?.adapter = adapterImage
 
-        adapterWeb= DownloadAdapter(this, "ZIP", brandId,brandName,arraylistZip,eDetailingId)
+        adapterWeb= DownloadAdapter(this, "ZIP", brandId,brandName,arraylistZipD,eDetailingId)
         html_rv?.layoutManager = GridLayoutManager(this, 5)
         html_rv?.itemAnimator = DefaultItemAnimator()
         html_rv?.adapter = adapterWeb
 
 
-        if(arraylistVideo.size==0)
+        if(arraylistVideoD.size==0)
         {
             videoView_parent?.visibility=View.GONE
         }
-        if(arraylistImages.size==0)
+        if(arraylistImagesD.size==0)
         {
             images_parent?.visibility=View.GONE
         }
-        if(arraylistZip.size==0)
+        if(arraylistZipD.size==0)
         {
             html_parent?.visibility=View.GONE
         }
@@ -202,21 +205,21 @@ class DownloadedActivtiy : BaseActivity() {
 
     fun downloadAll(
         index: Int,
-        arrayListtype: ArrayList<DownloadEdetail_model.Data.EDetailingImages>
+        arrayListtype: ArrayList<DownloadFileModel>
     )
     {
 
         this.runOnUiThread(Runnable {
-            downloadItem_tv?.setText("${index + 1} / ${arrayList.size}")
+            downloadItem_tv?.setText("${index + 1} / ${arrayListD.size}")
         })
 
 
-        var modelObject = arrayList.get(index)
-        downloadUrl(modelObject.filePath.toString(),index, modelObject.fileType.toString(),modelObject,arrayList,"all")
+        var modelObject = arrayListD.get(index)
+        downloadUrl(modelObject.filePath.toString(),index, modelObject.downloadType.toString(),modelObject,arrayListD,"all")
 
     }
 
-    fun downloadSingleFolders(index: Int, downloadList : ArrayList<DownloadEdetail_model.Data.EDetailingImages>)
+    fun downloadSingleFolders(index: Int, downloadList : ArrayList<DownloadFileModel>)
     {
         this.runOnUiThread(Runnable {
             downloadItem_tv?.setText("${index + 1} / ${downloadList.size}")
@@ -224,7 +227,7 @@ class DownloadedActivtiy : BaseActivity() {
         })
 
         var modelObject = downloadList.get(index)
-        downloadUrl(modelObject.filePath.toString(),index, modelObject.fileType.toString(),modelObject,downloadList,"single")
+        downloadUrl(modelObject.filePath.toString(),index, modelObject.downloadType.toString(),modelObject,downloadList,"single")
 
     }
 
@@ -258,8 +261,8 @@ class DownloadedActivtiy : BaseActivity() {
         urlMain: String,
         position: Int,
         category: String,
-        model: DownloadEdetail_model.Data.EDetailingImages,
-        arrayListtype: ArrayList<DownloadEdetail_model.Data.EDetailingImages>,
+        model: DownloadFileModel,
+        arrayListtype: ArrayList<DownloadFileModel>,
         downloadType: String
     )
     {
@@ -328,7 +331,7 @@ class DownloadedActivtiy : BaseActivity() {
                         fileModel.fileName=extension.replace("/","")
                         fileModel.fileDirectoryPath=folder.absolutePath
                         fileModel.filePath=folder.absolutePath+extension
-                        fileModel.model=model
+                     //   fileModel.model=model
                         fileModel.downloadType=category
                         fileModel.fileId= model.fileId
                         fileModel.brandId=brandId
@@ -417,9 +420,9 @@ class DownloadedActivtiy : BaseActivity() {
         path: String,
         zipname: String,
         position: Int,
-        zipmodel: DownloadEdetail_model.Data.EDetailingImages,
+        zipmodel: DownloadFileModel,
         downloadType: String,
-        arrayListtype: ArrayList<DownloadEdetail_model.Data.EDetailingImages>
+        arrayListtype: ArrayList<DownloadFileModel>
     ) {
         var htmlPath =""
         var isInput: InputStream? = null
@@ -489,7 +492,7 @@ class DownloadedActivtiy : BaseActivity() {
                     fileModel.fileName=extension.replace("/","")
                     fileModel.fileDirectoryPath=path+"/"+filename.substring(0, filename.lastIndexOf('/'))
                     fileModel.filePath=htmlPath
-                    fileModel.model=zipmodel
+                   // fileModel.model=zipmodel
                     fileModel.downloadType="ZIP"
                     fileModel.fileId=zipmodel.fileId
                     fileModel.brandId=brandId
@@ -539,7 +542,7 @@ class DownloadedActivtiy : BaseActivity() {
 
     }
 
-    fun deleteAndsaveRedownloads(db: DatabaseHandler, videomodel: DownloadEdetail_model.Data.EDetailingImages, downloadedModel: DownloadFileModel)
+    fun deleteAndsaveRedownloads(db: DatabaseHandler, videomodel: DownloadFileModel, downloadedModel: DownloadFileModel)
     {
         if(downloadedModel.favFile)
         {
@@ -601,7 +604,7 @@ class DownloadedActivtiy : BaseActivity() {
     fun notifyDataChange(type:String, position: Int)
     {
         runOnUiThread {
-            adapterVideo= DownloadAdapter(this, "VIDEO", brandId,brandName,arraylistVideo,eDetailingId)
+            adapterVideo= DownloadAdapter(this, "VIDEO", brandId,brandName,arraylistVideoD,eDetailingId)
             video_rv?.layoutManager = GridLayoutManager(this, 5)
             video_rv?.itemAnimator = DefaultItemAnimator()
             video_rv?.adapter = adapterVideo

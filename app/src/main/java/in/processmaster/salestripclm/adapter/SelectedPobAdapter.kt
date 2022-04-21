@@ -1,9 +1,12 @@
 package `in`.processmaster.salestripclm.adapter
 
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.activity.HomePage
 import `in`.processmaster.salestripclm.activity.SplashActivity
 import `in`.processmaster.salestripclm.activity.SubmitE_DetailingActivity
 import `in`.processmaster.salestripclm.fragments.PresentEDetailingFrag
+import `in`.processmaster.salestripclm.fragments.RetailerFillFragment
+import `in`.processmaster.salestripclm.interfaceCode.EditInterface
 import `in`.processmaster.salestripclm.interfaceCode.productTransfer
 import `in`.processmaster.salestripclm.interfaceCode.productTransferIndividual
 import `in`.processmaster.salestripclm.models.SyncModel
@@ -31,12 +34,10 @@ import com.google.android.material.button.MaterialButton
 class SelectedPobAdapter(
     var sendEDetailingArray: ArrayList<SyncModel.Data.Product>?,
     var sendProductInterface: productTransferIndividual?,
-    val submiteDetailingactivity: SubmitE_DetailingActivity?,
+    var editupdate: EditInterface?,
+    val context: Context?,
     val checkIsDcrSave:Boolean
     ): RecyclerView.Adapter<SelectedPobAdapter.MyViewHolder>() {
-
-    constructor() : this(null, null,null,false) {
-    }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -189,7 +190,7 @@ class SelectedPobAdapter(
 
     fun callEditAlert(model: SyncModel.Data.Product?, position: Int)
     {
-        val activity = submiteDetailingactivity as Activity
+        val activity = context as Activity
         val dialogBuilder = AlertDialog.Builder(activity)
         val inflater = activity.layoutInflater
         val dialogView: View = inflater.inflate(R.layout.pob_edit_layout, null)
@@ -217,7 +218,14 @@ class SelectedPobAdapter(
 
            val returnModel= model?.let { it1 -> getSchemeObject(it1,alertqty_et.text.toString()) }
             returnModel?.let { it1 -> sendEDetailingArray?.set(position, it1) }
-            submiteDetailingactivity.updateSpecificElement(returnModel,position)
+            if ( activity is SubmitE_DetailingActivity )
+            {
+                activity.updateSpecificElement(returnModel,position)
+            }
+            else if(context is HomePage)
+            {
+                model?.let { it1 -> editupdate?.onClickEdit(it1,position) }
+            }
             notifyDataSetChanged()
          //   returnModel?.let { it1 -> sendEDetailingArray?.set(position, it1) }
          //   sendEDetailingArray?.let { mCallback?.onClickButtonPOB(it) }
