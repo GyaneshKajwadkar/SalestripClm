@@ -4,9 +4,12 @@ import `in`.processmaster.salestripclm.fragments.PresentEDetailingFrag.Companion
 import `in`.processmaster.salestripclm.fragments.PresentEDetailingFrag.Companion.doctor_et
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.adapter.DownloadedFolderAdapter
+import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.models.DownloadFileModel
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -59,7 +62,7 @@ class ShowDownloadedFragment : Fragment() {
     ): View? {
         var view= inflater.inflate(R.layout.fragment_show_downloaded, container, false)
 
-        db = DatabaseHandler(requireActivity())
+
 
         if(currentDate.isEmpty()&& currentDate.isEmpty())
         {
@@ -104,85 +107,85 @@ class ShowDownloadedFragment : Fragment() {
         }
         else
         {
-            nodata_gif?.visibility=View.GONE
-            selection_tv?.setText("Please wait...")
+            AlertClass(requireActivity()).showProgressAlert("")
+            val runnable= Runnable {
 
-            val value = requireArguments().getInt("eDetailingID")
-            val brandID = requireArguments().getInt("brandId")
-            val selectionType = requireArguments().getInt("selectionType")
 
-            var downloadList: ArrayList<DownloadFileModel> = ArrayList()
-            if(selectionType==1)
-            {
-                downloadList= db?.getAllDownloadedData(value) as ArrayList<DownloadFileModel>
-            }
-            else
-            {
-                 downloadList= db?.getAllFavList() as ArrayList<DownloadFileModel>
-                if(downloadList.size==0)
+
+                db = DatabaseHandler(requireActivity())
+                val value = requireArguments().getInt("eDetailingID")
+                val brandID = requireArguments().getInt("brandId")
+                val selectionType = requireArguments().getInt("selectionType")
+
+                var downloadList: ArrayList<DownloadFileModel> = ArrayList()
+                if(selectionType==1)
                 {
-                    nodata_gif?.visibility=View.VISIBLE
+                    downloadList= db?.getAllDownloadedData(value) as ArrayList<DownloadFileModel>
                 }
                 else
                 {
-                    topSearchParent?.visibility=View.VISIBLE
+                    downloadList= db?.getAllFavList() as ArrayList<DownloadFileModel>
+                    if(downloadList.size==0) requireActivity().runOnUiThread {  nodata_gif?.visibility=View.VISIBLE }
+                    else requireActivity().runOnUiThread { topSearchParent?.visibility=View.VISIBLE }
                 }
-            }
-            for ((index, valueDownload) in downloadList?.withIndex()!!)
-            {
-                if(valueDownload.downloadType.equals("VIDEO"))
+                for ((index, valueDownload) in downloadList?.withIndex()!!)
                 {
-                    valueDownload.eDetailingId=value
-                    arraylistVideo.add(valueDownload)
+                    if(valueDownload.downloadType.equals("VIDEO"))
+                    {
+                        valueDownload.eDetailingId=value
+                        arraylistVideo.add(valueDownload)
+                    }
+                    else  if(valueDownload.downloadType.equals("IMAGE"))
+                    {
+                        valueDownload.eDetailingId=value
+                        arraylistImages.add(valueDownload)
+                    }
+                    else
+                    {
+                        valueDownload.eDetailingId=value
+                        arraylistZip.add(valueDownload)
+                    }
                 }
-                else  if(valueDownload.downloadType.equals("IMAGE"))
-                {
-                    valueDownload.eDetailingId=value
-                    arraylistImages.add(valueDownload)
+
+                if(arraylistVideo.size==0) requireActivity().runOnUiThread{ videoView_parent?.visibility=View.GONE}
+
+                if(arraylistImages.size==0) requireActivity().runOnUiThread{ images_parent?.visibility=View.GONE}
+
+                if(arraylistZip.size==0)requireActivity().runOnUiThread{ html_parent?.visibility=View.GONE}
+
+                val sendtext = requireArguments().getString("type")
+
+                adapterVideo= DownloadedFolderAdapter(sendtext,"VIDEO",arraylistVideo, requireActivity(),doctorIdDisplayVisual,brandID)
+                adapterImage= DownloadedFolderAdapter(sendtext,"IMAGE", arraylistImages, requireActivity(), doctorIdDisplayVisual, brandID)
+                adapterWeb= DownloadedFolderAdapter(sendtext,"ZIP", arraylistZip, requireActivity(), doctorIdDisplayVisual, brandID)
+
+
+                requireActivity().runOnUiThread {
+                    nodata_gif?.visibility=View.GONE
+                    selection_tv?.setText("Please wait...")
+
+                    video_rv?.layoutManager = GridLayoutManager(activity, 4)
+                    video_rv?.itemAnimator = DefaultItemAnimator()
+                    video_rv?.adapter = adapterVideo
+
+                    images_rv?.layoutManager = GridLayoutManager(activity, 4)
+                    images_rv?.itemAnimator = DefaultItemAnimator()
+                    images_rv?.adapter = adapterImage
+
+                    html_rv?.layoutManager = GridLayoutManager(activity, 4)
+                    html_rv?.itemAnimator = DefaultItemAnimator()
+                    html_rv?.adapter = adapterWeb
+
+                    nestedScroll?.visibility=View.VISIBLE
+                    selection_tv?.visibility=View.GONE
+
+                   Handler(Looper.getMainLooper()).postDelayed({
+                       AlertClass(requireActivity()).hideAlert()
+                   },100)
                 }
-                else
-                {
-                    valueDownload.eDetailingId=value
-                    arraylistZip.add(valueDownload)
-                }
             }
+            Thread(runnable).start()
 
-            if(arraylistVideo.size==0)
-            {
-                videoView_parent?.visibility=View.GONE
-            }
-
-            if(arraylistImages.size==0)
-            {
-                images_parent?.visibility=View.GONE
-            }
-
-            if(arraylistZip.size==0)
-            {
-                html_parent?.visibility=View.GONE
-            }
-
-
-
-            val sendtext = requireArguments().getString("type")
-
-            adapterVideo= DownloadedFolderAdapter(sendtext,"VIDEO",arraylistVideo, requireActivity(),doctorIdDisplayVisual,brandID)
-            video_rv!!.layoutManager = GridLayoutManager(activity, 4)
-            video_rv?.itemAnimator = DefaultItemAnimator()
-            video_rv?.adapter = adapterVideo
-
-            adapterImage= DownloadedFolderAdapter(sendtext,"IMAGE", arraylistImages, requireActivity(), doctorIdDisplayVisual, brandID)
-            images_rv!!.layoutManager = GridLayoutManager(activity, 4)
-            images_rv?.itemAnimator = DefaultItemAnimator()
-            images_rv?.adapter = adapterImage
-
-            adapterWeb= DownloadedFolderAdapter(sendtext,"ZIP", arraylistZip, requireActivity(), doctorIdDisplayVisual, brandID)
-            html_rv!!.layoutManager = GridLayoutManager(activity, 4)
-            html_rv?.itemAnimator = DefaultItemAnimator()
-            html_rv?.adapter = adapterWeb
-
-            nestedScroll?.visibility=View.VISIBLE
-            selection_tv?.visibility=View.GONE
         }
 
         filterFavList_et?.addTextChangedListener(filterTextWatcher)

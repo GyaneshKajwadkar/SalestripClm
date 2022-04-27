@@ -1,6 +1,7 @@
 package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.adapter.OtherBrandSelectionAdapter
 import `in`.processmaster.salestripclm.adapter.OtherFileAdapter
 import `in`.processmaster.salestripclm.interfaceCode.ItemClickDisplayVisual
 import `in`.processmaster.salestripclm.interfaceCode.StoreVisualInterface
@@ -76,6 +77,9 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
     var threadBrand: Thread?= null
     val currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
     lateinit var adapterVisualFile : HorizontalVideoViewAdapter
+    var clicked=""
+    var  filterWebList: ArrayList<DownloadFileModel> = ArrayList()
+    var  filterImageList: ArrayList<DownloadFileModel> = ArrayList()
 
     companion object {
         var videoModel : DownloadFileModel?= null
@@ -129,6 +133,13 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
       /*      if(!videoModel?.favFileName?.isEmpty()!!)
             { productParent_ll?.visibility= View.GONE }*/
 
+            showVideo_mb.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.appColor))
+
+
+            openBottomSheet_iv.setOnClickListener()
+            {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED)
+            }
 
             position = intent.getIntExtra("position", 0)
             if(arrayVideo!=null )
@@ -206,10 +217,14 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
                 currentProduct_btn?.setOnClickListener({
                     if(!isCurrent)
                     {
+                        setAllDefault("VIDEO")
+                        showVideo_mb.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.appColor))
+
                         otherProduct_btn?.setBackgroundColor(ContextCompat.getColor(this,R.color.gray))
                         currentProduct_btn?.setBackgroundColor(ContextCompat.getColor(this,R.color.appColor))
                         fabLike?.visibility=View.VISIBLE
                         fabComment?.visibility=View.VISIBLE
+                        selectionBtn_parent?.visibility=View.VISIBLE
 
                         setHorizontalAdapter(arrayVideo)
 
@@ -220,7 +235,6 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
                 otherProduct_btn?.setOnClickListener({
                     if(isCurrent)
                     {
-
                         edetailingList = getAllEdetailingProduct()
 
                         otherProduct_btn?.setBackgroundColor(ContextCompat.getColor(this,R.color.appColor))
@@ -232,10 +246,42 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
                         horizontal_rv?.adapter = otherFileAdapter
                         otherFileAdapter?.notifyDataSetChanged()
 
+                        horizontalOther_rv.visibility=View.GONE
+                        horizontal_rv.visibility=View.VISIBLE
+                        selectionBtn_parent?.visibility=View.GONE
+
                         isCurrent=false
                     }
                 })
             }
+
+            showVideo_mb.setOnClickListener {
+                if(clicked.equals("VIDEO"))return@setOnClickListener
+                setAllDefault("VIDEO")
+                runOnUiThread {
+                    showVideo_mb.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.appColor))
+                    horizontalOther_rv.visibility=View.GONE
+                    horizontal_rv.visibility=View.VISIBLE
+                }
+            }
+            showWeb_mb.setOnClickListener {
+                if(clicked.equals("ZIP"))return@setOnClickListener
+                setAllDefault("ZIP")
+                runOnUiThread {
+                    showWeb_mb.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.appColor))
+                }
+                setOtherBrandSelection(filterWebList)
+            }
+            showimg_mb.setOnClickListener {
+                if(clicked.equals("IMAGE"))return@setOnClickListener
+                setAllDefault("IMAGE")
+                runOnUiThread {
+                    showimg_mb.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.appColor))
+                }
+                setOtherBrandSelection(filterImageList)
+            }
+
+            filterListWebmage()
 
             playerView.getVideoSurfaceView()?.setOnClickListener({ view ->
 
@@ -274,7 +320,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
           val mediaSource: MediaSource? = buildMediaSourceSingle(uri)
 
             mediaSource?.let { mPlayer?.prepare(it, false, false) }
-
+            openBottomSheet_iv?.visibility=View.GONE
         }
 
 
@@ -549,7 +595,8 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
         isCurrent=true
         otherProduct_btn?.setBackgroundColor(ContextCompat.getColor(this,R.color.gray))
         currentProduct_btn?.setBackgroundColor(ContextCompat.getColor(this,R.color.appColor))
-
+        selectionBtn_parent?.visibility=View.VISIBLE
+        filterListWebmage()
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
 
         fabLike?.visibility=View.VISIBLE
@@ -684,7 +731,59 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
     }
 
+    fun setOtherBrandSelection(list: ArrayList<DownloadFileModel>)
+    {
+        runOnUiThread {
+            horizontalOther_rv.visibility=View.VISIBLE
+            horizontal_rv.visibility=View.GONE
+        }
+        horizontalOther_rv.setLayoutManager(LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false))
+        val otherBrandAdapter= OtherBrandSelectionAdapter(
+            this,
+            list,
+            clicked,
+            end_btn,
+            doctorId,
+            eDetailingId
+        )
+        horizontalOther_rv.adapter=otherBrandAdapter
+    }
 
+    fun setAllDefault(clickedButton:String)
+    {
+        clicked=clickedButton
+        showimg_mb.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.appDarkColor))
+        showWeb_mb.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.appDarkColor))
+        showVideo_mb.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.appDarkColor))
+
+    }
+
+    fun filterListWebmage()
+    {
+        val runnable= Runnable {  filterWebList.clear()
+            filterImageList.clear()
+
+            val dowloadedAllList=dbBase.getAllDownloadedData(eDetailingId)
+
+            for(item in dowloadedAllList)
+            {
+                if(item.downloadType.equals("ZIP"))filterWebList.add(item)
+                if(item.downloadType.equals("IMAGE"))filterImageList.add(item)
+            }
+
+            runOnUiThread { if(filterWebList.size==0)showWeb_mb.visibility=View.GONE
+            else showWeb_mb.visibility=View.VISIBLE
+                if(filterImageList.size==0)showimg_mb.visibility=View.GONE
+                else showimg_mb.visibility=View.VISIBLE }
+
+        }
+        Thread(runnable).start()
+    }
+
+    override fun onBackPressed() {
+        if(intent.getSerializableExtra("videoArray")!=null)
+        else  super.onBackPressed()
+    }
 }
 
 

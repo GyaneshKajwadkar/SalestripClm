@@ -124,6 +124,12 @@ class DownloadManagerClass(
                     val decoded: String = URLDecoder.decode(downloadFilePath, "UTF-8")
                     writeFileOnInternalStorage(decoded,downloadTitle,cursor)
                 }
+                else ->{
+                    getNumber++
+                    startDownloading()
+                }
+
+
             }
         }
     }

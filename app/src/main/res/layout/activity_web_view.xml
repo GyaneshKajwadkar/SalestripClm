@@ -12,6 +12,7 @@
         android:layout_height="match_parent">
 
         <RelativeLayout
+            android:visibility="gone"
             android:padding="3dp"
             android:id="@+id/parentMenu"
             android:layout_alignParentRight="true"
@@ -21,10 +22,10 @@
             android:background="@color/purple_200">
 
             <ImageView
-                android:tint="@color/white"
                 android:layout_width="25dp"
                 android:layout_height="40dp"
-                android:src="@drawable/ic_menu_dot"/>
+                android:src="@drawable/ic_menu_dot"
+                app:tint="@color/white" />
 
         </RelativeLayout>
 
@@ -115,7 +116,15 @@
             android:id="@+id/screenShotShow_iv"/>
 
 
-
+        <ImageView
+            android:id="@+id/openBottomSheet_iv"
+            android:layout_width="100dp"
+            android:layout_height="30dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:background="@color/appColor"
+            android:padding="5dp"
+            android:src="@drawable/zm_arrow_up_normal" />
 
 
 

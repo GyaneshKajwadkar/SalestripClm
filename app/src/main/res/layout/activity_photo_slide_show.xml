@@ -37,7 +37,7 @@
         <androidx.viewpager.widget.ViewPager
             android:id="@+id/viewPagerMain"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent" />
 
         <TextView
             android:background="@color/appColor"
@@ -54,15 +54,30 @@
 
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_send"
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/fab_send"
-            android:elevation="3dp"
-            android:layout_alignParentBottom="true"
-            app:tint="@color/white"
             android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:elevation="3dp"
             android:src="@android:drawable/ic_menu_send"
-            android:layout_margin="10dp"/>
+            app:tint="@color/white" />
+
+        <ImageView
+            android:id="@+id/openBottomSheet_iv"
+            android:layout_width="100dp"
+            android:layout_height="30dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:background="@color/appColor"
+            android:padding="5dp"
+            android:src="@drawable/zm_arrow_up_normal" />
+
 
     </RelativeLayout>
 

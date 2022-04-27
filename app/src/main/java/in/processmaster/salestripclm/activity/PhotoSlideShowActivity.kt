@@ -1,6 +1,7 @@
 package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.adapter.OtherBrandSelectionAdapter
 import `in`.processmaster.salestripclm.adapter.OtherFileAdapter
 import `in`.processmaster.salestripclm.fragments.ShowDownloadedFragment
 import `in`.processmaster.salestripclm.interfaceCode.ItemClickDisplayVisual
@@ -18,11 +19,9 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.AttributeSet
 import android.util.Log
 import android.view.*
 import android.view.GestureDetector.SimpleOnGestureListener
-import android.view.View.GONE
 import android.view.View.OnTouchListener
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.Animation
@@ -44,8 +43,8 @@ import androidx.viewpager.widget.ViewPager.OnPageChangeListener
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.activity_photo_slide_show.*
+import kotlinx.android.synthetic.main.web_bottom_sheet.*
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -63,31 +62,27 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
     var handler: Handler? = null
     var runnable: Runnable? = null
     var position=0
-    var parentRl: RelativeLayout? =null
     val currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
+    var clicked=""
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var bottomSheetWeb: ConstraintLayout
-    var end_btn: Button? =null
     var isList=false
-    var horizontal_rv:RecyclerView?=null
     var brandId=0
     var empId=0
     var startDateTime=""
     var doctorId=0
-    var currentProduct_btn: Button?= null
-    var otherProduct_btn: Button?= null
+
     var isCurrent=true;
     var otherFileAdapter :OtherFileAdapter?=null
     var edetailingList: ArrayList<DevisionModel.Data.EDetailing>? = null
     var adapterVisualFile: HorizontalImageViewAdapter? =null
     var arrayImage: ArrayList<DownloadFileModel> = ArrayList<DownloadFileModel>()
     var eDetailingId=0
-    var fab_send : FloatingActionButton?= null
-    var fabLike : FloatingActionButton?= null
-    var fabComment : FloatingActionButton?= null
+
     var mViewPagerAdapter: ViewPagerAdapter? = null
-    var productParent_ll: LinearLayout?=null
+    var  filterWebList: ArrayList<DownloadFileModel> = ArrayList()
+    var  filterVideoList: ArrayList<DownloadFileModel> = ArrayList()
 
     companion object {
         var model : DownloadFileModel?= null
@@ -103,20 +98,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
         imageFrame = findViewById(R.id.imageFrames) as ViewFlipper
 
-        parentRl = findViewById(R.id.parentRl) as RelativeLayout
-        productParent_ll = findViewById(R.id.productParent_ll) as LinearLayout
-
-        horizontal_rv = findViewById(R.id.horizontal_rv)
-        fab_send = findViewById(R.id.fab_send)
-
-        currentProduct_btn = findViewById(R.id.currentProduct_btn)
-        otherProduct_btn = findViewById(R.id.otherProduct_btn)
-
-        fabLike    = findViewById<View>(R.id.fabLike) as FloatingActionButton
-        fabComment = findViewById<View>(R.id.fabComment) as FloatingActionButton
-
         bottomSheetWeb=findViewById(R.id.bottomSheetWeb)as ConstraintLayout
-        end_btn=findViewById(R.id.end_btn)as Button
 
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetWeb)
 
@@ -178,7 +160,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
                     Date()
                 )
                 dbBase?.updateendData(currentDate + " " + currentTime,startDateTime)
-                onBackPressed()
+              //  onBackPressed()
                 finish()
 
                 /*     if (doctorId != 0) {
@@ -207,6 +189,11 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
                      }*/
             })
 
+            openBottomSheet_iv.setOnClickListener()
+            {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED)
+            }
+
 
             fabLike?.setOnClickListener({
                 if (isList) {
@@ -219,8 +206,6 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
                     fabLike?.setColorFilter(Color.WHITE)
                     isList = true
                 }
-
-
             })
 
             fabComment?.setOnClickListener({
@@ -230,10 +215,14 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
             currentProduct_btn?.setOnClickListener({
                 if(!isCurrent)
                 {
+                    setAllDefault("IMAGE")
+                    showimg_mb.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.appColor))
+
                     otherProduct_btn?.setBackgroundColor(ContextCompat.getColor(this,R.color.gray))
                     currentProduct_btn?.setBackgroundColor(ContextCompat.getColor(this,R.color.appColor))
                     fabLike?.visibility=View.VISIBLE
                     fabComment?.visibility=View.VISIBLE
+                    selectionBtn_parent?.visibility=View.VISIBLE
 
                     setHorizontalAdapter(arrayImage, position,model)
 
@@ -246,18 +235,22 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
             otherProduct_btn?.setOnClickListener({
                 if(isCurrent)
                 {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        edetailingList = getAllEdetailingProduct()
-                    }
+
+                    edetailingList = getAllEdetailingProduct()
 
                     otherProduct_btn?.setBackgroundColor(ContextCompat.getColor(this,R.color.appColor))
                     currentProduct_btn?.setBackgroundColor(ContextCompat.getColor(this,R.color.gray))
                     fabLike?.visibility=View.GONE
                     fabComment?.visibility=View.GONE
 
+
                     otherFileAdapter = OtherFileAdapter(edetailingList,this,this, eDetailingId)
                     horizontal_rv?.adapter = otherFileAdapter
                     otherFileAdapter?.notifyDataSetChanged()
+
+                    horizontalOther_rv.visibility=View.GONE
+                    horizontal_rv.visibility=View.VISIBLE
+                    selectionBtn_parent?.visibility=View.GONE
 
                     isCurrent=false
                 }
@@ -296,17 +289,45 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
                 }
             })
             slideBrandWiseInsert(startDateTime,brandId)
-            runOnUiThread {  alertClass.hideAlert() }
+            runOnUiThread {
+                showimg_mb.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.appColor))
+                alertClass.hideAlert() }
 
+           // val dowloadedAllList=dbBase.getAllDownloadedData(eDetailingId)
+
+            showimg_mb.setOnClickListener {
+                if(clicked.equals("IMAGE"))return@setOnClickListener
+                setAllDefault("IMAGE")
+                runOnUiThread {
+                    showimg_mb.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.appColor))
+                    horizontalOther_rv.visibility=View.GONE
+                    horizontal_rv.visibility=View.VISIBLE
+                }
+            }
+            showWeb_mb.setOnClickListener {
+                if(clicked.equals("ZIP"))return@setOnClickListener
+                setAllDefault("ZIP")
+                runOnUiThread {
+                    showWeb_mb.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.appColor))
+                }
+                setOtherBrandSelection(filterWebList)
+            }
+            showVideo_mb.setOnClickListener {
+                if(clicked.equals("VIDEO"))return@setOnClickListener
+                setAllDefault("VIDEO")
+                runOnUiThread {
+                    showVideo_mb.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.appColor))
+                }
+                setOtherBrandSelection(filterVideoList)
+            }
+
+            filterListVideoWeb()
         }
 
         if(intent.getStringExtra("singleSelection")!=null)
         {
-
-
             var  selection = intent.getStringExtra("singleSelection")
             var  model = intent.getSerializableExtra("model") as DownloadFileModel
-
 
             val imageView = ImageView(this)
             val imbm = BitmapFactory.decodeFile(selection)
@@ -316,6 +337,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
             runOnUiThread {
                 fab_send?.visibility=View.GONE
+                openBottomSheet_iv?.visibility=View.GONE
 
                 imageView.setImageBitmap(imbm)
                 imageFrame?.addView(imageView)
@@ -329,7 +351,48 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
     }
 
+    fun filterListVideoWeb()
+    {
+        val runnable= Runnable {    filterWebList.clear()
+            filterVideoList.clear()
 
+            val dowloadedAllList=dbBase.getAllDownloadedData(eDetailingId)
+
+            for(item in dowloadedAllList)
+            {
+                if(item.downloadType.equals("ZIP"))filterWebList.add(item)
+                if(item.downloadType.equals("VIDEO"))filterVideoList.add(item)
+            }
+
+            runOnUiThread { if(filterWebList.size==0)showWeb_mb.visibility=View.GONE
+            else showWeb_mb.visibility=View.VISIBLE
+                if(filterVideoList.size==0)showVideo_mb.visibility=View.GONE
+                else showVideo_mb.visibility=View.VISIBLE }
+        }
+        Thread(runnable).start()
+
+
+    }
+
+    fun setAllDefault(clickedButton:String)
+    {
+        clicked=clickedButton
+        showimg_mb.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.appDarkColor))
+        showWeb_mb.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.appDarkColor))
+        showVideo_mb.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.appDarkColor))
+
+    }
+
+    fun setOtherBrandSelection(list: ArrayList<DownloadFileModel>)
+    {
+        runOnUiThread {
+           horizontalOther_rv.visibility=View.VISIBLE
+           horizontal_rv.visibility=View.GONE
+        }
+        horizontalOther_rv.setLayoutManager(LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false))
+        val otherBrandAdapter= OtherBrandSelectionAdapter(this, list ,clicked,end_btn,doctorId,eDetailingId)
+        horizontalOther_rv.adapter=otherBrandAdapter
+    }
 
 
     fun setImageArray(arrayImage: ArrayList<DownloadFileModel>, position: Int, model: DownloadFileModel?)
@@ -338,28 +401,28 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
         {
             val imageView = ImageView(this)
             val imbm = BitmapFactory.decodeFile(arrayImage.get(0).filePath)
-            imageView.setImageBitmap(imbm)
-            imageFrame?.addView(imageView)
+            runOnUiThread {
+                imageView.setImageBitmap(imbm)
+                imageFrame?.addView(imageView)
 
-            mViewPagerAdapter = ViewPagerAdapter(this, arrayImage)
-            viewPagerMain.adapter = mViewPagerAdapter
+                mViewPagerAdapter = ViewPagerAdapter(this, arrayImage)
+                viewPagerMain.adapter = mViewPagerAdapter
+            }
 
             if(intent.getSerializableExtra("imageArray")!=null)
             {
-                gestureDetector = GestureDetector(this,MyGestureDetector())
-                gestureListener = OnTouchListener { v, event -> if (gestureDetector?.onTouchEvent(event) == true) true else false }
+                runOnUiThread {
+                    gestureDetector = GestureDetector(this,MyGestureDetector())
+                    gestureListener = OnTouchListener { v, event -> if (gestureDetector?.onTouchEvent(event) == true) true else false }
+                }
                 setHorizontalAdapter(arrayImage, position,model)
                 imageFrame?.setOnTouchListener(gestureListener)
                 imageFrame?.setOnClickListener(this@PhotoSlideShowActivity)
             }
-
         }
         else
         {
-
-
             mViewPagerAdapter = ViewPagerAdapter(this, arrayImage)
-
 
             runOnUiThread {
                 imageFrame?.let { addFlipperImages(it, arrayImage, position) }
@@ -389,7 +452,6 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
     fun getAllEdetailingProduct() : java.util.ArrayList<DevisionModel.Data.EDetailing>
     {
         var  edetailingList = dbBase?.getAlleDetail() //fetch edetailing list from dbBase
@@ -399,11 +461,17 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
             if(itemParent.isSaved==1)
             {
                 var downloadedList = dbBase?.getAllDownloadedData(itemParent.geteDetailId())
+                var isImage=false
+                for(itemChild in downloadedList)
+                {
+                    if(itemChild.downloadType.equals("IMAGE")) isImage=true
+                }
+                if(isImage)  filteredList.add(itemParent); continue
 
-                if(downloadedList?.stream()?.anyMatch({ o -> o.downloadType.equals("IMAGE") }) == true)
+              /*  if(downloadedList?.stream()?.anyMatch({ o -> o.downloadType.equals("IMAGE") }) == true)
                 {
                     filteredList.add(itemParent)
-                }
+                }*/
             }
         }
         return filteredList
@@ -450,9 +518,9 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
         override fun onDoubleTapEvent(e: MotionEvent): Boolean
         {
-            floating_action_button_image.visibility=View.GONE
-            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED)
-            return true
+           // floating_action_button_image.visibility=View.GONE
+           // bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED)
+           return true
         }
 
 
@@ -501,10 +569,6 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
                 else if (e2.x - e1.x > SWIPE_MIN_DISTANCE
                     && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-
-
-                    //commonlib/
-                    //mobilertc/
 
 
                     if(imageFrame?.displayedChild == 0)
@@ -634,15 +698,17 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
             relativeViewList.add(holder.parent_llImage)
 
+            holder.parent_llImage.setBackgroundColor(ContextCompat.getColor(context, R.color.white))
 
             if(modeladapter.filePath.equals(downloadedfiles.filePath))
             {
                 holder.parent_llImage.setBackgroundColor(ContextCompat.getColor(context, R.color.purple_500))
             }
 
+
             holder.parent_llImage.setOnClickListener({
                 for (currentList in relativeViewList) {
-                    currentList.setBackgroundColor(Color.TRANSPARENT)
+                    currentList.setBackgroundColor(ContextCompat.getColor(context, R.color.white))
                 }
                 holder.parent_llImage.setBackgroundColor(ContextCompat.getColor(context, R.color.purple_500));
 
@@ -726,46 +792,46 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
     override fun onClickDisplayVisual(passingInterface: Int, brandIDInterface: Int,selectionType: Int)
     {
 
-        arrayImage.clear()
+        alertClass.showProgressAlert("")
+        val runnable= Runnable {
+            arrayImage.clear()
 
-        for (itemParent in dbBase?.getAllDownloadedData(passingInterface) )
-        {
-
-            if(itemParent.downloadType.equals("IMAGE"))
+            for (itemParent in dbBase?.getAllDownloadedData(passingInterface) )
             {
-                arrayImage.add(itemParent)
+                if(itemParent.downloadType.equals("IMAGE")) arrayImage.add(itemParent)
+            }
+            position=0
+            model=arrayImage.get(0)
+            setImageArray(arrayImage,0,model)
+            isCurrent=true
+            eDetailingId=passingInterface
+
+            brandId=brandIDInterface
+            dbBase?.insertStartTimeSlide(startDateTime,doctorId,brandId,model?.brandName,0,currentTime.toString())
+            onClickString("")
+            slideBrandWiseInsert(startDateTime,brandId)
+            filterListVideoWeb()
+
+            runOnUiThread {
+                imageFrame?.removeAllViews()
+                otherProduct_btn?.setBackgroundColor(ContextCompat.getColor(this,R.color.gray))
+                currentProduct_btn?.setBackgroundColor(ContextCompat.getColor(this,R.color.appColor))
+
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
+
+                fabLike?.visibility=View.VISIBLE
+                fabComment?.visibility=View.VISIBLE
+                selectionBtn_parent?.visibility=View.VISIBLE
+
+                otherFileAdapter?.notifyDataSetChanged()
+                mViewPagerAdapter = ViewPagerAdapter(this, arrayImage)
+                viewPagerMain.adapter = mViewPagerAdapter
+                alertClass.hideAlert()
             }
 
         }
+        Thread(runnable).start()
 
-        position=0
-        model=arrayImage.get(0)
-
-        imageFrame?.removeAllViews()
-
-        setImageArray(arrayImage,0,model)
-
-        isCurrent=true
-        otherProduct_btn?.setBackgroundColor(ContextCompat.getColor(this,R.color.gray))
-        currentProduct_btn?.setBackgroundColor(ContextCompat.getColor(this,R.color.appColor))
-
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
-
-        fabLike?.visibility=View.VISIBLE
-        fabComment?.visibility=View.VISIBLE
-
-        eDetailingId=passingInterface
-        otherFileAdapter?.notifyDataSetChanged()
-
-        brandId=brandIDInterface
-        dbBase?.insertStartTimeSlide(startDateTime,doctorId,brandId,model?.brandName,0,currentTime.toString())
-
-        onClickString("")
-
-        mViewPagerAdapter = ViewPagerAdapter(this, arrayImage)
-        viewPagerMain.adapter = mViewPagerAdapter
-
-        slideBrandWiseInsert(startDateTime,brandId)
     }
 
 
@@ -944,4 +1010,8 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
         thread?.interrupt()
     }
 
+    override fun onBackPressed() {
+        if(intent.getSerializableExtra("imageArray")!=null)
+            else  super.onBackPressed()
+    }
 }

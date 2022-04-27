@@ -48,7 +48,7 @@ class OtherFileAdapter(
         else
         {
             holder.parentLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
-            holder.filePathName_tv.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
+            holder.filePathName_tv.setBackgroundColor(ContextCompat.getColor(context, R.color.lightGray));
         }
 
 

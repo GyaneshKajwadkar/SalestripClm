@@ -28,7 +28,7 @@
     <ImageView
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:tint="@color/white"
         android:layout_alignParentRight="true"
-        android:id="@+id/right_iv"/>
+        android:id="@+id/right_iv"
+        app:tint="@color/white" />
 </RelativeLayout>

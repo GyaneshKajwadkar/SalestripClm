@@ -99,14 +99,14 @@
 
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/samples_btn"
+                        android:id="@+id/rcpa_btn"
                         style="@style/ToggleButtonGroupStyle"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:insetLeft="2dp"
                         android:insetRight="2dp"
-                        android:text="Samples" />
+                        android:text="RCPA" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/gifts_btn"
@@ -152,6 +152,150 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/box_boarder"
                     android:visibility="gone" />
+
+                <androidx.core.widget.NestedScrollView
+                    android:visibility="gone"
+                    android:id="@+id/rcpaNestedScroll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                        <LinearLayout
+                            android:layout_gravity="center"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:weightSum="3">
+
+                            <EditText
+                                android:layout_marginLeft="5dp"
+                                android:layout_marginRight="5dp"
+                                android:hint="Doctor 1 *"
+                                android:inputType="none"
+                                android:focusable="false"
+                                android:cursorVisible="false"
+                                android:id="@+id/doctorOne_et"
+                                android:drawableTint="@color/appColor"
+                                android:drawableLeft="@android:drawable/ic_menu_search"
+                                android:paddingLeft="5dp"
+                                android:background="@drawable/edittext_capsul"
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:layout_height="40dp"/>
+
+                            <com.google.android.material.button.MaterialButton
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                app:cornerRadius="10dp"
+                                android:id="@+id/addBrandOne_btn"
+                                android:text="Add brand"
+                                android:layout_weight="0.5"/>
+
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:layout_marginLeft="5dp"
+                                android:layout_marginRight="5dp"
+                                android:layout_width="0dp"
+                                android:nestedScrollingEnabled="false"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/rcpaDetailOne_rv"
+                                android:layout_weight="1.5"/>
+
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_gravity="center"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:weightSum="3">
+
+                            <EditText
+                                android:layout_marginLeft="5dp"
+                                android:layout_marginRight="5dp"
+                                android:hint="Doctor 2"
+                                android:inputType="text"
+                                android:enabled="false"
+                                android:id="@+id/doctorTwo_et"
+                                android:drawableTint="@color/appColor"
+                                android:drawableLeft="@android:drawable/ic_menu_search"
+                                android:paddingLeft="5dp"
+                                android:background="@drawable/edittext_capsul"
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:layout_height="40dp"/>
+
+                            <com.google.android.material.button.MaterialButton
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                app:cornerRadius="10dp"
+                                android:id="@+id/addBrandTwo_btn"
+                                android:text="Add brand"
+                                android:layout_weight="0.5"/>
+
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:layout_marginLeft="5dp"
+                                android:layout_marginRight="5dp"
+                                android:layout_width="0dp"
+                                android:nestedScrollingEnabled="false"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/rcpaDetailTwo_rv"
+                                android:layout_weight="1.5"/>
+
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_gravity="center"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:weightSum="3">
+
+                            <EditText
+                                android:layout_marginLeft="5dp"
+                                android:layout_marginRight="5dp"
+                                android:hint="Doctor 3"
+                                android:inputType="text"
+                                android:enabled="false"
+                                android:id="@+id/doctorThree_et"
+                                android:drawableTint="@color/appColor"
+                                android:drawableLeft="@android:drawable/ic_menu_search"
+                                android:paddingLeft="5dp"
+                                android:background="@drawable/edittext_capsul"
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:layout_height="40dp"/>
+
+                            <com.google.android.material.button.MaterialButton
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                app:cornerRadius="10dp"
+                                android:text="Add brand"
+                                android:id="@+id/addBrandThree_btn"
+                                android:layout_weight="0.5"/>
+
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:layout_marginLeft="5dp"
+                                android:layout_marginRight="5dp"
+                                android:layout_width="0dp"
+                                android:nestedScrollingEnabled="false"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/rcpaDetailThree_rv"
+                                android:layout_weight="1.5"/>
+
+                        </LinearLayout>
+                    </LinearLayout>
+
+
+                </androidx.core.widget.NestedScrollView>
+
+
+
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/sample_rv"

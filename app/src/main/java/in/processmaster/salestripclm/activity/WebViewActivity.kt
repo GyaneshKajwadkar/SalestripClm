@@ -2,10 +2,9 @@ package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.adapter.HorizontalWebViewAdapter
+import `in`.processmaster.salestripclm.adapter.OtherBrandSelectionAdapter
 import `in`.processmaster.salestripclm.adapter.OtherFileAdapter
 import `in`.processmaster.salestripclm.fragments.ShowDownloadedFragment
-import `in`.processmaster.salestripclm.fragments.ShowDownloadedFragment.Companion.currentDate
-import `in`.processmaster.salestripclm.fragments.ShowDownloadedFragment.Companion.currentTime
 import `in`.processmaster.salestripclm.interfaceCode.ItemClickDisplayVisual
 import `in`.processmaster.salestripclm.interfaceCode.StoreVisualInterface
 import `in`.processmaster.salestripclm.models.DevisionModel
@@ -18,7 +17,6 @@ import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -29,23 +27,20 @@ import android.view.animation.Animation
 import android.view.inputmethod.InputMethodManager
 import android.webkit.*
 import android.widget.*
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.activity_web_view.*
+import kotlinx.android.synthetic.main.web_bottom_sheet.*
 import java.io.File
 import java.io.FileOutputStream
 import java.io.FilenameFilter
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayVisual {
@@ -53,19 +48,13 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
     private var gs: GestureDetector? = null
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var bottomSheetWeb: ConstraintLayout
-    var end_btn: Button? =null
-    var horizontal_rv:RecyclerView?=null
     var db = DatabaseHandler(this)
-    var downloadFilePathList: ArrayList<DownloadFileModel> = ArrayList()
-    var extractFileArray:ArrayList<String> = ArrayList()
-    lateinit var webview:WebView
     var brandId=0
     var empId=0
     var startDateTime=""
     var doctorId=0
-    var screenShotShow_iv:ImageView?=null
-    var fab_send:FloatingActionButton?=null
-    var fab_sc:FloatingActionButton?=null
+    var clicked=""
+
     var pnlFlash:CoordinatorLayout?=null
     var position=0
     var isList=false
@@ -74,44 +63,28 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
 
     var eDetailingId=0
     var isCurrent=true;
-    var currentProduct_btn: Button?= null
-    var otherProduct_btn: Button?= null
+
     var arrayweb: ArrayList<DownloadFileModel> = ArrayList<DownloadFileModel>()
     var edetailingList: ArrayList<DevisionModel.Data.EDetailing>? = null
     var otherFileAdapter :OtherFileAdapter?=null
 
-    var fabLike : FloatingActionButton?= null
-    var fabComment : FloatingActionButton?= null
-
     var thread: Thread?= null
-    var productParent_ll: LinearLayout?=null
     val currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
 
+    var  filterImageList: ArrayList<DownloadFileModel> = ArrayList()
+    var  filterVideoList: ArrayList<DownloadFileModel> = ArrayList()
 
     companion object {
         var modelweb : DownloadFileModel?= null
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_web_view)
 
-        //WebView initialization
-        webview = findViewById<WebView>(R.id.webview)
-        screenShotShow_iv = findViewById<ImageView>(R.id.screenShotShow_iv)
-        fab_send = findViewById<FloatingActionButton>(R.id.fab_send)
-        fab_sc = findViewById<FloatingActionButton>(R.id.fab_sc)
         pnlFlash = findViewById<CoordinatorLayout>(R.id.pnlFlash)
-        productParent_ll = findViewById(R.id.productParent_ll) as LinearLayout
-
-        horizontal_rv = findViewById<RecyclerView>(R.id.horizontal_rv)
-
-        currentProduct_btn = findViewById<Button>(R.id.currentProduct_btn)
-        otherProduct_btn = findViewById<Button>(R.id.otherProduct_btn)
 
         bottomSheetWeb=findViewById(R.id.bottomSheetWeb)as ConstraintLayout
-        end_btn=findViewById(R.id.end_btn)as Button
 
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetWeb)
 
@@ -148,11 +121,14 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
         }
 
 
+        openBottomSheet_iv.setOnClickListener()
+        {
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED)
+        }
+
+
         if(intent.getSerializableExtra("webArray")!=null)
         {
-
-            fabLike    = findViewById<View>(R.id.fabLike) as FloatingActionButton
-            fabComment = findViewById<View>(R.id.fabComment) as FloatingActionButton
 
             db = DatabaseHandler(this)
 
@@ -214,8 +190,6 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
 
             })
 
-
-
             var file = File(arrayweb.get(position).filePath)
             webview.loadUrl("file:///$file")
             webview.setOnTouchListener(onTouch);
@@ -233,6 +207,8 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
             //  val file = File(webUrlPath)
 
             db?.insertFileID(modelweb!!.fileId,startDateTime,brandId)
+            showWeb_mb.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.appColor))
+
             setSlideViewTime()
 
             end_btn?.setOnClickListener({
@@ -252,6 +228,34 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
             })
 
             likeCommentColor()
+            filterListVideoImage()
+
+            showWeb_mb.setOnClickListener {
+                if(clicked.equals("ZIP"))return@setOnClickListener
+                setAllDefault("ZIP")
+                runOnUiThread {
+                    showWeb_mb.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.appColor))
+                    horizontalOther_rv.visibility=View.GONE
+                    horizontal_rv.visibility=View.VISIBLE
+                }
+            }
+            showimg_mb.setOnClickListener {
+                if(clicked.equals("IMAGE"))return@setOnClickListener
+                setAllDefault("IMAGE")
+                runOnUiThread {
+                    showimg_mb.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.appColor))
+                }
+                setOtherBrandSelection(filterImageList)
+            }
+            showVideo_mb.setOnClickListener {
+                if(clicked.equals("VIDEO"))return@setOnClickListener
+                setAllDefault("VIDEO")
+                runOnUiThread {
+                    showVideo_mb.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.appColor))
+                }
+                setOtherBrandSelection(filterVideoList)
+            }
+
         }
 
         if(intent.getStringExtra("singleSelection")!=null)
@@ -266,6 +270,7 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
             parentScreeShotLL.visibility=View.GONE
             parent_sendLL.visibility=View.GONE
             floating_action_button.visibility=View.VISIBLE
+            openBottomSheet_iv?.visibility=View.GONE
 
             webview.setOnTouchListener(onTouchSimple);
 
@@ -337,10 +342,14 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
         currentProduct_btn?.setOnClickListener({
             if(!isCurrent)
             {
+                setAllDefault("ZIP")
+                showWeb_mb.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.appColor))
+
                 otherProduct_btn?.setBackgroundColor(ContextCompat.getColor(this,R.color.gray))
                 currentProduct_btn?.setBackgroundColor(ContextCompat.getColor(this,R.color.appColor))
                 fabLike?.visibility=View.VISIBLE
                 fabComment?.visibility=View.VISIBLE
+                selectionBtn_parent?.visibility=View.VISIBLE
 
                 setWebHorizontalAdapter(arrayweb, position, modelweb!!)
 
@@ -363,6 +372,10 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
                 horizontal_rv?.adapter = otherFileAdapter
                 otherFileAdapter?.notifyDataSetChanged()
 
+                horizontalOther_rv.visibility=View.GONE
+                horizontal_rv.visibility=View.VISIBLE
+                selectionBtn_parent?.visibility=View.GONE
+
                 isCurrent=false
             }
 
@@ -370,6 +383,31 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
         floating_action_button.setOnClickListener({
             onBackPressed()
         })
+    }
+
+    fun filterListVideoImage()
+    {
+        val runnable= Runnable {
+            filterImageList.clear()
+            filterVideoList.clear()
+
+            val dowloadedAllList=dbBase.getAllDownloadedData(eDetailingId)
+
+            for(item in dowloadedAllList)
+            {
+                if(item.downloadType.equals("IMAGE"))filterImageList.add(item)
+            }
+            for(item in dowloadedAllList)
+            {
+                if(item.downloadType.equals("VIDEO"))filterVideoList.add(item)
+            }
+            runOnUiThread { if(filterImageList.size==0)showimg_mb.visibility=View.GONE
+            else showimg_mb.visibility=View.VISIBLE
+                if(filterVideoList.size==0)showVideo_mb.visibility=View.GONE
+                else showVideo_mb.visibility=View.VISIBLE }
+
+        }
+        Thread(runnable).start()
     }
 
     private val onTouchSimple = OnTouchListener { v, event ->
@@ -649,7 +687,6 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
         alertDialog.show()
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
     fun getAllEdetailingProduct() : java.util.ArrayList<DevisionModel.Data.EDetailing>
     {
         var  edetailingList = db.getAlleDetail() //fetch edetailing list from db
@@ -659,11 +696,18 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
             if(itemParent.isSaved==1)
             {
                 var downloadedList = db.getAllDownloadedData(itemParent.geteDetailId()!!)
+                var isImage=false
+                for(itemChild in downloadedList)
+                {
+                    if(itemChild.downloadType.equals("ZIP")) isImage=true
+                }
+                if(isImage)  filteredList.add(itemParent); continue
 
-                if(downloadedList.stream().anyMatch({ o -> o.downloadType.equals("ZIP") }))
+
+              /*  if(downloadedList.stream().anyMatch({ o -> o.downloadType.equals("ZIP") }))
                 {
                     filteredList.add(itemParent)
-                }
+                }*/
             }
         }
         return filteredList
@@ -704,7 +748,9 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
 
         fabLike?.visibility=View.VISIBLE
         fabComment?.visibility=View.VISIBLE
+        selectionBtn_parent?.visibility=View.VISIBLE
 
+        filterListVideoImage()
         likeCommentColor()
         slideBrandWiseInsert(startDateTime,brandId)
     }
@@ -840,6 +886,38 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
         super.onStop()
         threadBrand?.interrupt()
         thread?.interrupt()
+    }
+
+    fun setOtherBrandSelection(list: ArrayList<DownloadFileModel>)
+    {
+        runOnUiThread {
+            horizontalOther_rv.visibility=View.VISIBLE
+            horizontal_rv.visibility=View.GONE
+        }
+        horizontalOther_rv.setLayoutManager(LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false))
+        val otherBrandAdapter= OtherBrandSelectionAdapter(
+            this,
+            list,
+            clicked,
+            end_btn,
+            doctorId,
+            eDetailingId
+        )
+        horizontalOther_rv.adapter=otherBrandAdapter
+    }
+
+    fun setAllDefault(clickedButton:String)
+    {
+        clicked=clickedButton
+        showimg_mb.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.appDarkColor))
+        showWeb_mb.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.appDarkColor))
+        showVideo_mb.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.appDarkColor))
+
+    }
+
+    override fun onBackPressed() {
+        if(intent.getSerializableExtra("webArray")!=null)
+        else  super.onBackPressed()
     }
 
 }

@@ -19,11 +19,22 @@
             android:layout_margin="16dp"
             app:tint="@android:color/white"
             app:srcCompat="@drawable/ic_back"/>
+
         <com.google.android.exoplayer2.ui.PlayerView
             android:id="@+id/playerView"
             android:layout_width="match_parent"
-            app:controller_layout_id="@layout/customecontroller"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            app:controller_layout_id="@layout/customecontroller" />
+
+        <ImageView
+            android:id="@+id/openBottomSheet_iv"
+            android:layout_width="100dp"
+            android:layout_height="30dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:background="@color/appColor"
+            android:padding="5dp"
+            android:src="@drawable/zm_arrow_up_normal" />
 
 
     </RelativeLayout>

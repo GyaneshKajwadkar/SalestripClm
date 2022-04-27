@@ -224,7 +224,6 @@ class DownloadedFolderAdapter(
                             intent.putExtra("position", index)
                         }
                     }
-
                     intent.putExtra("model", imagemodel)
                     context.startActivity(intent)
                     val db= DatabaseHandler(context)
@@ -313,7 +312,7 @@ class DownloadedFolderAdapter(
                         context.startActivity(intent)
 
                         val db= DatabaseHandler(context)
-                        db.insertStartTimeSlide(currentDate + " " + currentTime,doctorIdDisplayVisual,zipmodel?.brandId,zipmodel.brandName,0, currentTimeLocal)
+                        db.insertStartTimeSlide(currentDate + " " + currentTime,doctorIdDisplayVisual,zipmodel?.brandId,zipmodel.brandName,0, currentTime)
 
                         oneTime = false
 

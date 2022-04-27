@@ -25,12 +25,10 @@ import android.os.Looper
 import android.text.Editable
 import android.text.InputFilter
 import android.text.TextWatcher
+import android.util.Log
 import android.view.*
+import android.widget.*
 import androidx.fragment.app.Fragment
-import android.widget.ArrayAdapter
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.forEach
@@ -103,11 +101,11 @@ class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfe
 
         views.toggleButton.addOnButtonCheckedListener(MaterialButtonToggleGroup.OnButtonCheckedListener { group, checkedId, isChecked ->
 
-            if (isChecked && R.id.samples_btn == checkedId) {
+            if (isChecked && R.id.rcpa_btn == checkedId) {
                 hideAllSelection()
                 views.selectBtn.setText("Select Samples")
-                views.sample_rv.visibility = View.VISIBLE
-                views.selectBtn.visibility = View.VISIBLE
+                views.rcpaNestedScroll.visibility = View.VISIBLE
+                views.selectBtn.visibility = View.GONE
             } else if (isChecked && R.id.workingWith_btn == checkedId) {
                 hideAllSelection()
                 views?.selectBtn?.setText("Select Working with")
@@ -253,9 +251,11 @@ class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfe
         }
 
         closePob_iv.setOnClickListener{
-
             alertDialog.dismiss()
         }
+
+        doctorOne_et.setOnClickListener { Toast.makeText(requireActivity(),"dsgfosgfosu",Toast.LENGTH_LONG).show()}
+
         alertDialog.show()
 
     }
@@ -317,7 +317,7 @@ class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfe
     fun hideAllSelection()
     {   views.commonSearch_et.setText("")
         views.pobParent.visibility=View.GONE
-        views.sample_rv.visibility=View.GONE
+        views.rcpaNestedScroll.visibility=View.GONE
         views.gift_rv.visibility=View.GONE
         views.workingWithRv.visibility=View.GONE
         views.selectBtn.visibility=View.GONE
@@ -382,7 +382,7 @@ class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfe
                     selectionType,
                     false
                 )
-                if(sendingList.size!=0)views.sample_rv.visibility=View.VISIBLE
+              //  if(sendingList.size!=0)views.sample_rv.visibility=View.VISIBLE
 
         }
         if(localSelection==3)
