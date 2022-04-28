@@ -135,4 +135,38 @@ class CommonModel {
         }
 
     }
+
+    class SaveRcpaDetail{
+        var ownBrand=""
+            get() = field
+            set(value) { field = value }
+        var rxUnit=""
+            get() = field
+            set(value) { field = value }
+        var competitor1=""
+            get() = field
+            set(value) { field = value }
+        var competitor2=""
+            get() = field
+            set(value) { field = value }
+        var competitor3=""
+            get() = field
+            set(value) { field = value }
+        var competitor4=""
+            get() = field
+            set(value) { field = value }
+        var cp1Rxunit=""
+            get() = field
+            set(value) { field = value }
+        var cp2Rxunit=""
+            get() = field
+            set(value) { field = value }
+        var cp3Rxunit=""
+            get() = field
+            set(value) { field = value }
+        var cp4Rxunit=""
+            get() = field
+            set(value) { field = value }
+
+    }
 }

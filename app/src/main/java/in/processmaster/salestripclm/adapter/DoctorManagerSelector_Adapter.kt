@@ -1,6 +1,7 @@
 
 import `in`.processmaster.salestripclm.R
 import android.annotation.SuppressLint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -34,11 +35,27 @@ class DoctorManagerSelector_Adapter(
         holder.speciality_tv.setText("Speciality: " + modeldata?.specialityName)
         holder.select_checkBox.isChecked= modeldata.checked
 
+        if(selectionType>9)
+        {
+            holder.select_checkBox.visibility=View.GONE
+        }
 
         holder.checkParent_ll.setOnClickListener({
             for ((iMain, itemMain) in arrayListSelector.withIndex())
             {
-                if(itemMain.id== modeldata.id)
+                if(selectionType>9)
+                {
+                    itemMain.checked=false
+                    arrayListSelector.set(iMain,itemMain)
+                    if(itemMain.id== modeldata.id)
+                    {
+                        modeldata.checked=true
+                        arrayListSelector.set(iMain,modeldata)
+                        listner.selectorArray(arrayListSelector,selectionType)
+                    }
+                }
+                else {
+                    if(itemMain.id== modeldata.id)
                     {
                         var getChecked=modeldata.checked
                         modeldata.checked=!modeldata.checked
@@ -46,7 +63,13 @@ class DoctorManagerSelector_Adapter(
                         holder.select_checkBox.isChecked=!getChecked
                         listner.selectorArray(arrayListSelector,selectionType)
                     }
+                }
+
+
+
+
             }
+
         })
 
        // holder.select_checkBox.isChecked= modeldata.getChecked()!!

@@ -1715,7 +1715,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
 
 
-      val pobProductSelectAdapter=PobProductAdapter(unSelectedProductList, passingSchemeList,this)
+      val pobProductSelectAdapter=PobProductAdapter(unSelectedProductList, passingSchemeList,this,1)
         pobProduct_rv.adapter= pobProductSelectAdapter
 
         productSearch_et.addTextChangedListener(object : TextWatcher {

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="7dp"
+    android:orientation="vertical"
+    android:layout_margin="3dp">
+
+    <LinearLayout
+        android:padding="3dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/deleteClick_iv"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_alignParentRight="true"
+                android:padding="2dp"
+                android:src="@drawable/ic_bin"
+                app:tint="@color/appDarkColor" />
+
+            <ImageView
+                android:id="@+id/editClick_iv"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginRight="10dp"
+                android:layout_toLeftOf="@+id/deleteClick_iv"
+                android:padding="2dp"
+                android:src="@drawable/ic_qa_pencil"
+                app:tint="@color/appDarkColor" />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:padding="1dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="1">
+            <TextView
+                android:id="@+id/productName_tv"
+                android:textSize="15sp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="productName_tv"
+                android:textColor="@color/appColor"
+                android:textStyle="bold"
+                android:layout_weight="0.7"/>
+
+            <TextView
+                android:id="@+id/rxUnit_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="rxUnit_tv"
+                android:textColor="@color/black"
+                android:layout_weight="0.3"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="1">
+            <TextView
+                android:textColor="@color/black"
+                android:layout_weight="0.7"
+                android:textSize="13sp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Competitors"/>
+
+            <TextView
+                android:textSize="13sp"
+                android:textColor="@color/black"
+                android:text="CP Rx unit"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.3"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="1">
+            <TextView
+                android:id="@+id/competitor1Tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.7"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/cp1rx_tv"
+                android:layout_weight="0.3"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="1">
+            <TextView
+                android:id="@+id/competitor2Tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.7"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/cp2rx_tv"
+                android:layout_weight="0.3"/>
+        </LinearLayout>
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/cp3Parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="1">
+            <TextView
+                android:id="@+id/competitor3Tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.7"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/cp3rx_tv"
+                android:layout_weight="0.3"/>
+        </LinearLayout>
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/cp4Parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="1">
+            <TextView
+                android:id="@+id/competitor4Tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.7"/>
+
+            <TextView
+                android:id="@+id/cp4rx_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.3"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+
+</androidx.cardview.widget.CardView>

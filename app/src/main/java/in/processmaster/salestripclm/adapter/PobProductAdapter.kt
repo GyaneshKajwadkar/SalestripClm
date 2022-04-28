@@ -20,14 +20,13 @@ import androidx.recyclerview.widget.RecyclerView
 class PobProductAdapter(
     val productList: ArrayList<SyncModel.Data.Product>?,
     val schemeList: ArrayList<SyncModel.Data.Scheme>?,
-    var sendProductInterface: productTransfer?
+    var sendProductInterface: productTransfer?,
+    val viewType:Int
 ): RecyclerView.Adapter<PobProductAdapter.MyViewHolder>(), Filterable {
 
     var productFilteringList= ArrayList(productList)
 
-
-    constructor() : this(ArrayList(), ArrayList(),null) {
-    }
+    constructor() : this(ArrayList(), ArrayList(),null,0) {}
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -54,111 +53,128 @@ class PobProductAdapter(
         @SuppressLint("RecyclerView") position: Int
     ) {
 
-        val model = productFilteringList?.get(position)
-        holder.titlePobproduct_tv.text=model?.productName
-        holder.uom_tv.text="UOM: "+model?.packingTypeName
-        holder.division_tv.text="Divison: "+model?.divisionName
-        if (model?.notApi?.qty != null) {
-            holder.qty_et.setText(model.notApi?.qty.toString())
-        }
-        if(model?.notApi?.insertedProductId!=0 && model?.notApi?.isSaved == true)
+        if(viewType==2)
         {
-            holder.parentlinearL.visibility=View.GONE
+            val model = productFilteringList?.get(position)
+            holder.titlePobproduct_tv.text=model?.productName
+            holder.uom_tv.visibility=View.GONE
+            holder.division_tv.visibility=View.GONE
+            holder.qty_et.visibility=View.GONE
+            holder.titlePobproduct_tv.setOnClickListener({
+                val tempList: ArrayList<SyncModel.Data.Product> = ArrayList()
+                tempList.add(model)
+                sendProductInterface?.onClickButtonProduct(tempList,100)
+            })
+
         }
+        else{
+            val model = productFilteringList?.get(position)
+            holder.titlePobproduct_tv.text=model?.productName
+            holder.uom_tv.text="UOM: "+model?.packingTypeName
+            holder.division_tv.text="Divison: "+model?.divisionName
+            if (model?.notApi?.qty != null) {
+                holder.qty_et.setText(model.notApi?.qty.toString())
+            }
+            if(model?.notApi?.insertedProductId!=0 && model?.notApi?.isSaved == true)
+            {
+                holder.parentlinearL.visibility=View.GONE
+            }
 
 
-        schemeList?.forEachIndexed { index, element ->
-           if(element.productId==model?.productId)
-           {
-               model?.notApi?.schemeId=element.schemeId
-               model?.notApi?.salesQty=element.salesQty
-               holder.scheme_tv.visibility=View.VISIBLE
-               holder.scheme_tv.setText("Scheme: on "+ element.salesQty+" get "+ element.freeQty)
-               model?.notApi?.freeQtyMain=element.freeQty
+            schemeList?.forEachIndexed { index, element ->
+               if(element.productId==model?.productId)
+               {
+                   model?.notApi?.schemeId=element.schemeId
+                   model?.notApi?.salesQty=element.salesQty
+                   holder.scheme_tv.visibility=View.VISIBLE
+                   holder.scheme_tv.setText("Scheme: on "+ element.salesQty+" get "+ element.freeQty)
+                   model?.notApi?.freeQtyMain=element.freeQty
 
-           }
-        }
+               }
+            }
 
-        holder.qty_et.setTag(position)
-        holder.setIsRecyclable(false)
+            holder.qty_et.setTag(position)
+            holder.setIsRecyclable(false)
 
-        holder.qty_et.setFilters(arrayOf<InputFilter>(InputFilter.LengthFilter(5)))
+            holder.qty_et.setFilters(arrayOf<InputFilter>(InputFilter.LengthFilter(5)))
 
-        holder.qty_et.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable) {
-                if(!s.toString().isEmpty() && s.toString()!="")
-                {
-                    model?.notApi?.rate=model?.price
-                    model?.packingTypeName=model?.packingTypeName
-                    model?.notApi?.insertedProductId=model?.productId
-                    model?.notApi?.salesQtyMain=model?.notApi?.salesQty
-                    if( holder.scheme_tv.visibility==View.VISIBLE)
+            holder.qty_et.addTextChangedListener(object : TextWatcher {
+                override fun afterTextChanged(s: Editable) {
+                    if(!s.toString().isEmpty() && s.toString()!="")
                     {
-                        model?.notApi?.scheme=holder.scheme_tv.text.toString()
-                        model?.notApi?.schemeId=model?.notApi?.schemeId
-
-                        val getFree=s.toString().toInt()/ model?.notApi?.salesQty!! * model?.notApi?.freeQtyMain!!
-
-                        model?.notApi?.freeQty=getFree
-                        val totalQty=getFree+s.toString().toInt()
-                        model?.notApi?.totalQty=totalQty
-                        model?.notApi?.qty=s.toString().toInt()
-                        model?.notApi?.amount=s.toString().toInt()*model.price
-                    }
-                    else
-                    {
-                       model?.notApi?.amount=s.toString().toInt()*model?.price!!
-                       model?.notApi?.qty=s.toString().toInt()
-                       model?.notApi?.totalQty=s.toString().toInt()
-                    }
-
-
-
-                 /*   if(sendEDetailingArray?.size==0)
-                    {
-                        val getCurrentObj= Send_EDetailingModel.PobObj.PobDetailList()
-                        sendEDetailingArray?.add(getSchemeObject(getCurrentObj,model!!,holder,s))
-
-                    }
-
-                    for((index,getId) in sendEDetailingArray?.withIndex()!!)
-                    {
-                        if(getId.productId==model?.productId) checkSelected=true
-                        if(index==sendEDetailingArray!!.size-1)
+                        model?.notApi?.rate=model?.price
+                        model?.packingTypeName=model?.packingTypeName
+                        model?.notApi?.insertedProductId=model?.productId
+                        model?.notApi?.salesQtyMain=model?.notApi?.salesQty
+                        if( holder.scheme_tv.visibility==View.VISIBLE)
                         {
-                            if(checkSelected)
-                            {
-                                val getCurrentObj: Send_EDetailingModel.PobObj.PobDetailList? = sendEDetailingArray!!.find { it.productId == model?.productId }
-                                val position=sendEDetailingArray?.indexOf(getCurrentObj)
-                                position?.let { sendEDetailingArray?.set(it, getSchemeObject(getCurrentObj,model!!,holder,s)) }
-                            }
-                            else
-                            {
-                                val getCurrentObj= Send_EDetailingModel.PobObj.PobDetailList()
-                                sendEDetailingArray?.add(getSchemeObject(getCurrentObj,model!!,holder,s))
-                            }
-                        }
-                    }*/
+                            model?.notApi?.scheme=holder.scheme_tv.text.toString()
+                            model?.notApi?.schemeId=model?.notApi?.schemeId
 
-                }
-                else model?.notApi=SyncModel.Data.Product.NotApiData()
-            }
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-            }
-        })
+                            val getFree=s.toString().toInt()/ model?.notApi?.salesQty!! * model?.notApi?.freeQtyMain!!
 
-        holder.qty_et.setOnFocusChangeListener(object : View.OnFocusChangeListener {
-            override fun onFocusChange(v: View, hasFocus: Boolean) {
-                if (hasFocus) {
-                    v.postDelayed({
-                        if (!v.hasFocus()) {
-                            v.requestFocus()
+                            model?.notApi?.freeQty=getFree
+                            val totalQty=getFree+s.toString().toInt()
+                            model?.notApi?.totalQty=totalQty
+                            model?.notApi?.qty=s.toString().toInt()
+                            model?.notApi?.amount=s.toString().toInt()*model.price
                         }
-                    }, 300)
+                        else
+                        {
+                           model?.notApi?.amount=s.toString().toInt()*model?.price!!
+                           model?.notApi?.qty=s.toString().toInt()
+                           model?.notApi?.totalQty=s.toString().toInt()
+                        }
+
+
+
+                     /*   if(sendEDetailingArray?.size==0)
+                        {
+                            val getCurrentObj= Send_EDetailingModel.PobObj.PobDetailList()
+                            sendEDetailingArray?.add(getSchemeObject(getCurrentObj,model!!,holder,s))
+
+                        }
+
+                        for((index,getId) in sendEDetailingArray?.withIndex()!!)
+                        {
+                            if(getId.productId==model?.productId) checkSelected=true
+                            if(index==sendEDetailingArray!!.size-1)
+                            {
+                                if(checkSelected)
+                                {
+                                    val getCurrentObj: Send_EDetailingModel.PobObj.PobDetailList? = sendEDetailingArray!!.find { it.productId == model?.productId }
+                                    val position=sendEDetailingArray?.indexOf(getCurrentObj)
+                                    position?.let { sendEDetailingArray?.set(it, getSchemeObject(getCurrentObj,model!!,holder,s)) }
+                                }
+                                else
+                                {
+                                    val getCurrentObj= Send_EDetailingModel.PobObj.PobDetailList()
+                                    sendEDetailingArray?.add(getSchemeObject(getCurrentObj,model!!,holder,s))
+                                }
+                            }
+                        }*/
+
+                    }
+                    else model?.notApi=SyncModel.Data.Product.NotApiData()
                 }
+                override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                }
+            })
+
+            holder.qty_et.setOnFocusChangeListener(object : View.OnFocusChangeListener {
+                override fun onFocusChange(v: View, hasFocus: Boolean) {
+                    if (hasFocus) {
+                        v.postDelayed({
+                            if (!v.hasFocus()) {
+                                v.requestFocus()
+                            }
+                        }, 300)
+                    }
+                }
+            })
             }
-        })
+
 
     }
 

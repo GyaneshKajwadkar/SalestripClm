@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusableInTouchMode="true"
+    android:background="@color/white">
+<LinearLayout
+    android:id="@+id/editParent_ll"
+    android:layout_alignParentTop="true"
+    android:layout_above="@+id/bottomParent_ll"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:gravity="center"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        android:text="Add RCPA detail"
+        android:textColor="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@color/appColor"/>
+
+
+    <LinearLayout
+        android:id="@+id/parentScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <LinearLayout
+            android:padding="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <LinearLayout
+                android:layout_marginRight="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Own Brand*"
+                    android:textColor="@color/black"/>
+                <EditText
+                    android:inputType="none"
+                    android:focusable="false"
+                    android:cursorVisible="false"
+                    android:id="@+id/ownBrand_et"
+                    android:drawableTint="@color/appColor"
+                    android:drawableLeft="@android:drawable/ic_menu_search"
+                    android:paddingLeft="5dp"
+                    android:background="@drawable/edittext_capsul"
+                    android:layout_width="match_parent"
+                    android:layout_weight="1"
+                    android:textSize="16sp"
+                    android:layout_height="35dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_marginRight="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Rx Unit*"
+                    android:textColor="@color/black"/>
+                <EditText
+                    android:inputType="number"
+                    android:id="@+id/rxunit_et"
+                    android:paddingLeft="10dp"
+                    android:background="@drawable/edittext_capsul"
+                    android:layout_width="match_parent"
+                    android:textSize="16sp"
+                    android:layout_height="35dp"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:padding="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <LinearLayout
+                android:layout_marginRight="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Competitor 1 *"
+                    android:textColor="@color/black"/>
+                <EditText
+                    android:inputType="text"
+                    android:id="@+id/competitor1_et"
+                    android:paddingLeft="10dp"
+                    android:background="@drawable/edittext_capsul"
+                    android:layout_width="match_parent"
+                    android:textSize="16sp"
+                    android:layout_height="35dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_marginRight="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="CP1 Rx Unit*"
+                    android:textColor="@color/black"/>
+                <EditText
+                    android:inputType="number"
+                    android:id="@+id/cp1unit_et"
+                    android:paddingLeft="10dp"
+                    android:background="@drawable/edittext_capsul"
+                    android:layout_width="match_parent"
+                    android:textSize="16sp"
+                    android:layout_height="35dp"/>
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:padding="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <LinearLayout
+                android:layout_marginRight="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Competitor 2*"
+                    android:textColor="@color/black"/>
+                <EditText
+                    android:inputType="text"
+                    android:id="@+id/competitor2_et"
+                    android:paddingLeft="10dp"
+                    android:background="@drawable/edittext_capsul"
+                    android:layout_width="match_parent"
+                    android:textSize="16sp"
+                    android:layout_height="35dp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_marginRight="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="CP2 Rx Unit*"
+                    android:textColor="@color/black"/>
+                <EditText
+                    android:inputType="number"
+                    android:id="@+id/cp2unit_et"
+                    android:paddingLeft="10dp"
+                    android:background="@drawable/edittext_capsul"
+                    android:layout_width="match_parent"
+                    android:textSize="16sp"
+                    android:layout_height="35dp"/>
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:padding="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <LinearLayout
+                android:layout_marginRight="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Competitor 3"
+                    android:textColor="@color/black"/>
+
+                <EditText
+                    android:inputType="text"
+                    android:id="@+id/competitor3_et"
+                    android:paddingLeft="10dp"
+                    android:background="@drawable/edittext_capsul"
+                    android:layout_width="match_parent"
+                    android:textSize="16sp"
+                    android:layout_height="35dp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_marginRight="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="CP3 Unit*"
+                    android:textColor="@color/black"/>
+                <EditText
+                    android:inputType="number"
+                    android:id="@+id/cp3unit_et"
+                    android:paddingLeft="10dp"
+                    android:background="@drawable/edittext_capsul"
+                    android:layout_width="match_parent"
+                    android:textSize="16sp"
+                    android:layout_height="35dp"/>
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:padding="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <LinearLayout
+                android:layout_marginRight="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Competitor 4"
+                    android:textColor="@color/black"/>
+
+                <EditText
+                    android:inputType="text"
+                    android:id="@+id/competitor4_et"
+                    android:paddingLeft="10dp"
+                    android:background="@drawable/edittext_capsul"
+                    android:layout_width="match_parent"
+                    android:textSize="16sp"
+                    android:layout_height="35dp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_marginRight="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Rx Unit*"
+                    android:textColor="@color/black"/>
+                <EditText
+                    android:inputType="number"
+                    android:id="@+id/cp4unit_et"
+                    android:paddingLeft="10dp"
+                    android:background="@drawable/edittext_capsul"
+                    android:layout_width="match_parent"
+                    android:textSize="16sp"
+                    android:layout_height="35dp"/>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/productFilter_paretn"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <ImageView
+            android:id="@+id/closeIv"
+            android:padding="10dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_close"
+            android:layout_margin="2dp"/>
+        <EditText
+            android:inputType="text"
+            android:id="@+id/productSearch_et"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/edittext_capsul"
+            android:drawableLeft="@android:drawable/ic_menu_search"
+            android:drawableTint="@color/appColor"
+            android:paddingLeft="5dp" />
+    </LinearLayout>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:id="@+id/selectProduct"/>
+</LinearLayout>
+
+<LinearLayout
+    android:id="@+id/bottomParent_ll"
+    android:layout_alignParentBottom="true"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:weightSum="2">
+    <com.google.android.material.button.MaterialButton
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/cancelBtn"
+        android:text="Cancel"
+        android:layout_marginRight="1dp"
+        android:layout_weight="1"/>
+    <com.google.android.material.button.MaterialButton
+        android:layout_marginLeft="1dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/addBtn"
+        android:text="Add"
+        android:layout_weight="1"/>
+
+
+</LinearLayout>
+</RelativeLayout>
