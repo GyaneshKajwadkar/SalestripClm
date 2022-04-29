@@ -13,6 +13,7 @@ import `in`.processmaster.salestripclm.common_classes.CommonListGetClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.models.*
 import `in`.processmaster.salestripclm.networkUtils.APIClientKot
+import `in`.processmaster.salestripclm.networkUtils.ConnectivityChangeReceiver
 import `in`.processmaster.salestripclm.networkUtils.GPSTracker
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
@@ -20,6 +21,8 @@ import android.content.Intent
 import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -71,6 +74,9 @@ class NewCallFragment : Fragment() {
     lateinit var  docCallModel : DailyDocVisitModel.Data
     var isSecondTime = false
     var doctorObject=SyncModel.Data.Doctor()
+    companion object {
+        var retailerObj= SyncModel.Data.Retailer()
+    }
 
 
     override fun onCreateView(
@@ -79,8 +85,17 @@ class NewCallFragment : Fragment() {
     ): View? {
         views= inflater.inflate(R.layout.fragment_new_call, container, false)
 
+        val runnable= java.lang.Runnable {
+            val transaction = requireActivity().supportFragmentManager.beginTransaction()
+            transaction.replace(R.id.frameRetailer_view, RetailerFillFragment())
+            transaction.disallowAddToBackStack()
+            transaction.commit()
+        }
+        Thread(runnable).start()
+
         if (activity != null && isAdded)
         { initView() }
+
 
         return views
     }
@@ -144,18 +159,18 @@ class NewCallFragment : Fragment() {
                 views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#A9A9A9"))
             }
             else if(SplashActivity.staticSyncData?.settingDCR?.roleType=="FS") {
-                views?.selectTeamsCv?.visibility = View.GONE
-                views?.selectTeamHeader_tv?.visibility = View.GONE
+                views?.selectTeamsCv?.visibility = View.INVISIBLE
+                views?.selectTeamHeader_tv?.visibility = View.INVISIBLE
                 views?.selectRoutesCv?.setEnabled(true)
                 views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
             }
 
-            views?.doctorDetail_parent?.visibility=View.GONE
-            views?.precall_parent?.visibility=View.GONE
-            views?.parentButton?.visibility=View.GONE
+            views?.doctorDetail_parent?.visibility=View.INVISIBLE
+            views?.precall_parent?.visibility=View.INVISIBLE
+            views?.parentButton?.visibility=View.INVISIBLE
             views?.noData_gif?.visibility=View.VISIBLE
-            views?.frameRetailer_view?.visibility=View.GONE
-            views?.retailer_parent?.visibility=View.GONE
+            views?.frameRetailer_view?.visibility=View.INVISIBLE
+            views?.retailer_parent?.visibility=View.INVISIBLE
 
             views?.selectRoute_tv?.setText("Select route")
             views?.selectDoctor_tv?.setBackgroundColor(Color.parseColor("#A9A9A9"))
@@ -275,13 +290,6 @@ class NewCallFragment : Fragment() {
 
 
         //  checkDCRusingShareP(0)
-
-
-        val transaction = requireActivity().supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.frameRetailer_view, RetailerFillFragment())
-        transaction.disallowAddToBackStack()
-        transaction.commit()
-
 
         val responseDocCall=db.getApiDetail(5)
         if(!responseDocCall.equals("")) {
@@ -541,25 +549,29 @@ class NewCallFragment : Fragment() {
 
     fun setRetailer(retailerModel:SyncModel.Data.Retailer)
     {
+        retailerObj=retailerModel
         views?.noData_gif?.visibility=View.GONE
-        views?.frameRetailer_view?.visibility=View.VISIBLE
         views?.retailer_parent?.visibility=View.VISIBLE
         views?.routeNameRetailer_tv?.setText(retailerModel.routeName)
         views?.mobileRetailer_tv?.setText(retailerModel.contactPerson)
         views?.emailIdRetail_tv?.setText(retailerModel.emailId)
         views?.cityRetail_tv?.setText(retailerModel.cityName)
         views?.shopNameRetail_tv?.setText(retailerModel.shopName)
-      //  views?.qualifiction_tv?.setText(retailerModel.qualificationName)
-     //   selectedDocID= retailerModel.retailerId!!
-        //selectedDocName= retailerModel.doctorName.toString()
-       // doctorObject=retailerModel;
-
         if(retailerModel.mobileNo?.isEmpty() == true)
             views?.mobileParent_tr?.visibility=View.GONE
         if(retailerModel.emailId?.isEmpty() == true)
             views?.emailParentRetail?.visibility=View.GONE
         if(retailerModel.cityName?.isEmpty() == true)
             views?.cityParentRetailer?.visibility=View.GONE
+
+        views?.frameRetailer_view?.visibility=View.VISIBLE
+
+
+
+      //  views?.qualifiction_tv?.setText(retailerModel.qualificationName)
+     //   selectedDocID= retailerModel.retailerId!!
+        //selectedDocName= retailerModel.doctorName.toString()
+       // doctorObject=retailerModel;
 
     }
 
@@ -613,8 +625,8 @@ class NewCallFragment : Fragment() {
          views?.selectDoctor_tv?.setText("Select Doctor")
          views?.selectRoutesCv?.setEnabled(true)
          views?.selectDoctorsCv?.setEnabled(false)
-         views?.frameRetailer_view?.visibility=View.GONE
-         views?.retailer_parent?.visibility=View.GONE
+         views?.frameRetailer_view?.visibility=View.INVISIBLE
+         views?.retailer_parent?.visibility=View.INVISIBLE
      }
      else if(selectionType==1)
      {
@@ -628,8 +640,8 @@ class NewCallFragment : Fragment() {
              else  views?.selectDoctor_tv?.setText("Select Retailer")
 
          views?.selectDoctorsCv?.setEnabled(true)
-         views?.frameRetailer_view?.visibility=View.GONE
-         views?.retailer_parent?.visibility=View.GONE
+         views?.frameRetailer_view?.visibility=View.INVISIBLE
+         views?.retailer_parent?.visibility=View.INVISIBLE
      }
      else
      {

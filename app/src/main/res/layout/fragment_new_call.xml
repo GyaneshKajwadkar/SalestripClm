@@ -26,13 +26,11 @@
 
 
                 <LinearLayout
-                    android:visibility="gone"
                     android:gravity="center"
                     android:orientation="horizontal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
                     <TextView
-                        android:textColor="@color/darkBlue"
                         android:id="@+id/retailerHeader_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -46,6 +44,7 @@
                         android:layout_height="wrap_content" />
 
                     <TextView
+                        android:textColor="@color/darkBlue"
                         android:id="@+id/doctorHeader_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -126,6 +125,184 @@
                         android:gravity="center"
                         android:text="Select doctor"/>
                 </androidx.cardview.widget.CardView>
+
+                <LinearLayout
+                    android:visibility="gone"
+                    android:id="@+id/retailer_parent"
+                    android:background="@color/appColor"
+                    android:layout_marginTop="20dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="5dp">
+                    <TextView
+                        android:background="@color/appColor"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:padding="3dp"
+                        android:text="Retailer detail"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"/>
+                    <TableLayout
+                        android:background="@color/white"
+                        android:padding="5dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TableRow
+                            android:layout_marginTop="3dp"
+                            android:weightSum="3"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            <ImageView
+                                android:layout_height="20dp"
+                                android:layout_width="20dp"
+                                android:layout_weight="0.2"
+                                android:src="@drawable/ic_specility"
+                                app:tint="@color/darkBlue" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:textColor="@color/black"
+                                android:gravity="center_vertical"
+                                android:text="Store name " />
+                            <TextView
+                                android:id="@+id/shopNameRetail_tv"
+                                android:layout_height="wrap_content"
+                                android:layout_width="0dp"
+                                android:layout_weight="1.8"
+                                android:textStyle="italic"
+                                android:text="abcd"/>
+
+                        </TableRow>
+
+                        <TableRow
+                            android:layout_marginTop="3dp"
+                            android:weightSum="3"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            <ImageView
+                                android:layout_height="20dp"
+                                android:layout_width="20dp"
+                                android:layout_weight="0.2"
+                                android:src="@drawable/ic_route"
+                                app:tint="@color/darkBlue" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:textColor="@color/black"
+                                android:gravity="center_vertical"
+                                android:text="Route name " />
+                            <TextView
+                                android:id="@+id/routeNameRetailer_tv"
+                                android:layout_height="wrap_content"
+                                android:layout_width="0dp"
+                                android:layout_weight="1.8"
+                                android:textStyle="italic"
+                                android:text="abcd"/>
+
+                        </TableRow>
+
+                        <TableRow
+                            android:id="@+id/mobileParent_tr"
+                            android:layout_marginTop="3dp"
+                            android:weightSum="3"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            <ImageView
+                                android:layout_height="20dp"
+                                android:layout_width="20dp"
+                                android:layout_weight="0.2"
+                                android:src="@drawable/ic_mobile"
+                                app:tint="@color/zm_green" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:textColor="@color/black"
+                                android:gravity="center_vertical"
+                                android:text="Mobile number " />
+                            <TextView
+                                android:id="@+id/mobileRetailer_tv"
+                                android:layout_height="wrap_content"
+                                android:layout_width="0dp"
+                                android:layout_weight="1.8"
+                                android:textStyle="italic" />
+
+                        </TableRow>
+
+                        <TableRow
+                            android:layout_marginTop="3dp"
+                            android:id="@+id/emailParentRetail"
+                            android:weightSum="3"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            <ImageView
+                                android:layout_height="20dp"
+                                android:layout_width="20dp"
+                                android:layout_weight="0.2"
+                                android:src="@drawable/ic_email"
+                                app:tint="@android:color/holo_purple" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:textColor="@color/black"
+                                android:gravity="center_vertical"
+                                android:text="Email " />
+                            <TextView
+                                android:id="@+id/emailIdRetail_tv"
+                                android:layout_height="wrap_content"
+                                android:layout_width="0dp"
+                                android:layout_weight="1.8"
+                                android:textStyle="italic"
+                                android:text="abcd"/>
+
+                        </TableRow>
+
+                        <TableRow
+                            android:layout_marginTop="3dp"
+                            android:weightSum="3"
+                            android:id="@+id/cityParentRetailer"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            <ImageView
+                                android:layout_height="20dp"
+                                android:layout_width="20dp"
+                                android:layout_weight="0.2"
+                                android:src="@drawable/ic_city"
+                                app:tint="@color/orange" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:textColor="@color/black"
+                                android:gravity="center_vertical"
+                                android:text="City " />
+                            <TextView
+                                android:id="@+id/cityRetail_tv"
+                                android:layout_height="wrap_content"
+                                android:layout_width="0dp"
+                                android:layout_weight="1.8"
+                                android:textStyle="italic"
+                                android:text="abcd"/>
+
+                        </TableRow>
+
+
+
+                    </TableLayout>
+
+                </LinearLayout>
 
                 <LinearLayout
                     android:visibility="gone"
@@ -818,7 +995,7 @@
                     android:id="@+id/analysisProgress"/>
 
                 <FrameLayout
-                    android:visibility="gone"
+                    android:visibility="invisible"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/frameRetailer_view"/>

@@ -2376,6 +2376,10 @@ class SyncModel {
             @Expose
             var isGeoLocationRequired: Boolean? = false
 
+            @SerializedName("isRCPAMandatoryForChemistReport")
+            @Expose
+            var isRCPAMandatoryForChemistReport: Boolean? = false
+
             /*  @SerializedName("reportingAllow")
               @Expose
               var reportingAllow: String? = ""
@@ -2406,9 +2410,7 @@ class SyncModel {
              @Expose
              var minCallPerDayChem: Int? = 0
 
-             @SerializedName("isRCPAMandatoryForChemistReport")
-             @Expose
-             var isRCPAMandatoryForChemistReport: Boolean? = false
+
 
              @SerializedName("isSTPMandatory")
              @Expose

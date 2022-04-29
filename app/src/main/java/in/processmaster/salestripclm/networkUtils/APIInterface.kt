@@ -196,6 +196,12 @@ interface APIInterface
         @Body arrayVisual: DailyDocVisitModel.Data.DcrDoctor
     ): Call<DailyDocVisitModel?>?
 
+    @POST("api/dcr/clm/retailer/mobile")
+    fun submitRetailer(
+        @Header("Authorization") authorization: String?,
+        @Body arrayVisual: RetailerPobModel
+    ): Call<DailyDocVisitModel?>?
+
     @Streaming
     @GET
     suspend fun downloadFile(@Url fileUrl:String): Response<ResponseBody>

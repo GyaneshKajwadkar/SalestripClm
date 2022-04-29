@@ -320,6 +320,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 alertClass.commonAlert("","Sample quantity not be zero")
                 return@setOnClickListener
             }
+
             if(giftyQTy.size>0) {
                 alertClass.commonAlert("","Gift quantity not be zero")
                 return@setOnClickListener
@@ -347,7 +348,6 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             }
 
             val filterSelectecd=selectedProductList.filter { s -> (s.notApi.isSaved==true) }
-
 
             if(intent.getStringExtra("apiDataDcr")?.isEmpty() == false)
             {

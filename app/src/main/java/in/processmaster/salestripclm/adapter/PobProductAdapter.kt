@@ -60,7 +60,7 @@ class PobProductAdapter(
             holder.uom_tv.visibility=View.GONE
             holder.division_tv.visibility=View.GONE
             holder.qty_et.visibility=View.GONE
-            holder.titlePobproduct_tv.setOnClickListener({
+            holder.parentlinearL.setOnClickListener({
                 val tempList: ArrayList<SyncModel.Data.Product> = ArrayList()
                 tempList.add(model)
                 sendProductInterface?.onClickButtonProduct(tempList,100)
