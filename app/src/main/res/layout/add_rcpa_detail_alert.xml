@@ -2,7 +2,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:focusableInTouchMode="true"
     android:background="@color/white">
 <LinearLayout
     android:id="@+id/editParent_ll"
@@ -54,11 +53,12 @@
                     android:cursorVisible="false"
                     android:id="@+id/ownBrand_et"
                     android:drawableTint="@color/appColor"
-                    android:drawableLeft="@android:drawable/ic_menu_search"
-                    android:paddingLeft="5dp"
+                    android:drawableRight="@android:drawable/ic_menu_search"
+                    android:paddingRight="5dp"
                     android:background="@drawable/edittext_capsul"
                     android:layout_width="match_parent"
                     android:layout_weight="1"
+                    android:paddingLeft="5dp"
                     android:textSize="16sp"
                     android:layout_height="35dp"/>
             </LinearLayout>
@@ -327,9 +327,9 @@
             android:layout_height="40dp"
             android:layout_marginTop="5dp"
             android:background="@drawable/edittext_capsul"
-            android:drawableLeft="@android:drawable/ic_menu_search"
+            android:drawableRight="@android:drawable/ic_menu_search"
             android:drawableTint="@color/appColor"
-            android:paddingLeft="5dp" />
+            android:paddingRight="5dp" />
     </LinearLayout>
 
 

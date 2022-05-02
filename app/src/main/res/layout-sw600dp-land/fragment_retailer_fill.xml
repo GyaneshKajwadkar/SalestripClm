@@ -205,12 +205,13 @@
                                     android:layout_weight="1"
                                     android:background="@drawable/edittext_capsul"
                                     android:cursorVisible="false"
-                                    android:drawableLeft="@android:drawable/ic_menu_search"
+                                    android:drawableRight="@android:drawable/ic_menu_search"
                                     android:drawableTint="@color/appColor"
                                     android:focusable="false"
                                     android:hint="Doctor 1 *"
                                     android:inputType="none"
-                                    android:paddingLeft="5dp" />
+                                    android:paddingLeft="5dp"
+                                    android:paddingRight="5dp" />
 
                                 <com.google.android.material.button.MaterialButton
                                     android:id="@+id/addBrandOne_btn"
@@ -249,12 +250,13 @@
                                     android:layout_weight="1"
                                     android:background="@drawable/edittext_capsul"
                                     android:cursorVisible="false"
-                                    android:drawableLeft="@android:drawable/ic_menu_search"
+                                    android:drawableRight="@android:drawable/ic_menu_search"
                                     android:drawableTint="@color/appColor"
                                     android:focusable="false"
                                     android:hint="Doctor 2"
                                     android:inputType="none"
-                                    android:paddingLeft="5dp" />
+                                    android:paddingLeft="5dp"
+                                    android:paddingRight="5dp"/>
 
                                 <com.google.android.material.button.MaterialButton
                                     android:id="@+id/addBrandTwo_btn"
@@ -293,12 +295,13 @@
                                     android:layout_weight="1"
                                     android:background="@drawable/edittext_capsul"
                                     android:cursorVisible="false"
-                                    android:drawableLeft="@android:drawable/ic_menu_search"
+                                    android:drawableRight="@android:drawable/ic_menu_search"
                                     android:drawableTint="@color/appColor"
                                     android:focusable="false"
                                     android:hint="Doctor 3"
                                     android:inputType="none"
-                                    android:paddingLeft="5dp" />
+                                    android:paddingLeft="5dp"
+                                    android:paddingRight="5dp" />
 
                                 <com.google.android.material.button.MaterialButton
                                     android:id="@+id/addBrandThree_btn"
@@ -415,7 +418,6 @@
 
         <include layout="@layout/checkbox_bottom_sheet" />
 
-        <include layout="@layout/pob_product_bottom_sheet" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

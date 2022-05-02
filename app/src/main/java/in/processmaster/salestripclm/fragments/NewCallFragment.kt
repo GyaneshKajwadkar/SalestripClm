@@ -85,17 +85,11 @@ class NewCallFragment : Fragment() {
     ): View? {
         views= inflater.inflate(R.layout.fragment_new_call, container, false)
 
-        val runnable= java.lang.Runnable {
-            val transaction = requireActivity().supportFragmentManager.beginTransaction()
-            transaction.replace(R.id.frameRetailer_view, RetailerFillFragment())
-            transaction.disallowAddToBackStack()
-            transaction.commit()
-        }
-        Thread(runnable).start()
 
         if (activity != null && isAdded)
-        { initView() }
-
+        {
+            initView()
+        }
 
         return views
     }
@@ -103,199 +97,217 @@ class NewCallFragment : Fragment() {
     fun initView()
     {
 
-        db = DatabaseHandler(requireActivity())
-        sharePreferance = PreferenceClass(activity)
-        alertClass = AlertClass(requireActivity())
-
-        SplashActivity.staticSyncData?.doctorList?.let { doctorListArray.addAll(it) }
-        SplashActivity.staticSyncData?.routeList?.let { routeList.addAll(it) }
-        SplashActivity.staticSyncData?.retailerList?.let { retailerListArray.addAll(it) }
-
         bottomSheetBehavior = BottomSheetBehavior.from(views!!.bottomSheet)
-        generalClassObject= GeneralClass(requireActivity())
 
-        if(SplashActivity.staticSyncData?.settingDCR?.roleType=="MAN")
-        {
-            views?.selectRoutesCv?.setEnabled(false)
-        }
-        else if(SplashActivity.staticSyncData?.settingDCR?.roleType=="FS") {
-            views?.selectTeamsCv?.visibility = View.GONE
-            views?.selectTeamHeader_tv?.visibility = View.GONE
-            views?.selectRoutesCv?.setEnabled(true)
-            views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
-        }
+        val coroutine=GlobalScope.launch(Dispatchers.Default) {
+            db = DatabaseHandler(requireActivity())
+            sharePreferance = PreferenceClass(activity)
+            alertClass = AlertClass(requireActivity())
+            generalClassObject= GeneralClass(requireActivity())
 
-        if(sharePreferance?.getPref("otherActivitySelected").equals("1") && sharePreferance?.checkKeyExist("todayDate")==true && sharePreferance?.getPref("todayDate") == generalClassObject?.currentDateMMDDYY() )
-        {
-            if(generalClassObject?.isInternetAvailable()==false)
-            {
-                setOtherActivityView()
+
+
+            Log.i("Main_ctivity ",Thread.currentThread().name.toString())
+                SplashActivity.staticSyncData?.doctorList?.let { doctorListArray.addAll(it) }
+                SplashActivity.staticSyncData?.routeList?.let { routeList.addAll(it) }
+                SplashActivity.staticSyncData?.retailerList?.let { retailerListArray.addAll(it) }
+
+                staticSyncData?.fieldStaffTeamList?.let { teamsList.addAll(it) }
+                routeList = routeList?.filter { s -> s.headQuaterName !=""} as java.util.ArrayList<SyncModel.Data.Route>
+
+                val responseDocCall=db.getApiDetail(5)
+                if(!responseDocCall.equals("")) {
+                    docCallModel = Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
+                }
+
+                if(staticSyncData?.settingDCR?.isRestrictedParty==true)
+                {
+                    if(sharePreferance?.getPref("dcrObj")?.isEmpty() == false) {
+                        var dcrModel = Gson().fromJson(sharePreferance?.getPref("dcrObj"), GetDcrToday.Data.DcrData::class.java)
+
+                        var routeListPartList: ArrayList<SyncModel.Data.Route> = ArrayList()
+                        val items: List<String>? = dcrModel?.routeId?.split(",")
+                        if (items != null) {
+                            for (data in items) {
+                                for(route in routeList)
+                                {
+                                    if(route.routeId==data.toInt())
+                                    { routeListPartList.add(route) }
+                                } }}
+                        routeList.clear()
+                        routeList.addAll(routeListPartList)
+
+                    }
+
+                }
+
+                adapter =BottomSheetDoctorAdapter()
+
+            val transaction = requireActivity().supportFragmentManager.beginTransaction()
+            transaction.replace(R.id.frameRetailer_view, RetailerFillFragment())
+            transaction.disallowAddToBackStack()
+            transaction.commit()
+
+            }
+            coroutine.invokeOnCompletion {
+                requireActivity().runOnUiThread {
+                    if(SplashActivity.staticSyncData?.settingDCR?.roleType=="MAN")
+                    {
+                        views?.selectRoutesCv?.setEnabled(false)
+                    }
+                    else if(SplashActivity.staticSyncData?.settingDCR?.roleType=="FS") {
+                        views?.selectTeamsCv?.visibility = View.GONE
+                        views?.selectTeamHeader_tv?.visibility = View.GONE
+                        views?.selectRoutesCv?.setEnabled(true)
+                        views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
+                    }
+
+                    if(sharePreferance?.getPref("otherActivitySelected").equals("1") && sharePreferance?.checkKeyExist("todayDate")==true && sharePreferance?.getPref("todayDate") == generalClassObject?.currentDateMMDDYY() )
+                    {
+                        if(generalClassObject?.isInternetAvailable()==false)
+                        {
+                            setOtherActivityView()
+                        }
+
+                    }
+
+                    views?.docRetail_switch?.setOnCheckedChangeListener { buttonView, isChecked ->
+                        if (isChecked) {
+                            views?.selectDoctor_tv?.setText("Select Doctor")
+                            views?.selectionDocRet_tv?.setText("Select Doctor")
+                            doctorHeader_tv.setTextColor(ContextCompat.getColorStateList(requireActivity(), R.color.darkBlue))
+                            retailerHeader_tv.setTextColor(ContextCompat.getColorStateList(requireActivity(), R.color.gray))
+                        } else {
+                            views?.selectDoctor_tv?.setText("Select Retailer")
+                            views?.selectionDocRet_tv?.setText("Select Retailer")
+                            retailerHeader_tv.setTextColor(ContextCompat.getColorStateList(requireActivity(), R.color.darkBlue))
+                            doctorHeader_tv.setTextColor(ContextCompat.getColorStateList(requireActivity(), R.color.gray))
+
+                        }
+                        if(SplashActivity.staticSyncData?.settingDCR?.roleType=="MAN")
+                        {
+                            views?.selectRoutesCv?.setEnabled(false)
+                            views?.selectTeam_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
+                            views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#A9A9A9"))
+                        }
+                        else if(SplashActivity.staticSyncData?.settingDCR?.roleType=="FS") {
+                            views?.selectTeamsCv?.visibility = View.INVISIBLE
+                            views?.selectTeamHeader_tv?.visibility = View.INVISIBLE
+                            views?.selectRoutesCv?.setEnabled(true)
+                            views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
+                        }
+
+                        views?.doctorDetail_parent?.visibility=View.INVISIBLE
+                        views?.precall_parent?.visibility=View.INVISIBLE
+                        views?.parentButton?.visibility=View.INVISIBLE
+                        views?.noData_gif?.visibility=View.VISIBLE
+                        views?.frameRetailer_view?.visibility=View.INVISIBLE
+                        views?.retailer_parent?.visibility=View.GONE
+
+                        views?.selectRoute_tv?.setText("Select route")
+                        views?.selectDoctor_tv?.setBackgroundColor(Color.parseColor("#A9A9A9"))
+                        views?.selectTeam_tv?.setText("Select team")
+                        views?.selectDoctorsCv?.setEnabled(false)
+                    }
+
+                    views?.selectTeamsCv?.setOnClickListener({
+                        selectionType=0
+                        views?.bottomSheetTitle_tv?.setText("Select Team")
+                        if(checkDCRusingShareP())
+                        { openCloseModel() }
+                    })
+
+                    views?.selectRoutesCv?.setOnClickListener({
+                        selectionType=1
+                        views?.bottomSheetTitle_tv?.setText("Select route")
+                        if(!SplashActivity.staticSyncData?.settingDCR?.roleType.equals("MAN") ){
+                            if(generalClassObject?.isInternetAvailable() == true)
+                            {
+                                callCoroutineApi()
+                            }
+                            else if(sharePreferance?.checkKeyExist("empIdSp")==false  ||
+                                sharePreferance?.checkKeyExist("todayDate")==false  || sharePreferance?.checkKeyExist("dcrId")==false || sharePreferance?.getPref("empIdSp") != loginModelHomePage.empId.toString())
+                            {
+                                alertClass?.commonAlert("Alert!","DCR not submitted please connect to internet and fill DCR first.")
+                            }
+                            else if( sharePreferance?.getPref("todayDate") != generalClassObject?.currentDateMMDDYY() || sharePreferance?.getPref("dcrId")=="0") {
+                                alertClass?.commonAlert("Alert!","DCR not submitted please connect to internet and fill DCR first.")
+                            }
+                            else{ openCloseModel() }
+                        }
+                        else{ openCloseModel() }
+                    })
+
+                    views?.selectDoctorsCv?.setOnClickListener({
+
+                        selectionType=2
+
+                        if(view?.docRetail_switch?.isChecked == true)
+                        {
+                            views?.bottomSheetTitle_tv?.setText("Select Doctor")
+                            if(doctorListArray.size<=0)
+                            {
+                                alertClass?.commonAlert("This route has no doctor","")
+                                return@setOnClickListener
+                            }
+                        }
+                        else{
+                            views?.bottomSheetTitle_tv?.setText("Select Retailer")
+                            if(retailerListArray.size<=0)
+                            {
+                                alertClass?.commonAlert("This route has no Retailer","")
+                                return@setOnClickListener
+                            }
+                        }
+                        openCloseModel()})
+
+                    views?.selectDoctorsCv?.setEnabled(false)
+
+                    views?.close_imv?.setOnClickListener({ bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)})
+
+                    views?.doctorSearch_et?.addTextChangedListener(filterTextWatcher)
+
+                    views?.startDetailing_btn?.setOnClickListener({
+
+                        val isAlreadyContain=docCallModel.dcrDoctorlist?.any{ s -> s.doctorId == selectedDocID }
+                        if(isAlreadyContain == true) {
+                            views?.parentButton?.visibility=View.GONE
+                            alertClass?.commonAlert("Alert!","This doctor DCR is already submitted")
+                            return@setOnClickListener
+                        }
+
+                        val intent = Intent(activity, OnlinePresentationActivity::class.java)
+                        intent.putExtra("doctorID", selectedDocID)
+                        intent.putExtra("doctorName", selectedDocName)
+                        intent.putExtra("skip", false)
+                        intent.putExtra("doctorObj", Gson().toJson(doctorObject))
+                        startActivityForResult(intent,3)
+                    })
+
+                    views?.skipDetailing_btn?.setOnClickListener({
+                        val intent = Intent(activity, SubmitE_DetailingActivity::class.java)
+                        intent.putExtra("doctorID", selectedDocID)
+                        intent.putExtra("doctorName", selectedDocName)
+                        intent.putExtra("skip", true)
+                        startActivityForResult(intent,3)
+                    })
+
+
+
+                }
+
             }
 
-        }
 
     /*    else
             views?.selectRoutesCv?.setEnabled(false)*/
         //  views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
 
 
-        views?.docRetail_switch?.setOnCheckedChangeListener { buttonView, isChecked ->
-            if (isChecked) {
-                views?.selectDoctor_tv?.setText("Select Doctor")
-                views?.selectionDocRet_tv?.setText("Select Doctor")
-                doctorHeader_tv.setTextColor(ContextCompat.getColorStateList(requireActivity(), R.color.darkBlue))
-                retailerHeader_tv.setTextColor(ContextCompat.getColorStateList(requireActivity(), R.color.gray))
-            } else {
-                views?.selectDoctor_tv?.setText("Select Retailer")
-                views?.selectionDocRet_tv?.setText("Select Retailer")
-                retailerHeader_tv.setTextColor(ContextCompat.getColorStateList(requireActivity(), R.color.darkBlue))
-                doctorHeader_tv.setTextColor(ContextCompat.getColorStateList(requireActivity(), R.color.gray))
-
-            }
-            if(SplashActivity.staticSyncData?.settingDCR?.roleType=="MAN")
-            {
-                views?.selectRoutesCv?.setEnabled(false)
-                views?.selectTeam_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
-                views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#A9A9A9"))
-            }
-            else if(SplashActivity.staticSyncData?.settingDCR?.roleType=="FS") {
-                views?.selectTeamsCv?.visibility = View.INVISIBLE
-                views?.selectTeamHeader_tv?.visibility = View.INVISIBLE
-                views?.selectRoutesCv?.setEnabled(true)
-                views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
-            }
-
-            views?.doctorDetail_parent?.visibility=View.INVISIBLE
-            views?.precall_parent?.visibility=View.INVISIBLE
-            views?.parentButton?.visibility=View.INVISIBLE
-            views?.noData_gif?.visibility=View.VISIBLE
-            views?.frameRetailer_view?.visibility=View.INVISIBLE
-            views?.retailer_parent?.visibility=View.INVISIBLE
-
-            views?.selectRoute_tv?.setText("Select route")
-            views?.selectDoctor_tv?.setBackgroundColor(Color.parseColor("#A9A9A9"))
-            views?.selectTeam_tv?.setText("Select team")
-            views?.selectDoctorsCv?.setEnabled(false)
-        }
-
-
-        views?.selectTeamsCv?.setOnClickListener({
-            selectionType=0
-            views?.bottomSheetTitle_tv?.setText("Select Team")
-            if(checkDCRusingShareP())
-            { openCloseModel() }
-    })
-
-        views?.selectRoutesCv?.setOnClickListener({
-            selectionType=1
-            views?.bottomSheetTitle_tv?.setText("Select route")
-            if(!SplashActivity.staticSyncData?.settingDCR?.roleType.equals("MAN") ){
-                if(generalClassObject?.isInternetAvailable() == true)
-                {
-                    callCoroutineApi()
-                }
-                else if(sharePreferance?.checkKeyExist("empIdSp")==false  ||
-                    sharePreferance?.checkKeyExist("todayDate")==false  || sharePreferance?.checkKeyExist("dcrId")==false || sharePreferance?.getPref("empIdSp") != loginModelHomePage.empId.toString())
-                {
-                    alertClass?.commonAlert("Alert!","DCR not submitted please connect to internet and fill DCR first.")
-                }
-                else if( sharePreferance?.getPref("todayDate") != generalClassObject?.currentDateMMDDYY() || sharePreferance?.getPref("dcrId")=="0") {
-                    alertClass?.commonAlert("Alert!","DCR not submitted please connect to internet and fill DCR first.")
-                }
-                else{ openCloseModel() }
-            }
-            else{ openCloseModel() }
-        })
-
-        views?.selectDoctorsCv?.setOnClickListener({
-
-            selectionType=2
-
-            if(view?.docRetail_switch?.isChecked == true)
-            {
-                views?.bottomSheetTitle_tv?.setText("Select Doctor")
-                if(doctorListArray.size<=0)
-                {
-                    alertClass?.commonAlert("This route has no doctor","")
-                    return@setOnClickListener
-                }
-            }
-            else{
-                views?.bottomSheetTitle_tv?.setText("Select Retailer")
-                if(retailerListArray.size<=0)
-                {
-                    alertClass?.commonAlert("This route has no Retailer","")
-                    return@setOnClickListener
-                }
-            }
-            openCloseModel()})
-
-        views?.selectDoctorsCv?.setEnabled(false)
-
-        adapter =BottomSheetDoctorAdapter()
-
-        views?.close_imv?.setOnClickListener({
-            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)})
-
-        views?.doctorSearch_et?.addTextChangedListener(filterTextWatcher)
-
-        views?.startDetailing_btn?.setOnClickListener({
-
-            val isAlreadyContain=docCallModel.dcrDoctorlist?.any{ s -> s.doctorId == selectedDocID }
-            if(isAlreadyContain == true) {
-                views?.parentButton?.visibility=View.GONE
-                alertClass?.commonAlert("Alert!","This doctor DCR is already submitted")
-                return@setOnClickListener
-            }
-
-            val intent = Intent(activity, OnlinePresentationActivity::class.java)
-            intent.putExtra("doctorID", selectedDocID)
-            intent.putExtra("doctorName", selectedDocName)
-            intent.putExtra("skip", false)
-            intent.putExtra("doctorObj", Gson().toJson(doctorObject))
-            startActivityForResult(intent,3)
-        })
-
-        views?.skipDetailing_btn?.setOnClickListener({
-            val intent = Intent(activity, SubmitE_DetailingActivity::class.java)
-            intent.putExtra("doctorID", selectedDocID)
-            intent.putExtra("doctorName", selectedDocName)
-            intent.putExtra("skip", true)
-            startActivityForResult(intent,3)
-        })
-
-        staticSyncData?.fieldStaffTeamList?.let { teamsList.addAll(it) }
-        routeList = routeList?.filter { s -> s.headQuaterName !=""} as java.util.ArrayList<SyncModel.Data.Route>
-
-        if(staticSyncData?.settingDCR?.isRestrictedParty==true)
-        {
-            if(sharePreferance?.getPref("dcrObj")?.isEmpty() == false) {
-                var dcrModel = Gson().fromJson(sharePreferance?.getPref("dcrObj"), GetDcrToday.Data.DcrData::class.java)
-
-                var routeListPartList: ArrayList<SyncModel.Data.Route> = ArrayList()
-                val items: List<String>? = dcrModel?.routeId?.split(",")
-                if (items != null) {
-                    for (data in items) {
-                           for(route in routeList)
-                           {
-                               if(route.routeId==data.toInt())
-                               { routeListPartList.add(route) }
-                           } }}
-                routeList.clear()
-                routeList.addAll(routeListPartList)
-
-            }
-
-        }
-
-
-        //  checkDCRusingShareP(0)
-
-        val responseDocCall=db.getApiDetail(5)
-        if(!responseDocCall.equals("")) {
-            docCallModel = Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
-        }
+       //  checkDCRusingShareP(0)
     }
+
+
 
     fun checkDCRusingShareP():Boolean
     {
@@ -626,7 +638,7 @@ class NewCallFragment : Fragment() {
          views?.selectRoutesCv?.setEnabled(true)
          views?.selectDoctorsCv?.setEnabled(false)
          views?.frameRetailer_view?.visibility=View.INVISIBLE
-         views?.retailer_parent?.visibility=View.INVISIBLE
+         views?.retailer_parent?.visibility=View.GONE
      }
      else if(selectionType==1)
      {
@@ -641,7 +653,7 @@ class NewCallFragment : Fragment() {
 
          views?.selectDoctorsCv?.setEnabled(true)
          views?.frameRetailer_view?.visibility=View.INVISIBLE
-         views?.retailer_parent?.visibility=View.INVISIBLE
+         views?.retailer_parent?.visibility=View.GONE
      }
      else
      {

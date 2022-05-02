@@ -401,7 +401,42 @@ open class BaseActivity : AppCompatActivity(){
         withContext(Dispatchers.Main) {
             if (response?.isSuccessful == true)
             {
-             //   Log.e("dfsdgtrertef", response.body().toString())
+                //   Log.e("dfsdgtrertef", response.body().toString())
+                if (response.code() == 200 && !response.body().toString().isEmpty()) {
+                    if(response.body()?.getErrorObj()?.errorMessage==null || !response.body()?.getErrorObj()?.errorMessage.toString().isEmpty())
+                    {
+                        response.body()?.getErrorObj()?.errorMessage?.let { Log.e("errorOnSubmitEDetailing", it) }
+                    }
+                    else {
+                        Log.e("getSubmitEdetailingData", response.body().toString())
+                        eDetailingArray.get(0).doctorId?.let { dbBase.deleteSaveSend(it) }
+                        submitDCRCo()
+                    }
+                }
+                else Log.e("elsesubmitDCRCoAPI", response.code().toString())
+            }
+            else Log.e("submitDCRCoAPIERROR", response?.errorBody().toString())
+        }
+    }
+
+    suspend fun submitDCRRetailer()
+    {
+
+        val dcrRetailerList=dbBase.getAllSaveSendRetailer("retailerFeedback")
+        if(dcrRetailerList.size==0)
+        {
+            return }
+        val sendRetailerDcr: ArrayList<RetailerPobModel> = ArrayList()
+         sendRetailerDcr.add(dcrRetailerList.get(0))
+
+        val response =
+            sharePreferanceBase?.getPref("secondaryUrl")?.let {
+                APIClientKot().getUsersService(2, it
+                ).retailerSendApiCoo("bearer " + loginModelHomePage.accessToken,sendRetailerDcr)
+            }
+        withContext(Dispatchers.Main) {
+            if (response?.isSuccessful == true)
+            {
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
                     if(response.body()?.getErrorObj()?.errorMessage==null || !response.body()?.getErrorObj()?.errorMessage.toString().isEmpty())
                     {
@@ -409,8 +444,8 @@ open class BaseActivity : AppCompatActivity(){
                     }
                     else {
                            Log.e("getSubmitEdetailingData", response.body().toString())
-                        eDetailingArray.get(0).doctorId?.let { dbBase.deleteSaveSend(it) }
-                        submitDCRCo()
+                        dcrRetailerList.get(0).retailerId?.let { dbBase.deleteSaveSend(it) }
+                        submitDCRRetailer()
                     }
                 }
                 else Log.e("elsesubmitDCRCoAPI", response.code().toString())

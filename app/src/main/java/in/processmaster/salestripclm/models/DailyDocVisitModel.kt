@@ -43,6 +43,12 @@ class DailyDocVisitModel {
     }
 
     class Data {
+
+        @SerializedName("message")
+        @Expose
+        var message: String? = null
+
+
         @SerializedName("dcrDoctorlist")
         @Expose
         var dcrDoctorlist: List<DcrDoctor>? = ArrayList()

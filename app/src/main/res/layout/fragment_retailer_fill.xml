@@ -415,7 +415,6 @@
 
         <include layout="@layout/checkbox_bottom_sheet" />
 
-        <include layout="@layout/pob_product_bottom_sheet" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

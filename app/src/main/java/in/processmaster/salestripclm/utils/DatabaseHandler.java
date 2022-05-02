@@ -11,6 +11,7 @@ import android.util.Log;
 import in.processmaster.salestripclm.models.DailyDocVisitModel;
 import in.processmaster.salestripclm.models.DevisionModel;
 import in.processmaster.salestripclm.models.DownloadFileModel;
+import in.processmaster.salestripclm.models.RetailerPobModel;
 import in.processmaster.salestripclm.models.SyncModel;
 import in.processmaster.salestripclm.models.VisualAdsModel_Send;
 
@@ -1187,6 +1188,27 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         return edetailList;
     }
+
+    @SuppressLint("Range")
+    public ArrayList<RetailerPobModel>getAllSaveSendRetailer(String type)
+    {
+        ArrayList<RetailerPobModel> edetailList = new ArrayList<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_SAVE_SEND_API, new String[] { APIKEY_DATA}, API_TYPE + "=?",
+                new String[] {type}, null, null, null, null);
+        if (cursor.moveToFirst()) {
+            do {
+                String data=cursor.getString(cursor.getColumnIndex(APIKEY_DATA));
+                RetailerPobModel getSaveModel  = new Gson().fromJson(data, RetailerPobModel.class);
+                edetailList.add(getSaveModel);
+
+            }
+            while (cursor.moveToNext());
+        }
+        return edetailList;
+    }
+
 
     public boolean  deleteSaveSend(int id) {
         SQLiteDatabase db = this.getWritableDatabase();

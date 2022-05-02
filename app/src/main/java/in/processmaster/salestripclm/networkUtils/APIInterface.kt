@@ -196,11 +196,16 @@ interface APIInterface
         @Body arrayVisual: DailyDocVisitModel.Data.DcrDoctor
     ): Call<DailyDocVisitModel?>?
 
-    @POST("api/dcr/clm/retailer/mobile")
+    @POST("api/dcr/retailer-stockist")
     fun submitRetailer(
         @Header("Authorization") authorization: String?,
-        @Body arrayVisual: RetailerPobModel
+        @Body arrayVisual: ArrayList<RetailerPobModel>
     ): Call<DailyDocVisitModel?>?
+
+    @POST("api/dcr/retailer-stockist")
+    suspend fun
+            retailerSendApiCoo(@Header("Authorization") authorization: String?,
+                               @Body arrayVisual: ArrayList<RetailerPobModel>): Response<DailyDocVisitModel>
 
     @Streaming
     @GET
