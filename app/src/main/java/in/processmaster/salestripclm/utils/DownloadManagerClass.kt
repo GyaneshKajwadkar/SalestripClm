@@ -70,9 +70,7 @@ class DownloadManagerClass(
         if(allProductList.size!=0 && getNumber<allProductList.size)
         {
             selectedObj= allProductList.get(getNumber)
-            Log.e("gdsgsdfdsfdsfds", context.stopDownload.toString())
             if(context.stopDownload==true)return
-            Log.e("sdfhiousgfiosufdf",selectedObj.filePath)
             downloadFile(selectedObj.filePath,selectedObj.fileName,selectedObj.downloadType)
         }
     }

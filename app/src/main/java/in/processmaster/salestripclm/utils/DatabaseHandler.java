@@ -228,7 +228,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             values.put(KEY_ID, id);
             db.insert(TABLE_SYNC_API, null, values);
         }
-        db.close();
+        //db.close();
 
     }
 
@@ -350,7 +350,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 routeList.add(contact);
             } while (cursor.moveToNext());
         }
-        db.close();
+        cursor.close();
+        //db.close();
         return routeList;
     }
 
@@ -370,7 +371,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 retailerList.add(contact);
             } while (cursor.moveToNext());
         }
-        db.close();
+        cursor.close();
+        //db.close();
         return retailerList;
     }
 
@@ -389,7 +391,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 productList.add(contact);
             } while (cursor.moveToNext());
         }
-        db.close();
+        cursor.close();
+        //db.close();
         return productList;
     }
 
@@ -425,7 +428,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             values.put(KEY_ID, id);
             db.insert(TABLE_SAVE_API, null, values);
         }
-        db.close();
+        //db.close();
 
     }
 
@@ -458,6 +461,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 strData=cursor.getString(cursor.getColumnIndex(KEY_DATA));
             } while (cursor.moveToNext());
         }
+        cursor.close();
+        //db.close();
         return strData;
     }
 
@@ -475,7 +480,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (u == 0) {
             db.insert(TABLE_EDETAILING, null, initialValues);
         }
-        db.close();
+        //db.close();
     }
 
     public void updateFavourite(String idModel,int isFavInt)
@@ -484,7 +489,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ContentValues initialValues = new ContentValues();
         initialValues.put(ISFAV, isFavInt);
         db.update(TABLE_EDETAILING, initialValues, "id=?", new String[] {String.valueOf(idModel)});
-        db.close();
+        //db.close();
     }
     //insert file path using id
     public void insertFilePath(int isDownloaded,String filePath,String idModel) {
@@ -493,7 +498,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         initialValues.put(IS_DOWNLOADED, isDownloaded);
         initialValues.put(FILEPATh, filePath);
         db.update(TABLE_EDETAILING, initialValues, "id=?", new String[] {String.valueOf(idModel)});  // number 1 is the _id here, update to variable for your code
-        db.close();
+        //db.close();
     }
 
     //get all edetailing list
@@ -520,7 +525,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 edetailList.add(contact);
             } while (cursor.moveToNext());
         }
-        db.close();
+        cursor.close();
+        //db.close();
         return edetailList;
     }
 
@@ -557,7 +563,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             } while (cursor.moveToNext());
         }
-        db.close();
+        cursor.close();
+        //db.close();
         return edetailList;
     }
 
@@ -603,6 +610,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             }
             while (cursor.moveToNext());
         }
+        cursor.close();
+        //db.close();
         return downloadFileList;
     }
 
@@ -610,7 +619,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     {
         SQLiteDatabase db = getWritableDatabase();
         db.delete(TABLE_EDETAILING, KEY_ID+" = ?", new String[]{id});
-        db.close();
+        //db.close();
     }
 
     //=======================================EDetailingDownload table============================================
@@ -629,12 +638,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if(CheckEdetailDownload(String.valueOf(childId),"child"))
         {
             db.update(TABLE_EDETAILINGDOWNLOAD, initialValues, "id_child=?", new String[] {String.valueOf(childId)});
-            db.close();
+            //db.close();
         }
         else
         {
             db.insert(TABLE_EDETAILINGDOWNLOAD, null, initialValues);
-            db.close();
+            //db.close();
         }
 
     }
@@ -656,9 +665,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         Cursor cursor = sqldb.rawQuery(Query, null);
         if(cursor.getCount() <= 0){
             cursor.close();
+            //sqlb.close();
             return false;
         }
         cursor.close();
+       // sqldb.close();
         return true;
     }
 
@@ -686,6 +697,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             }
             while (cursor.moveToNext());
         }
+        cursor.close();
+        //db.close();
         return downloadFileModel;
     }
 
@@ -720,6 +733,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             }
             while (cursor.moveToNext());
         }
+        cursor.close();
+        //db.close();
         return downloadFileList;
     }
 
@@ -733,7 +748,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     KEY_IDParent+" = ?",
                     new String[]{id});
         }
-        db.close();
+        //db.close();
     }
 
     @SuppressLint("Range")
@@ -754,6 +769,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             }
             while (cursor.moveToNext());
         }
+        cursor.close();
+        //db.close();
         return downloadFileList;
     }
 
@@ -779,6 +796,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             }
             while (cursor.moveToNext());
         }
+        cursor.close();
+        //db.close();
         return downloadFileList;
     }
 
@@ -789,7 +808,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         initialValues.put(ISFAVITEM, isFavInt);
 
         db.update(TABLE_EDETAILINGDOWNLOAD, initialValues, "id_child=?", new String[] {String.valueOf(idModel)});
-        db.close();
+        //db.close();
     }
 
 
@@ -801,7 +820,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         initialValues.put(EDETALING_DOWNLOAD_DATA, data);
 
         db.update(TABLE_EDETAILINGDOWNLOAD, initialValues, "id_child=?", new String[] {String.valueOf(idModel)});
-        db.close();
+        //db.close();
     }
 
     //=======================================VisualAds table==============================================
@@ -826,7 +845,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             Log.e("insertStartTimeSlide","insert");
             db.insert(TABLE_SENDVISUALADS, null, initialValues);
         }
-        db.close();
+        //db.close();
     }
 
     //Add end time
@@ -838,7 +857,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         initialValues.put(IS_SUBMIT, 1);
 
         db.update(TABLE_SENDVISUALADS, initialValues, "set_timeslide=?", new String[] {String.valueOf(startTime)});  // number 1 is the _id here, update to variable for your code
-        db.close();
+        //db.close();
     }
 
     //get all submitted visualads list
@@ -886,6 +905,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             } while (cursor.moveToNext());
         }
+        cursor.close();
+        //db.close();
         return edetailList;
     }
 
@@ -909,7 +930,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ContentValues initialValues = new ContentValues();
         initialValues.put(MONITOR_TIME, setTime);
         db.update(TABLE_SENDVISUALADS, initialValues, SLIDE_START_TIME+" = ? AND "+BRAND_ID+" = ? ", new String[] {mainTime, brandId});  // number 1 is the _id here, update to variable for your code
-        db.close();
+        //db.close();
     }
 
     @SuppressLint("Range")
@@ -924,6 +945,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             do { getDbTimer=cursor.getInt(cursor.getColumnIndex(MONITOR_TIME)); }
             while (cursor.moveToNext());
         }
+        cursor.close();
+        //db.close();
         return getDbTimer;
     }
 
@@ -946,6 +969,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             }
             while (cursor.moveToNext());
         }
+        cursor.close();
+        //db.close();
         return false;
     }
 
@@ -966,7 +991,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         else
         {
             db.insert(TABLE_CHILD_VISUAL_ADS, null, initialValues);
-            db.close();
+            //db.close();
         }
 
     }
@@ -979,7 +1004,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         initialValues.put(ISLIKE, setLike);
 
         db.update(TABLE_CHILD_VISUAL_ADS, initialValues, "setTime = ? AND file_id= ? ", new String[] {startTime, String.valueOf(setfileId)});  // number 1 is the _id here, update to variable for your code
-        db.close();
+        //db.close();
     }
 
     //insert comment
@@ -990,7 +1015,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         initialValues.put(COMMENT, setComment);
 
         db.update(TABLE_CHILD_VISUAL_ADS, initialValues, "setTime = ? AND file_id= ? ", new String[] {startTime, String.valueOf(setfileId)});  // number 1 is the _id here, update to variable for your code
-        db.close();
+        //db.close();
     }
 
     //insert time in second
@@ -1001,7 +1026,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         initialValues.put(SINGLE_SLIDE_TIMER, setTime);
 
         db.update(TABLE_CHILD_VISUAL_ADS, initialValues, "setTime = ? AND file_id= ? ", new String[] {startTime, String.valueOf(setfileId)});  // number 1 is the _id here, update to variable for your code
-        db.close();
+        //db.close();
 
     }
 
@@ -1028,6 +1053,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             }
             while (cursor.moveToNext());
         }
+        cursor.close();
+        //db.close();
         return false;
     }
 
@@ -1052,6 +1079,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             }
             while (cursor.moveToNext());
         }
+        cursor.close();
+        //db.close();
         return getDbComment;
     }
 
@@ -1076,6 +1105,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             }
             while (cursor.moveToNext());
         }
+        cursor.close();
+        //db.close();
         return getDbTimer;
     }
 
@@ -1113,6 +1144,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             }
             while (cursor.moveToNext());
         }
+        cursor.close();
+        //db.close();
         return childListVisualAds;
     }
 
@@ -1147,6 +1180,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             }
             while (cursor.moveToNext());
         }
+        cursor.close();
+        //db.close();
         return false;
     }
 
@@ -1186,6 +1221,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             }
             while (cursor.moveToNext());
         }
+        cursor.close();
+        //db.close();
         return edetailList;
     }
 
@@ -1206,6 +1243,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             }
             while (cursor.moveToNext());
         }
+        cursor.close();
+        //db.close();
         return edetailList;
     }
 
@@ -1230,7 +1269,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         initialValues.put(DOCTOR_ID, doctorID);
         initialValues.put(DETAILING_DATE, date);
         db.insert(TABLE_SAVE_DOCTOR_EDETAIL, null, initialValues);
-        db.close();
+        //db.close();
     }
 
     public boolean isEDetailingAvailable(int doctorId, String detailingDate)

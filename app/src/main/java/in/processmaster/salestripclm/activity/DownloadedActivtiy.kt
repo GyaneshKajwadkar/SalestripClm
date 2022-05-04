@@ -3,6 +3,7 @@ package `in`.processmaster.salestripclm.activity
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.adapter.DownloadAdapter
 import `in`.processmaster.salestripclm.models.DownloadFileModel
+import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import android.app.Activity
 import android.graphics.Color
@@ -20,11 +21,20 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_downloaded_activtiy.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
+import okhttp3.ResponseBody
 import org.apache.commons.io.FileUtils
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.io.*
 import java.net.URL
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
@@ -197,10 +207,6 @@ class DownloadedActivtiy : BaseActivity() {
            recyclerView!!.layoutManager = GridLayoutManager(this, mNoOfColumns)
            recyclerView?.itemAnimator = DefaultItemAnimator()
            recyclerView?.adapter = adapter*/
-
-
-
-
     }
 
     fun downloadAll(
@@ -215,8 +221,9 @@ class DownloadedActivtiy : BaseActivity() {
 
 
         var modelObject = arrayListD.get(index)
-        downloadUrl(modelObject.filePath.toString(),index, modelObject.downloadType.toString(),modelObject,arrayListD,"all")
+       // downloadUrl(modelObject.filePath.toString(),index, modelObject.downloadType.toString(),modelObject,arrayListD,"all")
 
+        newDownloadMethod(modelObject,index,modelObject.downloadType,arrayListD,"all")
     }
 
     fun downloadSingleFolders(index: Int, downloadList : ArrayList<DownloadFileModel>)
@@ -227,8 +234,8 @@ class DownloadedActivtiy : BaseActivity() {
         })
 
         var modelObject = downloadList.get(index)
-        downloadUrl(modelObject.filePath.toString(),index, modelObject.downloadType.toString(),modelObject,downloadList,"single")
-
+       // downloadUrl(modelObject.filePath.toString(),index, modelObject.downloadType.toString(),modelObject,downloadList,"single")
+        newDownloadMethod(modelObject,index,modelObject.downloadType,downloadList,"single")
     }
 
 
@@ -338,19 +345,19 @@ class DownloadedActivtiy : BaseActivity() {
                         fileModel.brandName=brandName
 
 
-                        var downloadedModel=db.getSingleDownloadedData(model.fileId)
+                        /*var downloadedModel=db.getSingleDownloadedData(model.fileId)
 
                         if(downloadedModel.favFile)
                         {
                             fileModel.favFilePath=downloadedModel.favFilePath
                             fileModel.favFileName=downloadedModel.favFileName
-                        }
+                        }*/
 
 
                         val gson = Gson()
                         db.insertOrUpdateEDetailDownload(eDetailingId.toInt(), model.fileId,  gson.toJson(fileModel),category)
                         db.insertFilePath(1,  gson.toJson(fileModel), eDetailingId.toString())
-                        deleteAndsaveRedownloads(db,model,downloadedModel)
+                      //  deleteAndsaveRedownloads(db,model,downloadedModel)
 
                         if(position==arrayListtype.size-1)
                         {
@@ -603,13 +610,222 @@ class DownloadedActivtiy : BaseActivity() {
 
     fun notifyDataChange(type:String, position: Int)
     {
-        runOnUiThread {
-            adapterVideo= DownloadAdapter(this, "VIDEO", brandId,brandName,arraylistVideoD,eDetailingId)
-            video_rv?.layoutManager = GridLayoutManager(this, 5)
-            video_rv?.itemAnimator = DefaultItemAnimator()
-            video_rv?.adapter = adapterVideo
+        if(type=="IMAGE")
+        {
+            runOnUiThread {
+                adapterImage= DownloadAdapter(this, "IMAGE", brandId,brandName,arraylistVideoD,eDetailingId)
+                images_rv?.layoutManager = GridLayoutManager(this, 5)
+                images_rv?.itemAnimator = DefaultItemAnimator()
+                images_rv?.adapter = adapterImage
+            }
+        }
+        else
+        {
+            runOnUiThread {
+                adapterVideo= DownloadAdapter(this, "VIDEO", brandId,brandName,arraylistVideoD,eDetailingId)
+                video_rv?.layoutManager = GridLayoutManager(this, 5)
+                video_rv?.itemAnimator = DefaultItemAnimator()
+                video_rv?.adapter = adapterVideo
+            }
+        }
+
+
+    }
+
+    fun newDownloadMethod(model: DownloadFileModel, position: Int, type: String , arrayListtype: ArrayList<DownloadFileModel>, downloadType: String)
+    {
+        if(generalClass.isInternetAvailable()==false) {
+            alertClass.networkAlert()
+            return
+        }
+
+        val remainingurl: String = model.filePath?.replace("https://salestrip.blob.core.windows.net/", "").toString()
+
+        val downloadService: APIInterface =
+            createService(APIInterface::class.java, "https://salestrip.blob.core.windows.net/")
+
+        val coroutineScope= CoroutineScope(Dispatchers.IO).launch {
+            val sendEdetailing= async {
+                val responseBody=downloadService.downloadFile(remainingurl).body()
+                responseBody?.let { it1 -> saveFile(it1,type,position,model,model.filePath!!,arrayListtype,downloadType) }
+            }
+            sendEdetailing.await()
+        }
+        coroutineScope.invokeOnCompletion {
+            coroutineScope.cancel()
+
+            if(arrayListtype.size-1==position)
+            {
+                runOnUiThread { if(type.equals("IMAGE")) {
+                    adapterImage.notifyDataSetChanged()
+                }
+                else if(type.equals("VIDEO"))
+                {
+                    adapterVideo.notifyDataSetChanged()
+                }
+                else
+                {
+                    adapterWeb.notifyDataSetChanged()
+                }
+                }
+            }
         }
     }
 
+
+    fun saveFile(
+        body: ResponseBody,
+        type: String,
+        position: Int,
+        model: DownloadFileModel,
+        urlMain: String,
+        arrayListtype: ArrayList<DownloadFileModel>,
+        downloadType: String
+    ):String{
+        val extension: String = urlMain.substring(urlMain.lastIndexOf("/"))
+        var folder = File(getFilesDir() , "/$brandName"+"/$type")
+        if(!type.equals("ZIP"))
+        {
+            folder = File(getFilesDir() , "/$brandName"+"/$type")
+        }
+        else
+        {
+            folder = File(getExternalFilesDir(null)?.absolutePath + "/$brandName/$type")
+        }
+
+        //  val folder =Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        try {
+            folder.mkdirs();
+            if (folder.mkdir()) {
+                println("Directorycreated")
+            } else {
+                println("Directoryisnotcreated")
+            }
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+            Log.e("firstCatch",e.message.toString())
+        }
+
+        var success = true
+        if (!folder.exists()) {
+            success = folder.mkdirs()
+        }
+        if (body==null && success)
+            return ""
+        var input: InputStream? = null
+        try {
+            input = body?.byteStream()
+            val lenghtOfFile =body?.contentLength()
+            //val file = File(getCacheDir(), "cacheFileAppeal.srl")
+            val fos = FileOutputStream(folder.getAbsolutePath() + extension)
+            var total: Long = 0
+            fos.use { output ->
+                val buffer = ByteArray(4 * 1024) // or other buffer size
+                var read: Int
+                while (input.read(buffer).also { read = it } != -1) {
+                    total += read.toLong()
+
+                    runOnUiThread(Runnable {
+                        progressBarAlert?.setIndeterminate(false)
+                        progressBarAlert?.setProgress(((total * 100 / lenghtOfFile).toInt()))
+                        textViewAlert?.setText(((total * 100 / lenghtOfFile).toInt()).toString())
+                    })
+                    output.write(buffer, 0, read)
+                }
+
+                var fileModel= DownloadFileModel()
+                fileModel.fileName=extension.replace("/","")
+                fileModel.fileDirectoryPath=folder.absolutePath
+                fileModel.filePath=folder.absolutePath+extension
+                //  fileModel.model=model
+                fileModel.downloadType=type
+                fileModel.fileId=model.fileId!!
+                fileModel.brandId=brandId
+                fileModel.brandName=brandName
+
+                var downloadedModel=db.getSingleDownloadedData(model.fileId!!)
+
+                /*if(downloadedModel.favFile)
+                {
+                    fileModel.favFilePath=downloadedModel.favFilePath
+                    fileModel.favFileName=downloadedModel.favFileName
+                }*/
+
+                if(!type.equals("ZIP")){
+
+                    if(position==arrayListtype.size-1)
+                    {
+                        this.runOnUiThread(Runnable {
+                            //     progressBarAlert?.setIndeterminate(true)
+                            alertDialog?.dismiss()
+                            adapterVideo.notifyDataSetChanged()
+                            adapterImage.notifyDataSetChanged()
+                            adapterWeb.notifyDataSetChanged()
+                        })
+                    }
+                    else
+                    {
+                        if(downloadType.equals("all"))
+                        {
+                            downloadAll(position+1,arrayListtype)
+                        }
+                        else
+                        {
+                            downloadSingleFolders(position+1,arrayListtype)
+                        }
+
+                    }
+
+
+
+                    val gson = Gson()
+                    db.insertOrUpdateEDetailDownload(eDetailingId!!.toInt(), model.fileId!!,  gson.toJson(fileModel),type)
+                    db.insertFilePath(1,  gson.toJson(fileModel), eDetailingId.toString())
+                    deleteAndsaveRedownloads(db,model,downloadedModel)
+                }
+                else{
+                    val filePathzip=folder.getAbsolutePath() + extension;
+                    //get main path
+                    val zipName: String = filePathzip.substring(
+                        filePathzip.lastIndexOf(
+                            "/"
+                        )
+                    )
+                    unpackZipmethod(folder.getAbsolutePath(), zipName,position,model,type,arrayListtype)
+
+                }
+
+                runOnUiThread(Runnable {
+                    //     progressBarAlert?.setIndeterminate(true)
+                  //  alertDialog?.dismiss()
+                  //  this.currentFocus?.clearFocus()
+                })
+
+                output.flush()
+                Log.e("itsSucess","success")
+            }
+            return folder.getAbsolutePath() + "extension"
+        }catch (e:Exception){
+            Log.e("saveFile",e.toString())
+        }
+        finally {
+            input?.close()
+        }
+        return ""
+    }
+
+    fun <T> createService(serviceClass: Class<T>?, baseUrl: String?): T {
+
+        val client = OkHttpClient.Builder()
+            .connectTimeout(10000, TimeUnit.SECONDS)
+            .readTimeout(10000, TimeUnit.SECONDS).build()
+
+        val retrofit = Retrofit.Builder()
+            .baseUrl(baseUrl)
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create(Gson()))
+            .build()
+        return retrofit.create(serviceClass)
+    }
 
 }

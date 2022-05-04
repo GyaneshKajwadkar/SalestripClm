@@ -36,6 +36,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.fasterxml.jackson.databind.ser.std.StdKeySerializers
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.navigation.NavigationView
@@ -44,6 +45,7 @@ import com.google.gson.JsonObject
 import kotlinx.android.synthetic.main.activity_home_page.*
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.Dispatchers.IO
 import org.json.JSONObject
 import retrofit2.Call
@@ -82,7 +84,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         apiInterface = APIClientKot().getClient(2, sharePreferance?.getPref("secondaryUrl")).create(
             APIInterface::class.java)
 
-        initView()
+
 
         if(generalClass.isInternetAvailable()) callingMultipleAPI()
         else {
@@ -100,6 +102,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
                 }
             }*/
+            initView()
             bottomNavigation?.selectedItemId= R.id.landingPage
         }
 
@@ -414,10 +417,13 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         alertClass.showProgressAlert("")
 
     //    if (dbBase.getDatasCount() > 0) {
-            dbBase.deleteAll()
+
        // }
 
         val coroutineScope= CoroutineScope(IO).launch {
+
+            val deleteItem= async {  dbBase.deleteAll() }
+
             val sync= async { callingSyncAPI() }
 
             val divisionApi =async { callingDivisionAPI() }
@@ -441,6 +447,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                     getCredientailAPI(this@HomePage)
                 }
             }
+            deleteItem.await()
             sync.await()
             divisionApi.await()
             credientialApi.await()
@@ -455,6 +462,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         coroutineScope.invokeOnCompletion {
             this.runOnUiThread(java.lang.Runnable {
                 alertClass.hideAlert()
+                initView()
                 bottomNavigation?.selectedItemId= R.id.landingPage
               //  generalClass.disableProgress(progressView_parentRv!!)
             })
@@ -568,19 +576,21 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             if (response?.code() == 200 && !response.body().toString().isEmpty())
                 {
                    // dbBase?.addAPIData(Gson().toJson(response.body()),1)
-                    staticSyncData=response.body()?.data
-                    val apiModel=response.body()?.data
-                    val gson=Gson()
-                    dbBase?.deleteAll_SYNCAPI()
 
-                    dbBase?.addSYNCAPIData(gson.toJson(apiModel?.settingDCR),
-                         gson.toJson(apiModel?.workTypeList),"",
-                         "",gson.toJson(apiModel?.workingWithList),gson.toJson(apiModel?.fieldStaffTeamList),""
-                         ,apiModel?.configurationSetting, gson.toJson(apiModel?.schemeList),
-                         "",0, gson.toJson(apiModel?.doctorList))
-                    dbBase?.addRoutes(apiModel?.routeList)
-                    dbBase?.addRetailer(apiModel?.retailerList)
-                    dbBase?.addProduct(apiModel?.productList)
+                       staticSyncData=response.body()?.data
+                        val apiModel=response.body()?.data
+                        val gson=Gson()
+                        dbBase?.deleteAll_SYNCAPI()
+
+                        dbBase?.addSYNCAPIData(gson.toJson(apiModel?.settingDCR),
+                            gson.toJson(apiModel?.workTypeList),"",
+                            "",gson.toJson(apiModel?.workingWithList),gson.toJson(apiModel?.fieldStaffTeamList),""
+                            ,apiModel?.configurationSetting, gson.toJson(apiModel?.schemeList),
+                            "",0, gson.toJson(apiModel?.doctorList))
+                        dbBase?.addRoutes(apiModel?.routeList)
+                        dbBase?.addRetailer(apiModel?.retailerList)
+                        dbBase?.addProduct(apiModel?.productList)
+
 
             }
 

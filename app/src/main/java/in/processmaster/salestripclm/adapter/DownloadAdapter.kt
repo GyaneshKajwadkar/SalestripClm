@@ -43,10 +43,12 @@ import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import org.apache.commons.io.FileUtils
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.io.*
 import java.net.URL
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
@@ -136,19 +138,19 @@ class DownloadAdapter constructor() :
             val videoView: ViewHoldersVideo = holder as ViewHoldersVideo
             var videomodel=arraylistVideo.get(position)
 
+            videoView.videoTitle.setText(videomodel.fileName)
+            videoView.videoTitle.setSelected(true)
 
             var dbdata=db.getSingleDownloadedData(videomodel.fileId!!)
             if(dbdata.fileName!=null)
             {
                 if(getAllfileList(dbdata.fileDirectoryPath,dbdata.fileName))
                 {
+                        val circularProgressDrawable = CircularProgressDrawable(context!!)
+                        circularProgressDrawable.strokeWidth = 5f
+                        circularProgressDrawable.centerRadius = 30f
+                        circularProgressDrawable.start()
 
-                    val circularProgressDrawable = CircularProgressDrawable(context!!)
-                    circularProgressDrawable.strokeWidth = 5f
-                    circularProgressDrawable.centerRadius = 30f
-                    circularProgressDrawable.start()
-
-                    context?.runOnUiThread {
                         videoView.reDownload_rl.visibility=View.VISIBLE
                         //    videoView.fav_iv.visibility=View.VISIBLE
                         videoView.download_rl.visibility=View.GONE
@@ -162,7 +164,7 @@ class DownloadAdapter constructor() :
                             .placeholder(circularProgressDrawable)
                             .into(videoView.videoThumb_iv)
 
-                        if(dbdata.favFile!!)
+                       /* if(dbdata.favFile!!)
                         {
                             videoView.fav_iv.setColorFilter(ContextCompat.getColor(context!!, R.color.zm_red));
                             videoView.fav_iv.setTag("set")
@@ -171,11 +173,10 @@ class DownloadAdapter constructor() :
                         {
                             videoView.fav_iv.setColorFilter(ContextCompat.getColor(context!!, R.color.gray));
                             videoView.fav_iv.setTag("not")
-                        }
+                        }*/
 
-                        videoView.videoTitle.setText(videomodel.fileName)
-                        videoView.videoTitle.setSelected(true)
-                    }
+
+
 
                     videoView.videoThumb_iv.setOnClickListener({
                         if(videoView.reDownload_rl.visibility==View.VISIBLE)
@@ -188,7 +189,7 @@ class DownloadAdapter constructor() :
                 }
             }
 
-            videoView.fav_iv.setOnClickListener({
+           /* videoView.fav_iv.setOnClickListener({
 
                 if(videoView.fav_iv.getTag().equals("set"))
                 {
@@ -205,7 +206,7 @@ class DownloadAdapter constructor() :
                 }
 
                 checkIsItemIsFav(db)
-            })
+            })*/
 
 
 
@@ -219,29 +220,8 @@ class DownloadAdapter constructor() :
                 progressDialog()
                 progressBarAlert?.setIndeterminate(true)
 
-                val remainingurl: String = videomodel.filePath?.replace("https://salestrip.blob.core.windows.net/", "").toString()
-
-                val downloadService: APIInterface =
-                    createService(APIInterface::class.java, "https://salestrip.blob.core.windows.net/")
-
-                val coroutineScope= CoroutineScope(Dispatchers.IO).launch {
-                    val sendEdetailing= async {
-                        val responseBody=downloadService.downloadFile(remainingurl).body()
-                        responseBody?.let { it1 -> saveFile(it1,"VIDEO",position,videomodel,videomodel.filePath!!) }
-                    }
-                    sendEdetailing.await()
-                }
-                coroutineScope.invokeOnCompletion {
-
-                    context?.notifyDataChange("VIDEO",position)
-
-                   // context?.runOnUiThread { notifyItemChanged(position) }
-                }
-
-
-
-
-             //  downloadUrl(videomodel.filePath!!,position,"VIDEO",videomodel)
+                newDownloadMethod(videomodel,position,"VIDEO")
+            //  downloadUrl(videomodel.filePath!!,position,"VIDEO",videomodel)
             })
 
             videoView.reDownload_rl.setOnClickListener({
@@ -252,6 +232,7 @@ class DownloadAdapter constructor() :
                 }
                 progressDialog()
                 progressBarAlert?.setIndeterminate(true)
+                newDownloadMethod(videomodel,position,"VIDEO")
              //   downloadUrl(videomodel.filePath!!,position,"VIDEO",videomodel)
 
             })
@@ -319,7 +300,9 @@ class DownloadAdapter constructor() :
                 }
                 progressDialog()
                 progressBarAlert?.setIndeterminate(true)
-                downloadUrl(imagemodel.filePath!!, position, "IMAGE", imagemodel)
+                newDownloadMethod(imagemodel,position,"IMAGE")
+
+                //  downloadUrl(imagemodel.filePath!!, position, "IMAGE", imagemodel)
 
             })
 
@@ -331,7 +314,8 @@ class DownloadAdapter constructor() :
                 }
                 progressDialog()
                 progressBarAlert?.setIndeterminate(true)
-                downloadUrl(imagemodel.filePath!!, position, "IMAGE", imagemodel)
+                newDownloadMethod(imagemodel,position,"IMAGE")
+              //  downloadUrl(imagemodel.filePath!!, position, "IMAGE", imagemodel)
 
             })
 
@@ -445,7 +429,10 @@ class DownloadAdapter constructor() :
                 }
                 progressDialog()
                 progressBarAlert?.setIndeterminate(true)
-                downloadHtmlZip(zipmodel.filePath!!, position,zipmodel)
+               // downloadHtmlZip(zipmodel.filePath!!, position,zipmodel)
+                newDownloadMethod(zipmodel,position,"ZIP")
+
+
 
             })
 
@@ -457,7 +444,8 @@ class DownloadAdapter constructor() :
                 }
                 progressDialog()
                 progressBarAlert?.setIndeterminate(true)
-                downloadHtmlZip(zipmodel.filePath!!, position,zipmodel)
+               // downloadHtmlZip(zipmodel.filePath!!, position,zipmodel)
+                newDownloadMethod(zipmodel,position,"ZIP")
 
             })
 
@@ -484,6 +472,31 @@ class DownloadAdapter constructor() :
 
     override fun getItemCount(): Int {
         return arraylistVideo.size
+    }
+
+    fun newDownloadMethod(model: DownloadFileModel, position: Int, type: String)
+    {
+        if(GeneralClass(context as Activity).isInternetAvailable()==false) {
+            AlertClass(context as Activity).networkAlert()
+            return
+        }
+
+        val remainingurl: String = model.filePath?.replace("https://salestrip.blob.core.windows.net/", "").toString()
+
+        val downloadService: APIInterface =
+            createService(APIInterface::class.java, "https://salestrip.blob.core.windows.net/")
+
+        val coroutineScope= CoroutineScope(Dispatchers.IO).launch {
+            val sendEdetailing= async {
+                val responseBody=downloadService.downloadFile(remainingurl).body()
+                responseBody?.let { it1 -> saveFile(it1,type,position,model,model.filePath!!) }
+            }
+            sendEdetailing.await()
+        }
+        coroutineScope.invokeOnCompletion {
+             coroutineScope.cancel()
+             context?.runOnUiThread { notifyDataSetChanged() }
+        }
     }
 
 
@@ -635,15 +648,23 @@ class DownloadAdapter constructor() :
 
     fun saveFile(
         body: ResponseBody,
-        category: String,
+        type: String,
         position: Int,
         model: DownloadFileModel,
         urlMain: String
     ):String{
         val extension: String = urlMain.substring(urlMain.lastIndexOf("/"))
+        var folder = File(context?.getFilesDir() , "/$brandName"+"/$type")
+        if(!type.equals("ZIP"))
+        {
+             folder = File(context?.getFilesDir() , "/$brandName"+"/$type")
+        }
+        else
+        {
+             folder = File(context?.getExternalFilesDir(null)?.absolutePath + "/$brandName/$type")
+        }
 
-        var folder = File(context?.getFilesDir() , "/$brandName"+"/$category")
-    //    val folder =Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+       //  val folder =Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         try {
             folder.mkdirs();
             if (folder.mkdir()) {
@@ -660,8 +681,6 @@ class DownloadAdapter constructor() :
         if (!folder.exists()) {
             success = folder.mkdirs()
         }
-
-
         if (body==null && success)
             return ""
         var input: InputStream? = null
@@ -691,7 +710,7 @@ class DownloadAdapter constructor() :
                 fileModel.fileDirectoryPath=folder.absolutePath
                 fileModel.filePath=folder.absolutePath+extension
               //  fileModel.model=model
-                fileModel.downloadType=category
+                fileModel.downloadType=type
                 fileModel.fileId=model.fileId!!
                 fileModel.brandId=parentId
                 fileModel.brandName=brandName
@@ -704,11 +723,23 @@ class DownloadAdapter constructor() :
                     fileModel.favFileName=downloadedModel.favFileName
                 }
 
-                val gson = Gson()
-                db.insertOrUpdateEDetailDownload(eDetailingId!!.toInt(), model.fileId!!,  gson.toJson(fileModel),category)
-                db.insertFilePath(1,  gson.toJson(fileModel), eDetailingId.toString())
-                deleteAndsaveRedownloads(db,model,downloadedModel)
+                if(!type.equals("ZIP")){
+                    val gson = Gson()
+                    db.insertOrUpdateEDetailDownload(eDetailingId!!.toInt(), model.fileId!!,  gson.toJson(fileModel),type)
+                    db.insertFilePath(1,  gson.toJson(fileModel), eDetailingId.toString())
+                    deleteAndsaveRedownloads(db,model,downloadedModel)
+                }
+                else{
+                    val filePathzip=folder.getAbsolutePath() + extension;
+                    //get main path
+                    val zipName: String = filePathzip.substring(
+                        filePathzip.lastIndexOf(
+                            "/"
+                        )
+                    )
+                    unpackZipmethod(folder.getAbsolutePath(), zipName,position,model)
 
+                }
 
                 context?.runOnUiThread(Runnable {
                     //     progressBarAlert?.setIndeterminate(true)
@@ -1225,9 +1256,15 @@ class DownloadAdapter constructor() :
     }
 
     fun <T> createService(serviceClass: Class<T>?, baseUrl: String?): T {
+
+        val client = OkHttpClient.Builder()
+            .connectTimeout(10000, TimeUnit.SECONDS)
+            .readTimeout(10000, TimeUnit.SECONDS).build()
+
         val retrofit = Retrofit.Builder()
             .baseUrl(baseUrl)
-            .client(OkHttpClient.Builder().build())
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create(Gson()))
             .build()
         return retrofit.create(serviceClass)
     }

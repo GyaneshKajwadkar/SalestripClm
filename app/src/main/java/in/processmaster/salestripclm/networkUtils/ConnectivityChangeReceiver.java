@@ -18,25 +18,29 @@ import in.processmaster.salestripclm.common_classes.GeneralClass;
 public class ConnectivityChangeReceiver extends BroadcastReceiver {
 
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        Activity activity= (Activity) context;
-        BaseActivity baseActivity = new BaseActivity();
-
-        if(!isConnected(context))
+        if(context instanceof Activity)
         {
-            if(SplashActivity.Companion.getShowNetworkAlert())
+            Activity activity= (Activity) context;
+            BaseActivity baseActivity = new BaseActivity();
+
+            if(!isConnected(context))
             {
-                SplashActivity.Companion.setShowNetworkAlert(false);
-                baseActivity.networkAlertNotification(activity);
+                if(SplashActivity.Companion.getShowNetworkAlert())
+                {
+                    SplashActivity.Companion.setShowNetworkAlert(false);
+                    baseActivity.networkAlertNotification(activity);
+                }
+            }
+            else {
+                SplashActivity.Companion.setShowNetworkAlert(true);
+                baseActivity.disableNetworkAlert(activity);
             }
         }
-        else {
-             SplashActivity.Companion.setShowNetworkAlert(true);
-            baseActivity.disableNetworkAlert(activity);
-        }
+
+
     }
 
     public  boolean isConnected(Context context) {

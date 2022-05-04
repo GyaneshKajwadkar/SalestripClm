@@ -51,15 +51,34 @@
     </LinearLayout>
 
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/logo"
+    <androidx.cardview.widget.CardView
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_centerHorizontal="true"
         android:layout_gravity="center"
+        app:cardCornerRadius="20dp">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/logo"
+            android:src="@mipmap/ic_launcher"/>
+
+    </androidx.cardview.widget.CardView>
+
+
+
+
+
+ <!--   <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/logo"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center"
         android:src="@mipmap/ic_launcher"
         app:civ_border_color="@color/black"
-        app:civ_border_width="1dp" />
+        app:civ_border_width="1dp" />-->
 
 
 </RelativeLayout>

@@ -643,10 +643,17 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
             {
                 var downloadedList = dbBase.getAllDownloadedData(itemParent.geteDetailId())
 
-                if(downloadedList.stream().anyMatch({ o -> o.downloadType.equals("VIDEO") }))
+                var isAvailable=false
+                for(itemChild in downloadedList)
+                {
+                    if(itemChild.downloadType.equals("VIDEO")) isAvailable=true
+                }
+                if(isAvailable)  filteredList.add(itemParent); continue
+
+              /*  if(downloadedList.stream().anyMatch({ o -> o.downloadType.equals("VIDEO") }))
                 {
                     filteredList.add(itemParent)
-                }
+                }*/
             }
         }
         return filteredList

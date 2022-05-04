@@ -696,12 +696,12 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
             if(itemParent.isSaved==1)
             {
                 var downloadedList = db.getAllDownloadedData(itemParent.geteDetailId()!!)
-                var isImage=false
+                var isAvailable=false
                 for(itemChild in downloadedList)
                 {
-                    if(itemChild.downloadType.equals("ZIP")) isImage=true
+                    if(itemChild.downloadType.equals("ZIP")) isAvailable=true
                 }
-                if(isImage)  filteredList.add(itemParent); continue
+                if(isAvailable)  filteredList.add(itemParent); continue
 
 
               /*  if(downloadedList.stream().anyMatch({ o -> o.downloadType.equals("ZIP") }))
