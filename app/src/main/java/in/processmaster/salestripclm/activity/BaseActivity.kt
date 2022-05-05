@@ -103,12 +103,32 @@ open class BaseActivity : AppCompatActivity(){
         dbBase= DatabaseHandler(activity)
         sharePreferanceBase = PreferenceClass(activity)
         val eDetailingArray=dbBase.getAllSaveSend("feedback")
+        val retailerArray=dbBase.getAllSaveSend("retailerFeedback")
 
-        if(eDetailingArray.size!=0)
+        if( eDetailingArray.size!=0)
         {
             val coroutineScope= CoroutineScope(Dispatchers.IO).launch {
                 val sendEdetailing= async {
                     submitDCRCo() }
+                sendEdetailing.await()
+            }
+            coroutineScope.invokeOnCompletion {
+                AlertClass(activity).commonAlert("","Offline DCR submit successfully")
+
+                if (activity is HomePage) {
+                    if(activity.getFragmentRefreshListener()!=null){
+                        activity?.getFragmentRefreshListener()?.onRefresh()
+                    }
+                }
+
+            }
+        }
+
+        if(retailerArray.size!=0)
+        {
+            val coroutineScope= CoroutineScope(Dispatchers.IO).launch {
+                val sendEdetailing= async {
+                    submitDCRRetailer() }
                 sendEdetailing.await()
             }
             coroutineScope.invokeOnCompletion {
@@ -425,8 +445,10 @@ open class BaseActivity : AppCompatActivity(){
         val dcrRetailerList=dbBase.getAllSaveSendRetailer("retailerFeedback")
         if(dcrRetailerList.size==0)
         {
-            return }
-        val sendRetailerDcr: ArrayList<RetailerPobModel> = ArrayList()
+            getDocCallAPI()
+            return
+        }
+        val sendRetailerDcr: ArrayList<DailyDocVisitModel.Data.DcrDoctor> = ArrayList()
          sendRetailerDcr.add(dcrRetailerList.get(0))
 
         val response =

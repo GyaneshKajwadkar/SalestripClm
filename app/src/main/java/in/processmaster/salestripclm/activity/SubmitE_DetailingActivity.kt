@@ -968,7 +968,18 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                         alertClass?.commonAlert("",response.body()?.getErrorObj()?.errorMessage.toString())
                     }
                     else {
-                        dbBase?.addAPIData(Gson().toJson(response.body()?.getData()), 5)
+                        val responseDocCall=dbBase.getApiDetail(5)
+
+                        var  docCallModel= Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
+                        if(responseDocCall.isEmpty()){
+                            docCallModel= DailyDocVisitModel.Data()
+                        }
+
+
+                        docCallModel.dcrDoctorlist=response.body()?.getData()?.dcrDoctorlist
+
+                      //  dbBase?.addAPIData(Gson().toJson(response.body()?.getData()), 5)
+                        dbBase?.addAPIData(Gson().toJson(docCallModel), 5)
                         alertClass?.hideAlert()
                         callRunnableAlert("Doctor Dcr save successfully")
 
@@ -1340,7 +1351,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                // visualSendModel.addAll(edetailingEditModel.eDetailList)
                 for((index,mainVisual) in visualSendModel.withIndex())
                 {
-                    for(dbVisual in edetailingEditModel.eDetailList)
+                    for(dbVisual in edetailingEditModel.eDetailList!!)
                     {
                         if(mainVisual.brandId==dbVisual.brandId)
                         {
@@ -1421,7 +1432,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                     }
                 }
 
-                for (getEdetailing in edetailingEditModel.eDetailList)
+                for (getEdetailing in edetailingEditModel.eDetailList!!)
                 {
                     var eDetailingObj= VisualAdsModel_Send()
                     eDetailingObj.startDate=getEdetailing.startDate
@@ -1497,7 +1508,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             val edetailingEditModel=Gson().fromJson(intent.getStringExtra("apiDataDcr"),DailyDocVisitModel.Data.DcrDoctor::class.java)
 
             doctorIdDisplayVisual= edetailingEditModel.doctorId!!
-            visualSendModel.addAll(edetailingEditModel.eDetailList)
+            edetailingEditModel.eDetailList?.let { visualSendModel.addAll(it) }
 
             if(edetailingEditModel.dataSaveType?.lowercase().equals("s"))
             {
@@ -1583,7 +1594,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 }
             }
 
-            for (getEdetailing in edetailingEditModel.eDetailList)
+            for (getEdetailing in edetailingEditModel.eDetailList!!)
             {
                 var eDetailingObj= VisualAdsModel_Send()
                 eDetailingObj.startDate=getEdetailing.startDate

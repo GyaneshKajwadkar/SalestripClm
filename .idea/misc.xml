@@ -32,9 +32,9 @@
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-sw600dp-land/doctorlist_view.xml" value="0.11244979919678715" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-sw600dp-land/downloadlist_view.xml" value="0.11244979919678715" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-sw600dp-land/edetailing_view.xml" value="0.1" />
-        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-sw600dp-land/fragment_home.xml" value="0.15" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-sw600dp-land/fragment_home.xml" value="0.33" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-sw600dp-land/fragment_new_call.xml" value="0.29713114754098363" />
-        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-sw600dp-land/fragment_retailer_fill.xml" value="0.1" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-sw600dp-land/fragment_retailer_fill.xml" value="0.18" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-sw600dp-land/horizontal_webview.xml" value="0.12115127175368139" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-sw600dp-land/join_activity_view.xml" value="0.25" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-sw600dp-land/nav_header_main.xml" value="0.16" />
@@ -85,6 +85,7 @@
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout/exitalert.xml" value="0.18854166666666666" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout/feed_heading.xml" value="0.175" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout/fragment_downloaded2.xml" value="0.11005434782608696" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout/fragment_home.xml" value="0.15" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout/fragment_my_meeting.xml" value="0.175" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout/fragment_my_meeting2.xml" value="0.175" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout/fragment_new_call.xml" value="0.18" />
@@ -118,7 +119,7 @@
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout/text_edit_view.xml" value="0.1421875" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout/update_app_dialog.xml" value="0.22" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout/web_bottom_sheet.xml" value="0.10190217391304347" />
-        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/menu/activity_main_drawer.xml" value="0.16927083333333334" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/menu/activity_main_drawer.xml" value="0.33" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/menu/menu_main.xml" value="0.1" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/menu/navigation.xml" value="0.1" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/menu/profilemenu.xml" value="0.14635416666666667" />

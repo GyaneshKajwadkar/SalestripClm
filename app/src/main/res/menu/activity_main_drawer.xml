@@ -31,10 +31,10 @@
             android:icon="@drawable/ic_refresh"
             android:title="Sync" />
 
-        <item
+      <!--  <item
             android:id="@+id/nav_screenshot"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="Screenshots" />
+            android:title="Screenshots" />-->
 
         <item
             android:id="@+id/nav_logout"

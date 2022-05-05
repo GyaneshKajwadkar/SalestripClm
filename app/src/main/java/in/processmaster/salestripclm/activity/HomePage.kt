@@ -20,7 +20,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.database.Cursor
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -28,7 +27,6 @@ import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
@@ -36,7 +34,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.fasterxml.jackson.databind.ser.std.StdKeySerializers
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.navigation.NavigationView
@@ -45,17 +42,15 @@ import com.google.gson.JsonObject
 import kotlinx.android.synthetic.main.activity_home_page.*
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.Dispatchers.IO
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import us.zoom.sdk.ZoomSDK
-import java.io.*
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/*, UserLoginCallback.ZoomDemoAuthenticationListener , MeetingServiceListener, InitAuthSDKCallback*/
@@ -67,6 +62,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     var stopDownload =false
     lateinit var downloadManager :DownloadManager
     lateinit var objDownloadManager : DownloadManagerClass
+    var retailerString=""
 
     companion object {
         var loginModelHomePage= LoginModel()
@@ -263,8 +259,15 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     private fun openFragment(fragment: Fragment)
     {
         val transaction = supportFragmentManager.beginTransaction()
+        if(!retailerString.isEmpty())
+        {
+            val bundle = Bundle()
+            bundle.putString("retailerData", retailerString)
+            fragment.arguments=bundle
+        }
         transaction.replace(R.id.container, fragment)
         transaction.commit()
+        retailerString=""
     }
 
     //on back button press open exit alert
@@ -335,13 +338,13 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                     overridePendingTransition(0, 0)
                 }
 
-                R.id.nav_screenshot -> {
+             /*   R.id.nav_screenshot -> {
                     var intent = Intent(this, ImageSelectorActivity::class.java)
                     intent.putExtra("filePath", getFilesDir()?.getAbsolutePath() + "/Screenshots/")
                     intent.putExtra("selection", "delete")
                     startActivity(intent)
                     overridePendingTransition(0, 0)
-                }
+                }*/
 
                 R.id.sync_menu -> {
                     if (generalClass.isInternetAvailable()) callingMultipleAPI() //  sync_api()
@@ -434,6 +437,8 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
             val sendEdetailing= async { submitDCRCo() }
 
+            val sendRetailerList= async { submitDCRRetailer() }
+
             val doctorGraphApi= async { getDoctorGraphAPI() }
 
             val getDocCall= async { getDocCallAPI() }
@@ -457,9 +462,11 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             doctorGraphApi.await()
             getDocCall.await()
             profileApi.await()
+            sendRetailerList.await()
 
         }
         coroutineScope.invokeOnCompletion {
+            coroutineScope.cancel()
             this.runOnUiThread(java.lang.Runnable {
                 alertClass.hideAlert()
                 initView()
@@ -493,6 +500,64 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                     "Division"
                 ))
             }
+        if (response?.isSuccessful == true) {
+            if (response?.code() == 200 && !response.body().toString().isEmpty()) {
+
+                     if(response.body()?.getData()?.geteDetailingList()==null)
+                    {  }
+                    else{
+
+                        for ((index, value) in response.body()?.getData()?.geteDetailingList()?.withIndex()!!) {
+                            //store edetailing data to db
+                            val gson = Gson()
+                            dbBase.insertOrUpdateEDetail(
+                                value.geteDetailId().toString(),
+                                gson.toJson(value)
+                            )
+                        }
+                        // clear database
+                        for (dbList in dbBase.getAlleDetail()) {
+                            var isSet = false
+                            for (mainList in response.body()?.getData()?.geteDetailingList()!!) {
+                                if (mainList.geteDetailId() == dbList.geteDetailId()) {
+                                    isSet = true
+                                }
+                            }
+
+                            //this clear database and files from device which is not in used
+                            if (!isSet) {
+                                dbBase.deleteEdetailingData(dbList.geteDetailId().toString())
+
+                                var downloadModelArrayList =
+                                    dbBase.getAllDownloadedData(dbList.geteDetailId())
+
+                                //Delete files from folder before erase db
+                                for (item in downloadModelArrayList) {
+                                    val someDir = File(item.fileDirectoryPath)
+                                    someDir.deleteRecursively()
+                                }
+                                dbBase.deleteEdetailDownloada(dbList.geteDetailId().toString())
+                            }
+                        }
+
+                        //get all remaining download file
+                        val list= dbBase.getAlleDetail().filter { s-> s.isSaved==0} as ArrayList<DevisionModel.Data.EDetailing>
+                        if(list.size!=0 && generalClass.isInternetAvailable())
+                        {
+                            objDownloadManager= DownloadManagerClass(this@HomePage,dbBase,list)
+                            objDownloadManager.startDownloading()
+                        }
+
+
+
+                    }
+
+
+            }
+        }
+
+
+        /*
         withContext(Dispatchers.Main) {
             if (response?.isSuccessful == true)
             {
@@ -502,46 +567,49 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                     {  }
                     else{
 
-                    for ((index, value) in response.body()?.getData()?.geteDetailingList()?.withIndex()!!) {
-                        //store edetailing data to db
-                            val gson = Gson()
-                            dbBase.insertOrUpdateEDetail(
-                            value.geteDetailId().toString(),
-                            gson.toJson(value)
-                        )
-                    }
-                        // clear database
-                    for (dbList in dbBase.getAlleDetail()) {
-                        var isSet = false
-                        for (mainList in response.body()?.getData()?.geteDetailingList()!!) {
-                            if (mainList.geteDetailId() == dbList.geteDetailId()) {
-                                isSet = true
+                        for ((index, value) in response.body()?.getData()?.geteDetailingList()?.withIndex()!!) {
+                                //store edetailing data to db
+                                val gson = Gson()
+                                dbBase.insertOrUpdateEDetail(
+                                    value.geteDetailId().toString(),
+                                    gson.toJson(value)
+                                )
                             }
-                        }
+                            // clear database
+                            for (dbList in dbBase.getAlleDetail()) {
+                                var isSet = false
+                                for (mainList in response.body()?.getData()?.geteDetailingList()!!) {
+                                    if (mainList.geteDetailId() == dbList.geteDetailId()) {
+                                        isSet = true
+                                    }
+                                }
 
-                        //this clear database and files from device which is not in used
-                        if (!isSet) {
-                            dbBase.deleteEdetailingData(dbList.geteDetailId().toString())
+                                //this clear database and files from device which is not in used
+                                if (!isSet) {
+                                    dbBase.deleteEdetailingData(dbList.geteDetailId().toString())
 
-                            var downloadModelArrayList =
-                                dbBase.getAllDownloadedData(dbList.geteDetailId())
+                                    var downloadModelArrayList =
+                                        dbBase.getAllDownloadedData(dbList.geteDetailId())
 
-                            //Delete files from folder before erase db
-                            for (item in downloadModelArrayList) {
-                                val someDir = File(item.fileDirectoryPath)
-                                someDir.deleteRecursively()
+                                    //Delete files from folder before erase db
+                                    for (item in downloadModelArrayList) {
+                                        val someDir = File(item.fileDirectoryPath)
+                                        someDir.deleteRecursively()
+                                    }
+                                    dbBase.deleteEdetailDownloada(dbList.geteDetailId().toString())
+                                }
                             }
-                            dbBase.deleteEdetailDownloada(dbList.geteDetailId().toString())
-                        }
-                    }
 
-                     //get all remaining download file
-                     val list= dbBase.getAlleDetail().filter { s-> s.isSaved==0} as ArrayList<DevisionModel.Data.EDetailing>
-                        if(list.size!=0 && generalClass.isInternetAvailable())
-                        {
-                            objDownloadManager= DownloadManagerClass(this@HomePage,dbBase,list)
-                            objDownloadManager.startDownloading()
-                        }
+                            //get all remaining download file
+                            val list= dbBase.getAlleDetail().filter { s-> s.isSaved==0} as ArrayList<DevisionModel.Data.EDetailing>
+                            if(list.size!=0 && generalClass.isInternetAvailable())
+                            {
+                                objDownloadManager= DownloadManagerClass(this@HomePage,dbBase,list)
+                                objDownloadManager.startDownloading()
+                            }
+
+
+
                     }
                 }
 
@@ -559,7 +627,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             {
                 generalClass.checkInternet()
             }
-        }
+        }*/
     }
 
     suspend fun callingSyncAPI()
@@ -574,12 +642,14 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             {
               //  alertClass.commonAlert("",Gson().toJson(response.body()))
             if (response?.code() == 200 && !response.body().toString().isEmpty())
-                {
+            {
                    // dbBase?.addAPIData(Gson().toJson(response.body()),1)
 
                        staticSyncData=response.body()?.data
                         val apiModel=response.body()?.data
                         val gson=Gson()
+              CoroutineScope(Dispatchers.Unconfined).launch {
+                    val asyn=async {
                         dbBase?.deleteAll_SYNCAPI()
 
                         dbBase?.addSYNCAPIData(gson.toJson(apiModel?.settingDCR),
@@ -589,13 +659,16 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                             "",0, gson.toJson(apiModel?.doctorList))
                         dbBase?.addRoutes(apiModel?.routeList)
                         dbBase?.addRetailer(apiModel?.retailerList)
-                        dbBase?.addProduct(apiModel?.productList)
+                        dbBase?.addProduct(apiModel?.productList) }
+                    asyn.await()
+                }
 
 
             }
 
                 // if token expire go to login page again
-                else{
+                else
+                {
                     Log.e("responseCode", "error")
                     sharePreferanceBase?.setPrefBool("isLogin", false)
                     val intent = Intent(this@HomePage, LoginActivity::class.java)
@@ -608,7 +681,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                 generalClass.checkInternet()
             }
         }
-
     }
 
     suspend fun getQuantityAPI()
@@ -627,6 +699,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                     var model = response.body()
 
                     dbBase?.addAPIData(gson.toJson(model?.getData()), 3)
+
 
                 }
                 else Log.e("elsequantitiveAPI", response.code().toString())
@@ -694,7 +767,10 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             {
                 if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage?.isEmpty() == true) {
                     var model = response.body()
+
                     dbBase?.addAPIData(Gson().toJson(model?.getData()), 4)
+
+
                   }
                 else Log.e("elseDoctorGraphAPI", response.code().toString())
             }
@@ -718,6 +794,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                 if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage?.isEmpty() == true) {
                     var model = response.body()
                     dbBase?.addAPIData(Gson().toJson(model?.getData()), 6)
+
                 }
                 else Log.e("elseProfileAPI", response.code().toString())
             }
@@ -934,8 +1011,9 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         })
     }
 
+        fun selectRetailerForEdit(toJson: String) {
+            bottomNavigation?.selectedItemId= R.id.callPage
+            retailerString=toJson
 
-
-
-
+        }
 }

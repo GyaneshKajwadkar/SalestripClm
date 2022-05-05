@@ -2342,6 +2342,10 @@ class SyncModel {
             @Expose
             var isDoctorFencingRequired: Boolean? = false
 
+            @SerializedName("isRetailerFencingRequired")
+            @Expose
+            var isRetailerFencingRequired: Boolean? = false
+
             /*  @SerializedName("hqType")
               @Expose
               var hqType: Int? = 0
@@ -2356,9 +2360,7 @@ class SyncModel {
 
 
 
-              @SerializedName("isRetailerFencingRequired")
-              @Expose
-              var isRetailerFencingRequired: Boolean? = false
+
 
               @SerializedName("roleTypeName")
               @Expose
@@ -2399,6 +2401,10 @@ class SyncModel {
             @SerializedName("isCallPlanMandatoryForDCR")
             @Expose
             var isCallPlanMandatoryForDCR: Boolean? = false
+
+            @SerializedName("minChemistRCPA")
+            @Expose
+            var minChemistRCPA: Int? = 0
 
             /*
 
@@ -2461,9 +2467,7 @@ class SyncModel {
              @Expose
              var allowNegativeSampleAndGiftDist: Boolean? = false
 
-             @SerializedName("minChemistRCPA")
-             @Expose
-             var minChemistRCPA: Int? = 0
+
 
              @SerializedName("expenseSubmissionDeadline")
              @Expose

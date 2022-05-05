@@ -27,6 +27,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -49,7 +50,9 @@ import com.github.mikephil.charting.listener.OnChartGestureListener
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.utils.ViewPortHandler
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.gson.Gson
+import kotlinx.android.synthetic.main.fragment_retailer_fill.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
@@ -77,10 +80,14 @@ class HomeFragment : Fragment(), OnChartGestureListener {
     var todaysCall_tv : TextView? =null
     var expandable_Rv: RecyclerView?= null
     var dailyDoctorCall_rv: RecyclerView?= null
+    var dailyRetailer_rv: RecyclerView?= null
     lateinit var db : DatabaseHandler
     var parent_ll: LinearLayout?=null
     var progressHomeFrag: ProgressBar?=null
     var noDocCall_tv: TextView?=null
+    var doctorList=ArrayList<DailyDocVisitModel.Data.DcrDoctor>()
+    var retailerList=ArrayList<DailyDocVisitModel.Data.DcrDoctor>()
+    lateinit var toggleButton: MaterialButtonToggleGroup
 
     @SuppressLint("RestrictedApi", "UseRequireInsteadOfGet")
     override fun onCreateView(
@@ -96,9 +103,12 @@ class HomeFragment : Fragment(), OnChartGestureListener {
             progressHomeFrag = root.findViewById<View>(R.id.progressHomeFrag) as ProgressBar
             expandable_Rv    = root.findViewById<View>(R.id.expandable_Rv) as RecyclerView
             dailyDoctorCall_rv = root.findViewById<View>(R.id.dailyDoctorCall_rv) as RecyclerView
+            dailyRetailer_rv = root.findViewById<View>(R.id.dailyRetailer_rv) as RecyclerView
             noDocCall_tv = root.findViewById<View>(R.id.noDocCall_tv) as TextView
             todaysCall_tv = root.findViewById<View>(R.id.todaysCall_tv) as TextView
+            toggleButton = root.findViewById<View>(R.id.toggleButton) as MaterialButtonToggleGroup
             dailyDoctorCall_rv?.layoutManager=LinearLayoutManager(activity)
+            dailyRetailer_rv?.layoutManager=LinearLayoutManager(activity)
             expandable_Rv?.layoutManager = LinearLayoutManager(activity)
 
             sharePreferance = PreferenceClass(activity)
@@ -108,6 +118,27 @@ class HomeFragment : Fragment(), OnChartGestureListener {
             // charthalf = root.findViewById(R.id.charthalf)
             parent_ll?.visibility = View.VISIBLE
             progressHomeFrag?.visibility = View.GONE
+
+            toggleButton.forEach { button ->
+                button.setOnClickListener { (button as MaterialButton).isChecked = true }
+            }
+
+            toggleButton.addOnButtonCheckedListener(MaterialButtonToggleGroup.OnButtonCheckedListener { group, checkedId, isChecked ->
+
+                if (isChecked && R.id.doctorCall_btn == checkedId) {
+                    if(doctorList.size==0) { noDocCall_tv?.visibility = View.VISIBLE}
+                    else  { noDocCall_tv?.visibility = View.INVISIBLE}
+                    dailyDoctorCall_rv?.visibility=View.VISIBLE
+                    dailyRetailer_rv?.visibility=View.INVISIBLE
+
+                } else if (isChecked && R.id.retailer_btn == checkedId) {
+                    if(retailerList.size==0) { noDocCall_tv?.visibility = View.VISIBLE}
+                    else  { noDocCall_tv?.visibility = View.INVISIBLE}
+
+                    dailyDoctorCall_rv?.visibility=View.INVISIBLE
+                    dailyRetailer_rv?.visibility=View.VISIBLE
+                }
+            })
 
 
        /*     val handler = Handler(Looper.getMainLooper())
@@ -132,12 +163,23 @@ class HomeFragment : Fragment(), OnChartGestureListener {
                 if(!responseDocCall.equals(""))
                 {
                     val  docCallModel= Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
-                    val docAdapter= activity?.let { CallDoctor_Adapter(docCallModel.dcrDoctorlist, it) }
+                    val docAdapter= activity?.let { CallDoctor_Adapter(docCallModel.dcrDoctorlist, it,"doc") }
+                    val retailAdapter= activity?.let { CallDoctor_Adapter(docCallModel.dcrRetailerlist, it,"ret") }
 
                     activity?.runOnUiThread {
-                        if(docCallModel.dcrDoctorlist?.size==0) { noDocCall_tv?.visibility = View.VISIBLE}
+                        val buttonId: Int = toggleButton.getCheckedButtonId()
+
+                        if(docCallModel.dcrDoctorlist?.size==0 && buttonId==R.id.doctorCall_btn) { noDocCall_tv?.visibility = View.VISIBLE}
+
                         dailyDoctorCall_rv?.adapter=docAdapter
-                        todaysCall_tv?.setText("Today's call- "+docCallModel.dcrDoctorlist?.size)
+                        dailyRetailer_rv?.adapter=retailAdapter
+
+                        docCallModel.dcrDoctorlist?.let { doctorList.addAll(it) }
+                        docCallModel.dcrRetailerlist?.let { retailerList.addAll(it) }
+                        val totalCall= docCallModel?.dcrRetailerlist?.size?.let {
+                            docCallModel.dcrDoctorlist?.size?.plus(it)
+                        }
+                        todaysCall_tv?.setText("Today's call- "+totalCall)
                     }
                 }
             }
@@ -236,12 +278,23 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         if(!responseDocCall.equals(""))
         {
             val  docCallModel= Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
-            val docAdapter= activity?.let { CallDoctor_Adapter(docCallModel.dcrDoctorlist, it) }
+            val docAdapter= activity?.let { CallDoctor_Adapter(docCallModel.dcrDoctorlist, it,"doc") }
+            val retailAdapter= activity?.let { CallDoctor_Adapter(docCallModel.dcrRetailerlist, it,"ret") }
 
             activity?.runOnUiThread {
-                if(docCallModel.dcrDoctorlist?.size==0) { noDocCall_tv?.visibility = View.VISIBLE}
+                val buttonId: Int = toggleButton.getCheckedButtonId()
+
+                if(docCallModel.dcrDoctorlist?.size==0 && buttonId==R.id.doctorCall_btn) { noDocCall_tv?.visibility = View.VISIBLE}
+
                 dailyDoctorCall_rv?.adapter=docAdapter
-                todaysCall_tv?.setText("Today's call- "+docCallModel.dcrDoctorlist?.size)
+                dailyRetailer_rv?.adapter=retailAdapter
+
+                docCallModel.dcrDoctorlist?.let { doctorList.addAll(it) }
+                docCallModel.dcrRetailerlist?.let { retailerList.addAll(it) }
+                val totalCall= docCallModel?.dcrRetailerlist?.size?.let {
+                    docCallModel.dcrDoctorlist?.size?.plus(it)
+                }
+                todaysCall_tv?.setText("Today's call- "+totalCall)
             }
         }
     }
@@ -252,7 +305,7 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         db= DatabaseHandler(activity)
         val responseDocCall=db.getApiDetail(5)
         val  docCallModel= Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
-        val docAdapter= activity?.let { CallDoctor_Adapter(docCallModel.dcrDoctorlist, it) }
+        val docAdapter= activity?.let { CallDoctor_Adapter(docCallModel.dcrDoctorlist, it, "ret") }
         activity?.runOnUiThread {
             if(docCallModel.dcrDoctorlist?.size==0) { noDocCall_tv?.visibility = View.VISIBLE}
             dailyDoctorCall_rv?.adapter=docAdapter

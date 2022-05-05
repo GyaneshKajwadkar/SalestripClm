@@ -178,7 +178,7 @@ interface APIInterface
                                 @Query("fromDate") fromDate:String,
                                 @Query("toDate") toDate:String): Response<DoctorGraphModel>
 
-    @GET("api/dcr/doctors")
+    @GET("api/dcr/dcrDataByDcrDate")
     suspend fun
             dailyDocCallApi(@Header("Authorization") authorization: String?,
                                 @Query("dcrDate") fromDate:String): Response<DailyDocVisitModel>
@@ -199,13 +199,13 @@ interface APIInterface
     @POST("api/dcr/retailer-stockist")
     fun submitRetailer(
         @Header("Authorization") authorization: String?,
-        @Body arrayVisual: ArrayList<RetailerPobModel>
+        @Body arrayVisual: ArrayList<DailyDocVisitModel.Data.DcrDoctor>
     ): Call<DailyDocVisitModel?>?
 
     @POST("api/dcr/retailer-stockist")
     suspend fun
             retailerSendApiCoo(@Header("Authorization") authorization: String?,
-                               @Body arrayVisual: ArrayList<RetailerPobModel>): Response<DailyDocVisitModel>
+                               @Body arrayVisual: ArrayList<DailyDocVisitModel.Data.DcrDoctor>): Response<DailyDocVisitModel>
 
     @Streaming
     @GET

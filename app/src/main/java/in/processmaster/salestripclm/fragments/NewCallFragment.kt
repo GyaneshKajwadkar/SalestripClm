@@ -13,7 +13,6 @@ import `in`.processmaster.salestripclm.common_classes.CommonListGetClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.models.*
 import `in`.processmaster.salestripclm.networkUtils.APIClientKot
-import `in`.processmaster.salestripclm.networkUtils.ConnectivityChangeReceiver
 import `in`.processmaster.salestripclm.networkUtils.GPSTracker
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
@@ -74,6 +73,7 @@ class NewCallFragment : Fragment() {
     lateinit var  docCallModel : DailyDocVisitModel.Data
     var isSecondTime = false
     var doctorObject=SyncModel.Data.Doctor()
+    var isRetailerAttached=false
     companion object {
         var retailerObj= SyncModel.Data.Retailer()
     }
@@ -99,57 +99,62 @@ class NewCallFragment : Fragment() {
 
         bottomSheetBehavior = BottomSheetBehavior.from(views!!.bottomSheet)
 
-        val coroutine=GlobalScope.launch(Dispatchers.Default) {
-            db = DatabaseHandler(requireActivity())
-            sharePreferance = PreferenceClass(activity)
-            alertClass = AlertClass(requireActivity())
-            generalClassObject= GeneralClass(requireActivity())
+        val strtext = arguments?.getString("retailerData")
+        if(strtext?.isEmpty()==false)
+        {
+            isRetialerEdit()
+        }
+        else
+        {
+            val coroutine=GlobalScope.launch(Dispatchers.Default) {
+                val task=async {
+                    db = DatabaseHandler(requireActivity())
+                    sharePreferance = PreferenceClass(activity)
+                    alertClass = AlertClass(requireActivity())
+                    generalClassObject= GeneralClass(requireActivity())
 
+                    Log.i("Main_ctivity ",Thread.currentThread().name.toString())
+                    SplashActivity.staticSyncData?.doctorList?.let   { doctorListArray.addAll(it) }
+                    SplashActivity.staticSyncData?.routeList?.let    { routeList.addAll(it) }
+                    SplashActivity.staticSyncData?.retailerList?.let { retailerListArray.addAll(it) }
 
+                    staticSyncData?.fieldStaffTeamList?.let { teamsList.addAll(it) }
+                    routeList = routeList?.filter { s -> s.headQuaterName !=""} as java.util.ArrayList<SyncModel.Data.Route>
 
-            Log.i("Main_ctivity ",Thread.currentThread().name.toString())
-                SplashActivity.staticSyncData?.doctorList?.let { doctorListArray.addAll(it) }
-                SplashActivity.staticSyncData?.routeList?.let { routeList.addAll(it) }
-                SplashActivity.staticSyncData?.retailerList?.let { retailerListArray.addAll(it) }
+                    val responseDocCall=db.getApiDetail(5)
+                    if(!responseDocCall.equals("")) {
+                        docCallModel = Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
+                    }
 
-                staticSyncData?.fieldStaffTeamList?.let { teamsList.addAll(it) }
-                routeList = routeList?.filter { s -> s.headQuaterName !=""} as java.util.ArrayList<SyncModel.Data.Route>
+                    if(staticSyncData?.settingDCR?.isRestrictedParty==true)
+                    {
+                        if(sharePreferance?.getPref("dcrObj")?.isEmpty() == false) {
+                            var dcrModel = Gson().fromJson(sharePreferance?.getPref("dcrObj"), GetDcrToday.Data.DcrData::class.java)
 
-                val responseDocCall=db.getApiDetail(5)
-                if(!responseDocCall.equals("")) {
-                    docCallModel = Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
-                }
+                            var routeListPartList: ArrayList<SyncModel.Data.Route> = ArrayList()
+                            val items: List<String>? = dcrModel?.routeId?.split(",")
+                            if (items != null) {
+                                for (data in items) {
+                                    for(route in routeList)
+                                    {
+                                        if(route.routeId==data.toInt())
+                                        { routeListPartList.add(route) }
+                                    } }}
+                            routeList.clear()
+                            routeList.addAll(routeListPartList)
 
-                if(staticSyncData?.settingDCR?.isRestrictedParty==true)
-                {
-                    if(sharePreferance?.getPref("dcrObj")?.isEmpty() == false) {
-                        var dcrModel = Gson().fromJson(sharePreferance?.getPref("dcrObj"), GetDcrToday.Data.DcrData::class.java)
-
-                        var routeListPartList: ArrayList<SyncModel.Data.Route> = ArrayList()
-                        val items: List<String>? = dcrModel?.routeId?.split(",")
-                        if (items != null) {
-                            for (data in items) {
-                                for(route in routeList)
-                                {
-                                    if(route.routeId==data.toInt())
-                                    { routeListPartList.add(route) }
-                                } }}
-                        routeList.clear()
-                        routeList.addAll(routeListPartList)
+                        }
 
                     }
 
+                    adapter =BottomSheetDoctorAdapter()
+
+
                 }
-
-                adapter =BottomSheetDoctorAdapter()
-
-            val transaction = requireActivity().supportFragmentManager.beginTransaction()
-            transaction.replace(R.id.frameRetailer_view, RetailerFillFragment())
-            transaction.disallowAddToBackStack()
-            transaction.commit()
-
+                task.await()
             }
             coroutine.invokeOnCompletion {
+                coroutine.cancel()
                 requireActivity().runOnUiThread {
                     if(SplashActivity.staticSyncData?.settingDCR?.roleType=="MAN")
                     {
@@ -291,12 +296,13 @@ class NewCallFragment : Fragment() {
                         intent.putExtra("skip", true)
                         startActivityForResult(intent,3)
                     })
-
-
-
                 }
-
+                alertClass?.hideAlert()
             }
+        }
+
+
+
 
 
     /*    else
@@ -306,7 +312,6 @@ class NewCallFragment : Fragment() {
 
        //  checkDCRusingShareP(0)
     }
-
 
 
     fun checkDCRusingShareP():Boolean
@@ -461,10 +466,8 @@ class NewCallFragment : Fragment() {
                     holder.speciality_tv.setText("Headquater- " + modeldata?.headQuaterName)
 
                     holder.parent_cv.setOnClickListener({
-                        views?.selectDoctor_tv?.setText((modeldata?.shopName))
-                        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
+                        alertClass?.showProgressAlert("")
                         setRetailer(modeldata)
-                        onSelection()
                     })
                 }
             }
@@ -561,22 +564,61 @@ class NewCallFragment : Fragment() {
 
     fun setRetailer(retailerModel:SyncModel.Data.Retailer)
     {
-        retailerObj=retailerModel
-        views?.noData_gif?.visibility=View.GONE
-        views?.retailer_parent?.visibility=View.VISIBLE
-        views?.routeNameRetailer_tv?.setText(retailerModel.routeName)
-        views?.mobileRetailer_tv?.setText(retailerModel.contactPerson)
-        views?.emailIdRetail_tv?.setText(retailerModel.emailId)
-        views?.cityRetail_tv?.setText(retailerModel.cityName)
-        views?.shopNameRetail_tv?.setText(retailerModel.shopName)
-        if(retailerModel.mobileNo?.isEmpty() == true)
-            views?.mobileParent_tr?.visibility=View.GONE
-        if(retailerModel.emailId?.isEmpty() == true)
-            views?.emailParentRetail?.visibility=View.GONE
-        if(retailerModel.cityName?.isEmpty() == true)
-            views?.cityParentRetailer?.visibility=View.GONE
+        val isAlreadyContain=docCallModel.dcrRetailerlist?.any{ s -> s.retailerId == retailerModel.retailerId }
+        if(isAlreadyContain == true) {
+            views?.selectDoctor_tv?.setText("Select Retailer")
+            views?.parentButton?.visibility=View.GONE
+            alertClass?.commonAlert("Alert!","Dcr already done for this retailer")
+            alertClass?.hideAlert()
+            views?.noData_gif?.visibility=View.VISIBLE
+            views?.retailer_parent?.visibility=View.GONE
+            views?.frameRetailer_view?.visibility=View.INVISIBLE
+            views?.selectDoctor_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
+            return
+        }
 
-        views?.frameRetailer_view?.visibility=View.VISIBLE
+        onSelection()
+
+        val coroutine= CoroutineScope(Dispatchers.Default).launch {
+            val task= async {
+                if(isRetailerAttached==false) {
+                    isRetailerAttached = true
+                    val transaction = requireActivity().supportFragmentManager.beginTransaction()
+                    transaction.replace(R.id.frameRetailer_view, RetailerFillFragment())
+                    transaction.disallowAddToBackStack()
+                    transaction.commit()
+                }
+            }
+            task.await()
+        }
+        coroutine.invokeOnCompletion {
+            coroutine.cancel()
+            requireActivity().runOnUiThread {
+                retailerObj=retailerModel
+                views?.selectDoctor_tv?.setText((retailerModel?.shopName))
+                views?.noData_gif?.visibility=View.GONE
+                views?.retailer_parent?.visibility=View.VISIBLE
+                views?.routeNameRetailer_tv?.setText(retailerModel.routeName)
+                views?.mobileRetailer_tv?.setText(retailerModel.contactPerson)
+                views?.emailIdRetail_tv?.setText(retailerModel.emailId)
+                views?.cityRetail_tv?.setText(retailerModel.cityName)
+                views?.shopNameRetail_tv?.setText(retailerModel.shopName)
+                if(retailerModel.mobileNo?.isEmpty() == true)
+                    views?.mobileParent_tr?.visibility=View.GONE
+                if(retailerModel.emailId?.isEmpty() == true)
+                    views?.emailParentRetail?.visibility=View.GONE
+                if(retailerModel.cityName?.isEmpty() == true)
+                    views?.cityParentRetailer?.visibility=View.GONE
+
+                views?.frameRetailer_view?.visibility=View.VISIBLE
+                Handler(Looper.getMainLooper()).postDelayed({
+                    alertClass?.hideAlert()
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)}, 2)
+            }
+
+        }
+
+
 
 
 
@@ -682,7 +724,7 @@ class NewCallFragment : Fragment() {
         }
         else if(selectionType==1)
         {
-            if(staticSyncData?.settingDCR?.isDoctorFencingRequired == true)
+            if(staticSyncData?.settingDCR?.isDoctorFencingRequired == true && views?.docRetail_switch?.isChecked==true)
             {
                 val getGpsTracker=GPSTracker(requireActivity())
                 val jsonObj=JSONObject(staticSyncData?.configurationSetting)
@@ -695,8 +737,8 @@ class NewCallFragment : Fragment() {
                // startPoint.setLongitude(75.90522484470453)
 
 
-                if(views?.docRetail_switch?.isChecked==true)
-                {
+               /* if(views?.docRetail_switch?.isChecked==true )
+                {*/
                     val docFirstFilter= SplashActivity.staticSyncData?.doctorList?.filter { s -> s.routeId == id } as java.util.ArrayList<SyncModel.Data.Doctor>
 
                     for(fetch in docFirstFilter)
@@ -713,8 +755,8 @@ class NewCallFragment : Fragment() {
                            doctorListArray.add(fetch)
                         }
                     }
-                }
-                else
+               // }
+              /*  else
                 {
 
                     val retailFirstFilter= SplashActivity.staticSyncData?.retailerList?.filter { s -> s.routeId == id } as java.util.ArrayList<SyncModel.Data.Retailer>
@@ -732,6 +774,33 @@ class NewCallFragment : Fragment() {
                         if(distance <= getRadius){
                            retailerListArray.add(fetch)
                         }
+                    }
+                }*/
+            }
+            else if(staticSyncData?.settingDCR?.isDoctorFencingRequired == true && views?.docRetail_switch?.isChecked==false){
+                val retailFirstFilter= SplashActivity.staticSyncData?.retailerList?.filter { s -> s.routeId == id } as java.util.ArrayList<SyncModel.Data.Retailer>
+
+                val getGpsTracker=GPSTracker(requireActivity())
+                val jsonObj=JSONObject(staticSyncData?.configurationSetting)
+                val getRadius=jsonObj.getInt("SET011")
+
+                val startPoint = Location("locationA")
+                startPoint.setLatitude(getGpsTracker.latitude)
+                // startPoint.setLatitude(22.724177793056885)
+                startPoint.setLongitude(getGpsTracker.longitude)
+                // startPoint.setLongitude(75.90522484470453)
+                for(fetch in retailFirstFilter)
+                {
+
+                    if(fetch.latitude==0.00 || fetch.longitude==0.00) { continue }
+
+                    val endPoint = Location("locationB")
+                    endPoint.latitude = fetch.latitude
+                    endPoint.longitude = fetch.longitude
+                    val distance = startPoint.distanceTo(endPoint).toInt()
+                    //  retailerListArray.add(fetch)
+                    if(distance <= getRadius){
+                        retailerListArray.add(fetch)
                     }
                 }
             }
@@ -1312,4 +1381,81 @@ class NewCallFragment : Fragment() {
         else isSecondTime=true
     }
 
+    fun attachRetailerFrag()
+    {
+       // alertClass?.showProgressAlert("")
+
+        val coroutine= CoroutineScope(Dispatchers.Default).launch {
+            val task= async {
+                isRetailerAttached=true
+                val transaction = requireActivity().supportFragmentManager.beginTransaction()
+                transaction.replace(R.id.frameRetailer_view, RetailerFillFragment())
+                transaction.disallowAddToBackStack()
+                transaction.commit()
+            }
+            task.await()
+        }
+        coroutine.invokeOnCompletion {
+            coroutine.cancel()
+
+        }
+
+
+
+    /*    val thread=Thread(Runnable {
+
+        })
+        thread.start() // spawn thread
+        thread.join()
+        thread.interrupt()
+        alertClass?.hideAlert()*/
+
+    }
+
+    fun isRetialerEdit()
+    {
+        val strtext = arguments?.getString("retailerData")
+        view?.docRetail_switch?.isChecked=false
+        views?.noData_gif?.visibility=View.GONE
+        views?.noInternet_tv?.visibility=View.VISIBLE
+        views?.noInternet_tv?.setText("Please wait..")
+        views?.selectionDocRet_tv?.setText("Select Retailer")
+        views?.selectRoutesCv?.setEnabled(false)
+        views?.selectTeamsCv?.visibility=View.GONE
+        views?.selectTeamHeader_tv?.visibility = View.GONE
+        views?.selectDoctorsCv?.setEnabled(false)
+        view?.docRetail_switch?.isChecked=false
+        views?.docRetail_switch?.setEnabled(false)
+
+        views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#3CB371"))
+        views?.selectDoctor_tv?.setBackgroundColor(Color.parseColor("#3CB371"))
+        views?.retailerHeader_tv?.setTextColor(ContextCompat.getColorStateList(requireActivity(), R.color.darkBlue))
+        views?.doctorHeader_tv?.setTextColor(ContextCompat.getColorStateList(requireActivity(), R.color.gray))
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            var  retailerModel= Gson().fromJson(strtext, DailyDocVisitModel.Data.DcrDoctor::class.java)
+
+            val retailerFragment=RetailerFillFragment()
+            val bundle = Bundle()
+            bundle.putString("retailerData", strtext)
+            retailerFragment.arguments=bundle
+
+            val transaction = requireActivity().supportFragmentManager.beginTransaction()
+            transaction.replace(R.id.frameRetailer_view, retailerFragment)
+            transaction.disallowAddToBackStack()
+            transaction.commit()
+
+            Handler(Looper.getMainLooper()).postDelayed({
+                requireActivity().runOnUiThread {
+                    views?.selectRoute_tv?.text=retailerModel.routeName
+                    views?.selectDoctor_tv?.text=retailerModel.shopName
+                    views?.frameRetailer_view?.visibility=View.VISIBLE
+                    views?.noInternet_tv?.visibility=View.GONE
+
+                }
+            },10)
+        },10)
+
+
+    }
 }

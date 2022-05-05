@@ -1,27 +1,22 @@
 package `in`.processmaster.salestripclm.adapter
 
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.activity.HomePage
 import `in`.processmaster.salestripclm.activity.SubmitE_DetailingActivity
 import `in`.processmaster.salestripclm.models.DailyDocVisitModel
-import `in`.processmaster.salestripclm.models.SyncModel
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Filter
-import android.widget.Filterable
 import android.widget.TextView
-import androidx.cardview.widget.CardView
-import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
-import java.util.ArrayList
 
 class CallDoctor_Adapter(
     val doctorList: List<DailyDocVisitModel.Data.DcrDoctor>?,
-    val requireActivity: Activity
+    val requireActivity: Activity,
+    val type: String
 ) : RecyclerView.Adapter<CallDoctor_Adapter.ViewHolders>()
 {
 
@@ -34,6 +29,13 @@ class CallDoctor_Adapter(
         val modeldata = doctorList?.get(position)
         holder.doctorName_tv.setText(modeldata?.doctorName)
         holder.doctorPlace_tv.setText( modeldata?.routeName)
+        if(type.equals("ret")){
+            holder.specilityHeader.setText("Shope name")
+            holder.speciality_tv.setText( modeldata?.shopName)
+        }
+        else   holder.speciality_tv.setText( modeldata?.specialityName)
+
+
         holder.speciality_tv.setText( modeldata?.specialityName)
         holder.reportedTime_tv.setText( modeldata?.strReportedTime)
         holder.workWithName_tv.setText(if(modeldata?.workWithName?.isEmpty()==false) modeldata?.workWithName else "-")
@@ -47,10 +49,17 @@ class CallDoctor_Adapter(
         }
 
         holder.editDoctorCall_mb.setOnClickListener({
+            if(type.equals("doc"))
+            {
+                val intent = Intent(requireActivity, SubmitE_DetailingActivity::class.java)
+                intent.putExtra("apiDataDcr", Gson().toJson(modeldata))
+                requireActivity.startActivity(intent)
+            }
+            else{
+                requireActivity as HomePage
+                requireActivity.selectRetailerForEdit(Gson().toJson(doctorList?.get(position)))
+            }
 
-            val intent = Intent(requireActivity, SubmitE_DetailingActivity::class.java)
-            intent.putExtra("apiDataDcr", Gson().toJson(modeldata))
-            requireActivity.startActivity(intent)
         })
 
     }
@@ -69,6 +78,7 @@ class CallDoctor_Adapter(
     var meetingAt_tv=view.findViewById<TextView>(R.id.meetingAt_tv)
     var editDoctorCall_mb=view.findViewById<TextView>(R.id.editDoctorCall_mb)
     var callTime_tv=view.findViewById<TextView>(R.id.callTime_tv)
+    var specilityHeader=view.findViewById<TextView>(R.id.specilityHeader)
     }
 
 

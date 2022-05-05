@@ -176,13 +176,56 @@
                         android:textColor="@color/white"
                         android:textSize="18sp" />
 
+                    <com.google.android.material.button.MaterialButtonToggleGroup
+                        android:id="@+id/toggleButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:weightSum="2"
+                        android:layout_marginTop="-5dp"
+                        android:layout_below="@+id/todaysCall_tv"
+                        app:checkedButton="@+id/doctorCall_btn"
+                        app:singleSelection="true">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/doctorCall_btn"
+                            style="@style/ToggleButtonGroupStyle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:insetLeft="2dp"
+                            android:insetRight="2dp"
+                            android:text="Doctor call" />
+
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/retailer_btn"
+                            style="@style/ToggleButtonGroupStyle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:insetLeft="2dp"
+                            android:insetRight="2dp"
+                            android:text="Retailer call" />
+
+
+
+                    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/dailyDoctorCall_rv"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/todaysCall_tv"
+                        android:layout_below="@+id/toggleButton"
                         android:padding="5dp" />
 
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/dailyRetailer_rv"
+                        android:visibility="invisible"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/toggleButton"
+                        android:padding="5dp" />
                     <TextView
                         android:visibility="gone"
                         android:layout_width="wrap_content"
