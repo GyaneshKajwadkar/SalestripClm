@@ -87,9 +87,9 @@ class DailyDocVisitModel {
             @Expose
             var doctorId: Int? = null
 
-            @SerializedName("isVisited")
+         /*   @SerializedName("isVisited")
             @Expose
-            var isVisited: Boolean? = false
+            var isVisited: Boolean? = null*/
 
             @SerializedName("detailType")
             @Expose
@@ -252,9 +252,9 @@ class DailyDocVisitModel {
             @Expose
             var metAtTimeDisplay: String? = ""*/
 
-            @SerializedName("isEDetailing")
+      /*      @SerializedName("isEDetailing")
             @Expose
-            var isEDetailing: Boolean? = false
+            var isEDetailing: Boolean? = null*/
 
             @SerializedName("productDetailCount")
             @Expose
@@ -871,7 +871,7 @@ class DailyDocVisitModel {
 
                 @SerializedName("rcpaDetailList")
                 @Expose
-                var rCPADetailList: List<RCPADetail>? = null
+                var rCPADetailList: ArrayList<RCPADetail>? = null
 
 
                 class RCPADetail {

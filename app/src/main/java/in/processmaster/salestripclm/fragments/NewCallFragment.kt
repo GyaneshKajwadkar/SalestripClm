@@ -70,7 +70,7 @@ class NewCallFragment : Fragment() {
     var generalClassObject:GeneralClass?=null
     var routeIdGetDCR=""
     var alertClass:AlertClass?=null
-    lateinit var  docCallModel : DailyDocVisitModel.Data
+    var  docCallModel : DailyDocVisitModel.Data= DailyDocVisitModel.Data()
     var isSecondTime = false
     var doctorObject=SyncModel.Data.Doctor()
     var isRetailerAttached=false

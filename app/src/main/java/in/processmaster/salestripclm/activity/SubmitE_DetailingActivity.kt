@@ -57,6 +57,7 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
+import kotlin.collections.ArrayList
 
 
 class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProductTransfer,
@@ -365,7 +366,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 saveModel.pobObject?.partyId=doctorIdDisplayVisual
                 saveModel.pobObject?.employeeId= loginModelHomePage.empId
             }
-
+            saveModel.pobObject?.pobDetailList= ArrayList()
             for(dataObj in filterSelectecd)
             {
                 val pobObje=DailyDocVisitModel.Data.DcrDoctor.PobObj.PobDetailList()
@@ -870,6 +871,8 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         {
             val edetailingEditModel=Gson().fromJson(intent.getStringExtra("apiDataDcr"),DailyDocVisitModel.Data.DcrDoctor::class.java)
 
+            saveModel.eDetailList = ArrayList()
+            saveModel.productList = ArrayList()
             saveModel.eDetailList=edetailingEditModel.eDetailList
             saveModel.productList=edetailingEditModel.productList
         }
@@ -902,9 +905,12 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 }
                 catch (e: ParseException) { e.printStackTrace() }
             }
+            saveModel.eDetailList= ArrayList()
             saveModel.eDetailList?.addAll(visualSendModel)
         }
-
+        saveModel.giftList= ArrayList()
+        saveModel.sampleList= ArrayList()
+        saveModel.productList=ArrayList()
 
         saveModel.giftList?.addAll(giftList)
         saveModel.sampleList?.addAll(sampleList)
@@ -1505,9 +1511,12 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
         val runnable = java.lang.Runnable {
 
-            val edetailingEditModel=Gson().fromJson(intent.getStringExtra("apiDataDcr"),DailyDocVisitModel.Data.DcrDoctor::class.java)
+
+           val  edetailingEditModel=Gson().fromJson(intent.getStringExtra("apiDataDcr"),DailyDocVisitModel.Data.DcrDoctor::class.java)
 
             doctorIdDisplayVisual= edetailingEditModel.doctorId!!
+
+
             edetailingEditModel.eDetailList?.let { visualSendModel.addAll(it) }
 
             if(edetailingEditModel.dataSaveType?.lowercase().equals("s"))
@@ -1667,6 +1676,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             val filterSelectecd=selectedProductList.filter { s -> (s.notApi.isSaved==true) }
 
             saveModel.pobObject = DailyDocVisitModel.Data.DcrDoctor.PobObj()
+            saveModel.pobObject?.pobDetailList= ArrayList()
             for(dataObj in filterSelectecd)
             {
                 val pobObje=DailyDocVisitModel.Data.DcrDoctor.PobObj.PobDetailList()

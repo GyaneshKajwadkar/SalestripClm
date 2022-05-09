@@ -55,6 +55,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfer,
@@ -443,6 +444,7 @@ class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfe
             if(filterSelectecd.size!=0){
                 if(arguments?.getString("retailerData")?.isEmpty() == false)
                 {
+
                     val edetailingEditModel=Gson().fromJson(arguments?.getString("retailerData"),DailyDocVisitModel.Data.DcrDoctor::class.java)
                     saveModel.pobObject=edetailingEditModel.pobObject
                     saveModel.pobObject?.pobDetailList?.clear()
@@ -455,7 +457,7 @@ class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfe
                     saveModel.pobObject?.employeeId= loginModelHomePage.empId
                 }
 
-
+                saveModel.pobObject?.pobDetailList=ArrayList()
                 for(dataObj in filterSelectecd)
                 {
                     val pobObje=DailyDocVisitModel.Data.DcrDoctor.PobObj.PobDetailList()
@@ -469,6 +471,7 @@ class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfe
                     pobObje.pobId=dataObj.notApi.pobId
                     pobObje.pobNo=dataObj.notApi.pobNo
                     saveModel.pobObject?.pobDetailList?.add(pobObje)
+                    Log.e("dsfdsfdsfdsfdsfsf",saveModel.pobObject?.pobDetailList?.size.toString())
                 }
 
                 if(filterSelectecd.size!=0)
@@ -531,7 +534,7 @@ class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfe
         val arrayModel:ArrayList<DailyDocVisitModel.Data.DcrDoctor> = ArrayList()
         arrayModel.add(saveModel)
         Log.e("isgfuiosgfiosgfuisf",Gson().toJson(arrayModel))
-      return
+     // return
 
         alertClass?.showProgressAlert("")
         var call: Call<DailyDocVisitModel> = HomePage.apiInterface?.submitRetailer("bearer " + HomePage.loginModelHomePage.accessToken,arrayModel) as Call<DailyDocVisitModel>
@@ -651,7 +654,7 @@ class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfe
             giftModel.type="GIFT"
             giftList.add(giftModel)
         }
-
+        saveModel.giftList= ArrayList()
         saveModel.giftList?.addAll(giftList)
 
         return saveModel
