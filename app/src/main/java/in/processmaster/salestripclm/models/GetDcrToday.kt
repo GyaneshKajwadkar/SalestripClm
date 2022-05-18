@@ -50,6 +50,9 @@ class GetDcrToday {
              var strDCRDate: String? = null*/
              @SerializedName("dataSaveType")
              var dataSaveType: String = "D"
+
+             @SerializedName("rtpApproveStatus")
+             var rtpApproveStatus: String? = null
           /*   @SerializedName("isRouteDeviated")
              var isRouteDeviated: Boolean? = null
              @SerializedName("concatEmployeeId")
@@ -87,8 +90,7 @@ class GetDcrToday {
              var year: Int? = null
              @SerializedName("monthName")
              var monthName: String? = null
-             @SerializedName("rtpApproveStatus")
-             var rtpApproveStatus: String? = null
+
              @SerializedName("weekDay")
              var weekDay: String? = null
              @SerializedName("cssClass")

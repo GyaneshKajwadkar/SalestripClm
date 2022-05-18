@@ -114,6 +114,7 @@ class AlertClass(val context : Context)
     {
         if(alertDialog!=null&& alertDialog!!.isShowing)
             alertDialog?.dismiss()
+            alertDialog?.cancel()
 
         val activity = context as Activity
         activity.runOnUiThread(Runnable {
@@ -351,7 +352,7 @@ class AlertClass(val context : Context)
 
             if(workAreaSeletd.equals("Select")) {generalClass?.showSnackbar(it,"Working area not selected"); return@setOnClickListener}
             if(activitySeletd.equals("Select") && !toggleSwitch.isChecked) {generalClass?.showSnackbar(it,"Activity not selected"); return@setOnClickListener}
-            if(startingSeletd.equals("Select") && dialogView.startEndParent.visibility==View.VISIBLE) {generalClass?.showSnackbar(it,"Start date not selected"); return@setOnClickListener}
+            if(startingSeletd.equals("Select") && dialogView.startEndParent.visibility==View.VISIBLE) {generalClass?.showSnackbar(it,"Start station not selected"); return@setOnClickListener}
             if(endingSeletd.equals("Select") && dialogView.startEndParent.visibility==View.VISIBLE) {generalClass?.showSnackbar(it,"End station not selected"); return@setOnClickListener}
 
             if(SplashActivity.staticSyncData?.settingDCR?.roleType=="MAN")

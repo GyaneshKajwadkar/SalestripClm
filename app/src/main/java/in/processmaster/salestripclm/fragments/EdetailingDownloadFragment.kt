@@ -38,9 +38,7 @@ import java.io.File
 
 class EdetailingDownloadFragment : Fragment() {
 
-   // var recyclerView:RecyclerView?=null
     var sharePreferance: PreferenceClass?= null
-  //  var adapter : Edetailing_Adapter?=null
     var position:Int=0
     var viewPager: ViewPager?=null
     var tabs: TabLayout? = null
@@ -63,7 +61,6 @@ class EdetailingDownloadFragment : Fragment() {
 
     fun initView(view: View)
     {
-       // recyclerView=view.findViewById(R.id.recyclerView)as RecyclerView
         filter_et=view.findViewById(R.id.filter_et)as EditText
         syncData_ll=view.findViewById(R.id.syncData_ll)as LinearLayout
         sharePreferance = PreferenceClass(activity)
@@ -71,10 +68,9 @@ class EdetailingDownloadFragment : Fragment() {
         viewPager = view.findViewById<View>(R.id.viewpager) as ViewPager
         tabs = view.findViewById<View>(R.id.result_tabs) as TabLayout
 
-
         filter_et!!.addTextChangedListener(filterTextWatcher)
 
-        syncData_ll?.setOnClickListener({ division_api()})
+      /*  syncData_ll?.setOnClickListener({ division_api()})*/
 
         AlertClass(requireActivity()).showProgressAlert("")
     }
@@ -88,8 +84,7 @@ class EdetailingDownloadFragment : Fragment() {
         override fun afterTextChanged(s: Editable) {}
     }
 
-    //call_divisioinApi
-    private fun division_api()
+   /* private fun division_api()
     {
         AlertClass(requireActivity()).showProgressAlert("Sync data")
         val jsonObject = JSONObject(loginModelHomePage?.getEmployeeObj().toString())
@@ -151,7 +146,7 @@ class EdetailingDownloadFragment : Fragment() {
                 call.cancel()
             }
         })
-    }
+    }*/
 
     //set recycler view
     fun calladapter()

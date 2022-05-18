@@ -103,6 +103,7 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
 
         bundle.putInt("doctorID", loadsPosition)
         bundle.putString("doctorName", doctorName_tv.text.toString())
+        bundle.putBoolean("isPresentation", intent.getBooleanExtra("isPresentation",false))
         if(!sendResumeString.isEmpty()) bundle.putString("apiDataDcr", sendResumeString)
 
         fragment.setArguments(bundle)
@@ -326,11 +327,7 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
             setResult(3)
             finish();
         }
-        if(resultCode==4){
-            Log.e("rertetfefddsfdsf",data?.getStringExtra("apiDataDcr").toString())
-                sendResumeString = data?.getStringExtra("apiDataDcr").toString()
-
-        }
+        if(resultCode==4){ sendResumeString = data?.getStringExtra("apiDataDcr").toString() }
     }
 }
 

@@ -164,9 +164,9 @@
 
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/brand_rv"
-                            android:layout_above="@+id/submitBtn"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
+                            android:layout_above="@+id/submitBtn"
                             android:padding="5dp" />
 
                         <LinearLayout

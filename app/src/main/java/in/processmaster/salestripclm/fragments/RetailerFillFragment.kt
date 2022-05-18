@@ -58,9 +58,10 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfer,
+class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNameBoll_interface, PobProductTransfer,
     productTransferIndividual
     , productTransfer, EditInterface,SelectorInterface,StringInterface {
+
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     var workWithArray=ArrayList<IdNameBoll_model>()
@@ -99,6 +100,7 @@ class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfe
     lateinit  var doctorRcpa2 :DocManagerModel
     lateinit  var doctorRcpa3 :DocManagerModel
     var brandId=0
+    //IsCLMUser
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -352,13 +354,12 @@ class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfe
                     alertClass.commonAlert("","Doctor 1 RCPA required")
                     return@setOnClickListener
                 }
-                else {
-                    if(saveRcpaDetailList1.size==0)
+                if(saveRcpaDetailList1.size==0)
                     {
                         alertClass.commonAlert("","Please add brands in RCPA section doctor 1")
                         return@setOnClickListener
                     }
-                }
+
             }
 
             var saveModel=getSaveData(false)
@@ -372,18 +373,18 @@ class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfe
                val model = DailyDocVisitModel.Data.DcrDoctor.Rcpavo()
                 model.docId=doctorRcpa1.id
                 model.docName=doctorRcpa1.name
+                model.mode = 1
+                model.dcrId = dcrId
+                model.empId= loginModelHomePage.empId
+                model.rCPADate=generalClass.getCurrentDateTimeApiForamt()
+                model.strRCPADate=generalClass.getCurrentDateTimeApiForamt()
 
                 if(arguments?.getString("retailerData")?.isEmpty() == false) {
-                    model.mode = 2
+                    val edetailingEditModel=Gson().fromJson(arguments?.getString("retailerData"),DailyDocVisitModel.Data.DcrDoctor::class.java)
+                    model.retailerId=edetailingEditModel.retailerId
                 }
                 else
-                {
-                        model.mode = 1
-                        model.empId= loginModelHomePage.empId
-                        model.retailerId=retailerObj.retailerId
-                        model.rCPADate=generalClass.getCurrentDateTimeApiForamt()
-                        model.strRCPADate=generalClass.getCurrentDateTimeApiForamt()
-                }
+                {  model.retailerId=retailerObj.retailerId  }
                 model.rCPADetailList=saveRcpaDetailList1
                 rcpaarray.add(model)
             }
@@ -392,17 +393,20 @@ class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfe
                 val model = DailyDocVisitModel.Data.DcrDoctor.Rcpavo()
                 model.docId=doctorRcpa2.id
                 model.docName=doctorRcpa2.name
+                model.docId=doctorRcpa1.id
+                model.docName=doctorRcpa1.name
+                model.mode = 1
+                model.dcrId = dcrId
+                model.empId= loginModelHomePage.empId
+                model.rCPADate=generalClass.getCurrentDateTimeApiForamt()
+                model.strRCPADate=generalClass.getCurrentDateTimeApiForamt()
 
                 if(arguments?.getString("retailerData")?.isEmpty() == false) {
-                    model.mode = 2
+                    val edetailingEditModel=Gson().fromJson(arguments?.getString("retailerData"),DailyDocVisitModel.Data.DcrDoctor::class.java)
+                    model.retailerId=edetailingEditModel.retailerId
                 }
-                    else {
-                    model.mode = 1
-                    model.empId= loginModelHomePage.empId
-                    model.retailerId=retailerObj.retailerId
-                    model.rCPADate=generalClass.getCurrentDateTimeApiForamt()
-                    model.strRCPADate=generalClass.getCurrentDateTimeApiForamt()
-                }
+                else
+                {  model.retailerId=retailerObj.retailerId  }
 
                 model.rCPADetailList=saveRcpaDetailList2
                 rcpaarray.add(model)
@@ -413,16 +417,21 @@ class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfe
                 model.docId=doctorRcpa3.id
                 model.docName=doctorRcpa3.name
 
-                if(arguments?.getString("retailerData")?.isEmpty() == false) {
-                    model.mode = 2
-                }
-                else {
+                model.docId=doctorRcpa1.id
+                model.docName=doctorRcpa1.name
                 model.mode = 1
+                model.dcrId = dcrId
                 model.empId= loginModelHomePage.empId
-                model.retailerId=retailerObj.retailerId
                 model.rCPADate=generalClass.getCurrentDateTimeApiForamt()
                 model.strRCPADate=generalClass.getCurrentDateTimeApiForamt()
+
+                if(arguments?.getString("retailerData")?.isEmpty() == false) {
+                    val edetailingEditModel=Gson().fromJson(arguments?.getString("retailerData"),DailyDocVisitModel.Data.DcrDoctor::class.java)
+                    model.retailerId=edetailingEditModel.retailerId
                 }
+                else
+                {  model.retailerId=retailerObj.retailerId  }
+
                 model.rCPADetailList=saveRcpaDetailList3
                 rcpaarray.add(model)
             }
@@ -471,7 +480,6 @@ class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfe
                     pobObje.pobId=dataObj.notApi.pobId
                     pobObje.pobNo=dataObj.notApi.pobNo
                     saveModel.pobObject?.pobDetailList?.add(pobObje)
-                    Log.e("dsfdsfdsfdsfdsfsf",saveModel.pobObject?.pobDetailList?.size.toString())
                 }
 
                 if(filterSelectecd.size!=0)
@@ -511,9 +519,18 @@ class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfe
                dbBase.addAPIData(Gson().toJson(commonModel),3)
                 alertClass.commonAlert("","Data save successfully")
 
-                requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frameRetailer_view, RetailerFillFragment())
-                    .commit()
+                if(arguments?.getString("retailerData")?.isEmpty() == false) {
+
+                    (requireActivity() as HomePage).backToHome()
+                }
+                else{
+                    requireActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.frameRetailer_view, RetailerFillFragment(stringInter))
+                        .commit()
+                    stringInter.onClickString("")
+                }
+
+
 
             }
             else{
@@ -570,9 +587,18 @@ class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfe
                         commonModel.employeeSampleBalanceList=quantityArray
                         dbBase.addAPIData(Gson().toJson(commonModel),3)
 
-                        requireActivity().getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.frameRetailer_view, RetailerFillFragment())
-                            .commit()
+                        if(arguments?.getString("retailerData")?.isEmpty() == false) {
+                            (requireActivity() as HomePage).backToHome()
+                        }
+                        else
+                        {
+                            requireActivity().getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.frameRetailer_view, RetailerFillFragment(stringInter))
+                                .commit()
+
+                        }
+
+
                        // dbBase.deleteApiData(7)
 
                     } }
@@ -621,18 +647,22 @@ class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfe
         if(arguments?.getString("retailerData")?.isEmpty() == false)
         {
             val edetailingEditModel=Gson().fromJson(arguments?.getString("retailerData"),DailyDocVisitModel.Data.DcrDoctor::class.java)
-            saveModel.mode=2
-
-            saveModel.callTiming= edetailingEditModel.callTiming
-            saveModel.dcrId=      edetailingEditModel.dcrId
-            saveModel.doctorId=   edetailingEditModel.doctorId
+            saveModel.mode=1
+            saveModel.callTiming=  edetailingEditModel.callTiming
+            saveModel.dcrId=       edetailingEditModel.dcrId
+            saveModel.doctorId=    edetailingEditModel.doctorId
+            saveModel.dcrDate=     generalClass.getCurrentDateTimeApiForamt()
+            saveModel.retailerId = edetailingEditModel.retailerId
         }
         else {
             saveModel.dcrId = dcrId
             saveModel.retailerId = NewCallFragment.retailerObj.retailerId
             saveModel.mode = 1
             saveModel.callTiming = if (c.get(Calendar.AM_PM) == Calendar.AM) "M" else "E"
+            saveModel.dcrDate=generalClass.getCurrentDateTimeApiForamt()
         }
+        saveModel.dcrYear=year
+        saveModel.dcrMonth=month
 
         val workWithTemp=workWithArray?.filter { s -> s.isChecked == true }
         var workWithStr=""
@@ -796,10 +826,6 @@ class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfe
 
             }
         }
-
-
-
-
     }
 
     override fun onChangeArray(
@@ -1218,9 +1244,7 @@ class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfe
         }
     }
 
-    override fun onClickString(passingInterface: String?) {
-
-    }
+    override fun onClickString(passingInterface: String?) { }
 
     inner class AddedRcpa_Adapter(
         val type: Int,
@@ -1235,20 +1259,20 @@ class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfe
 
         override fun onBindViewHolder(holder:ViewHolders, position: Int) {
             val modeldata = rcpaList?.get(position)
-            holder.productName_tv.setText(modeldata.brandName)
-            holder.rxUnit_tv.setText("Rx unit: "+modeldata.brandUnits)
-            holder.cp1rx_tv.setText(modeldata.cPRx1.toString())
-            holder.competitor1Tv.setText(modeldata.cp1)
-            holder.cp2rx_tv.setText(modeldata.cPRx2.toString())
-            holder.competitor2Tv.setText(modeldata.cp2)
+            holder.productName_tv.setText(modeldata?.brandName)
+            holder.rxUnit_tv.setText("Rx unit: "+modeldata?.brandUnits)
+            holder.cp1rx_tv.setText(modeldata?.cPRx1.toString())
+            holder.competitor1Tv.setText(modeldata?.cp1)
+            holder.cp2rx_tv.setText(modeldata?.cPRx2.toString())
+            holder.competitor2Tv.setText(modeldata?.cp2)
 
-            if(modeldata.cp3?.isEmpty() == false) holder.cp3Parent.visibility=View.VISIBLE
-            if(modeldata.cp4?.isEmpty() == false) holder.cp4Parent.visibility=View.VISIBLE
+            if(modeldata?.cp3?.isEmpty() == false) holder.cp3Parent.visibility=View.VISIBLE
+            if(modeldata?.cp4?.isEmpty() == false) holder.cp4Parent.visibility=View.VISIBLE
 
-            holder.competitor3Tv.setText(modeldata.cp3)
-            holder.competitor4Tv.setText(modeldata.cp4)
-            holder.cp3rx_tv.setText(modeldata.cPRx3.toString())
-            holder.cp4rx_tv.setText(modeldata.cPRx4.toString())
+            holder.competitor3Tv.setText(modeldata?.cp3)
+            holder.competitor4Tv.setText(modeldata?.cp4)
+            holder.cp3rx_tv.setText(modeldata?.cPRx3.toString())
+            holder.cp4rx_tv.setText(modeldata?.cPRx4.toString())
 
             holder.editClick_iv.setOnClickListener {
                 AddRCPA_alert(type,modeldata,position)
@@ -1299,10 +1323,11 @@ class RetailerFillFragment : Fragment(), IdNameBoll_interface, PobProductTransfe
     }
     fun getUpdateData()
     {
-
         val runnable = java.lang.Runnable {
 
             val edetailingEditModel=Gson().fromJson(arguments?.getString("retailerData"),DailyDocVisitModel.Data.DcrDoctor::class.java)
+
+            arguments?.getString("retailerData")?.let { Log.e("dfosjdfposdjfoisd", it) }
 
             if(edetailingEditModel.dataSaveType?.lowercase().equals("s"))
             {

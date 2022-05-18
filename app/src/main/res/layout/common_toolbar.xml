@@ -15,15 +15,15 @@
         app:tint="@color/white" />
 
     <TextView
-        android:layout_toRightOf="@+id/back_iv"
+        android:id="@+id/doctorName_tv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:textColor="@color/white"
+        android:layout_toRightOf="@+id/back_iv"
         android:textAlignment="center"
+        android:textColor="@color/white"
         android:textSize="24sp"
-        android:textStyle="bold"
-        android:id="@+id/doctorName_tv"/>
+        android:textStyle="bold" />
 
     <ImageView
         android:layout_width="30dp"

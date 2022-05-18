@@ -335,20 +335,24 @@ open class BaseActivity : AppCompatActivity(){
                 APIClientKot().getUsersService(2, it
                 ).getScheduledMeetingCoo("bearer " + loginModelHomePage.accessToken,loginModelHomePage.empId.toString())
             }
-        withContext(Dispatchers.Main) {
+
             Log.e("getScheduleAPI",response.toString())
             if (response?.isSuccessful == true)
             {
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
                     val gson = Gson()
                     var model = response.body()
-                    dbBase?.addAPIData(gson.toJson(model), 2) }
+                    withContext(Dispatchers.Default) {
+                        launch { dbBase?.addAPIData(gson.toJson(model), 2)  }
+                    }
+                }
+
                 else
                 { Log.e("elseGetScheduled", response.code().toString()) }
             }
             else
             {   Log.e("scheduleERROR", response?.errorBody().toString()) }
-        }
+
 
     }
 
@@ -483,23 +487,27 @@ open class BaseActivity : AppCompatActivity(){
                 APIClientKot().getUsersService(2, it
                 ).dailyDocCallApi("bearer " + loginModelHomePage.accessToken,generalClass.currentDateMMDDYY())
             }
-        withContext(Dispatchers.Main) {
+
             Log.e("getDocCallAPI", response?.body().toString())
             if (response?.isSuccessful == true)
             {
                 if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage?.isEmpty() == true) {
                     var model = response.body()
-                    if(model?.getData()?.dcrDoctorlist?.size==0)
-                    {
-                        dbBase.deleteAllDoctorEdetailing()
-                    }
+                    withContext(Dispatchers.Main) {
+                        launch {
+                            if(model?.getData()?.dcrDoctorlist?.size==0)
+                            {
+                                dbBase.deleteAllDoctorEdetailing()
+                            }
 
-                    dbBase?.addAPIData(Gson().toJson(model?.getData()), 5)
+                            dbBase?.addAPIData(Gson().toJson(model?.getData()), 5)
+                        }
+                    }
                 }
                 else Log.e("elsegetDocCallAPI", response.code().toString())
             }
             else Log.e("getDocCallAPIERROR", response?.errorBody().toString())
-        }
+
     }
 
 

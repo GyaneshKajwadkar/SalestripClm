@@ -8,9 +8,11 @@ import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.staticS
 import `in`.processmaster.salestripclm.activity.SubmitE_DetailingActivity
 import `in`.processmaster.salestripclm.adapter.LastRCPA_Adapter
 import `in`.processmaster.salestripclm.adapter.SimpleListAdapter
+import `in`.processmaster.salestripclm.adapter.StringListAdapter
 import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.common_classes.CommonListGetClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
+import `in`.processmaster.salestripclm.interfaceCode.StringInterface
 import `in`.processmaster.salestripclm.models.*
 import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import `in`.processmaster.salestripclm.networkUtils.GPSTracker
@@ -18,6 +20,7 @@ import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.location.Location
 import android.os.Bundle
 import android.os.Handler
@@ -31,6 +34,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.NonNull
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.AppCompatButton
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -54,11 +58,11 @@ import retrofit2.Response
 import java.util.*
 
 
-class NewCallFragment : Fragment() {
+class NewCallFragment : Fragment(),StringInterface {
     lateinit var db : DatabaseHandler
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     var views:View?=null
-    private lateinit var adapter:BottomSheetDoctorAdapter
+    var adapter:BottomSheetDoctorAdapter =BottomSheetDoctorAdapter()
     var doctorListArray:ArrayList<SyncModel.Data.Doctor> = ArrayList()
     var retailerListArray:ArrayList<SyncModel.Data.Retailer> = ArrayList()
     var routeList: ArrayList<SyncModel.Data.Route> = ArrayList()
@@ -85,12 +89,10 @@ class NewCallFragment : Fragment() {
     ): View? {
         views= inflater.inflate(R.layout.fragment_new_call, container, false)
 
-
         if (activity != null && isAdded)
         {
             initView()
         }
-
         return views
     }
 
@@ -100,6 +102,11 @@ class NewCallFragment : Fragment() {
         bottomSheetBehavior = BottomSheetBehavior.from(views!!.bottomSheet)
 
         val strtext = arguments?.getString("retailerData")
+        db = DatabaseHandler(requireActivity())
+        sharePreferance = PreferenceClass(activity)
+        alertClass = AlertClass(requireActivity())
+        generalClassObject= GeneralClass(requireActivity())
+
         if(strtext?.isEmpty()==false)
         {
             isRetialerEdit()
@@ -108,12 +115,6 @@ class NewCallFragment : Fragment() {
         {
             val coroutine=GlobalScope.launch(Dispatchers.Default) {
                 val task=async {
-                    db = DatabaseHandler(requireActivity())
-                    sharePreferance = PreferenceClass(activity)
-                    alertClass = AlertClass(requireActivity())
-                    generalClassObject= GeneralClass(requireActivity())
-
-                    Log.i("Main_ctivity ",Thread.currentThread().name.toString())
                     SplashActivity.staticSyncData?.doctorList?.let   { doctorListArray.addAll(it) }
                     SplashActivity.staticSyncData?.routeList?.let    { routeList.addAll(it) }
                     SplashActivity.staticSyncData?.retailerList?.let { retailerListArray.addAll(it) }
@@ -142,14 +143,9 @@ class NewCallFragment : Fragment() {
                                     } }}
                             routeList.clear()
                             routeList.addAll(routeListPartList)
-
                         }
-
                     }
-
                     adapter =BottomSheetDoctorAdapter()
-
-
                 }
                 task.await()
             }
@@ -247,6 +243,8 @@ class NewCallFragment : Fragment() {
 
                         selectionType=2
 
+
+
                         if(view?.docRetail_switch?.isChecked == true)
                         {
                             views?.bottomSheetTitle_tv?.setText("Select Doctor")
@@ -264,6 +262,7 @@ class NewCallFragment : Fragment() {
                                 return@setOnClickListener
                             }
                         }
+
                         openCloseModel()})
 
                     views?.selectDoctorsCv?.setEnabled(false)
@@ -281,13 +280,14 @@ class NewCallFragment : Fragment() {
                             return@setOnClickListener
                         }
 
-                        val intent = Intent(activity, OnlinePresentationActivity::class.java)
-                        intent.putExtra("doctorID", selectedDocID)
-                        intent.putExtra("doctorName", selectedDocName)
-                        intent.putExtra("skip", false)
-                        intent.putExtra("doctorObj", Gson().toJson(doctorObject))
-                        startActivityForResult(intent,3)
-                    })
+                        val presentationList=db.getAllSavedPresentationName()
+                        if(presentationList.size!=0)
+                        {
+                            selectSubmitActionAlert()
+                        }
+                        else{
+                            callOnlinePresentationIntent(false)
+                        } })
 
                     views?.skipDetailing_btn?.setOnClickListener({
                         val intent = Intent(activity, SubmitE_DetailingActivity::class.java)
@@ -301,18 +301,49 @@ class NewCallFragment : Fragment() {
             }
         }
 
-
-
-
-
     /*    else
             views?.selectRoutesCv?.setEnabled(false)*/
         //  views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
-
-
-       //  checkDCRusingShareP(0)
+    //  checkDCRusingShareP(0)
     }
 
+
+    fun callOnlinePresentationIntent(isPresentation:Boolean)
+    {
+        val intent = Intent(activity, OnlinePresentationActivity::class.java)
+        intent.putExtra("doctorID", selectedDocID)
+        intent.putExtra("doctorName", selectedDocName)
+        intent.putExtra("skip", false)
+        intent.putExtra("doctorObj", Gson().toJson(doctorObject))
+        intent.putExtra("isPresentation", isPresentation)
+        startActivityForResult(intent,3)
+    }
+
+    fun selectSubmitActionAlert(){
+        val dialogBuilder = AlertDialog.Builder(requireActivity())
+        val inflater = layoutInflater
+        val dialogView: View = inflater.inflate(R.layout.select_submit_alert, null)
+        dialogBuilder.setView(dialogView)
+
+       val alertDialogEdit = dialogBuilder.create()
+        alertDialogEdit.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+
+        val presentation_btn = dialogView.findViewById<View>(R.id.presentation_btn) as AppCompatButton
+        val edetailing_btn = dialogView.findViewById<View>(R.id.edetailing_btn) as AppCompatButton
+
+        val cancel_btn = dialogView.findViewById<View>(R.id.cancel_btn) as AppCompatButton
+
+        presentation_btn.setOnClickListener { callOnlinePresentationIntent(true) }
+
+        edetailing_btn.setOnClickListener { callOnlinePresentationIntent(false) }
+
+
+        cancel_btn.setOnClickListener {
+            alertDialogEdit.dismiss()
+        }
+
+        alertDialogEdit.show()
+    }
 
     fun checkDCRusingShareP():Boolean
     {
@@ -336,6 +367,7 @@ class NewCallFragment : Fragment() {
     }
 
     fun callCoroutineApi() {
+        alertClass?.hideAlert()
         alertClass?.showProgressAlert("")
         val coroutineScope = CoroutineScope(Dispatchers.IO).launch {
             val api = async { checkCurrentDCR_API() }
@@ -495,7 +527,16 @@ class NewCallFragment : Fragment() {
                     else if(selectionType==1)
                     { filteredDataRoute = results.values as ArrayList<SyncModel.Data.Route> }
                     else
-                    { filteredDataDoctor = results.values as ArrayList<SyncModel.Data.Doctor> }
+                    {
+                        if(views?.docRetail_switch?.isChecked == true)
+                        {
+                            filteredDataDoctor = results.values as ArrayList<SyncModel.Data.Doctor>
+                        }
+                        else
+                        {
+                            filteredDataRetailer= results.values as ArrayList<SyncModel.Data.Retailer>
+                        }
+                       }
                     notifyDataSetChanged()
                 }
                 override fun performFiltering(constraint: CharSequence): FilterResults? {
@@ -507,7 +548,7 @@ class NewCallFragment : Fragment() {
                         constraint = constraint.toString().lowercase()
                         for (i in 0 until teamsList?.size!!) {
                             val dataNames: SyncModel.Data.FieldStaffTeam = teamsList?.get(i)
-                            if (dataNames.fullName?.lowercase()?.startsWith(constraint.toString()) == true) {
+                            if (dataNames.fullName?.lowercase()?.contains(constraint.toString()) == true) {
                                 FilteredArrayNames.add(dataNames)
                             }
                         }
@@ -520,7 +561,7 @@ class NewCallFragment : Fragment() {
                         constraint = constraint.toString().lowercase()
                         for (i in 0 until routeList?.size!!) {
                             val routeName: SyncModel.Data.Route = routeList?.get(i)
-                            if (routeName.routeName?.lowercase()?.startsWith(constraint.toString()) == true) {
+                            if (routeName.routeName?.lowercase()?.contains(constraint.toString()) == true) {
                                 FilteredArrayNames.add(routeName)
                             }
                         }
@@ -536,7 +577,7 @@ class NewCallFragment : Fragment() {
 
                             for (i in 0 until doctorListArray?.size!!) {
                                 val docNames: SyncModel.Data.Doctor = doctorListArray?.get(i)
-                                if (docNames.doctorName?.lowercase()?.startsWith(constraint.toString()) == true) {
+                                if (docNames.doctorName?.lowercase()?.contains(constraint.toString()) == true) {
                                     FilteredArrayNames.add(docNames)
                                 }
                             }
@@ -549,7 +590,7 @@ class NewCallFragment : Fragment() {
                             val FilteredArrayNames: ArrayList<SyncModel.Data.Retailer> = ArrayList()
                             for (i in 0 until retailerListArray?.size!!) {
                                 val docNames: SyncModel.Data.Retailer = retailerListArray?.get(i)
-                                if (docNames.shopName?.lowercase()?.startsWith(constraint.toString()) == true) {
+                                if (docNames.shopName?.lowercase()?.contains(constraint.toString()) == true) {
                                     FilteredArrayNames.add(docNames) } }
                             results.count = FilteredArrayNames.size
                             results.values = FilteredArrayNames
@@ -581,10 +622,11 @@ class NewCallFragment : Fragment() {
 
         val coroutine= CoroutineScope(Dispatchers.Default).launch {
             val task= async {
+
                 if(isRetailerAttached==false) {
                     isRetailerAttached = true
                     val transaction = requireActivity().supportFragmentManager.beginTransaction()
-                    transaction.replace(R.id.frameRetailer_view, RetailerFillFragment())
+                    transaction.replace(R.id.frameRetailer_view, RetailerFillFragment(this@NewCallFragment))
                     transaction.disallowAddToBackStack()
                     transaction.commit()
                 }
@@ -743,7 +785,6 @@ class NewCallFragment : Fragment() {
 
                     for(fetch in docFirstFilter)
                     {
-
                         if(fetch.latitude==0.00 || fetch.longitude==0.00) { continue }
 
                         val endPoint = Location("locationB")
@@ -816,6 +857,7 @@ class NewCallFragment : Fragment() {
                 }
 
             }
+
         }
     }
 
@@ -1198,12 +1240,19 @@ class NewCallFragment : Fragment() {
             if (response!!.isSuccessful) {
 
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
+
+                    Log.e("dcrObject",Gson().toJson(response.body()))
                     if (response.body()?.errorObj?.errorMessage?.isEmpty() == true) {
                         val dcrData=response.body()?.data?.dcrData
 
                         if(staticSyncData?.settingDCR?.isCallPlanMandatoryForDCR==true && response.body()?.data?.isCPExiest == true)
                         {
                             alertClass?.commonAlert("Alert!","Please submit you day plan first")
+                            return@withContext
+                        }
+
+                        if (dcrData?.rtpApproveStatus?.lowercase() != "a") {
+                            alertClass?.commonAlert("Alert!","Tour plan not approved")
                             return@withContext
                         }
 
@@ -1379,6 +1428,15 @@ class NewCallFragment : Fragment() {
             }
         }
         else isSecondTime=true
+
+        if(views?.frameRetailer_view?.visibility==View.VISIBLE)
+        {
+            views?.selectDoctor_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
+            views?.frameRetailer_view?.visibility=View.INVISIBLE
+            views?.noData_gif?.visibility=View.VISIBLE
+            views?.retailer_parent?.visibility=View.VISIBLE
+        }
+
     }
 
     fun attachRetailerFrag()
@@ -1389,7 +1447,7 @@ class NewCallFragment : Fragment() {
             val task= async {
                 isRetailerAttached=true
                 val transaction = requireActivity().supportFragmentManager.beginTransaction()
-                transaction.replace(R.id.frameRetailer_view, RetailerFillFragment())
+                transaction.replace(R.id.frameRetailer_view, RetailerFillFragment(this@NewCallFragment))
                 transaction.disallowAddToBackStack()
                 transaction.commit()
             }
@@ -1397,7 +1455,6 @@ class NewCallFragment : Fragment() {
         }
         coroutine.invokeOnCompletion {
             coroutine.cancel()
-
         }
 
 
@@ -1435,7 +1492,7 @@ class NewCallFragment : Fragment() {
         Handler(Looper.getMainLooper()).postDelayed({
             var  retailerModel= Gson().fromJson(strtext, DailyDocVisitModel.Data.DcrDoctor::class.java)
 
-            val retailerFragment=RetailerFillFragment()
+            val retailerFragment=RetailerFillFragment(this@NewCallFragment)
             val bundle = Bundle()
             bundle.putString("retailerData", strtext)
             retailerFragment.arguments=bundle
@@ -1457,5 +1514,13 @@ class NewCallFragment : Fragment() {
         },10)
 
 
+    }
+
+
+    override fun onClickString(passingInterface: String?) {
+        views?.selectDoctor_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
+        views?.frameRetailer_view?.visibility=View.INVISIBLE
+        views?.noData_gif?.visibility=View.VISIBLE
+        views?.retailer_parent?.visibility=View.GONE
     }
 }

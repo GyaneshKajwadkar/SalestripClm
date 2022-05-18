@@ -17,11 +17,9 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_downloaded2.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import pl.droidsonroids.gif.GifImageView
+import java.lang.Runnable
 
 
 class DownloadedFragment : Fragment() {
@@ -48,37 +46,44 @@ class DownloadedFragment : Fragment() {
         nodownload_tv=view.findViewById(R.id.nodownload_tv)as TextView
         nodata_gif=view.findViewById(R.id.nodata_gif)as GifImageView
 
-        sharePreferance = PreferenceClass(activity)
-        db = DatabaseHandler(requireActivity())
-        getAlleDetailListDb= db.getSelectedeDetail(true)
-
-        Handler(Looper.getMainLooper())
-            .postDelayed({
-                if(getAlleDetailListDb!!.size==0)
-                {
-                    nodata_gif?.visibility=View.VISIBLE
-                    recyclerView?.visibility=View.GONE
+        runBlocking{
+            withContext(Dispatchers.Default){
+                launch {
+                    sharePreferance = PreferenceClass(activity)
+                    db = DatabaseHandler(requireActivity())
+                    getAlleDetailListDb= db.getSelectedeDetail(true)
                 }
-                else
-                {
-                    nodata_gif?.visibility=View.GONE
-                    recyclerView?.visibility=View.VISIBLE
-                }
+            }}
 
-                adapter =  Edetailing_Adapter(
-                    getAlleDetailListDb, sharePreferance, requireActivity(), db
-                )
-                val layoutManager = LinearLayoutManager(activity)
-                recyclerView?.layoutManager = layoutManager
-                recyclerView?.adapter = adapter
+        if(getAlleDetailListDb!!.size==0)
+        {
+            nodata_gif?.visibility=View.VISIBLE
+            recyclerView?.visibility=View.GONE
+        }
+        else
+        {
+            nodata_gif?.visibility=View.GONE
+            recyclerView?.visibility=View.VISIBLE
+        }
 
-                if(EdetailingDownloadFragment.filter_et?.text?.equals("") == false)
-                {
-                    editTextFilter(EdetailingDownloadFragment.filter_et?.text.toString())
-                }
 
-                isFirstTimeOpen=false
-            }, 10)
+        if(EdetailingDownloadFragment.filter_et?.text?.equals("") == false)
+        {
+            editTextFilter(EdetailingDownloadFragment.filter_et?.text.toString())
+        }
+
+        isFirstTimeOpen=false
+
+
+
+
+        adapter =  Edetailing_Adapter(
+            getAlleDetailListDb, sharePreferance, requireActivity(), db
+        )
+        val layoutManager = LinearLayoutManager(activity)
+        recyclerView?.layoutManager = layoutManager
+        recyclerView?.adapter = adapter
+
 
         return view
         }

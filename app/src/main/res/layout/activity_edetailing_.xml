@@ -74,7 +74,8 @@
                         android:maxLines="1"
                         android:id="@+id/filter_et"
                         android:drawableTint="@color/appColor"
-                        android:drawableLeft="@android:drawable/ic_menu_search"
+                        android:drawableRight="@android:drawable/ic_menu_search"
+                        android:paddingRight="5dp"
                         android:paddingLeft="5dp"
                         android:background="@drawable/edittext_capsul"
                         android:layout_width="match_parent"
@@ -90,6 +91,7 @@
                     android:layout_height="wrap_content">
 
                     <LinearLayout
+                        android:visibility="gone"
                         android:layout_marginRight="20dp"
                         android:layout_alignParentRight="true"
                         android:id="@+id/syncData_ll"

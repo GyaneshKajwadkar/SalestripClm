@@ -54,6 +54,10 @@ class LoginModel {
     @Expose
      var imageName: String? = null
 
+    @SerializedName("empName")
+    @Expose
+    var empName: String? = null
+
     /*@SerializedName("compName")
     @Expose
      var compName: String? = null
@@ -62,9 +66,7 @@ class LoginModel {
     @Expose
      var industryType: String? = null
 
-    @SerializedName("empName")
-    @Expose
-     var empName: String? = null
+
 
     @SerializedName("compAddress")
     @Expose

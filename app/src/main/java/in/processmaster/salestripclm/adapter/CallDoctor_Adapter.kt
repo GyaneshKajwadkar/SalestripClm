@@ -12,6 +12,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
+import java.text.ParseException
+import java.text.SimpleDateFormat
 
 class CallDoctor_Adapter(
     val doctorList: List<DailyDocVisitModel.Data.DcrDoctor>?,
@@ -29,19 +31,37 @@ class CallDoctor_Adapter(
         val modeldata = doctorList?.get(position)
         holder.doctorName_tv.setText(modeldata?.doctorName)
         holder.doctorPlace_tv.setText( modeldata?.routeName)
+
+        if(modeldata?.isOffline==true)
+        {
+            holder.needsync.visibility=View.VISIBLE
+            holder.editDoctorCall_mb.visibility=View.GONE
+
+            if(modeldata.callTiming.equals("E"))  holder.callTime_tv.setText("Evening")
+                else   holder.callTime_tv.setText( "Morning")
+
+            holder.speciality_tv.setText( "-")
+            holder.workWithName_tv.setText("-")
+            holder.reportedTime_tv.setText("-")
+            holder.visitPurpose_tv.setText("-")
+        }
+        else {
+            holder.needsync.visibility = View.GONE
+            holder.editDoctorCall_mb.visibility = View.VISIBLE
+
+            holder.callTime_tv.setText( modeldata?.callTimingName)
+            holder.speciality_tv.setText( modeldata?.specialityName)
+            holder.reportedTime_tv.setText( modeldata?.strReportedTime)
+            holder.workWithName_tv.setText(if(modeldata?.workWithName?.isEmpty()==false) modeldata?.workWithName else "-")
+            holder.visitPurpose_tv.setText(if(modeldata?.visitPurposeName?.isEmpty()==false) modeldata?.visitPurposeName else "-" )
+
+        }
         if(type.equals("ret")){
-            holder.specilityHeader.setText("Shope name")
+            holder.specilityHeader.setText("Shop name")
             holder.speciality_tv.setText( modeldata?.shopName)
         }
         else   holder.speciality_tv.setText( modeldata?.specialityName)
 
-
-        holder.speciality_tv.setText( modeldata?.specialityName)
-        holder.reportedTime_tv.setText( modeldata?.strReportedTime)
-        holder.workWithName_tv.setText(if(modeldata?.workWithName?.isEmpty()==false) modeldata?.workWithName else "-")
-        holder.visitPurpose_tv.setText(if(modeldata?.visitPurposeName?.isEmpty()==false) modeldata?.visitPurposeName else "-" )
-        holder.meetingAt_tv.setText( modeldata?.callMediumTypeName)
-        holder.callTime_tv.setText( modeldata?.callTimingName)
 
         if(modeldata?.dataSaveType?.lowercase().equals("s"))
         {
@@ -75,10 +95,10 @@ class CallDoctor_Adapter(
     var reportedTime_tv=view.findViewById<TextView>(R.id.reportedTime_tv)
     var workWithName_tv=view.findViewById<TextView>(R.id.workWithName_tv)
     var visitPurpose_tv=view.findViewById<TextView>(R.id.visitPurpose_tv)
-    var meetingAt_tv=view.findViewById<TextView>(R.id.meetingAt_tv)
     var editDoctorCall_mb=view.findViewById<TextView>(R.id.editDoctorCall_mb)
     var callTime_tv=view.findViewById<TextView>(R.id.callTime_tv)
     var specilityHeader=view.findViewById<TextView>(R.id.specilityHeader)
+    var needsync=view.findViewById<TextView>(R.id.needsync)
     }
 
 

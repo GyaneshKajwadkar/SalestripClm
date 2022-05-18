@@ -117,13 +117,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/selectDoctorsCv">
+
                     <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
                         android:id="@+id/selectDoctor_tv"
                         style="@style/whiteTextBold18"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:gravity="center"
-                        android:text="Select doctor"/>
+                        android:text="Select doctor" />
                 </androidx.cardview.widget.CardView>
 
                 <LinearLayout

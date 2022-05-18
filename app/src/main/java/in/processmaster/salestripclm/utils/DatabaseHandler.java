@@ -103,6 +103,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String TABLE_SAVE_DOCTOR_EDETAIL = "save_doctor_eDetail";
     private static final String DETAILING_DATE = "detailingDate";
 
+    //==========================================Save custome presentation edeailing date wise=============================
+    private static final String TABLE_CREATE_EDETAIL_PRESENTATION = "create_eDetail";
+    private static final String PRESENTATION_NAME = "presentaion_name";
+    private static final String EDETAILING_ITEM = "edetailing_item";
+
+
 
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -183,6 +189,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + ")";
         db.execSQL(CREATE_DOCTOR_EDETAIL);
 
+        //store edetailing custome presentaion wise
+        String CREATE_CUSTOME_EDETAIL = "CREATE TABLE " + TABLE_CREATE_EDETAIL_PRESENTATION + "("
+                + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                +  PRESENTATION_NAME + " TEXT,"
+                +  EDETAILING_ITEM + " TEXT"
+                + ")";
+        db.execSQL(CREATE_CUSTOME_EDETAIL);
+
+
     }
 
     // Upgrading database
@@ -200,6 +215,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHILD_VISUAL_ADS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_SAVE_SEND_API);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_SAVE_DOCTOR_EDETAIL);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CREATE_EDETAIL_PRESENTATION);
         onCreate(db);
     }
 
@@ -490,6 +506,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.update(TABLE_EDETAILING, initialValues, "id=?", new String[] {String.valueOf(idModel)});
         //db.close();
     }
+
     //insert file path using id
     public void insertFilePath(int isDownloaded,String filePath,String idModel) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -1291,4 +1308,65 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL("delete from "+ TABLE_SAVE_DOCTOR_EDETAIL);
     }
 
+    //===================================Create presentaion =======================================
+
+    public void insertCreatePresentaionData(String presentaionName,String data)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues initialValues = new ContentValues();
+        initialValues.put(PRESENTATION_NAME, presentaionName);
+        initialValues.put(EDETAILING_ITEM, data);
+        db.insert(TABLE_CREATE_EDETAIL_PRESENTATION, null, initialValues);
+    }
+
+    public void updatePresentaionData(String presentaionName,String data)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues initialValues = new ContentValues();
+        initialValues.put(EDETAILING_ITEM, data);
+        db.update(TABLE_CREATE_EDETAIL_PRESENTATION, initialValues, PRESENTATION_NAME+"=?", new String[]{presentaionName});
+    }
+
+    public void deletePresentaionData(String presentaionName)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_CREATE_EDETAIL_PRESENTATION, PRESENTATION_NAME+"=?", new String[]{presentaionName});
+    }
+
+    @SuppressLint("Range")
+    public ArrayList<String> getAllSavedPresentationName() {
+        ArrayList<String> presentationNameList = new ArrayList<String>();
+
+        String selectQuery = "SELECT  * FROM " + TABLE_CREATE_EDETAIL_PRESENTATION;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                presentationNameList.add(cursor.getString(cursor.getColumnIndex(PRESENTATION_NAME)));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return presentationNameList;
+    }
+
+
+    @SuppressLint("Range")
+    public  ArrayList<DownloadFileModel> getAllPresentationItem(String name)
+    {
+        ArrayList<DownloadFileModel> itemList=new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(TABLE_CREATE_EDETAIL_PRESENTATION, new String[] {
+                        EDETAILING_ITEM }, PRESENTATION_NAME + "=?",
+                new String[] { String.valueOf(name) }, null, null, null, null);
+        if (cursor.moveToFirst()) {
+            do {
+                Type typeType = new TypeToken<ArrayList<DownloadFileModel>>() {}.getType();
+                itemList.addAll(new Gson().fromJson(cursor.getString(cursor.getColumnIndex(EDETAILING_ITEM)), typeType));
+            }
+            while (cursor.moveToNext());
+        }
+        cursor.close();
+        return itemList;
+    }
 }

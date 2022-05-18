@@ -63,6 +63,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     lateinit var downloadManager :DownloadManager
     lateinit var objDownloadManager : DownloadManagerClass
     var retailerString=""
+    var firstCall=false
 
     companion object {
         var loginModelHomePage= LoginModel()
@@ -338,6 +339,12 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                     overridePendingTransition(0, 0)
                 }
 
+                   R.id.nav_createPresentation -> {
+                  var intent = Intent(this, CreatePresentationActivity::class.java)
+                  startActivity(intent)
+                  overridePendingTransition(0, 0)
+              }
+
              /*   R.id.nav_screenshot -> {
                     var intent = Intent(this, ImageSelectorActivity::class.java)
                     intent.putExtra("filePath", getFilesDir()?.getAbsolutePath() + "/Screenshots/")
@@ -387,7 +394,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         val df = SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault())
         val formattedDate: String = df.format(c)
 
-        if(sharePreferanceBase?.getPref("SyncDate")==null || sharePreferanceBase?.getPref("SyncDate").toString().isEmpty())
+      /*  if(sharePreferanceBase?.getPref("SyncDate")==null || sharePreferanceBase?.getPref("SyncDate").toString().isEmpty())
         {
             sharePreferanceBase?.setPref("SyncDate", formattedDate)
         }
@@ -404,7 +411,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                 }
             }
 
-        }
+        }*/
 
         setImages()
 
@@ -469,7 +476,8 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             coroutineScope.cancel()
             this.runOnUiThread(java.lang.Runnable {
                 alertClass.hideAlert()
-                initView()
+                if(!firstCall) initView()
+                firstCall=true
                 bottomNavigation?.selectedItemId= R.id.landingPage
               //  generalClass.disableProgress(progressView_parentRv!!)
             })
@@ -506,50 +514,51 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                      if(response.body()?.getData()?.geteDetailingList()==null)
                     {  }
                     else{
+                         withContext(Dispatchers.Default){
+                             launch {
+                                 for ((index, value) in response.body()?.getData()?.geteDetailingList()?.withIndex()!!) {
+                                     //store edetailing data to db
+                                     val gson = Gson()
+                                     dbBase.insertOrUpdateEDetail(
+                                         value.geteDetailId().toString(),
+                                         gson.toJson(value)
+                                     )
+                                 }
+                                 // clear database
+                                 for (dbList in dbBase.getAlleDetail()) {
+                                     var isSet = false
+                                     for (mainList in response.body()?.getData()?.geteDetailingList()!!) {
+                                         if (mainList.geteDetailId() == dbList.geteDetailId()) {
+                                             isSet = true
+                                         }
+                                     }
 
-                        for ((index, value) in response.body()?.getData()?.geteDetailingList()?.withIndex()!!) {
-                            //store edetailing data to db
-                            val gson = Gson()
-                            dbBase.insertOrUpdateEDetail(
-                                value.geteDetailId().toString(),
-                                gson.toJson(value)
-                            )
-                        }
-                        // clear database
-                        for (dbList in dbBase.getAlleDetail()) {
-                            var isSet = false
-                            for (mainList in response.body()?.getData()?.geteDetailingList()!!) {
-                                if (mainList.geteDetailId() == dbList.geteDetailId()) {
-                                    isSet = true
-                                }
-                            }
+                                     //this clear database and files from device which is not in used
+                                     if (!isSet) {
+                                         dbBase.deleteEdetailingData(dbList.geteDetailId().toString())
 
-                            //this clear database and files from device which is not in used
-                            if (!isSet) {
-                                dbBase.deleteEdetailingData(dbList.geteDetailId().toString())
+                                         var downloadModelArrayList =
+                                             dbBase.getAllDownloadedData(dbList.geteDetailId())
 
-                                var downloadModelArrayList =
-                                    dbBase.getAllDownloadedData(dbList.geteDetailId())
+                                         //Delete files from folder before erase db
+                                         for (item in downloadModelArrayList) {
+                                             val someDir = File(item.fileDirectoryPath)
+                                             someDir.deleteRecursively()
+                                         }
+                                         dbBase.deleteEdetailDownloada(dbList.geteDetailId().toString())
+                                     }
+                                 }
 
-                                //Delete files from folder before erase db
-                                for (item in downloadModelArrayList) {
-                                    val someDir = File(item.fileDirectoryPath)
-                                    someDir.deleteRecursively()
-                                }
-                                dbBase.deleteEdetailDownloada(dbList.geteDetailId().toString())
-                            }
-                        }
-
-                        //get all remaining download file
-                        val list= dbBase.getAlleDetail().filter { s-> s.isSaved==0} as ArrayList<DevisionModel.Data.EDetailing>
-                        if(list.size!=0 && generalClass.isInternetAvailable())
-                        {
-                            objDownloadManager= DownloadManagerClass(this@HomePage,dbBase,list)
-                            objDownloadManager.startDownloading()
-                        }
+                                 //get all remaining download file
+                                 val list= dbBase.getAlleDetail().filter { s-> s.isSaved==0} as ArrayList<DevisionModel.Data.EDetailing>
+                                 if(list.size!=0 && generalClass.isInternetAvailable())
+                                 {
+                                     objDownloadManager= DownloadManagerClass(this@HomePage,dbBase,list)
+                                     objDownloadManager.startDownloading()
+                                 }
 
 
-
+                             } }
                     }
 
 
@@ -637,13 +646,62 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                 APIClientKot().getUsersService(2, it
                 ).syncApiCoo("bearer " + loginModelHomePage.accessToken)
             }
-        withContext(Dispatchers.Main) {
+
+
+        if (response?.isSuccessful == true)
+        {
+            //  alertClass.commonAlert("",Gson().toJson(response.body()))
+            if (response?.code() == 200 && !response.body().toString().isEmpty())
+            {
+                staticSyncData=response.body()?.data
+                val apiModel=response.body()?.data
+                val gson=Gson()
+                runBlocking {
+                    withContext(Dispatchers.IO) {
+                        launch {  dbBase?.deleteAll_SYNCAPI() }
+                    }
+                }
+
+              //  runBlocking {
+                    withContext(Dispatchers.Default){
+
+                        launch { dbBase?.addSYNCAPIData(gson.toJson(apiModel?.settingDCR),
+                            gson.toJson(apiModel?.workTypeList),"",
+                            "",gson.toJson(apiModel?.workingWithList),gson.toJson(apiModel?.fieldStaffTeamList),""
+                            ,apiModel?.configurationSetting, gson.toJson(apiModel?.schemeList),
+                            "",0, gson.toJson(apiModel?.doctorList)) }
+                        launch {   dbBase?.addRoutes(apiModel?.routeList) }
+                        launch {  dbBase?.addRetailer(apiModel?.retailerList) }
+                        launch {  dbBase?.addProduct(apiModel?.productList)  }
+
+                    }
+               // }
+            }
+
+            // if token expire go to login page again
+            else
+            {
+                Log.e("responseCode", "error")
+                sharePreferanceBase?.setPrefBool("isLogin", false)
+                val intent = Intent(this@HomePage, LoginActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
+        }
+        else
+        {   Log.e("responseERROR", response?.errorBody().toString())
+            generalClass.checkInternet()
+        }
+
+
+       /* withContext(Dispatchers.Main) {
             if (response?.isSuccessful == true)
             {
               //  alertClass.commonAlert("",Gson().toJson(response.body()))
             if (response?.code() == 200 && !response.body().toString().isEmpty())
             {
                    // dbBase?.addAPIData(Gson().toJson(response.body()),1)
+
 
                        staticSyncData=response.body()?.data
                         val apiModel=response.body()?.data
@@ -680,7 +738,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             {   Log.e("responseERROR", response?.errorBody().toString())
                 generalClass.checkInternet()
             }
-        }
+        }*/
     }
 
     suspend fun getQuantityAPI()
@@ -690,23 +748,23 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                 APIClientKot().getUsersService(2, it
                 ).getQuantiyApiCoo("bearer " + loginModelHomePage.accessToken)
             }
-        withContext(Dispatchers.Main) {
+
             Log.e("quantitiveAPI",response.toString())
             if (response?.isSuccessful == true)
             {
                 if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage?.isEmpty() == true) {
                     val gson = Gson()
                     var model = response.body()
-
-                    dbBase?.addAPIData(gson.toJson(model?.getData()), 3)
-
+                    withContext(Dispatchers.Default) {
+                        launch { dbBase?.addAPIData(gson.toJson(model?.getData()), 3) }
+                    }
 
                 }
                 else Log.e("elsequantitiveAPI", response.code().toString())
             }
             else Log.e("quantitiveAPIERROR", response?.errorBody().toString())
 
-        }
+
 
     }
 
@@ -761,21 +819,20 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                 APIClientKot().getUsersService(2, it
                 ).visitDoctorGraphApi("bearer " + loginModelHomePage.accessToken,df.format(c),generalClass.currentDateMMDDYY())
             }
-        withContext(Dispatchers.Main) {
+
             Log.e("getDoctorGraphAPI", response?.body().toString())
             if (response?.isSuccessful == true)
             {
                 if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage?.isEmpty() == true) {
                     var model = response.body()
-
-                    dbBase?.addAPIData(Gson().toJson(model?.getData()), 4)
-
-
-                  }
+                    withContext(Dispatchers.Main) {
+                        launch { dbBase?.addAPIData(Gson().toJson(model?.getData()), 4) }
+                    }
+                }
                 else Log.e("elseDoctorGraphAPI", response.code().toString())
             }
             else Log.e("DoctorGraphERROR", response?.errorBody().toString())
-        }
+
     }
 
 
@@ -787,19 +844,20 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                 ).getProfileData("bearer " + loginModelHomePage.accessToken,
                     loginModelHomePage.empId.toString())
             }
-        withContext(Dispatchers.Main) {
+
             Log.e("getProfileAPI", response?.body().toString())
             if (response?.isSuccessful == true)
             {
                 if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage?.isEmpty() == true) {
                     var model = response.body()
-                    dbBase?.addAPIData(Gson().toJson(model?.getData()), 6)
-
+                    withContext(Dispatchers.Main) {
+                        launch {   dbBase?.addAPIData(Gson().toJson(model?.getData()), 6) }
+                    }
                 }
                 else Log.e("elseProfileAPI", response.code().toString())
             }
             else Log.e("getProfileAPIERROR", response?.errorBody().toString())
-        }
+
     }
 
     fun getFragmentRefreshListener(): FragmentRefreshListener? {
@@ -816,17 +874,17 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
     fun checkDCRusingShareP(onMenuItemClickListener: MenuItem)
     {
-
-
         if(generalClass?.isInternetAvailable() == true)
         {
-            alertClass?.showProgressAlert("")
+            runOnUiThread(java.lang.Runnable { alertClass?.showProgressAlert("") })
+
             val coroutineScope = CoroutineScope(Dispatchers.IO).launch {
                 val api = async { checkCurrentDCR_API(onMenuItemClickListener) }
-                 api.await()
+                api.await()
             }
 
             coroutineScope.invokeOnCompletion {
+                coroutineScope.cancel()
                 runOnUiThread(java.lang.Runnable {
                     alertClass?.hideAlert() })
             }
@@ -878,36 +936,50 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             loginModelHomePage.empId,
             generalClass?.currentDateMMDDYY()
         )
-        withContext(Dispatchers.Main) {
 
             if (response!!.isSuccessful) {
 
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
+
                     if (response.body()?.errorObj?.errorMessage?.isEmpty() == true) {
 
                         val dcrData=response.body()?.data?.dcrData
 
                         if(staticSyncData?.settingDCR?.isCallPlanMandatoryForDCR==true && response.body()?.data?.isCPExiest == true)
                         {
-                            alertClass?.commonAlert("Alert!","Please submit your day plan first")
-                            return@withContext
+                            runOnUiThread(java.lang.Runnable {
+                                alertClass?.commonAlert("Alert!","Please submit your day plan first")
+
+                            })
+                            return
+                        }
+                        if (dcrData?.rtpApproveStatus?.lowercase() != "a") {
+                            alertClass?.commonAlert("Alert!","Tour plan not approved")
+                            return
                         }
 
+
                         if (dcrData?.dataSaveType?.lowercase() == "s") {
-                            alertClass?.commonAlert("Alert!","The DCR is submitted it cannot be unlocked please connect with your admin")
-                            onMenuItemClickListener.setCheckable(false)
-                            onMenuItemClickListener.setChecked(false)
-                            return@withContext
+
+                            runOnUiThread(java.lang.Runnable {
+                                alertClass?.commonAlert("Alert!","The DCR is submitted it cannot be unlocked please connect with your admin")
+                                onMenuItemClickListener.setCheckable(false)
+                                onMenuItemClickListener.setChecked(false)
+                            })
+
+                            return
                         }
 
 
                         if (dcrData?.routeId.toString()=="" || dcrData?.routeId==null || dcrData?.routeId=="0") {
+                            runOnUiThread {
+                                alertClass?.commonAlert("Alert!", "Please submit tour program first")
+                                alertClass?.hideAlert()
+                                onMenuItemClickListener.setCheckable(false)
+                                onMenuItemClickListener.setChecked(false)
+                            }
 
-                            alertClass?.commonAlert("Alert!", "Please submit tour program first")
-                            alertClass?.hideAlert()
-                            onMenuItemClickListener.setCheckable(false)
-                            onMenuItemClickListener.setChecked(false)
-                            return@withContext
+                            return
                         }
 
                         dcrData?.dataSaveType="D"
@@ -915,14 +987,17 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
                         if (dcrData?.dcrId == 0) {
 
-                           // createDCRAlert(dcrData?.routeId.toString())
-                            alertClass.createDCRAlert(
-                                dcrData?.routeId.toString(),
-                                dcrData?.routeName.toString()
-                            )
+                            runOnUiThread {
+                                alertClass.createDCRAlert(
+                                    dcrData?.routeId.toString(),
+                                    dcrData?.routeName.toString()
+                                )
+                                onMenuItemClickListener.setCheckable(false)
+                                onMenuItemClickListener.setChecked(false)
+                            }
+
                             sharePreferanceBase?.setPref("dcrId", dcrData?.dcrId.toString())
-                            onMenuItemClickListener.setCheckable(false)
-                            onMenuItemClickListener.setChecked(false)
+
                         } else {
                             sharePreferanceBase?.setPref("todayDate", generalClass?.currentDateMMDDYY())
                             sharePreferanceBase?.setPref("dcrId", dcrData?.dcrId.toString())
@@ -931,35 +1006,41 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                             if(dcrData?.otherDCR!=0)
                             {
                                // setOtherActivityView()
-
-                                alertClass?.commonAlert("Alert!","You have not planned field working today. Kindly save it from Salestrip app")
+                                runOnUiThread {
+                                    alertClass?.commonAlert("Alert!","You have not planned field working today. Kindly save it from Salestrip app")
+                                    onMenuItemClickListener.setCheckable(false)
+                                    onMenuItemClickListener.setChecked(false)
+                                }
                                 sharePreferanceBase?.setPref("otherActivitySelected","1")
-                                onMenuItemClickListener.setCheckable(false)
-                                onMenuItemClickListener.setChecked(false)
-                                return@withContext
+
+                                return
                             }
                            // if(!setDcrCheck) {
                            //     setDcrCheck=true
                            //     bottomNavigation?.selectedItemId = R.id.callPage
                            // }
-                            toolbarTv?.setText("Create Calls")
 
 
-                            val fragment = NewCallFragment()
-                            openFragment(fragment)
-                            openFragmentStr = "CallsFragment"
-                            onMenuItemClickListener.setCheckable(true)
-                            onMenuItemClickListener.setChecked(true)
 
+                            runOnUiThread {
+                                toolbarTv?.setText("Create Calls")
+                                val fragment = NewCallFragment()
+                                openFragment(fragment)
+                                openFragmentStr = "CallsFragment"
+                                onMenuItemClickListener.setCheckable(true)
+                                onMenuItemClickListener.setChecked(true)
+                            }
                         }
                     } else {
                         GeneralClass(this@HomePage).checkInternet()
-                        onMenuItemClickListener.setCheckable(false)
-                        onMenuItemClickListener.setChecked(false)
+                        runOnUiThread {
+                            onMenuItemClickListener.setCheckable(false)
+                            onMenuItemClickListener.setChecked(false) }
+
                      }
                 }
             }
-        }
+
 
     }
 
@@ -1011,9 +1092,14 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         })
     }
 
+
         fun selectRetailerForEdit(toJson: String) {
             bottomNavigation?.selectedItemId= R.id.callPage
             retailerString=toJson
 
         }
+    fun backToHome()
+    {
+        bottomNavigation?.selectedItemId= R.id.landingPage
+    }
 }

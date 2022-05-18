@@ -31,6 +31,12 @@
             android:icon="@drawable/ic_refresh"
             android:title="Sync" />
 
+          <item
+              android:visible="false"
+           android:id="@+id/nav_createPresentation"
+           android:icon="@drawable/ic_menu_gallery"
+           android:title="Create Presentation" />
+
       <!--  <item
             android:id="@+id/nav_screenshot"
             android:icon="@drawable/ic_menu_gallery"

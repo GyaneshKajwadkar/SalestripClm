@@ -160,25 +160,30 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         (activity as HomePage?)?.setFragmentRefreshListener(object : HomePage.FragmentRefreshListener {
             override fun onRefresh() {
                 val responseDocCall=db.getApiDetail(5)
+                val dbListRetailer=db.getAllSaveSendRetailer("retailerFeedback")
+                val eDetailingArray=db.getAllSaveSend("feedback")
+                doctorList.clear()
+                retailerList.clear()
                 if(!responseDocCall.equals(""))
                 {
                     val  docCallModel= Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
-                    val docAdapter= activity?.let { CallDoctor_Adapter(docCallModel.dcrDoctorlist, it,"doc") }
-                    val retailAdapter= activity?.let { CallDoctor_Adapter(docCallModel.dcrRetailerlist, it,"ret") }
 
                     activity?.runOnUiThread {
                         val buttonId: Int = toggleButton.getCheckedButtonId()
 
                         if(docCallModel.dcrDoctorlist?.size==0 && buttonId==R.id.doctorCall_btn) { noDocCall_tv?.visibility = View.VISIBLE}
 
+                          doctorList.addAll(eDetailingArray)
+                        retailerList.addAll(dbListRetailer)
+
+                        val docAdapter= activity?.let { CallDoctor_Adapter(doctorList, it,"doc") }
+                        val retailAdapter= activity?.let { CallDoctor_Adapter(retailerList, it,"ret") }
                         dailyDoctorCall_rv?.adapter=docAdapter
                         dailyRetailer_rv?.adapter=retailAdapter
 
                         docCallModel.dcrDoctorlist?.let { doctorList.addAll(it) }
                         docCallModel.dcrRetailerlist?.let { retailerList.addAll(it) }
-                        val totalCall= docCallModel?.dcrRetailerlist?.size?.let {
-                            docCallModel.dcrDoctorlist?.size?.plus(it)
-                        }
+                        val totalCall= doctorList.size+ retailerList.size
                         todaysCall_tv?.setText("Today's call- "+totalCall)
                     }
                 }
@@ -257,6 +262,12 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         val responseData=db.getApiDetail(2)
         val responseGraph=db.getApiDetail(4)
         val responseDocCall=db.getApiDetail(5)
+        val dbListRetailer=db.getAllSaveSendRetailer("retailerFeedback")
+        val eDetailingArray=db.getAllSaveSend("feedback")
+
+        doctorList.clear()
+        retailerList.clear()
+
         if(!responseData.equals(""))
         {
            val  getScheduleModel= Gson().fromJson(responseData, GetScheduleModel::class.java)
@@ -278,22 +289,28 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         if(!responseDocCall.equals(""))
         {
             val  docCallModel= Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
-            val docAdapter= activity?.let { CallDoctor_Adapter(docCallModel.dcrDoctorlist, it,"doc") }
-            val retailAdapter= activity?.let { CallDoctor_Adapter(docCallModel.dcrRetailerlist, it,"ret") }
+            doctorList.addAll(eDetailingArray)
+            retailerList.addAll(dbListRetailer)
+
 
             activity?.runOnUiThread {
                 val buttonId: Int = toggleButton.getCheckedButtonId()
 
                 if(docCallModel.dcrDoctorlist?.size==0 && buttonId==R.id.doctorCall_btn) { noDocCall_tv?.visibility = View.VISIBLE}
 
-                dailyDoctorCall_rv?.adapter=docAdapter
-                dailyRetailer_rv?.adapter=retailAdapter
+
 
                 docCallModel.dcrDoctorlist?.let { doctorList.addAll(it) }
                 docCallModel.dcrRetailerlist?.let { retailerList.addAll(it) }
-                val totalCall= docCallModel?.dcrRetailerlist?.size?.let {
-                    docCallModel.dcrDoctorlist?.size?.plus(it)
-                }
+
+                val docAdapter= activity?.let { CallDoctor_Adapter(doctorList, it,"doc") }
+                val retailAdapter= activity?.let { CallDoctor_Adapter(retailerList, it,"ret") }
+                dailyDoctorCall_rv?.adapter=docAdapter
+                dailyRetailer_rv?.adapter=retailAdapter
+
+
+
+                val totalCall= doctorList.size+ retailerList.size
                 todaysCall_tv?.setText("Today's call- "+totalCall)
             }
         }

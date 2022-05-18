@@ -139,9 +139,8 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
                 doctorName= requireArguments().getString("doctorName").toString()
             }
 
-        //    val doctorObj = requireArguments().getString("doctorObj")
-            /*if(doctorObj!
-            =null)
+            val doctorObj = requireArguments().getString("doctorObj")
+            if(doctorObj!=null)
             {
                 var doctorObj= Gson().fromJson(doctorObj, SyncModel.Data.Doctor::class.java)
                 if(doctorObj.product1Id!=0)
@@ -166,7 +165,7 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
                     }
                 }
                 setDownloadListAdapter(storedDownloadedList)
-            }*/
+            }
         }
 
 

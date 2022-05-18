@@ -137,11 +137,19 @@ class LoginActivity : BaseActivity() {
                     var loginModel = response.body()
 
                     val jsonObj= JSONObject(loginModel?.configurationSetting)
+                    val jsonObjEmp= JSONObject(loginModel?.getEmployeeObj())
                     val checkCLM=jsonObj.getInt("SET056")
+                    val checkUser=jsonObjEmp.getBoolean("IsCLMUser")
                     if(checkCLM==0)
                     {
-                        alertClass?.commonAlert("Alert!","Salestrip CLM is not enable for this credential. Please contact to administration")
                         alertClass.hideAlert()
+                        alertClass?.commonAlert("Alert!","Salestrip CLM is not enable for this credential. Please contact to administration")
+                        return
+                    }
+                    if(!checkUser)
+                    {
+                        alertClass.hideAlert()
+                        alertClass?.commonAlert("Alert!","Salestrip CLM is not enable for this user. Please contact to administration")
                         return
                     }
 

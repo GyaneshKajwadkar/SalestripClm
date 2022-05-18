@@ -817,6 +817,9 @@ class DailyDocVisitModel {
             }
 
             class Rcpavo {
+                @SerializedName("dcrId")
+                var dcrId: Int? = null
+
                 @SerializedName("rcpaId")
                 @Expose
                 var rCPAId: Int? = null
@@ -895,7 +898,7 @@ class DailyDocVisitModel {
                     @Expose
                     var brandValue: String? = null
 
-                    @SerializedName("cp1")
+                    @SerializedName("cP1")
                     @Expose
                     var cp1: String? = null
 
@@ -903,7 +906,7 @@ class DailyDocVisitModel {
                     @Expose
                     var cPRx1: Int? = null
 
-                    @SerializedName("cp2")
+                    @SerializedName("cP2")
                     @Expose
                     var cp2: String? = null
 
@@ -911,7 +914,7 @@ class DailyDocVisitModel {
                     @Expose
                     var cPRx2: Int? = null
 
-                    @SerializedName("cp3")
+                    @SerializedName("cP3")
                     @Expose
                     var cp3: String? = null
 
@@ -919,7 +922,7 @@ class DailyDocVisitModel {
                     @Expose
                     var cPRx3: Int? = null
 
-                    @SerializedName("cp4")
+                    @SerializedName("cP4")
                     @Expose
                     var cp4: String? = null
 
