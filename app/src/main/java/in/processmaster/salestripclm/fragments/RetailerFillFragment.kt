@@ -316,7 +316,7 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
         }
 
         views.addBrandTwo_btn.setOnClickListener {
-            if(saveRcpaDetailList1.size!=0)
+            if(saveRcpaDetailList1.size==0)
             {
                 generalClass.showSnackbar(it,"First RCPA detail not fill")
                 return@setOnClickListener
@@ -326,12 +326,12 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
         }
 
         views.addBrandThree_btn.setOnClickListener {
-            if(saveRcpaDetailList1.size!=0)
+            if(saveRcpaDetailList1.size==0)
             {
                 generalClass.showSnackbar(it,"First RCPA detail not fill")
                 return@setOnClickListener
             }
-            if(saveRcpaDetailList2.size!=0)
+            if(saveRcpaDetailList2.size==0)
             {
                 generalClass.showSnackbar(it,"Second RCPA detail not fill")
                 return@setOnClickListener
@@ -1219,15 +1219,15 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
                 when(type)
                 {
                     1-> {
-                        obj.rCPANo=1
+                        objRcpaDetail.rCPANo=1
                         saveRcpaDetailList1.add(objRcpaDetail)
                         adapter1.notifyItemInserted(saveRcpaDetailList1.size)}
                     2-> {
-                        obj.rCPANo=2
+                        objRcpaDetail.rCPANo=2
                         saveRcpaDetailList2.add(objRcpaDetail)
                         adapter2.notifyItemInserted(saveRcpaDetailList2.size)}
                     3-> {
-                        obj.rCPANo=3
+                        objRcpaDetail.rCPANo=3
                         saveRcpaDetailList3.add(objRcpaDetail)
                         adapter3.notifyItemInserted(saveRcpaDetailList3.size)}
                 }
