@@ -92,5 +92,10 @@ class VisualFileAdapter(
         return downloadList?.size!!
     }
 
+    override fun getItemViewType(position: Int): Int = position
+
+    override fun getItemId(position: Int): Long {
+        return position.toLong()
+    }
 
 }

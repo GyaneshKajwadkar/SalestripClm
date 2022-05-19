@@ -4,6 +4,8 @@ import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.SplashActivity
 import `in`.processmaster.salestripclm.activity.SubmitE_DetailingActivity
 import `in`.processmaster.salestripclm.adapter.VisualFileAdapter
+import `in`.processmaster.salestripclm.fragments.ShowDownloadedFragment.Companion.currentDate
+import `in`.processmaster.salestripclm.fragments.ShowDownloadedFragment.Companion.currentTime
 import `in`.processmaster.salestripclm.interfaceCode.ItemClickDisplayVisual
 import `in`.processmaster.salestripclm.interfaceCode.SortingDisplayVisual
 import `in`.processmaster.salestripclm.models.*
@@ -138,7 +140,6 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
                 doctorIdDisplayVisual=requireArguments().getInt("doctorID")
                 doctorName= requireArguments().getString("doctorName").toString()
             }
-
             val doctorObj = requireArguments().getString("doctorObj")
             if(doctorObj!=null)
             {
@@ -201,6 +202,10 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
         db.deleteAllChildVisual()
 
         setDoctorList()
+
+        currentTime=""
+        currentDate=""
+
     }
 
     fun setDoctorFavBrand(product1Id: Int?, i1: Int)

@@ -52,7 +52,6 @@ class ShowDownloadedFragment : Fragment() {
     {
         var currentTime = ""
         var currentDate = ""
-
     }
 
 

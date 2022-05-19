@@ -192,14 +192,14 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
             R.id.downloadVisualPage -> {
 
-                if(::objDownloadManager.isInitialized && generalClass.isInternetAvailable())
+               /* if(::objDownloadManager.isInitialized && generalClass.isInternetAvailable())
                 {
                     if(objDownloadManager?.getNumber<objDownloadManager?.allProductList.size)
                     {
                         objDownloadManager.downloadProgressAlert()
                         return@OnNavigationItemSelectedListener false
                     }
-                }
+                }*/
                 toolbarTv?.setText("Download Content")
 
                 if (openFragmentStr.equals("EdetailingFragment")) {
@@ -220,14 +220,14 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             }
 
             R.id.callPage->{
-                if(::objDownloadManager.isInitialized && generalClass.isInternetAvailable())
+                /*if(::objDownloadManager.isInitialized && generalClass.isInternetAvailable())
                 {
                     if(objDownloadManager?.getNumber<objDownloadManager?.allProductList.size)
                     {
                         objDownloadManager.downloadProgressAlert()
                         return@OnNavigationItemSelectedListener false
                     }
-                }
+                }*/
 
                 if (openFragmentStr.equals("CallsFragment")) {
                     return@OnNavigationItemSelectedListener true
@@ -553,8 +553,8 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                                  val list= dbBase.getAlleDetail().filter { s-> s.isSaved==0} as ArrayList<DevisionModel.Data.EDetailing>
                                  if(list.size!=0 && generalClass.isInternetAvailable())
                                  {
-                                     objDownloadManager= DownloadManagerClass(this@HomePage,dbBase,list)
-                                     objDownloadManager.startDownloading()
+                                   //  objDownloadManager= DownloadManagerClass(this@HomePage,dbBase,list)
+                                   //  objDownloadManager.startDownloading()
                                  }
 
 

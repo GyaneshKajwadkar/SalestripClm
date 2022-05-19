@@ -2406,6 +2406,14 @@ class SyncModel {
             @Expose
             var minChemistRCPA: Int? = 0
 
+            @SerializedName("isSampleReportingMandatory")
+            @Expose
+            var isSampleReportingMandatory: Boolean? = false
+
+            @SerializedName("isGiftReportingMandatory")
+            @Expose
+            var isGiftReportingMandatory: Boolean? = false
+
             /*
 
              @SerializedName("minCallPerDayDoc")
@@ -2447,13 +2455,9 @@ class SyncModel {
              @Expose
              var isSelfieAttendanceRequired: Boolean? = false
 
-             @SerializedName("isGiftReportingMandatory")
-             @Expose
-             var isGiftReportingMandatory: Boolean? = false
 
-             @SerializedName("isSampleReportingMandatory")
-             @Expose
-             var isSampleReportingMandatory: Boolean? = false
+
+
 
              @SerializedName("minInclinicEffectivenessCall")
              @Expose

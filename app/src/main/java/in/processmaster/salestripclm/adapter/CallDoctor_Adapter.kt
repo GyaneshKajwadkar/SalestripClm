@@ -6,9 +6,11 @@ import `in`.processmaster.salestripclm.activity.SubmitE_DetailingActivity
 import `in`.processmaster.salestripclm.models.DailyDocVisitModel
 import android.app.Activity
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
@@ -32,7 +34,7 @@ class CallDoctor_Adapter(
         holder.doctorName_tv.setText(modeldata?.doctorName)
         holder.doctorPlace_tv.setText( modeldata?.routeName)
 
-        if(modeldata?.isOffline==true)
+        if(modeldata?.saveInDb==true)
         {
             holder.needsync.visibility=View.VISIBLE
             holder.editDoctorCall_mb.visibility=View.GONE
@@ -57,10 +59,12 @@ class CallDoctor_Adapter(
 
         }
         if(type.equals("ret")){
-            holder.specilityHeader.setText("Shop name")
-            holder.speciality_tv.setText( modeldata?.shopName)
+            holder.doctorName_tv.setText(modeldata?.shopName)
+            holder.parentSpeciality.visibility=View.GONE
         }
-        else   holder.speciality_tv.setText( modeldata?.specialityName)
+        else {
+            holder.speciality_tv.setText(modeldata?.specialityName)
+        }
 
 
         if(modeldata?.dataSaveType?.lowercase().equals("s"))
@@ -99,6 +103,7 @@ class CallDoctor_Adapter(
     var callTime_tv=view.findViewById<TextView>(R.id.callTime_tv)
     var specilityHeader=view.findViewById<TextView>(R.id.specilityHeader)
     var needsync=view.findViewById<TextView>(R.id.needsync)
+    var parentSpeciality=view.findViewById<LinearLayout>(R.id.parentSpeciality)
     }
 
 

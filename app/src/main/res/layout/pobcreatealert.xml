@@ -93,8 +93,9 @@
                         android:layout_height="40dp"
                         android:layout_marginTop="5dp"
                         android:background="@drawable/edittext_capsul"
-                        android:drawableLeft="@android:drawable/ic_menu_search"
+                        android:drawableRight="@android:drawable/ic_menu_search"
                         android:drawableTint="@color/appColor"
+                        android:paddingRight="5dp"
                         android:paddingLeft="5dp" />
 
 

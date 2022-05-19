@@ -56,6 +56,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class NewCallFragment : Fragment(),StringInterface {
@@ -124,6 +125,7 @@ class NewCallFragment : Fragment(),StringInterface {
 
                     val responseDocCall=db.getApiDetail(5)
                     if(!responseDocCall.equals("")) {
+
                         docCallModel = Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
                     }
 
@@ -192,8 +194,8 @@ class NewCallFragment : Fragment(),StringInterface {
                             views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#A9A9A9"))
                         }
                         else if(SplashActivity.staticSyncData?.settingDCR?.roleType=="FS") {
-                            views?.selectTeamsCv?.visibility = View.INVISIBLE
-                            views?.selectTeamHeader_tv?.visibility = View.INVISIBLE
+                            views?.selectTeamsCv?.visibility = View.GONE
+                            views?.selectTeamHeader_tv?.visibility = View.GONE
                             views?.selectRoutesCv?.setEnabled(true)
                             views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
                         }
@@ -240,11 +242,7 @@ class NewCallFragment : Fragment(),StringInterface {
                     })
 
                     views?.selectDoctorsCv?.setOnClickListener({
-
-                        selectionType=2
-
-
-
+                        removeDoneDcrFromList()
                         if(view?.docRetail_switch?.isChecked == true)
                         {
                             views?.bottomSheetTitle_tv?.setText("Select Doctor")
@@ -263,7 +261,11 @@ class NewCallFragment : Fragment(),StringInterface {
                             }
                         }
 
-                        openCloseModel()})
+                        selectionType=2
+                        openCloseModel()
+                        adapter.notifyDataSetChanged()
+
+                    })
 
                     views?.selectDoctorsCv?.setEnabled(false)
 
@@ -384,10 +386,11 @@ class NewCallFragment : Fragment(),StringInterface {
     fun openCloseModel()
     {
         views?.doctorSearch_et?.setText("")
-
+        Log.e("fsklhfsdhfisdhfishfdsf",doctorListArray.size.toString())
         adapter =BottomSheetDoctorAdapter()
         views?.doctorList_rv?.setLayoutManager(GridLayoutManager(requireActivity(), 3))
         views?.doctorList_rv?.adapter = adapter
+        adapter.notifyDataSetChanged()
 
         val state =
             if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED)
@@ -518,6 +521,8 @@ class NewCallFragment : Fragment(),StringInterface {
         }
 
 
+
+
         //-------------------------------------filter list using text input from edit text
         override fun getFilter(): Filter? {
             return object : Filter() {
@@ -599,6 +604,59 @@ class NewCallFragment : Fragment(),StringInterface {
 
                     }
                 }
+            }
+        }
+    }
+
+    fun removeDoneDcrFromList()
+    {
+
+        val responseDocCall=db.getApiDetail(5)
+        if(!responseDocCall.equals("")) {
+
+            docCallModel = Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
+
+            val doctTempList: ArrayList<SyncModel.Data.Doctor> = ArrayList()
+            doctTempList.addAll(doctorListArray)
+
+            for ((index,data) in doctTempList.withIndex())
+            {
+                for (item in docCallModel.dcrDoctorlist!!)
+                {
+                    if(item.doctorId==data.doctorId) {
+                        doctorListArray.remove(data)
+                    }
+                }
+            }
+            val rectTempList: ArrayList<SyncModel.Data.Retailer> = ArrayList()
+            rectTempList.addAll(retailerListArray)
+            for ((index,data) in rectTempList.withIndex())
+            {
+                val isAlreadyContain=docCallModel.dcrRetailerlist?.any{ s -> s.retailerId == data.retailerId }
+                if(isAlreadyContain == true) {
+                    retailerListArray.remove(data)
+                }
+            }
+        }
+        val doctTempList: ArrayList<SyncModel.Data.Doctor> = ArrayList()
+        val rectTempList: ArrayList<SyncModel.Data.Retailer> = ArrayList()
+        doctTempList.addAll(doctorListArray)
+        rectTempList.addAll(retailerListArray)
+
+        val dcrRetailerList=db.getAllSaveSendRetailer("retailerFeedback")
+        val eDetailingArray=db.getAllSaveSend("feedback")
+        for ((index,data) in doctTempList.withIndex())
+        {
+            val isAlreadyContain=eDetailingArray.any{ s -> s.doctorId == data.doctorId }
+            if(isAlreadyContain==true) {
+                doctorListArray.remove(data)
+            }
+        }
+        for ((index,data) in rectTempList.withIndex())
+        {
+            val isAlreadyContain=dcrRetailerList.any{ s -> s.retailerId == data.retailerId }
+            if(isAlreadyContain == true) {
+                retailerListArray.remove(data)
             }
         }
     }

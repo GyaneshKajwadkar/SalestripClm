@@ -33,8 +33,8 @@
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-sw600dp-land/downloadlist_view.xml" value="0.11244979919678715" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-sw600dp-land/edetailing_view.xml" value="0.1" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-sw600dp-land/fragment_home.xml" value="0.33" />
-        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-sw600dp-land/fragment_new_call.xml" value="0.29713114754098363" />
-        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-sw600dp-land/fragment_retailer_fill.xml" value="0.18" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-sw600dp-land/fragment_new_call.xml" value="0.1265377855887522" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-sw600dp-land/fragment_retailer_fill.xml" value="0.1" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-sw600dp-land/horizontal_webview.xml" value="0.12115127175368139" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-sw600dp-land/join_activity_view.xml" value="0.25" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-sw600dp-land/nav_header_main.xml" value="0.16" />
@@ -127,7 +127,7 @@
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

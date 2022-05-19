@@ -352,8 +352,6 @@ open class BaseActivity : AppCompatActivity(){
             }
             else
             {   Log.e("scheduleERROR", response?.errorBody().toString()) }
-
-
     }
 
     suspend fun getCredientailAPI(context: Activity)
@@ -410,7 +408,6 @@ open class BaseActivity : AppCompatActivity(){
 
     suspend fun submitDCRCo()
     {
-
         val eDetailingArray=dbBase.getAllSaveSend("feedback")
         if(eDetailingArray.size==0)
         { getDocCallAPI()
@@ -425,7 +422,6 @@ open class BaseActivity : AppCompatActivity(){
         withContext(Dispatchers.Main) {
             if (response?.isSuccessful == true)
             {
-                //   Log.e("dfsdgtrertef", response.body().toString())
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
                     if(response.body()?.getErrorObj()?.errorMessage==null || !response.body()?.getErrorObj()?.errorMessage.toString().isEmpty())
                     {
@@ -509,7 +505,5 @@ open class BaseActivity : AppCompatActivity(){
             else Log.e("getDocCallAPIERROR", response?.errorBody().toString())
 
     }
-
-
 
 }

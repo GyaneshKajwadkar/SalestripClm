@@ -349,6 +349,7 @@ class DailyDocVisitModel {
             @Expose
             var partyDistance: Int? =null
 
+            var saveInDb: Boolean? = null
 
            /*
 

@@ -289,6 +289,7 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         if(!responseDocCall.equals(""))
         {
             val  docCallModel= Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
+
             doctorList.addAll(eDetailingArray)
             retailerList.addAll(dbListRetailer)
 
@@ -297,8 +298,6 @@ class HomeFragment : Fragment(), OnChartGestureListener {
                 val buttonId: Int = toggleButton.getCheckedButtonId()
 
                 if(docCallModel.dcrDoctorlist?.size==0 && buttonId==R.id.doctorCall_btn) { noDocCall_tv?.visibility = View.VISIBLE}
-
-
 
                 docCallModel.dcrDoctorlist?.let { doctorList.addAll(it) }
                 docCallModel.dcrRetailerlist?.let { retailerList.addAll(it) }

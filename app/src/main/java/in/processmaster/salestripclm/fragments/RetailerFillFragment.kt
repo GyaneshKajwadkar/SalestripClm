@@ -20,6 +20,7 @@ import `in`.processmaster.salestripclm.models.*
 import `in`.processmaster.salestripclm.networkUtils.GPSTracker
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
+import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.InsetDrawable
@@ -31,6 +32,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -55,7 +57,6 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNameBoll_interface, PobProductTransfer,
@@ -370,7 +371,7 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
 
             if(::doctorRcpa1.isInitialized==true) {
                 saveModel.isRCPAFilled=true
-               val model = DailyDocVisitModel.Data.DcrDoctor.Rcpavo()
+                val model = DailyDocVisitModel.Data.DcrDoctor.Rcpavo()
                 model.docId=doctorRcpa1.id
                 model.docName=doctorRcpa1.name
                 model.mode = 1
@@ -378,6 +379,7 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
                 model.empId= loginModelHomePage.empId
                 model.rCPADate=generalClass.getCurrentDateTimeApiForamt()
                 model.strRCPADate=generalClass.getCurrentDateTimeApiForamt()
+
 
                 if(arguments?.getString("retailerData")?.isEmpty() == false) {
                     val edetailingEditModel=Gson().fromJson(arguments?.getString("retailerData"),DailyDocVisitModel.Data.DcrDoctor::class.java)
@@ -596,6 +598,7 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
                                 .replace(R.id.frameRetailer_view, RetailerFillFragment(stringInter))
                                 .commit()
 
+                            stringInter.onClickString("")
                         }
 
 
@@ -717,7 +720,13 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
         val productSearch_et = dialogView.findViewById<View>(R.id.productSearch_et) as EditText
         productSearch_et?.addTextChangedListener(filterTextPobWatcher)
 
-
+        pobProduct_rv.setOnTouchListener(object : View.OnTouchListener{
+            override fun onTouch(v: View, event: MotionEvent?): Boolean {
+                val imm = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                if (imm.isAcceptingText()) { imm?.hideSoftInputFromWindow(v.windowToken, 0) }
+                return false
+            }
+        })
 
         val pobProductSelectAdapter=PobProductAdapter(unSelectedProductList, passingSchemeList,this,1)
         pobProduct_rv.adapter= pobProductSelectAdapter
@@ -1106,8 +1115,8 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
             override fun afterTextChanged(p0: Editable?) {
-                productFilter_paretn.visibility=View.INVISIBLE
-                selectProduct.visibility=View.INVISIBLE
+                productFilter_paretn.visibility=View.GONE
+                selectProduct.visibility=View.GONE
                 parentScrollView.visibility=View.VISIBLE
             }
 
@@ -1166,6 +1175,7 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
                 obj.brandId=brandId
                 obj.dCRId=dcrId
 
+
                 obj.cp3=competitor3_et.text.toString()
                 obj.cp4=competitor4_et.text.toString()
 
@@ -1176,11 +1186,17 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
 
                 when(type)
                 {
-                    1-> {   saveRcpaDetailList1.set(position,obj)
+                    1-> {
+                        obj.rCPANo=1
+                        saveRcpaDetailList1.set(position,obj)
                         adapter1.notifyItemChanged(position)}
-                    2-> {  saveRcpaDetailList2.add(position,obj)
+                    2-> {
+                        obj.rCPANo=2
+                        saveRcpaDetailList2.add(position,obj)
                         adapter2.notifyItemChanged(position)}
-                    3-> {   saveRcpaDetailList3.add(position,obj)
+                    3-> {
+                        obj.rCPANo=3
+                        saveRcpaDetailList3.add(position,obj)
                         adapter3.notifyItemChanged(position)}
                 }
             }
@@ -1203,11 +1219,16 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
                 when(type)
                 {
                     1-> {
+                        obj.rCPANo=1
                         saveRcpaDetailList1.add(objRcpaDetail)
                         adapter1.notifyItemInserted(saveRcpaDetailList1.size)}
-                    2-> {  saveRcpaDetailList2.add(objRcpaDetail)
+                    2-> {
+                        obj.rCPANo=2
+                        saveRcpaDetailList2.add(objRcpaDetail)
                         adapter2.notifyItemInserted(saveRcpaDetailList2.size)}
-                    3-> {   saveRcpaDetailList3.add(objRcpaDetail)
+                    3-> {
+                        obj.rCPANo=3
+                        saveRcpaDetailList3.add(objRcpaDetail)
                         adapter3.notifyItemInserted(saveRcpaDetailList3.size)}
                 }
             }
@@ -1271,8 +1292,9 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
 
             holder.competitor3Tv.setText(modeldata?.cp3)
             holder.competitor4Tv.setText(modeldata?.cp4)
-            holder.cp3rx_tv.setText(modeldata?.cPRx3.toString())
-            holder.cp4rx_tv.setText(modeldata?.cPRx4.toString())
+            if(modeldata?.cPRx3!=null) holder.cp3rx_tv.setText(modeldata?.cPRx3.toString())
+            if(modeldata?.cPRx4!=null) holder.cp4rx_tv.setText(modeldata?.cPRx4.toString())
+
 
             holder.editClick_iv.setOnClickListener {
                 AddRCPA_alert(type,modeldata,position)

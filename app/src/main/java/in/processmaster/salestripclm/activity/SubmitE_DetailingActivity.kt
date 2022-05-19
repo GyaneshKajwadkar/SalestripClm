@@ -403,6 +403,17 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                   saveModel.routeName=dcrDetail.routeName
                   saveModel.routeId=dcrDetail.routeId
               }
+            if(staticSyncData?.settingDCR?.isSampleReportingMandatory==true && firstSample.size==0)
+            {
+                alertClass.commonAlert("","Please select at least one sample product")
+                return@setOnClickListener
+            }
+
+            if(staticSyncData?.settingDCR?.isGiftReportingMandatory==true && firstGift.size==0)
+            {
+                alertClass.commonAlert("","Gift reporting is Mandatory")
+                return@setOnClickListener
+            }
 
             if(!GeneralClass(this).isInternetAvailable())
             {   dbBase.insertOrUpdateSaveAPI(doctorIdDisplayVisual, Gson().toJson(saveModel),"feedback")
@@ -959,8 +970,8 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         saveModel: DailyDocVisitModel.Data.DcrDoctor,
         quantityArray: ArrayList<CommonModel.QuantityModel.Data.EmployeeSampleBalance>
     ) {
-      //  Log.e("isgfuiosgfiosgfuisf",Gson().toJson(saveModel))
-        //return
+     //  Log.e("isgfuiosgfiosgfuisf",Gson().toJson(saveModel))
+     //  return
 
         alertClass?.showProgressAlert("")
         var call: Call<DailyDocVisitModel> = HomePage.apiInterface?.submitEdetailingApiAndGet("bearer " + loginModelHomePage.accessToken,saveModel) as Call<DailyDocVisitModel>

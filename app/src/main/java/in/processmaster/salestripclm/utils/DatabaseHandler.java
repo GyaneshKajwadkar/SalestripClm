@@ -1232,6 +1232,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 String data=cursor.getString(cursor.getColumnIndex(APIKEY_DATA));
                 DailyDocVisitModel.Data.DcrDoctor getSaveModel  = new Gson().fromJson(data, DailyDocVisitModel.Data.DcrDoctor.class);
                 getSaveModel.setOffline(true);
+                getSaveModel.setSaveInDb(true);
                 edetailList.add(getSaveModel);
 
             }
@@ -1254,8 +1255,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             do {
                 String data=cursor.getString(cursor.getColumnIndex(APIKEY_DATA));
                 DailyDocVisitModel.Data.DcrDoctor getSaveModel  = new Gson().fromJson(data, DailyDocVisitModel.Data.DcrDoctor.class);
+               getSaveModel.setSaveInDb(true);
                 edetailList.add(getSaveModel);
-
             }
             while (cursor.moveToNext());
         }
