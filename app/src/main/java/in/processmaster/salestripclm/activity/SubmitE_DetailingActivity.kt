@@ -970,7 +970,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         saveModel: DailyDocVisitModel.Data.DcrDoctor,
         quantityArray: ArrayList<CommonModel.QuantityModel.Data.EmployeeSampleBalance>
     ) {
-     //  Log.e("isgfuiosgfiosgfuisf",Gson().toJson(saveModel))
+      Log.e("isgfuiosgfiosgfuisf",Gson().toJson(saveModel))
      //  return
 
         alertClass?.showProgressAlert("")

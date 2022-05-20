@@ -312,6 +312,9 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
         views.addBrandThree_btn.isEnabled=false
 
         views.addBrandOne_btn.setOnClickListener {
+
+           if(::alertDialog.isInitialized  && alertDialog.isShowing) { alertDialog.dismiss() }
+
             AddRCPA_alert(1)
         }
 
@@ -321,6 +324,7 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
                 generalClass.showSnackbar(it,"First RCPA detail not fill")
                 return@setOnClickListener
             }
+            if(::alertDialog.isInitialized && alertDialog.isShowing) { alertDialog.dismiss() }
 
             AddRCPA_alert(2)
         }
@@ -336,6 +340,8 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
                 generalClass.showSnackbar(it,"Second RCPA detail not fill")
                 return@setOnClickListener
             }
+            if(::alertDialog.isInitialized  && alertDialog.isShowing) { alertDialog.dismiss() }
+
             AddRCPA_alert(3)
         }
 
@@ -392,11 +398,18 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
             }
 
             if(::doctorRcpa2.isInitialized==true) {
+                if(::doctorRcpa1.isInitialized==true)
+                {
+                    if(doctorRcpa2.id==doctorRcpa1.id){
+                        alertClass.commonAlert("","Doctor 1 and Doctor 2 should not be the same")
+                        return@setOnClickListener
+                    }
+                }
+
+
                 val model = DailyDocVisitModel.Data.DcrDoctor.Rcpavo()
                 model.docId=doctorRcpa2.id
                 model.docName=doctorRcpa2.name
-                model.docId=doctorRcpa1.id
-                model.docName=doctorRcpa1.name
                 model.mode = 1
                 model.dcrId = dcrId
                 model.empId= loginModelHomePage.empId
@@ -415,12 +428,23 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
             }
 
             if(::doctorRcpa3.isInitialized==true) {
+                if(::doctorRcpa1.isInitialized==true)
+                {
+                    if(doctorRcpa3.id==doctorRcpa1.id){
+                        alertClass.commonAlert("","Doctor 1 and Doctor 3 should not be the same")
+                        return@setOnClickListener
+                    }
+                }
+                if(::doctorRcpa2.isInitialized==true)
+                {
+                    if(doctorRcpa3.id==doctorRcpa2.id){
+                        alertClass.commonAlert("","Doctor 2 and Doctor 3 should not be the same")
+                        return@setOnClickListener
+                    }
+                }
                 val model = DailyDocVisitModel.Data.DcrDoctor.Rcpavo()
                 model.docId=doctorRcpa3.id
                 model.docName=doctorRcpa3.name
-
-                model.docId=doctorRcpa1.id
-                model.docName=doctorRcpa1.name
                 model.mode = 1
                 model.dcrId = dcrId
                 model.empId= loginModelHomePage.empId
@@ -553,7 +577,7 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
         val arrayModel:ArrayList<DailyDocVisitModel.Data.DcrDoctor> = ArrayList()
         arrayModel.add(saveModel)
         Log.e("isgfuiosgfiosgfuisf",Gson().toJson(arrayModel))
-     // return
+      //  return
 
         alertClass?.showProgressAlert("")
         var call: Call<DailyDocVisitModel> = HomePage.apiInterface?.submitRetailer("bearer " + HomePage.loginModelHomePage.accessToken,arrayModel) as Call<DailyDocVisitModel>
@@ -943,7 +967,7 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
         {
             val selectedProduct=selectedList.get(0)
             ownBrand_et.setText(selectedProduct.productName)
-            brandId= selectedProduct.brandId!!
+            brandId= selectedProduct.productId!!
         }
         if(type==1)
         {
@@ -1157,8 +1181,8 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
             {
                 cp2unit_et.setError("Required");cp2unit_et.requestFocus();return@setOnClickListener
             }
-
-            if(obj.brandName?.isEmpty()==false)
+            Log.e("dsffsfsfsdfgegdfv",obj.brandId.toString())
+            if(obj.brandId!=null && obj.brandId != 0)
             {
                 obj.brandName=ownBrand_et.text.toString()
                 obj.brandUnits=rxunit_et.text.toString().toInt()
@@ -1184,11 +1208,11 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
                         adapter1.notifyItemChanged(position)}
                     2-> {
                         obj.rCPANo=2
-                        saveRcpaDetailList2.add(position,obj)
+                        saveRcpaDetailList2.set(position,obj)
                         adapter2.notifyItemChanged(position)}
                     3-> {
                         obj.rCPANo=3
-                        saveRcpaDetailList3.add(position,obj)
+                        saveRcpaDetailList3.set(position,obj)
                         adapter3.notifyItemChanged(position)}
                 }
             }
@@ -1289,6 +1313,7 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
 
 
             holder.editClick_iv.setOnClickListener {
+                if(::alertDialog.isInitialized  && alertDialog.isShowing) { alertDialog.dismiss() }
                 AddRCPA_alert(type,modeldata,position)
             }
 
@@ -1504,5 +1529,53 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
         }
         Thread(runnable).start()
     }
-
+    fun  addDoctorInStep(size: Int, edetailingEditModel: DailyDocVisitModel.Data.DcrDoctor)
+    {
+        Log.e("sdfsdfsdfdsgfsdf",size.toString())
+        if(size==1)
+        {
+            edetailingEditModel.RCPAList?.get(0)?.rCPADetailList?.let {
+                saveRcpaDetailList1.addAll(
+                    it
+                )
+            }
+            adapter1.notifyDataSetChanged()
+            doctorRcpa1=DocManagerModel()
+            doctorRcpa1.name= edetailingEditModel?.RCPAList?.get(0)?.docName.toString()
+            doctorRcpa1.id= edetailingEditModel?.RCPAList?.get(0)?.docId!!
+            views.doctorOne_et.setText(doctorRcpa1.name)
+            views.addBrandOne_btn.setAlpha(1f)
+            views.addBrandOne_btn.isEnabled=true
+        }
+        else if(size==2)
+        {
+            edetailingEditModel.RCPAList?.get(1)?.rCPADetailList?.let {
+                saveRcpaDetailList2.addAll(
+                    it
+                )
+            }
+            doctorRcpa2=DocManagerModel()
+            adapter2.notifyDataSetChanged()
+            doctorRcpa2.name= edetailingEditModel?.RCPAList?.get(1)?.docName.toString()
+            doctorRcpa2.id= edetailingEditModel?.RCPAList?.get(1)?.docId!!
+            views.doctorTwo_et.setText(doctorRcpa2.name)
+            views.addBrandTwo_btn.setAlpha(1f)
+            views.addBrandTwo_btn.isEnabled=true
+        }
+        else if(size==3)
+        {
+            edetailingEditModel.RCPAList?.get(2)?.rCPADetailList?.let {
+                saveRcpaDetailList3.addAll(
+                    it
+                )
+            }
+            doctorRcpa3=DocManagerModel()
+            adapter3.notifyDataSetChanged()
+            doctorRcpa3.name= edetailingEditModel?.RCPAList?.get(2)?.docName.toString()
+            doctorRcpa3.id= edetailingEditModel?.RCPAList?.get(2)?.docId!!
+            views.doctorThree_et.setText(doctorRcpa3.name)
+            views.addBrandThree_btn.setAlpha(1f)
+            views.addBrandThree_btn.isEnabled=true
+        }
+    }
 }

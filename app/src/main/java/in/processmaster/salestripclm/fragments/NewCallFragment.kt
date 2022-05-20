@@ -876,7 +876,7 @@ class NewCallFragment : Fragment(),StringInterface {
                     }
                 }*/
             }
-            else if(staticSyncData?.settingDCR?.isDoctorFencingRequired == true && views?.docRetail_switch?.isChecked==false){
+            else if(staticSyncData?.settingDCR?.isRetailerFencingRequired == true && views?.docRetail_switch?.isChecked==false){
                 val retailFirstFilter= SplashActivity.staticSyncData?.retailerList?.filter { s -> s.routeId == id } as java.util.ArrayList<SyncModel.Data.Retailer>
 
                 val getGpsTracker=GPSTracker(requireActivity())

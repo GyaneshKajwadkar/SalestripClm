@@ -1088,8 +1088,8 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
 
         fun selectRetailerForEdit(toJson: String) {
-            bottomNavigation?.selectedItemId= R.id.callPage
             retailerString=toJson
+            bottomNavigation?.selectedItemId= R.id.callPage
 
         }
     fun backToHome()

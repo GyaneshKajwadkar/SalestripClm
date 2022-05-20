@@ -66,6 +66,10 @@ class CommonModel {
             get() = field
             set(value) { field = value }
 
+        var routeName=""
+            get() = field
+            set(value) { field = value }
+
     }
 
     class QuantityModel{

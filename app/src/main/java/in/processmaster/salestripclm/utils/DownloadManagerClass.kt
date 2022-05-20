@@ -76,6 +76,8 @@ class DownloadManagerClass(
     }
 
     private fun downloadFile(url: String, name: String, fileType: String){
+        Log.e("fromDownloadMangerUrl",url)
+        Log.e("fromDownloadMangerName",name)
 
         val setMime = if(fileType=="IMAGE")"image/*" else if(fileType=="VIDEO")"video/*" else "zip"
         val request = DownloadManager.Request(Uri.parse(url))

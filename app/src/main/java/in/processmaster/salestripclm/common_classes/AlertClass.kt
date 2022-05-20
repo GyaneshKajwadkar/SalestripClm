@@ -376,6 +376,7 @@ class AlertClass(val context : Context)
             commonSaveDcrModel.workingType=workAreaSeletd.substring(0, i).toString().uppercase()
             commonSaveDcrModel.remark=dialogView.remarkEt.text.toString()
             commonSaveDcrModel.routeId=routeId
+            commonSaveDcrModel.routeName= routeNameData
             commonSaveDcrModel.monthNo=month+1
             commonSaveDcrModel.year=year
             commonSaveDcrModel.dayCount="0"
