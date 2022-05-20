@@ -162,17 +162,17 @@ class PobProductAdapter(
                 }
             })
 
-            holder.qty_et.setOnFocusChangeListener(object : View.OnFocusChangeListener {
+          /*  holder.qty_et.setOnFocusChangeListener(object : View.OnFocusChangeListener {
                 override fun onFocusChange(v: View, hasFocus: Boolean) {
                     if (hasFocus) {
                         v.postDelayed({
                             if (!v.hasFocus()) {
                                 v.requestFocus()
                             }
-                        }, 300)
+                        }, 100)
                     }
                 }
-            })
+            })*/
             }
 
 

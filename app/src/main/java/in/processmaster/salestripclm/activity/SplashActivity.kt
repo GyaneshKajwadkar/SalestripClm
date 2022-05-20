@@ -117,8 +117,9 @@ class SplashActivity : BaseActivity()
         }
     }
 
-    override fun onDestroy() { super.onDestroy()
+    override fun onDestroy() {
         generalClass.disableSimpleProgress(progressBar!!)
+        super.onDestroy()
     }
 
 

@@ -750,10 +750,7 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
         closePob_iv.setOnClickListener{
             alertDialog.dismiss()
         }
-
-
         alertDialog.show()
-
     }
 
     val filterTextPobWatcher: TextWatcher = object : TextWatcher {
@@ -904,11 +901,6 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
                 }
             }
         }
-
-
-
-
-
     }
 
     override fun onClickButtonPOB(selectedList: ArrayList<DailyDocVisitModel.Data.DcrDoctor.PobObj.PobDetailList>) {

@@ -82,7 +82,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             APIInterface::class.java)
 
 
-
         if(generalClass.isInternetAvailable()) callingMultipleAPI()
         else {
            /* if (dbBase?.getApiDetail(1) != "") {
@@ -104,7 +103,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         }
 
     }
-
 
     override fun onDestroy() {
         super.onDestroy()
@@ -958,7 +956,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                             return
                         }
 
-
                         if (dcrData?.dataSaveType?.lowercase() == "s") {
 
                             runOnUiThread(java.lang.Runnable {
@@ -1019,9 +1016,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                            //     setDcrCheck=true
                            //     bottomNavigation?.selectedItemId = R.id.callPage
                            // }
-
-
-
                             runOnUiThread {
                                 toolbarTv?.setText("Create Calls")
                                 val fragment = NewCallFragment()
