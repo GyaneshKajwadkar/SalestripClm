@@ -108,7 +108,8 @@ class SplashActivity : BaseActivity()
                     staticSyncData = response.body()?.data
                     intent = Intent(this@SplashActivity, HomePage::class.java)
                 }
-                else {
+                else
+                {
                     sharePreferance?.setPrefBool("isLogin", false)
                     intent= Intent(this@SplashActivity, LoginActivity::class.java)
                 }
