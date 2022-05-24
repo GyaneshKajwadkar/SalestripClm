@@ -47,6 +47,8 @@ class ShowDownloadedFragment : Fragment() {
     var adapterImage : DownloadedFolderAdapter?=null
     var adapterWeb : DownloadedFolderAdapter?=null
     var filterFavList_et : EditText?=null
+    var isCustomePresentation=false;
+
     private var db: DatabaseHandler? = null
     companion object
     {
@@ -60,8 +62,6 @@ class ShowDownloadedFragment : Fragment() {
             savedInstanceState: Bundle?
     ): View? {
         var view= inflater.inflate(R.layout.fragment_show_downloaded, container, false)
-
-
 
         if(currentDate.isEmpty()&& currentDate.isEmpty())
         {
@@ -108,40 +108,51 @@ class ShowDownloadedFragment : Fragment() {
         {
             AlertClass(requireActivity()).showProgressAlert("")
             val runnable= Runnable {
+             var downloadList: ArrayList<DownloadFileModel> = ArrayList()
+             db = DatabaseHandler(requireActivity())
 
+                isCustomePresentation=  requireArguments().getBoolean("presentation")
+             var value = 0
+             var brandID = 0
 
-
-                db = DatabaseHandler(requireActivity())
-                val value = requireArguments().getInt("eDetailingID")
-                val brandID = requireArguments().getInt("brandId")
-                val selectionType = requireArguments().getInt("selectionType")
-
-                var downloadList: ArrayList<DownloadFileModel> = ArrayList()
-                if(selectionType==1)
-                {
-                    downloadList= db?.getAllDownloadedData(value) as ArrayList<DownloadFileModel>
-                }
+             if(isCustomePresentation){
+                 val presentationName=  requireArguments().getString("presentationName")
+                 db?.getAllPresentationItem(presentationName)?.let { downloadList.addAll(it) }
+             }
                 else
-                {
-                    downloadList= db?.getAllFavList() as ArrayList<DownloadFileModel>
-                    if(downloadList.size==0) requireActivity().runOnUiThread {  nodata_gif?.visibility=View.VISIBLE }
-                    else requireActivity().runOnUiThread { topSearchParent?.visibility=View.VISIBLE }
-                }
+             {
+                 val selectionType = requireArguments().getInt("selectionType")
+                 value = requireArguments().getInt("eDetailingID")
+                 brandID = requireArguments().getInt("brandId")
+
+                 if(selectionType==1)
+                 {
+                     downloadList= db?.getAllDownloadedData(value) as ArrayList<DownloadFileModel>
+                 }
+                 else
+                 {
+                     downloadList= db?.getAllFavList() as ArrayList<DownloadFileModel>
+                     if(downloadList.size==0) requireActivity().runOnUiThread {  nodata_gif?.visibility=View.VISIBLE }
+                     else requireActivity().runOnUiThread { topSearchParent?.visibility=View.VISIBLE }
+                 }
+             }
+
+
                 for ((index, valueDownload) in downloadList?.withIndex()!!)
                 {
                     if(valueDownload.downloadType.equals("VIDEO"))
                     {
-                        valueDownload.eDetailingId=value
+                     //   valueDownload.eDetailingId=value
                         arraylistVideo.add(valueDownload)
                     }
                     else  if(valueDownload.downloadType.equals("IMAGE"))
                     {
-                        valueDownload.eDetailingId=value
+                      //  valueDownload.eDetailingId=value
                         arraylistImages.add(valueDownload)
                     }
                     else
                     {
-                        valueDownload.eDetailingId=value
+                       // valueDownload.eDetailingId=value
                         arraylistZip.add(valueDownload)
                     }
                 }
@@ -151,12 +162,13 @@ class ShowDownloadedFragment : Fragment() {
                 if(arraylistImages.size==0) requireActivity().runOnUiThread{ images_parent?.visibility=View.GONE}
 
                 if(arraylistZip.size==0)requireActivity().runOnUiThread{ html_parent?.visibility=View.GONE}
+                var presentationName=""
+                if(isCustomePresentation) presentationName= requireArguments().getString("presentationName")!!
 
-                val sendtext = requireArguments().getString("type")
 
-                adapterVideo= DownloadedFolderAdapter(sendtext,"VIDEO",arraylistVideo, requireActivity(),doctorIdDisplayVisual,brandID)
-                adapterImage= DownloadedFolderAdapter(sendtext,"IMAGE", arraylistImages, requireActivity(), doctorIdDisplayVisual, brandID)
-                adapterWeb= DownloadedFolderAdapter(sendtext,"ZIP", arraylistZip, requireActivity(), doctorIdDisplayVisual, brandID)
+                adapterVideo= DownloadedFolderAdapter(presentationName,"VIDEO",arraylistVideo, requireActivity(),doctorIdDisplayVisual,isCustomePresentation)
+                adapterImage= DownloadedFolderAdapter(presentationName,"IMAGE", arraylistImages, requireActivity(), doctorIdDisplayVisual, isCustomePresentation)
+                adapterWeb= DownloadedFolderAdapter(presentationName,"ZIP", arraylistZip, requireActivity(), doctorIdDisplayVisual, isCustomePresentation)
 
 
                 requireActivity().runOnUiThread {

@@ -67,6 +67,7 @@ class NewCallFragment : Fragment(),StringInterface {
     var doctorListArray:ArrayList<SyncModel.Data.Doctor> = ArrayList()
     var retailerListArray:ArrayList<SyncModel.Data.Retailer> = ArrayList()
     var routeList: ArrayList<SyncModel.Data.Route> = ArrayList()
+    var ristrictedRouteList: ArrayList<SyncModel.Data.Route> = ArrayList()
     var teamsList: ArrayList<SyncModel.Data.FieldStaffTeam> = ArrayList()
     var selectionType=0
     var selectedDocID=0
@@ -128,7 +129,6 @@ class NewCallFragment : Fragment(),StringInterface {
 
                         docCallModel = Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
                     }
-
                     if(staticSyncData?.settingDCR?.isRestrictedParty==true)
                     {
                         if(sharePreferance?.getPref("dcrObj")?.isEmpty() == false) {
@@ -136,6 +136,7 @@ class NewCallFragment : Fragment(),StringInterface {
 
                             var routeListPartList: ArrayList<SyncModel.Data.Route> = ArrayList()
                             val items: List<String>? = dcrModel?.routeId?.split(",")
+
                             if (items != null) {
                                 for (data in items) {
                                     for(route in routeList)
@@ -144,7 +145,7 @@ class NewCallFragment : Fragment(),StringInterface {
                                         { routeListPartList.add(route) }
                                     } }}
                             routeList.clear()
-                            routeList.addAll(routeListPartList)
+                            ristrictedRouteList.addAll(routeListPartList)
                         }
                     }
                     adapter =BottomSheetDoctorAdapter()
@@ -282,14 +283,16 @@ class NewCallFragment : Fragment(),StringInterface {
                             return@setOnClickListener
                         }
 
-                        val presentationList=db.getAllSavedPresentationName()
-                        if(presentationList.size!=0)
-                        {
-                            selectSubmitActionAlert()
-                        }
-                        else{
-                            callOnlinePresentationIntent(false)
-                        } })
+
+                         val intent = Intent(activity, OnlinePresentationActivity::class.java)
+                        intent.putExtra("doctorID", selectedDocID)
+                        intent.putExtra("doctorName", selectedDocName)
+                        intent.putExtra("skip", false)
+                        intent.putExtra("doctorObj", Gson().toJson(doctorObject))
+                        intent.putExtra("isPresentation", true)
+                        startActivityForResult(intent,3)
+
+                       })
 
                     views?.skipDetailing_btn?.setOnClickListener({
                         val intent = Intent(activity, SubmitE_DetailingActivity::class.java)
@@ -303,48 +306,12 @@ class NewCallFragment : Fragment(),StringInterface {
             }
         }
 
+
+
     /*    else
             views?.selectRoutesCv?.setEnabled(false)*/
         //  views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
     //  checkDCRusingShareP(0)
-    }
-
-
-    fun callOnlinePresentationIntent(isPresentation:Boolean)
-    {
-        val intent = Intent(activity, OnlinePresentationActivity::class.java)
-        intent.putExtra("doctorID", selectedDocID)
-        intent.putExtra("doctorName", selectedDocName)
-        intent.putExtra("skip", false)
-        intent.putExtra("doctorObj", Gson().toJson(doctorObject))
-        intent.putExtra("isPresentation", isPresentation)
-        startActivityForResult(intent,3)
-    }
-
-    fun selectSubmitActionAlert(){
-        val dialogBuilder = AlertDialog.Builder(requireActivity())
-        val inflater = layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.select_submit_alert, null)
-        dialogBuilder.setView(dialogView)
-
-       val alertDialogEdit = dialogBuilder.create()
-        alertDialogEdit.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
-
-        val presentation_btn = dialogView.findViewById<View>(R.id.presentation_btn) as AppCompatButton
-        val edetailing_btn = dialogView.findViewById<View>(R.id.edetailing_btn) as AppCompatButton
-
-        val cancel_btn = dialogView.findViewById<View>(R.id.cancel_btn) as AppCompatButton
-
-        presentation_btn.setOnClickListener { callOnlinePresentationIntent(true) }
-
-        edetailing_btn.setOnClickListener { callOnlinePresentationIntent(false) }
-
-
-        cancel_btn.setOnClickListener {
-            alertDialogEdit.dismiss()
-        }
-
-        alertDialogEdit.show()
     }
 
     fun checkDCRusingShareP():Boolean
@@ -386,7 +353,7 @@ class NewCallFragment : Fragment(),StringInterface {
     fun openCloseModel()
     {
         views?.doctorSearch_et?.setText("")
-        Log.e("fsklhfsdhfisdhfishfdsf",doctorListArray.size.toString())
+
         adapter =BottomSheetDoctorAdapter()
         views?.doctorList_rv?.setLayoutManager(GridLayoutManager(requireActivity(), 3))
         views?.doctorList_rv?.adapter = adapter
@@ -449,15 +416,18 @@ class NewCallFragment : Fragment(),StringInterface {
 
 
                 holder.parent_cv.setOnClickListener({
+
                     views?.selectTeam_tv?.setText((modeldata?.fullName))
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
                     onSelection()
                     modeldata.fieldStaffId?.let { it1 -> applySelectionFilter(it1) }
+
                 })
             }
 
             else if(selectionType==1)
-            {    if(filteredDataRoute.size<=0)  views?.noData_tv?.visibility=View.VISIBLE
+            {
+                if(filteredDataRoute.size<=0)  views?.noData_tv?.visibility=View.VISIBLE
                  else  views?.noData_tv?.visibility=View.GONE
 
                 val modeldata = filteredDataRoute?.get(position)
@@ -472,7 +442,6 @@ class NewCallFragment : Fragment(),StringInterface {
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
                     onSelection()
                     modeldata.routeId?.let { it1 -> applySelectionFilter(it1) }
-
                 })
             }
 
@@ -520,10 +489,7 @@ class NewCallFragment : Fragment(),StringInterface {
 
         }
 
-
-
-
-        //-------------------------------------filter list using text input from edit text
+         //-------------------------------------filter list using text input from edit text
         override fun getFilter(): Filter? {
             return object : Filter() {
                 override fun publishResults(constraint: CharSequence?, results: FilterResults) {
@@ -810,13 +776,12 @@ class NewCallFragment : Fragment(),StringInterface {
             if(staticSyncData?.settingDCR?.isRestrictedParty==false)
             {
                 routeList.clear()
-                // SplashActivity.staticSyncData?.routeList?.let { routeList.addAll(it) }
                 val filterRouteUsingFieldStaff= SplashActivity.staticSyncData?.routeList?.filter {  s -> s.fieldStaffId == id }
                 filterRouteUsingFieldStaff?.let { routeList.addAll(it) }
             }
             else
             {
-                val filterRouteUsingFieldStaff= routeList?.filter {  s -> s.fieldStaffId == id }
+                val filterRouteUsingFieldStaff= ristrictedRouteList?.filter {  s -> s.fieldStaffId == id }
                 routeList.clear()
                 filterRouteUsingFieldStaff?.let { routeList.addAll(it) }
             }
@@ -917,6 +882,7 @@ class NewCallFragment : Fragment(),StringInterface {
             }
 
         }
+
     }
 
     private fun preCallAnalysisApi(doctorDetailModel: SyncModel.Data.Doctor) {
@@ -1303,7 +1269,7 @@ class NewCallFragment : Fragment(),StringInterface {
                     if (response.body()?.errorObj?.errorMessage?.isEmpty() == true) {
                         val dcrData=response.body()?.data?.dcrData
 
-                        if(staticSyncData?.settingDCR?.isCallPlanMandatoryForDCR==true && response.body()?.data?.isCPExiest == true)
+                        if(staticSyncData?.settingDCR?.isCallPlanMandatoryForDCR==true && response.body()?.data?.isCPExiest == false)
                         {
                             alertClass?.commonAlert("Alert!","Please submit you day plan first")
                             return@withContext

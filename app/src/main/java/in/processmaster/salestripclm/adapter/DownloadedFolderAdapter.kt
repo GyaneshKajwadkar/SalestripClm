@@ -39,12 +39,12 @@ import java.util.*
 
 
 class DownloadedFolderAdapter(
-    var sendType: String?,
+    var presentationName: String,
     var downloadedType: String,
     var arraylist: ArrayList<DownloadFileModel>,
     var context: Context,
     var doctorIdDisplayVisual: Int,
-    var brandID: Int
+    var isCustomePresentation: Boolean
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Filterable {
 
 
@@ -150,6 +150,8 @@ class DownloadedFolderAdapter(
                     intent.putExtra("brandId", videomodel?.brandId)
                     intent.putExtra("doctorId", doctorIdDisplayVisual)
                     intent.putExtra("currentDateTime", currentDate + " " + currentTime)
+                    intent.putExtra("isPresentation", isCustomePresentation)
+                    intent.putExtra("presentationName", presentationName)
 
                     intent.putExtra("videoArray", arraylist)
                     for ((index, value) in arraylist?.withIndex()!!) {
@@ -160,7 +162,7 @@ class DownloadedFolderAdapter(
                     context.startActivity(intent)
 
                     val db= DatabaseHandler(context)
-                    db.insertStartTimeSlide(currentDate + " " + currentTime,doctorIdDisplayVisual,brandID,videomodel.brandName,0, currentTime)
+                    db.insertStartTimeSlide(currentDate + " " + currentTime,doctorIdDisplayVisual,videomodel.brandId,videomodel.brandName,0, currentTime)
 
                 })
 
@@ -216,6 +218,8 @@ class DownloadedFolderAdapter(
                     intent.putExtra("doctorId", doctorIdDisplayVisual)
                     intent.putExtra("currentDateTime", currentDate + " " + currentTime)
                     intent.putExtra("imageArray", arraylist)
+                    intent.putExtra("isPresentation", isCustomePresentation)
+                    intent.putExtra("presentationName", presentationName)
 
                     for ((index, value) in arraylist?.withIndex()!!)
                     {
@@ -298,6 +302,9 @@ class DownloadedFolderAdapter(
                         intent.putExtra("doctorId", doctorIdDisplayVisual)
                         intent.putExtra("currentDateTime", currentDate + " " + currentTime)
                         intent.putExtra("webArray", arraylist)
+                        intent.putExtra("isPresentation", isCustomePresentation)
+                        intent.putExtra("presentationName", presentationName)
+
                         for ((index, value) in arraylist?.withIndex()!!)
                         {
                             if(value==zipmodel)

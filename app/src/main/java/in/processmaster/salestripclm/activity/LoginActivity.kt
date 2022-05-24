@@ -59,10 +59,10 @@ class LoginActivity : BaseActivity() {
         { userName_et?.setText(sharePreferance?.getPref("userName_login")) }
 
         // userName_et?.setText("NILESH")
-       //  userName_et?.setText("MEDE0172")
+         userName_et?.setText("MEDE0172")
         // password_et?.setText("NILESH")
-       // password_et?.setText("1@@@sanjaysahu")
-       // companyCode_et.setText("UAT2")
+         password_et?.setText("1@@@sanjaysahu")
+         companyCode_et.setText("UAT2")
         //forgot click
         forgotPass_tv?.setOnClickListener {
             val intent = Intent(this, ForgotActivity::class.java)

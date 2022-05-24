@@ -13,6 +13,7 @@
         android:orientation="vertical">
 
         <RelativeLayout
+            android:id="@+id/fragmentToolbar_rl"
             android:padding="4dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -142,10 +143,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/c"/>
+
 
                 <LinearLayout
                     android:id="@+id/splitViewparent_ll"
@@ -161,84 +159,68 @@
                         android:layout_height="match_parent"
                         android:layout_weight="0.3">
 
+                        <com.google.android.material.button.MaterialButtonToggleGroup
+                            android:id="@+id/toggleButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:weightSum="2"
+                            app:checkedButton="@+id/brandAll_btn"
+                            app:singleSelection="true">
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/brandAll_btn"
+                                style="@style/ToggleButtonGroupStyle"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:insetLeft="2dp"
+                                android:textSize="12sp"
+                                android:insetRight="2dp"
+                                android:text="All Brands" />
+
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/customPresent_btn"
+                                style="@style/ToggleButtonGroupStyle"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:insetLeft="2dp"
+                                android:insetRight="2dp"
+                                android:textSize="12sp"
+                                android:text="Custom Presentation" />
+
+
+                        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                        <TextView
+                            android:visibility="gone"
+                            android:layout_below="@+id/toggleButton"
+                            android:id="@+id/noDataSelection_tv"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="No Data"
+                            android:textColor="@color/black"
+                            android:textSize="18sp"
+                            android:padding="10dp"
+                            android:textAlignment="center"/>
 
                         <androidx.recyclerview.widget.RecyclerView
+                            android:layout_below="@+id/toggleButton"
                             android:id="@+id/brand_rv"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_above="@+id/submitBtn"
                             android:padding="5dp" />
 
-                        <LinearLayout
-                            android:visibility="gone"
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/customPresentation_rv"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical">
-
-                            <RelativeLayout
-                                android:layout_margin="2dp"
-                                android:id="@+id/allFav_selectionParent"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content">
-
-                                <RelativeLayout
-                                    android:layout_margin="2dp"
-                                    android:id="@+id/favBrand_rl"
-                                    android:background="#E8D2A2"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content">
-                                    <TextView
-                                        android:layout_centerInParent="true"
-                                        android:padding="10dp"
-                                        android:text="Favourite brand"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:textColor="@color/black"
-                                        android:textAlignment="center"
-                                        android:textSize="16sp"
-                                        android:id="@+id/favBrand_tv"/>
-
-
-                                </RelativeLayout>
-                            </RelativeLayout>
-
-                            <RelativeLayout
-                                android:layout_margin="2dp"
-                                android:id="@+id/allbrand_selectionParent"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content">
-                                <RelativeLayout
-                                    android:layout_margin="1dp"
-                                    android:id="@+id/parentAllBrand_rl"
-                                    android:background="#E8D2A2"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content">
-                                    <TextView
-                                        android:layout_centerInParent="true"
-                                        android:padding="10dp"
-                                        android:text="All brand"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:textColor="@color/black"
-                                        android:textAlignment="center"
-                                        android:textSize="16sp"
-                                        android:id="@+id/allBrand_tv"/>
-
-                                    <ImageView
-                                        android:id="@+id/brand_upDown_iv"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:src="@drawable/zm_btn_dropdown"
-                                        android:layout_centerVertical="true"
-                                        android:layout_alignParentRight="true"
-                                        app:tint="@color/black"
-                                        android:layout_marginRight="5dp"/>
-
-
-                                </RelativeLayout>
-
-                            </RelativeLayout>
-                        </LinearLayout>
+                            android:layout_height="match_parent"
+                            android:layout_above="@+id/submitBtn"
+                            android:layout_below="@+id/toggleButton"
+                            android:padding="5dp"
+                            android:visibility="invisible" />
 
                         <Button
                             android:id="@+id/submitBtn"

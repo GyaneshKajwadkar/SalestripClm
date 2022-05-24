@@ -94,14 +94,11 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                     syncSmallData.await()
                     syncRouteData.await()
                     syncRetailerData.await()
-                    syncProductData.await()
-
-                }
+                    syncProductData.await()     }
             }*/
             initView()
             bottomNavigation?.selectedItemId= R.id.landingPage
         }
-
     }
 
     override fun onDestroy() {
@@ -190,14 +187,14 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
             R.id.downloadVisualPage -> {
 
-               /* if(::objDownloadManager.isInitialized && generalClass.isInternetAvailable())
+                if(::objDownloadManager.isInitialized && generalClass.isInternetAvailable())
                 {
                     if(objDownloadManager?.getNumber<objDownloadManager?.allProductList.size)
                     {
                         objDownloadManager.downloadProgressAlert()
                         return@OnNavigationItemSelectedListener false
                     }
-                }*/
+                }
                 toolbarTv?.setText("Download Content")
 
                 if (openFragmentStr.equals("EdetailingFragment")) {
@@ -218,14 +215,14 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             }
 
             R.id.callPage->{
-                /*if(::objDownloadManager.isInitialized && generalClass.isInternetAvailable())
+                if(::objDownloadManager.isInitialized && generalClass.isInternetAvailable())
                 {
                     if(objDownloadManager?.getNumber<objDownloadManager?.allProductList.size)
                     {
                         objDownloadManager.downloadProgressAlert()
                         return@OnNavigationItemSelectedListener false
                     }
-                }*/
+                }
 
                 if (openFragmentStr.equals("CallsFragment")) {
                     return@OnNavigationItemSelectedListener true
@@ -551,8 +548,8 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                                  val list= dbBase.getAlleDetail().filter { s-> s.isSaved==0} as ArrayList<DevisionModel.Data.EDetailing>
                                  if(list.size!=0 && generalClass.isInternetAvailable())
                                  {
-                                   //  objDownloadManager= DownloadManagerClass(this@HomePage,dbBase,list)
-                                   //  objDownloadManager.startDownloading()
+                                     objDownloadManager= DownloadManagerClass(this@HomePage,dbBase,list)
+                                     objDownloadManager.startDownloading()
                                  }
 
 
@@ -943,7 +940,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
                         val dcrData=response.body()?.data?.dcrData
 
-                        if(staticSyncData?.settingDCR?.isCallPlanMandatoryForDCR==true && response.body()?.data?.isCPExiest == true)
+                        if(staticSyncData?.settingDCR?.isCallPlanMandatoryForDCR==true && response.body()?.data?.isCPExiest == false)
                         {
                             runOnUiThread(java.lang.Runnable {
                                 alertClass?.commonAlert("Alert!","Please submit your day plan first")
@@ -952,6 +949,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                             return
                         }
                         if (dcrData?.rtpApproveStatus?.lowercase() != "a") {
+
                             alertClass?.commonAlert("Alert!","Tour plan not approved")
                             return
                         }

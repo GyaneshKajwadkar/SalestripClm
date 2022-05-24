@@ -322,6 +322,11 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
             }
 
             filterListVideoWeb()
+            if(intent.getBooleanExtra("isPresentation",false)) {
+                currentProduct_btn.visibility=View.INVISIBLE
+                otherProduct_btn.visibility=View.INVISIBLE
+            }
+
         }
 
         if(intent.getStringExtra("singleSelection")!=null)
@@ -356,7 +361,17 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
         val runnable= Runnable {    filterWebList.clear()
             filterVideoList.clear()
 
-            val dowloadedAllList=dbBase.getAllDownloadedData(eDetailingId)
+            var dowloadedAllList: ArrayList<DownloadFileModel> = ArrayList()
+            if(intent.getBooleanExtra("isPresentation",false))
+            {
+                 dowloadedAllList=dbBase.getAllPresentationItem(intent.getStringExtra("presentationName"))
+            }
+            else
+            {
+                 dowloadedAllList=dbBase.getAllDownloadedData(eDetailingId)
+            }
+
+
 
             for(item in dowloadedAllList)
             {

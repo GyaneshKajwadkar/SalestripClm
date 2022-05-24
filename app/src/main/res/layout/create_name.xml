@@ -26,7 +26,7 @@
                 android:textSize="20sp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Presentation name"
+                android:text="Presentation Name"
                 android:textColor="@color/purple_200"
                 android:textStyle="bold"/>
 

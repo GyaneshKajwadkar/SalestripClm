@@ -64,10 +64,6 @@ class DoctorManagerSelector_Adapter(
                         listner.selectorArray(arrayListSelector,selectionType)
                     }
                 }
-
-
-
-
             }
 
         })

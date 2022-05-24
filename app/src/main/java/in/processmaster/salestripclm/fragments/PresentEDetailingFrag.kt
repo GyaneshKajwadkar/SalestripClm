@@ -3,11 +3,13 @@ package `in`.processmaster.salestripclm.fragments
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.SplashActivity
 import `in`.processmaster.salestripclm.activity.SubmitE_DetailingActivity
+import `in`.processmaster.salestripclm.adapter.StringListAdapter
 import `in`.processmaster.salestripclm.adapter.VisualFileAdapter
 import `in`.processmaster.salestripclm.fragments.ShowDownloadedFragment.Companion.currentDate
 import `in`.processmaster.salestripclm.fragments.ShowDownloadedFragment.Companion.currentTime
 import `in`.processmaster.salestripclm.interfaceCode.ItemClickDisplayVisual
 import `in`.processmaster.salestripclm.interfaceCode.SortingDisplayVisual
+import `in`.processmaster.salestripclm.interfaceCode.StringInterface
 import `in`.processmaster.salestripclm.models.*
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
@@ -26,12 +28,15 @@ import androidx.annotation.NonNull
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_display_visual.view.*
@@ -39,7 +44,7 @@ import kotlinx.android.synthetic.main.bottom_sheet_visualads.view.*
 import java.util.*
 
 
-class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDisplayVisual {
+class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDisplayVisual,StringInterface {
 
     companion object
     {
@@ -50,7 +55,7 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
     private lateinit var bottomSheet: ConstraintLayout
     lateinit var db : DatabaseHandler
     var adapter: BottomSheetDoctorAdapter? = null
-    var adapterVisualFile: VisualFileAdapter? = null
+    lateinit var adapterVisualFile: VisualFileAdapter
     var sharePreferance: PreferenceClass? = null
     var contextFragment= getContext()
     var edetailingList: ArrayList<DevisionModel.Data.EDetailing>? = null
@@ -59,6 +64,7 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
     var storedDownloadedList: ArrayList<DownloadFileModel> = ArrayList()
     var views:View?=null
     var doctorName=""
+    lateinit var stringListAdapter : StringListAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -66,17 +72,59 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
     ): View? {
         views = inflater.inflate(R.layout.activity_display_visual, container, false)
         db = DatabaseHandler(requireActivity())
+        sharePreferance = PreferenceClass(activity)
+
+        doctor_et = views?.findViewById(R.id.doctor_et) as EditText
+        views!!.fragmentToolbar_rl.visibility=View.GONE
+        doctor_et?.setText("1")
+        doctor_et?.visibility=View.INVISIBLE
+
+        initViewPresentation(views!!)
         initView(views!!)
+
         return views }
+
+    fun initViewPresentation(views: View)
+    {
+
+      /*  arguments?.let {
+            val isPresentation = requireArguments().getBoolean("isPresentation")
+        }*/
+
+        val createdPresentatedList=db.getAllSavedPresentationName()
+
+
+        views?.customPresentation_rv?.setLayoutManager(LinearLayoutManager(requireActivity()))
+        stringListAdapter=StringListAdapter(createdPresentatedList,this)
+        views?.customPresentation_rv?.adapter = stringListAdapter
+
+        views?.toggleButton.forEach { button ->
+            button.setOnClickListener { (button as MaterialButton).isChecked = true }
+        }
+
+        views?.toggleButton.addOnButtonCheckedListener(MaterialButtonToggleGroup.OnButtonCheckedListener { group, checkedId, isChecked ->
+            if (isChecked && R.id.brandAll_btn == checkedId) {
+               views?.brand_rv.visibility=View.VISIBLE
+               views?.noDataSelection_tv.visibility=View.GONE
+               views?.customPresentation_rv.visibility=View.INVISIBLE
+            } else if (isChecked && R.id.customPresent_btn == checkedId) {
+                if(createdPresentatedList.size==0) {
+                    views?.noDataSelection_tv.visibility=View.VISIBLE
+                }
+                views?.brand_rv.visibility=View.INVISIBLE
+                views?.customPresentation_rv.visibility=View.VISIBLE
+            }
+        })
+    }
+
 
     fun  initView(views: View)
     {
-        doctor_et = views.findViewById(R.id.doctor_et) as EditText
-        bottomSheet = views.findViewById(R.id.bottomSheet) as ConstraintLayout
-        sharePreferance = PreferenceClass(activity)
-        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+       // bottomSheet = views.findViewById(R.id.bottomSheet) as ConstraintLayout
 
-        doctor_et?.setOnClickListener({
+      //  bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+
+       /* doctor_et?.setOnClickListener({
             val state =
                 if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED)
                     BottomSheetBehavior.STATE_COLLAPSED
@@ -84,7 +132,7 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
                     BottomSheetBehavior.STATE_EXPANDED
             bottomSheetBehavior.state = state
         })
-
+*/
         views!!.close_imv?.setOnClickListener({
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
         })
@@ -115,28 +163,12 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
         setSelectorAdapter(downloadFilePathList)
         setUserFavAdapter()
 
- /*       views!!.progressMessage_tv?.setText("Loading e-Detailing")
-        GeneralClass(requireActivity()).enableProgress(views!!.progressView_parentRv!!)
-
-
-        Handler(Looper.getMainLooper()).postDelayed({
-            setDoctorList()
-            setAdapter()
-            setSelectorAdapter(downloadFilePathList)
-            setUserFavAdapter()
-            GeneralClass(requireActivity()).disableProgress(views!!.progressView_parentRv!!)
-            //  activity?.let { disableProgress(progressView_parentRv!!, it) }
-        }, 50)*/
-
         callDownloadFragment()
 
         arguments?.let {
             val sendtext = requireArguments().getString("type")
             if(sendtext!=null)
             {
-                doctor_et?.visibility=View.INVISIBLE
-                doctor_et?.setText("1")
-
                 doctorIdDisplayVisual=requireArguments().getInt("doctorID")
                 doctorName= requireArguments().getString("doctorName").toString()
             }
@@ -201,7 +233,7 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
         db.deleteAllVisualAds()
         db.deleteAllChildVisual()
 
-        setDoctorList()
+      //  setDoctorList()
 
         currentTime=""
         currentDate=""
@@ -578,6 +610,12 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
 
     override fun onClickDisplayVisual(eDetailinId: Int,brandID: Int,selectionType: Int)
     {
+        if(::stringListAdapter.isInitialized)
+        {
+            stringListAdapter.selectedPosition=-1
+            views?.customPresentation_rv?.adapter?.notifyDataSetChanged()
+        }
+
         val args = Bundle()
         args.putInt("eDetailingID", eDetailinId)
         args.putInt("brandId", brandID)
@@ -620,6 +658,25 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
     {
         contextFragment=context
         super.onAttach(context)
+    }
+
+    override fun onClickString(passingInterface: String?) {
+
+        if(::adapterVisualFile.isInitialized)
+        {
+            adapterVisualFile.selectedPosition=-1
+            adapterVisualFile.notifyDataSetChanged()
+        }
+
+        val args = Bundle()
+        args.putBoolean("presentation", true)
+        args.putString("presentationName", passingInterface)
+
+        val childFragment2: Fragment = ShowDownloadedFragment()
+        childFragment2.setArguments(args)
+
+        val transaction2: FragmentTransaction = childFragmentManager.beginTransaction()
+        transaction2.replace(R.id.child_fragment_container, childFragment2).commit()
     }
 
 

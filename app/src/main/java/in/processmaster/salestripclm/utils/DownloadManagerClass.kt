@@ -128,8 +128,6 @@ class DownloadManagerClass(
                     getNumber++
                     startDownloading()
                 }
-
-
             }
         }
     }
@@ -253,10 +251,7 @@ class DownloadManagerClass(
             }
             else{
 
-            }
-        }
-
-    }
+            }}}
 
 
     fun downloadProgressAlert()
@@ -279,10 +274,8 @@ class DownloadManagerClass(
             dialogView.findViewById<View>(R.id.update_btn) as Button
         okBtn_rl.setText("Ok")
         okBtn_rl.setOnClickListener {
-
             alertDialog.dismiss()
         }
-
         alertDialog.show()
     }
 

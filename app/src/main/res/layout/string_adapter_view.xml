@@ -4,11 +4,12 @@
     android:layout_width="match_parent"
     android:id="@+id/parentStringLayout"
     android:layout_height="wrap_content"
-    android:padding="5dp">
+    android:background="@drawable/box_boarder"
+    android:padding="3dp"
+    android:layout_marginTop="5dp">
 <TextView
     android:textSize="16sp"
-    android:padding="10dp"
-    android:background="@drawable/box_boarder"
+    android:padding="5dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:textColor="@color/black"

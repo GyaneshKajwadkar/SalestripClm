@@ -9,6 +9,7 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.NonNull
@@ -31,7 +32,7 @@ class VisualFileAdapter(
     inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var division_tv: TextView = view.findViewById(R.id.division_tv)
         var filePathName_tv: TextView = view.findViewById(R.id.filePathName_tv)
-        var favBrand_tv: TextView = view.findViewById(R.id.favBrand_tv)
+        var favBrand_tv: LinearLayout = view.findViewById(R.id.favBrand_tv)
         var parentCard: CardView = view.findViewById(R.id.parentCard)
     }
     @NonNull

@@ -19,7 +19,7 @@
         android:layout_marginEnd="2dp"
         android:layout_marginBottom="2dp"
         android:padding="5dp"
-        android:text="Create new"
+        android:text="Save"
         android:textAllCaps="false" />
 
     <com.google.android.material.button.MaterialButton
@@ -33,7 +33,7 @@
         android:layout_marginBottom="2dp"
         android:layout_toLeftOf="@+id/createButton"
         android:padding="5dp"
-        android:text="Edit"
+        android:text="View presentation"
         android:textAllCaps="false" />
 
     <com.google.android.material.button.MaterialButton
@@ -51,10 +51,16 @@
         android:text="Delete"
         android:textAllCaps="false" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/customePresentataion_rv"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    <androidx.core.widget.NestedScrollView
         android:layout_below="@+id/createButton"
-        android:padding="10dp" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <androidx.recyclerview.widget.RecyclerView
+            android:nestedScrollingEnabled="false"
+            android:id="@+id/customePresentataion_rv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="10dp" />
+    </androidx.core.widget.NestedScrollView>
+
 </RelativeLayout>

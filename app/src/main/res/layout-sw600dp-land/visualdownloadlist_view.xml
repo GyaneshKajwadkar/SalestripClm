@@ -48,16 +48,29 @@
                             android:textSize="18sp"
                             android:textStyle="bold" />
 
-                        <TextView
+                        <LinearLayout
                             android:visibility="gone"
-                            android:layout_alignParentEnd="true"
                             android:id="@+id/favBrand_tv"
+                            android:layout_alignParentEnd="true"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Fav brand *"
-                            android:textColor="@color/zm_red"
-                            android:textSize="18sp"
-                            android:textStyle="bold" />
+                            android:orientation="horizontal">
+                            <TextView
+                                android:textSize="12sp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Fav brand"
+                                android:textColor="@color/zm_red"
+                                android:layout_gravity="center"
+                                android:gravity="center"
+                                android:textStyle="bold" />
+                            <ImageView
+                                android:layout_marginLeft="2dp"
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:src="@drawable/star"/>
+                        </LinearLayout>
+
                     </RelativeLayout>
 
 
@@ -66,7 +79,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="xyz"
-                        android:textColor="@color/gray"
+                        android:textColor="@color/black"
                         android:textSize="14sp" />
 
                 </LinearLayout>

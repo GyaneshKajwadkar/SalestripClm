@@ -12,6 +12,8 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -20,10 +22,7 @@ import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
 import androidx.cardview.widget.CardView
@@ -59,13 +58,16 @@ class CreatePresentationActivity : BaseActivity(), StringInterface {
         customePresentataion_rv.layoutManager=LinearLayoutManager(this)
         doctorName_tv.text="Create presentation"
         back_iv.setOnClickListener { onBackPressed() }
+
         runBlocking {
             processAllPages()
         }
+
         createButton.setOnClickListener {
             if(editButton.text.toString().equals("Update"))
             {
                 editButton.text="Edit"
+                createButton.text="Save"
                 selectedViewList.clear()
                 deleteButton.visibility=View.INVISIBLE
                 brandAdapter.notifyDataSetChanged()
@@ -130,17 +132,16 @@ class CreatePresentationActivity : BaseActivity(), StringInterface {
 
     }
 
-    suspend fun processAllPages() = withContext(Dispatchers.IO) {
+    suspend fun processAllPages() = withContext(Dispatchers.Default) {
         launch {
             val edetailingList = dbBase.getSelectedeDetail(true)
             brandAdapter=Brand_Adapter(edetailingList)
-            customePresentataion_rv.adapter=brandAdapter
+            runOnUiThread {  customePresentataion_rv.adapter=brandAdapter }
         }
         launch {
             createdPresentatedList=dbBase.getAllSavedPresentationName()
             if(createdPresentatedList.size==0) runOnUiThread { editButton.visibility=View.INVISIBLE }
         }
-        launch {  }
     }
 
 
@@ -159,24 +160,29 @@ class CreatePresentationActivity : BaseActivity(), StringInterface {
             val modeldata = brandList?.get(position)
             holder.brandName_tv.text=modeldata?.brandName
             holder.downloadedItem_rv.layoutManager=GridLayoutManager(this@CreatePresentationActivity,7)
-
+            holder.downloadedItem_rv.setHasFixedSize(true)
             runBlocking {
-                withContext(Dispatchers.IO){
+                withContext(Dispatchers.Default){
                     launch {
                         val itemList= modeldata?.geteDetailId()?.let { dbBase.getAllDownloadedData(it) }
                         itemList?.removeAll { it.downloadType == "" }
-
 
                         Collections.sort(itemList, Comparator<DownloadFileModel?> { a1, a2 ->
                             a1?.downloadType.toString().compareTo(a2?.downloadType.toString())
                         })
 
                         this@CreatePresentationActivity.runOnUiThread{holder.downloadedItem_rv.adapter=DownloadContent_Adapter(itemList)}
-
+                        runOnUiThread { holder.progressBarBrand.visibility=View.GONE }
                     } }
             }
+        }
 
+        override fun getItemId(position: Int): Long {
+            return position.toLong()
+        }
 
+        override fun getItemViewType(position: Int): Int {
+            return position
         }
 
         override fun getItemCount(): Int {
@@ -186,6 +192,7 @@ class CreatePresentationActivity : BaseActivity(), StringInterface {
        inner class ViewHolders(view: View): RecyclerView.ViewHolder(view){
             var brandName_tv=view.findViewById<TextView>(R.id.brandName_tv)
             var downloadedItem_rv=view.findViewById<RecyclerView>(R.id.downloadedItem_rv)
+            var progressBarBrand=view.findViewById<ProgressBar>(R.id.progressBarBrand)
         }
         }
 
@@ -218,18 +225,21 @@ class CreatePresentationActivity : BaseActivity(), StringInterface {
                     .placeholder(circularProgressDrawable)
                     .into(holder.thumb_iv)
             }
-            else if(modeldata?.downloadType.equals("ZIP"))
+            else
             {
                 holder.downloadedType_tv.setText("Web view")
                 holder.play_iv.visibility=View.INVISIBLE
+                holder.html_wv.visibility=View.VISIBLE
+                holder.thumb_iv.visibility=View.GONE
+
                 holder.html_wv.settings.javaScriptEnabled = true
                 holder.html_wv.settings.setDomStorageEnabled(true)
                 holder.html_wv.settings.setDatabaseEnabled(true)
                 holder.html_wv.settings.setLoadWithOverviewMode(true)
                 holder.html_wv.getSettings().setAllowContentAccess(true)
                 holder.html_wv.getSettings().setAllowFileAccess(true)
-                holder.html_wv.getSettings().setUseWideViewPort(true);
-                holder.html_wv.setInitialScale(1);
+                holder.html_wv.getSettings().setUseWideViewPort(true)
+                holder.html_wv.setInitialScale(1)
                 var filePath=File(modeldata?.filePath)
                 holder.html_wv.loadUrl("file:///$filePath")
                 holder.html_wv.webViewClient = object : WebViewClient() {
@@ -253,6 +263,7 @@ class CreatePresentationActivity : BaseActivity(), StringInterface {
 
 
             holder.parent_llVideo.setOnClickListener {
+
                 val color = (holder.parent_llVideo.getBackground() as ColorDrawable).color
 
                 if (color == Color.WHITE) {
@@ -284,6 +295,14 @@ class CreatePresentationActivity : BaseActivity(), StringInterface {
             return doctorList!!.size
         }
 
+        override fun getItemId(position: Int): Long {
+            return position.toLong()
+        }
+
+        override fun getItemViewType(position: Int): Int {
+            return position
+        }
+
       inner class ViewHolders(view: View): RecyclerView.ViewHolder(view){
             var title_tv=view.findViewById<TextView>(R.id.title_tv)
           var downloadedType_tv=view.findViewById<TextView>(R.id.downloadedType_tv)
@@ -310,9 +329,21 @@ class CreatePresentationActivity : BaseActivity(), StringInterface {
 
             var nameEditText = dialogView.findViewById<View>(R.id.nameEditText) as EditText
 
-
-
             okBtn_rl.setOnClickListener {
+
+                if(nameEditText.text.toString().isEmpty())
+                {
+                    nameEditText.requestFocus()
+                    nameEditText.setError("Name field is empty")
+                    return@setOnClickListener
+                }
+
+                if(nameEditText.text.toString().length<5)
+                {
+                    nameEditText.requestFocus()
+                    nameEditText.setError("Name is too short")
+                    return@setOnClickListener
+                }
 
                 for(item in createdPresentatedList)
                 {
@@ -349,7 +380,7 @@ class CreatePresentationActivity : BaseActivity(), StringInterface {
         alertDialogEdit.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
 
         val okBtn_rl = dialogView.findViewById<View>(R.id.ok_btn) as AppCompatButton
-        okBtn_rl.visibility=View.INVISIBLE
+        okBtn_rl.visibility=View.GONE
 
         val cancel_btn = dialogView.findViewById<View>(R.id.cancel_btn) as AppCompatButton
 
@@ -374,7 +405,9 @@ class CreatePresentationActivity : BaseActivity(), StringInterface {
         selectedViewList.addAll(dbBase.getAllPresentationItem(passingString))
         brandAdapter.notifyDataSetChanged()
         editButton.text="Update"
+        createButton.text="Create new"
         deleteButton.visibility=View.VISIBLE
+
     }
 
 

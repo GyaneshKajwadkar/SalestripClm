@@ -55,16 +55,16 @@
 
 
                                 <Button
-                                    android:layout_toLeftOf="@+id/otherProduct_btn"
-                                    android:layout_centerVertical="true"
                                     android:id="@+id/currentProduct_btn"
-                                    android:backgroundTint="@color/appColor"
-                                    android:layout_marginRight="5dp"
-                                    android:layout_marginLeft="5dp"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_centerVertical="true"
+                                    android:layout_marginLeft="5dp"
+                                    android:layout_marginRight="5dp"
+                                    android:layout_toLeftOf="@+id/otherProduct_btn"
+                                    android:backgroundTint="@color/appColor"
                                     android:text="Current Product"
-                                    android:textAllCaps="false"/>
+                                    android:textAllCaps="false" />
 
                                 <Button
                                     android:layout_alignParentRight="true"
