@@ -75,17 +75,36 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_set_schedule_)
 
-        if(!sharePreferanceBase?.getPrefBool("zoomCrediential")!! || sharePreferanceBase?.getPrefBool("zoomCrediential")==null )
+        val jsonObj= JSONObject(HomePage.loginModelHomePage?.configurationSetting)
+        val checkZoom=jsonObj.getInt("SET059")
+        if(checkZoom!=0)
         {
-            val r: Runnable = object : Runnable {
-                override fun run() {
-                    if(AlertClass.retunDialog) {
-                        finish()
-                    }}}
-            alertClass.commonAlertWithRunnable("Zoom Alert","Zoom account is not created. Contact to your administration for more info",r)
+            if(!sharePreferanceBase?.getPrefBool("zoomCrediential")!! || sharePreferanceBase?.getPrefBool("zoomCrediential")==null )
+            {
+                val r: Runnable = object : Runnable {
+                    override fun run() {
+                        if(AlertClass.retunDialog) {
+                            finish()
+                        }}}
+                alertClass.commonAlertWithRunnable("Zoom Alert","Zoom account is not created. Contact to your administration for more info",r)
+
+            }
+            var zoomSDKBase = ZoomSDK.getInstance()
+
+            if(!zoomSDKBase.isLoggedIn)
+            {
+                CoroutineScope(IO).launch {
+                    async {
+                        getCredientailAPI(this@SetSchedule_Activity)
+                    }
+                }
+            }
 
         }
+
         else{
+            first.visibility=View.GONE
+            physical_rb.isChecked=true
 
             Timer().schedule(50){
                 runOnUiThread(java.lang.Runnable {
@@ -97,16 +116,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
             if(!generalClass.isInternetAvailable()) return
 
             getTeamsApi()
-            var zoomSDKBase = ZoomSDK.getInstance()
 
-            if(!zoomSDKBase.isLoggedIn)
-            {
-                CoroutineScope(IO).launch {
-                    async {
-                        getCredientailAPI(this@SetSchedule_Activity)
-                    }
-                }
-            }
         }
     }
 
@@ -873,7 +883,17 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
                         selectDate_tv.setText("Select Date")
                         startTime.setText("Start time")
                         stopTime.setText("End time")
-                        first.isChecked=true
+                        val jsonObj= JSONObject(HomePage.loginModelHomePage?.configurationSetting)
+                        val checkZoom=jsonObj.getInt("SET059")
+                        if(checkZoom!=0)
+                        {
+                            first.isChecked=true
+                        }
+                        else
+                        {
+                            physical_rb.isChecked=true
+                        }
+
                         constructorList= ArrayList()
                         constructorListTeam= ArrayList()
                         setAdapterDefault()

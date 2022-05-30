@@ -173,4 +173,13 @@ class CommonModel {
             set(value) { field = value }
 
     }
+    class FilterModel
+    {
+        var categoryName=""
+            get() = field
+            set(value) { field = value }
+        var isSelected=false
+            get() = field
+            set(value) { field = value }
+    }
 }

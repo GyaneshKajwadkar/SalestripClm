@@ -2,11 +2,13 @@ package `in`.processmaster.salestripclm.adapter
 
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.interfaceCode.productTransfer
+import `in`.processmaster.salestripclm.models.CommonModel
 import `in`.processmaster.salestripclm.models.SyncModel
 import android.annotation.SuppressLint
 import android.text.Editable
 import android.text.InputFilter
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,12 +23,16 @@ class PobProductAdapter(
     val productList: ArrayList<SyncModel.Data.Product>?,
     val schemeList: ArrayList<SyncModel.Data.Scheme>?,
     var sendProductInterface: productTransfer?,
-    val viewType:Int
+    val viewType:Int,
+    val searchEdit:EditText?
 ): RecyclerView.Adapter<PobProductAdapter.MyViewHolder>(), Filterable {
 
     var productFilteringList= ArrayList(productList)
+    var  buttonFilterList: ArrayList<SyncModel.Data.Product> = ArrayList()
+    var searchText=""
+    var isFilterSelection=false
 
-    constructor() : this(ArrayList(), ArrayList(),null,0) {}
+    constructor() : this(ArrayList(), ArrayList(),null,0,null) {}
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -39,7 +45,6 @@ class PobProductAdapter(
 
 
     class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-
         var titlePobproduct_tv = view.findViewById<TextView>(R.id.titlePobproduct_tv)
         var uom_tv = view.findViewById<TextView>(R.id.uom_tv)
         var division_tv = view.findViewById<TextView>(R.id.division_tv)
@@ -79,7 +84,6 @@ class PobProductAdapter(
             {
                 holder.parentlinearL.visibility=View.GONE
             }
-
 
             schemeList?.forEachIndexed { index, element ->
                if(element.productId==model?.productId)
@@ -125,10 +129,7 @@ class PobProductAdapter(
                            model?.notApi?.qty=s.toString().toInt()
                            model?.notApi?.totalQty=s.toString().toInt()
                         }
-
-
-
-                     /*   if(sendEDetailingArray?.size==0)
+                    /*   if(sendEDetailingArray?.size==0)
                         {
                             val getCurrentObj= Send_EDetailingModel.PobObj.PobDetailList()
                             sendEDetailingArray?.add(getSchemeObject(getCurrentObj,model!!,holder,s))
@@ -174,8 +175,6 @@ class PobProductAdapter(
                 }
             })*/
             }
-
-
     }
 
   /*  fun getSchemeObject(
@@ -246,17 +245,65 @@ class PobProductAdapter(
                 val FilteredArrayNames: java.util.ArrayList<SyncModel.Data.Product> =
                     java.util.ArrayList()
                     constraint = constraint.toString().lowercase()
+                   searchText=constraint
+                if(!isFilterSelection)
+                {
                     for (i in 0 until productList?.size!!) {
                         val docNames: SyncModel.Data.Product = productList?.get(i)
                         if (docNames.productName?.lowercase()?.contains(constraint.toString()) == true) {
                             FilteredArrayNames.add(docNames)
                         }
                     }
+                }
+                else
+                {
+                    for (i in 0 until buttonFilterList?.size!!) {
+                        val docNames: SyncModel.Data.Product = buttonFilterList?.get(i)
+                        if (docNames.productName?.lowercase()?.contains(constraint.toString()) == true) {
+                            FilteredArrayNames.add(docNames)
+                        }
+                    }
+                }
+
                     results.count = FilteredArrayNames.size
                     results.values = FilteredArrayNames
                     return results
             }
         }
+    }
+
+    fun filterUsingSelection(selectedCategoryList: ArrayList<CommonModel.FilterModel>)
+    {
+
+        var productListTemp: ArrayList<SyncModel.Data.Product> = ArrayList()
+        productFilteringList.clear()
+        buttonFilterList.clear()
+
+       if(selectedCategoryList.size==0) {
+           productList?.let { productFilteringList.addAll(it) }
+           notifyDataSetChanged()
+           isFilterSelection=false
+           return
+       }
+
+        for(selection in selectedCategoryList)
+        {
+            if(selection.categoryName.isEmpty()) {
+                productListTemp = productList?.filter { s -> s.categoryName == "" } as ArrayList<SyncModel.Data.Product>
+            }
+            else
+            {
+                productListTemp = productList?.filter { s -> s.categoryName == selection.categoryName } as ArrayList<SyncModel.Data.Product>
+            }
+        }
+
+        productFilteringList.addAll(productListTemp)
+        buttonFilterList.addAll(productListTemp)
+
+        isFilterSelection=true
+        notifyDataSetChanged()
+        searchEdit?.setText("")
+      //  getFilter()?.filter(searchText)
     }
 
 }

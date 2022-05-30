@@ -8,6 +8,7 @@ import `in`.processmaster.salestripclm.interfaceCode.ItemClickDisplayVisual
 import `in`.processmaster.salestripclm.interfaceCode.StringInterface
 import `in`.processmaster.salestripclm.models.DevisionModel
 import `in`.processmaster.salestripclm.models.DownloadFileModel
+import `in`.processmaster.salestripclm.utils.CustomViewPager
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -21,7 +22,6 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.*
-import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.View.OnTouchListener
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.Animation
@@ -43,12 +43,13 @@ import androidx.viewpager.widget.ViewPager.OnPageChangeListener
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.jsibbold.zoomage.ZoomageView
 import kotlinx.android.synthetic.main.activity_photo_slide_show.*
+import kotlinx.android.synthetic.main.join_activity_view.view.*
 import kotlinx.android.synthetic.main.web_bottom_sheet.*
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickDisplayVisual, StringInterface {
@@ -58,7 +59,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
     val SWIPE_THRESHOLD_VELOCITY = 100
     var gestureDetector: GestureDetector? = null
     var gestureListener: OnTouchListener? = null
-    var imageFrame: ViewFlipper? = null
+  //  var imageFrame: ViewFlipper? = null
     var handler: Handler? = null
     var runnable: Runnable? = null
     var position=0
@@ -67,6 +68,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var bottomSheetWeb: ConstraintLayout
+    private lateinit var viewPagerMain: CustomViewPager
     var isList=false
     var brandId=0
     var empId=0
@@ -91,16 +93,17 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
     var thread: Thread?= null
     var threadBrand: Thread?= null
 
-    @RequiresApi(Build.VERSION_CODES.N)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_photo_slide_show)
 
-        imageFrame = findViewById(R.id.imageFrames) as ViewFlipper
+       // imageFrame = findViewById(R.id.imageFrames) as ViewFlipper
 
         bottomSheetWeb=findViewById(R.id.bottomSheetWeb)as ConstraintLayout
 
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetWeb)
+        viewPagerMain =   findViewById(R.id.viewPagerMain) as CustomViewPager
 
 
         horizontal_rv?.setLayoutManager(
@@ -265,15 +268,33 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
             setSlideViewTime()
 
+        /*    viewPagerMain.setOnTouchListener(OnTouchListener { v, event ->
+
+                if (event.action == MotionEvent.ACTION_MOVE) {
+
+                }
+                true
+            })*/
+
+
 
             viewPagerMain.addOnPageChangeListener(object : OnPageChangeListener {
                 override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
-                    model=arrayImage.get(position)
-                    setHorizontalAdapter(arrayImage, position, model)
-                    adapterVisualFile?.notifyDataSetChanged()
 
-                    likeCommentColor()
+                  try {
+                      bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
+                      model=arrayImage.get(position)
+                      if(model?.brandId!=brandId)
+                      {    brandId= model?.brandId!!
+                          dbBase?.insertStartTimeSlide(startDateTime,doctorId,brandId,model?.brandName,0,currentTime.toString())
+                      }
+                      setHorizontalAdapter(arrayImage, position, model)
+                      adapterVisualFile?.notifyDataSetChanged()
+                      likeCommentColor()
+                  }
+                  catch (e:Exception)
+                  { }
+
                 }
                 override fun onPageSelected(position: Int) {
 
@@ -345,7 +366,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
                 openBottomSheet_iv?.visibility=View.GONE
 
                 imageView.setImageBitmap(imbm)
-                imageFrame?.addView(imageView)
+               // imageFrame?.addView(imageView)
                 floating_action_button_image.visibility=View.VISIBLE
 
                 mViewPagerAdapter = ViewPagerAdapter(this, arrayImage)
@@ -385,8 +406,6 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
                 else showVideo_mb.visibility=View.VISIBLE }
         }
         Thread(runnable).start()
-
-
     }
 
     fun setAllDefault(clickedButton:String)
@@ -404,8 +423,13 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
            horizontalOther_rv.visibility=View.VISIBLE
            horizontal_rv.visibility=View.GONE
         }
+
+       val isPresentation=  intent.getBooleanExtra("isPresentation",false)
+        var presentationName=""
+        if(isPresentation) presentationName= intent.getStringExtra("presentationName").toString()
+
         horizontalOther_rv.setLayoutManager(LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false))
-        val otherBrandAdapter= OtherBrandSelectionAdapter(this, list ,clicked,end_btn,doctorId,eDetailingId)
+        val otherBrandAdapter= OtherBrandSelectionAdapter(this, list ,clicked,end_btn,doctorId,eDetailingId,presentationName,isPresentation)
         horizontalOther_rv.adapter=otherBrandAdapter
     }
 
@@ -418,7 +442,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
             val imbm = BitmapFactory.decodeFile(arrayImage.get(0).filePath)
             runOnUiThread {
                 imageView.setImageBitmap(imbm)
-                imageFrame?.addView(imageView)
+               // imageFrame?.addView(imageView)
 
                 mViewPagerAdapter = ViewPagerAdapter(this, arrayImage)
                 viewPagerMain.adapter = mViewPagerAdapter
@@ -427,12 +451,12 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
             if(intent.getSerializableExtra("imageArray")!=null)
             {
                 runOnUiThread {
-                    gestureDetector = GestureDetector(this,MyGestureDetector())
-                    gestureListener = OnTouchListener { v, event -> if (gestureDetector?.onTouchEvent(event) == true) true else false }
+                   // gestureDetector = GestureDetector(this,MyGestureDetector())
+                   // gestureListener = OnTouchListener { v, event -> if (gestureDetector?.onTouchEvent(event) == true) true else false }
                 }
                 setHorizontalAdapter(arrayImage, position,model)
-                imageFrame?.setOnTouchListener(gestureListener)
-                imageFrame?.setOnClickListener(this@PhotoSlideShowActivity)
+               // imageFrame?.setOnTouchListener(gestureListener)
+               // imageFrame?.setOnClickListener(this@PhotoSlideShowActivity)
             }
         }
         else
@@ -440,19 +464,18 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
             mViewPagerAdapter = ViewPagerAdapter(this, arrayImage)
 
             runOnUiThread {
-                imageFrame?.let { addFlipperImages(it, arrayImage, position) }
+              //  imageFrame?.let { addFlipperImages(it, arrayImage, position) }
 
                 viewPagerMain.adapter = mViewPagerAdapter
-
-                viewPagerMain.setCurrentItem(position);
-                gestureDetector = GestureDetector(this,MyGestureDetector())
-                gestureListener = OnTouchListener { v, event -> if (gestureDetector?.onTouchEvent(event) == true) true else false }
+                viewPagerMain.setCurrentItem(position)
+              //  gestureDetector = GestureDetector(this,MyGestureDetector())
+               // gestureListener = OnTouchListener { v, event -> if (gestureDetector?.onTouchEvent(event) == true) true else false }
             }
 
 
             handler = Handler(Looper.getMainLooper())
-            imageFrame?.setOnClickListener(this@PhotoSlideShowActivity)
-            imageFrame?.setOnTouchListener(gestureListener)
+          //  imageFrame?.setOnClickListener(this@PhotoSlideShowActivity)
+          //  imageFrame?.setOnTouchListener(gestureListener)
             //   slideShowBtn = findViewById<View>(R.id.slideShowBtn) as TextView
 
             /*    slideShowBtn!!.setOnClickListener({
@@ -511,14 +534,14 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
 
 
-    inner class MyGestureDetector : SimpleOnGestureListener() {
+    /*inner class MyGestureDetector : SimpleOnGestureListener() {
         override fun onSingleTapConfirmed(e: MotionEvent): Boolean
         {
 
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
 
 
-            /*      if(floating_action_button_image.visibility==View.VISIBLE)
+            *//*      if(floating_action_button_image.visibility==View.VISIBLE)
                   {
                       floating_action_button_image.visibility=View.GONE
                   }
@@ -526,7 +549,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
                   {
                       floating_action_button_image.visibility=View.VISIBLE
 
-                  }*/
+                  }*//*
 
             return true
         }
@@ -572,6 +595,12 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
                         position= imageFrame?.getDisplayedChild()!!
                         model=arrayImage.get(position)
+
+                        if(model?.brandId!=brandId)
+                        {    brandId= model?.brandId!!
+                            dbBase?.insertStartTimeSlide(startDateTime,doctorId,brandId,model?.brandName,0,currentTime.toString())
+                        }
+
                         setImageArray(arrayImage,position,model)
                         adapterVisualFile?.notifyDataSetChanged()
 
@@ -600,6 +629,10 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
                         position= imageFrame?.getDisplayedChild()!!
                         model=arrayImage.get(position)
+                        if(model?.brandId!=brandId)
+                        {    brandId= model?.brandId!!
+                            dbBase?.insertStartTimeSlide(startDateTime,doctorId,brandId,model?.brandName,0,currentTime.toString())
+                        }
                         setImageArray(arrayImage,position,model)
                         adapterVisualFile?.notifyDataSetChanged()
 
@@ -617,7 +650,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
             }
             return false
         }
-    }
+    }*/
 
     override fun onClick(view: View?) {}
 
@@ -668,7 +701,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
     fun setHorizontalAdapter(list: ArrayList<DownloadFileModel>, position: Int, model: DownloadFileModel?)
     {
         adapterVisualFile  =
-            model?.let { HorizontalImageViewAdapter(list, this, position, it,imageFrame,this) }
+            model?.let { HorizontalImageViewAdapter(list, this, position, it,this) }
         runOnUiThread {
             horizontal_rv?.adapter = adapterVisualFile
         }
@@ -681,7 +714,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
         var context: Context,
         var positionConst: Int,
         var modeladapter: DownloadFileModel,
-        var imageFrame: ViewFlipper?,
+      //  var imageFrame: ViewFlipper?,
         var mCallback :StringInterface
     ) : RecyclerView.Adapter<HorizontalImageViewAdapter.MyViewHolder>() {
 
@@ -700,8 +733,6 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
         {
             val itemView = LayoutInflater.from(parent.context)
                 .inflate(R.layout.downloaedimage_view, parent, false)
-
-
             return MyViewHolder(itemView)
         }
 
@@ -727,9 +758,14 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
                 }
                 holder.parent_llImage.setBackgroundColor(ContextCompat.getColor(context, R.color.purple_500));
 
-                imageFrame?.setDisplayedChild(position)
+               // imageFrame?.setDisplayedChild(position)
                 model=downloadedfiles
-                viewPagerMain.setCurrentItem(position);
+                viewPagerMain.setCurrentItem(position)
+                if(model?.brandId!=brandId)
+                {    brandId= model?.brandId!!
+                    dbBase?.insertStartTimeSlide(startDateTime,doctorId,brandId,model?.brandName,0,currentTime.toString())
+
+                }
 
                 mCallback.onClickString("callBack")
 
@@ -828,7 +864,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
             filterListVideoWeb()
 
             runOnUiThread {
-                imageFrame?.removeAllViews()
+                //imageFrame?.removeAllViews()
                 otherProduct_btn?.setBackgroundColor(ContextCompat.getColor(this,R.color.gray))
                 currentProduct_btn?.setBackgroundColor(ContextCompat.getColor(this,R.color.appColor))
 
@@ -938,16 +974,23 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
         override fun instantiateItem(container: ViewGroup, position: Int): Any {
 
             val itemView = mLayoutInflater.inflate(R.layout.itemexp, container, false)
-            val imageView = itemView.findViewById<View>(R.id.imageViewMain) as ImageView
+            val imageView = itemView.findViewById<View>(R.id.imageViewMain) as ZoomageView
             val model = images[position]
 
+            imageView.setOnTouchListener(OnTouchListener { v, event ->
+            Log.e("dsfdsfstgsdfsfsdfsdf","dfgdfgertdgfdfgfg")
+                if (event.action == MotionEvent.ACTION_MOVE) {
+
+                }
+                false
+            })
 
             runOnUiThread {
                 imageView.setImageBitmap(BitmapFactory.decodeFile(model.filePath))
                 Objects.requireNonNull(container).addView(itemView)
             }
 
-            imageView.setOnClickListener(object : View.OnClickListener {
+          /*  imageView.setOnClickListener(object : View.OnClickListener {
                 override fun onClick(v: View?) {
 
                     if(intent.getSerializableExtra("imageArray")!=null)
@@ -968,7 +1011,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
                         }
                     }
                 }
-            })
+            })*/
 
             return itemView
         }

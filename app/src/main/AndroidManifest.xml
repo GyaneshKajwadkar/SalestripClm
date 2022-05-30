@@ -26,9 +26,6 @@
             android:screenOrientation="landscape"
             android:windowSoftInputMode="stateHidden" />
         <activity
-            android:name=".activity.PresentationActivity"
-            android:exported="false" />
-        <activity
             android:name=".activity.MeetingActivity"
             android:exported="true"
             android:hardwareAccelerated="true"

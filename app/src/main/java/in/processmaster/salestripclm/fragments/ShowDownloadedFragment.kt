@@ -17,6 +17,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.cardview.widget.CardView
@@ -41,7 +42,7 @@ class ShowDownloadedFragment : Fragment() {
 
     var selection_tv: TextView?=null
     var nestedScroll: NestedScrollView?=null
-    var nodata_gif: GifImageView?=null
+    var nodata_gif: ImageView?=null
     var topSearchParent: CardView?=null
     var adapterVideo : DownloadedFolderAdapter?=null
     var adapterImage : DownloadedFolderAdapter?=null
@@ -175,15 +176,16 @@ class ShowDownloadedFragment : Fragment() {
                     nodata_gif?.visibility=View.GONE
                     selection_tv?.setText("Please wait...")
 
-                    video_rv?.layoutManager = GridLayoutManager(activity, 4)
+
+                    video_rv?.layoutManager = GridLayoutManager(activity, 5)
                     video_rv?.itemAnimator = DefaultItemAnimator()
                     video_rv?.adapter = adapterVideo
 
-                    images_rv?.layoutManager = GridLayoutManager(activity, 4)
+                    images_rv?.layoutManager = GridLayoutManager(activity, 5)
                     images_rv?.itemAnimator = DefaultItemAnimator()
                     images_rv?.adapter = adapterImage
 
-                    html_rv?.layoutManager = GridLayoutManager(activity, 4)
+                    html_rv?.layoutManager = GridLayoutManager(activity, 5)
                     html_rv?.itemAnimator = DefaultItemAnimator()
                     html_rv?.adapter = adapterWeb
 

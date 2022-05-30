@@ -65,7 +65,7 @@ class VisualFileAdapter(
         {
             holder.parentCard.setCardBackgroundColor(Color.parseColor("#ffffff"));
             holder.filePathName_tv.setTextColor(Color.parseColor("#055E99"));
-            holder.division_tv.setTextColor(Color.parseColor("#c5c5c5"));
+            holder.division_tv.setTextColor(Color.BLACK);
         }
 
 

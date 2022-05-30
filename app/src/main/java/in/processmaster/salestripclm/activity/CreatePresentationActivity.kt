@@ -66,7 +66,7 @@ class CreatePresentationActivity : BaseActivity(), StringInterface {
         createButton.setOnClickListener {
             if(editButton.text.toString().equals("Update"))
             {
-                editButton.text="Edit"
+                editButton.text="View presentation"
                 createButton.text="Save"
                 selectedViewList.clear()
                 deleteButton.visibility=View.INVISIBLE
@@ -90,7 +90,7 @@ class CreatePresentationActivity : BaseActivity(), StringInterface {
                     return@setOnClickListener}
 
                 dbBase.updatePresentaionData(updatePresentationName,Gson().toJson(selectedViewList))
-                editButton.text="Edit"
+                editButton.text="View presentation"
                 deleteButton.visibility=View.INVISIBLE
                 selectedViewList.clear()
                 brandAdapter.notifyDataSetChanged()
@@ -115,8 +115,7 @@ class CreatePresentationActivity : BaseActivity(), StringInterface {
                             }
                         }
 
-
-                        editButton.text="Edit"
+                        editButton.text="View presentation"
                         deleteButton.visibility=View.INVISIBLE
                         selectedViewList.clear()
                         brandAdapter.notifyDataSetChanged()

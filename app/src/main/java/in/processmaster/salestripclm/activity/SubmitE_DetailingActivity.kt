@@ -3,10 +3,7 @@ package `in`.processmaster.salestripclm.activity
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.HomePage.Companion.loginModelHomePage
 import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.staticSyncData
-import `in`.processmaster.salestripclm.adapter.CheckboxSpinnerAdapter
-import `in`.processmaster.salestripclm.adapter.PobProductAdapter
-import `in`.processmaster.salestripclm.adapter.SelectedPobAdapter
-import `in`.processmaster.salestripclm.adapter.TextWithEditAdapter
+import `in`.processmaster.salestripclm.adapter.*
 import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.common_classes.CommonListGetClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
@@ -45,10 +42,7 @@ import kotlinx.android.synthetic.main.checkbox_bottom_sheet.*
 import kotlinx.android.synthetic.main.checkbox_bottom_sheet.noDataCheckAdapter_tv
 import kotlinx.android.synthetic.main.common_toolbar.*
 import kotlinx.android.synthetic.main.pob_product_bottom_sheet.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Runnable
-import kotlinx.coroutines.launch
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
@@ -57,7 +51,6 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
-import kotlin.collections.ArrayList
 
 
 class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProductTransfer,
@@ -1742,16 +1735,37 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
         val closePob_iv = dialogView.findViewById<View>(R.id.closePob_iv) as ImageView
         val okPob_iv = dialogView.findViewById<View>(R.id.okPob_iv) as TextView
+        val filterRv = dialogView.findViewById<View>(R.id.filterRv) as RecyclerView
         val pobProduct_rv = dialogView.findViewById<View>(R.id.pobProduct_rv) as RecyclerView
             pobProduct_rv.layoutManager=LinearLayoutManager(this)
+            filterRv.setLayoutManager(LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false))
 
         val productSearch_et = dialogView.findViewById<View>(R.id.productSearch_et) as EditText
             productSearch_et?.addTextChangedListener(filterTextPobWatcher)
 
+        var categoryList:ArrayList<String> =ArrayList<String>()
+
+        for(categoryName in mainProductList)
+        {
+            categoryName.categoryName?.let { categoryList.add(it) }
+        }
+
+        val uniqueValues: HashSet<String> = HashSet(categoryList)
+        val categoryListFiltered :ArrayList<CommonModel.FilterModel> =ArrayList<CommonModel.FilterModel>()
+
+        for(categoryName in uniqueValues)
+        {
+            val filterModel=CommonModel.FilterModel()
+            filterModel.categoryName= categoryName.toString()
+            categoryListFiltered.add(filterModel)
+        }
 
 
-      val pobProductSelectAdapter=PobProductAdapter(unSelectedProductList, passingSchemeList,this,1)
+        val pobProductSelectAdapter=PobProductAdapter(unSelectedProductList, passingSchemeList,this,1,productSearch_et)
         pobProduct_rv.adapter= pobProductSelectAdapter
+
+        val filterAdapter= ButtonFilterAdapter(categoryListFiltered, pobProductSelectAdapter)
+        filterRv.adapter=filterAdapter
 
         productSearch_et.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}

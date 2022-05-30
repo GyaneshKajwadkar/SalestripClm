@@ -2,6 +2,7 @@ package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.staticSyncData
+import `in`.processmaster.salestripclm.adapter.PobProductAdapter
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.fragments.EdetailingDownloadFragment
 import `in`.processmaster.salestripclm.fragments.HomeFragment
@@ -22,9 +23,13 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.*
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -32,6 +37,8 @@ import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -78,6 +85,12 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         var profileData = sharePreferance.getPref("profileData")
 
          loginModelHomePage = Gson().fromJson(profileData, LoginModel::class.java)
+        val jsonObj= JSONObject(loginModelHomePage?.configurationSetting)
+        val checkZoom=jsonObj.getInt("SET059")
+        if(checkZoom==0)
+        {
+            nav_view?.getMenu()?.getItem(3)?.setVisible(false)
+        }
         apiInterface = APIClientKot().getClient(2, sharePreferance?.getPref("secondaryUrl")).create(
             APIInterface::class.java)
 
@@ -448,11 +461,17 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             val profileApi= async { profileApi() }
 
             val initilizeZoom= async {
-                var zoomSDKBase = ZoomSDK.getInstance()
-                if(!zoomSDKBase.isLoggedIn)
+                val jsonObj= JSONObject(loginModelHomePage?.configurationSetting)
+                val checkZoom=jsonObj.getInt("SET059")
+                if(checkZoom!=0)
                 {
-                    getCredientailAPI(this@HomePage)
+                    var zoomSDKBase = ZoomSDK.getInstance()
+                    if(!zoomSDKBase.isLoggedIn)
+                    {
+                        getCredientailAPI(this@HomePage)
+                    }
                 }
+
             }
             deleteItem.await()
             sync.await()
@@ -1094,4 +1113,5 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     {
         bottomNavigation?.selectedItemId= R.id.landingPage
     }
+
 }

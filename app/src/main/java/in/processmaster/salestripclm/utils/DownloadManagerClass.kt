@@ -54,6 +54,8 @@ class DownloadManagerClass(
             for(brand in getAlleDetailListDb)
             {
                 for(iteams in brand.eretailDetailList){
+                    if(iteams.fileType.isEmpty()) continue
+
                     var modelClass=DownloadFileModel()
                     modelClass.eDetailingId=iteams.geteDetailId()
                     modelClass.fileId=iteams.fileId

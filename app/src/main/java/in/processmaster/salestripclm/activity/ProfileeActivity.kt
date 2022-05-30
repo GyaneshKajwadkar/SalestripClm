@@ -526,7 +526,7 @@ class ProfileeActivity : BaseActivity() {
             loginModelHomePage.empId.toString()
         ) as Call<ProfileModel>
         call.enqueue(object : Callback<ProfileModel?> {
-            @RequiresApi(Build.VERSION_CODES.O)
+
             override fun onResponse(
                 call: Call<ProfileModel?>?,
                 response: Response<ProfileModel?>
@@ -613,7 +613,7 @@ class ProfileeActivity : BaseActivity() {
             paramObject
         ) as Call<GenerateOTPModel>
         call.enqueue(object : Callback<GenerateOTPModel?> {
-            @RequiresApi(Build.VERSION_CODES.O)
+
             override fun onResponse(
                 call: Call<GenerateOTPModel?>?,
                 response: Response<GenerateOTPModel?>

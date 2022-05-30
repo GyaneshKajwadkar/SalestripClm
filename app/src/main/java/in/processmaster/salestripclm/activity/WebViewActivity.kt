@@ -383,6 +383,11 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
         floating_action_button.setOnClickListener({
             onBackPressed()
         })
+
+        if(intent.getBooleanExtra("isPresentation",false)) {
+            currentProduct_btn.visibility=View.INVISIBLE
+            otherProduct_btn.visibility=View.INVISIBLE
+        }
     }
 
     fun filterListVideoImage()
@@ -391,7 +396,16 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
             filterImageList.clear()
             filterVideoList.clear()
 
-            val dowloadedAllList=dbBase.getAllDownloadedData(eDetailingId)
+            var dowloadedAllList: ArrayList<DownloadFileModel> = ArrayList()
+            if(intent.getBooleanExtra("isPresentation",false))
+            {
+                dowloadedAllList=dbBase.getAllPresentationItem(intent.getStringExtra("presentationName"))
+            }
+            else
+            {
+                dowloadedAllList=dbBase.getAllDownloadedData(eDetailingId)
+            }
+
 
             for(item in dowloadedAllList)
             {
@@ -447,14 +461,14 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
                         override fun onDoubleTapEvent(e: MotionEvent): Boolean {
                             Log.e("double tap", "double tap")
                             //Double Tap
-                            floating_action_button.visibility=View.GONE
-                            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED)
+                           // floating_action_button.visibility=View.GONE
+                           // bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED)
                             return true
                         }
 
                         override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
                             //Single Tab
-                            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
+                          //  bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
                             return false
                         }
                     })
@@ -832,6 +846,13 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
 
     override fun onClickString(fileString: File?) {
 
+
+        if(modelweb?.brandId!=brandId)
+        {    brandId= modelweb?.brandId!!
+            dbBase?.insertStartTimeSlide(startDateTime,doctorId,brandId,
+                modelweb?.brandName,0,currentTime.toString())
+        }
+
         webview.loadUrl("file:///$fileString")
 
         /*       val file = File(filePath)
@@ -894,6 +915,11 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
             horizontalOther_rv.visibility=View.VISIBLE
             horizontal_rv.visibility=View.GONE
         }
+
+        val isPresentation=  intent.getBooleanExtra("isPresentation",false)
+        var presentationName=""
+        if(isPresentation) presentationName= intent.getStringExtra("presentationName").toString()
+
         horizontalOther_rv.setLayoutManager(LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false))
         val otherBrandAdapter= OtherBrandSelectionAdapter(
             this,
@@ -901,7 +927,7 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
             clicked,
             end_btn,
             doctorId,
-            eDetailingId
+            eDetailingId,presentationName,isPresentation
         )
         horizontalOther_rv.adapter=otherBrandAdapter
     }

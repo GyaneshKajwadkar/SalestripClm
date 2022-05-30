@@ -4,13 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <pl.droidsonroids.gif.GifImageView
+    <ImageView
         android:id="@+id/nodata_gif"
         android:visibility="gone"
         android:layout_centerInParent="true"
         android:layout_width="250dp"
         android:layout_height="250dp"
-        android:src="@drawable/nodata_gif" />
+        android:src="@drawable/no_data_found" />
 
     <TextView
         android:layout_below="@+id/nodata_gif"

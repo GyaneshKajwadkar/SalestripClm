@@ -44,7 +44,9 @@ class OtherBrandSelectionAdapter(
     val clickType: String,
     val end_btn: Button,
     val doctorId: Int,
-    val eDetailingIdConst: Int
+    val eDetailingIdConst: Int,
+    var presentationName: String,
+    var isCustomePresentation: Boolean
 ): RecyclerView.Adapter<OtherBrandSelectionAdapter.MyViewHolder>() {
 
     inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -90,6 +92,8 @@ class OtherBrandSelectionAdapter(
                 intent.putExtra("position", position)
                 intent.putExtra("doctorId", doctorId)
                 intent.putExtra("model", model)
+                intent.putExtra("isPresentation", isCustomePresentation)
+                intent.putExtra("presentationName", presentationName)
                 context.startActivity(intent)
                 var db= DatabaseHandler(context)
                 db.insertStartTimeSlide(
@@ -134,8 +138,8 @@ class OtherBrandSelectionAdapter(
             intent.putExtra("position", position)
             intent.putExtra("doctorId", doctorId)
             intent.putExtra("model", model)
-            Log.e("fgdsfdsfhdsfdsfds",model.eDetailingId.toString())
-            Log.e("uytutytfhfhgf",model.brandId.toString())
+            intent.putExtra("isPresentation", isCustomePresentation)
+            intent.putExtra("presentationName", presentationName)
             context.startActivity(intent)
             val db= DatabaseHandler(context)
             db.insertStartTimeSlide(

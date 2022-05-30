@@ -7,10 +7,7 @@ import `in`.processmaster.salestripclm.activity.HomePage
 import `in`.processmaster.salestripclm.activity.HomePage.Companion.loginModelHomePage
 import `in`.processmaster.salestripclm.activity.SplashActivity
 import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.staticSyncData
-import `in`.processmaster.salestripclm.adapter.CheckboxSpinnerAdapter
-import `in`.processmaster.salestripclm.adapter.PobProductAdapter
-import `in`.processmaster.salestripclm.adapter.SelectedPobAdapter
-import `in`.processmaster.salestripclm.adapter.TextWithEditAdapter
+import `in`.processmaster.salestripclm.adapter.*
 import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.common_classes.CommonListGetClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
@@ -221,7 +218,6 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
             }
             task.await()
 
-
         }
         coroutine.invokeOnCompletion {
             requireActivity().runOnUiThread {
@@ -362,10 +358,10 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
                     return@setOnClickListener
                 }
                 if(saveRcpaDetailList1.size==0)
-                    {
-                        alertClass.commonAlert("","Please add brands in RCPA section doctor 1")
-                        return@setOnClickListener
-                    }
+                {
+                    alertClass.commonAlert("","Please add brands in RCPA section doctor 1")
+                    return@setOnClickListener
+                }
 
             }
 
@@ -405,7 +401,6 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
                         return@setOnClickListener
                     }
                 }
-
 
                 val model = DailyDocVisitModel.Data.DcrDoctor.Rcpavo()
                 model.docId=doctorRcpa2.id
@@ -543,11 +538,10 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
                val commonModel=CommonModel.QuantityModel.Data()
                commonModel.employeeSampleBalanceList=quantityArray
                dbBase.addAPIData(Gson().toJson(commonModel),3)
-                alertClass.commonAlert("","Data save successfully")
+               alertClass.commonAlert("","Data save successfully")
 
                 if(arguments?.getString("retailerData")?.isEmpty() == false) {
-
-                    (requireActivity() as HomePage).backToHome()
+                        (requireActivity() as HomePage).backToHome()
                 }
                 else{
                     requireActivity().getSupportFragmentManager().beginTransaction()
@@ -555,16 +549,12 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
                         .commit()
                     stringInter.onClickString("")
                 }
-
-
-
             }
             else{
                 saveModel.isOffline=false
                 submitDcr(saveModel,quantityArray) }
 
         })
-
 
 
         return views
@@ -738,11 +728,33 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
 
         val closePob_iv = dialogView.findViewById<View>(R.id.closePob_iv) as ImageView
         val okPob_iv = dialogView.findViewById<View>(R.id.okPob_iv) as TextView
+        val filterRv = dialogView.findViewById<View>(R.id.filterRv) as RecyclerView
+
         val pobProduct_rv = dialogView.findViewById<View>(R.id.pobProduct_rv) as RecyclerView
         pobProduct_rv.layoutManager=LinearLayoutManager(requireActivity())
+        filterRv.setLayoutManager(LinearLayoutManager(requireActivity(), LinearLayoutManager.HORIZONTAL, false))
 
         val productSearch_et = dialogView.findViewById<View>(R.id.productSearch_et) as EditText
         productSearch_et?.addTextChangedListener(filterTextPobWatcher)
+
+        var categoryList:ArrayList<String> =ArrayList<String>()
+
+        for(categoryName in mainProductList)
+        {
+            categoryName.categoryName?.let { categoryList.add(it) }
+        }
+
+        val uniqueValues: HashSet<String> = HashSet(categoryList)
+        val categoryListFiltered :ArrayList<CommonModel.FilterModel> =ArrayList<CommonModel.FilterModel>()
+
+        for(categoryName in uniqueValues)
+        {
+            val filterModel=CommonModel.FilterModel()
+            filterModel.categoryName= categoryName.toString()
+            categoryListFiltered.add(filterModel)
+        }
+
+
 
         pobProduct_rv.setOnTouchListener(object : View.OnTouchListener{
             override fun onTouch(v: View, event: MotionEvent?): Boolean {
@@ -752,8 +764,11 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
             }
         })
 
-        val pobProductSelectAdapter=PobProductAdapter(unSelectedProductList, passingSchemeList,this,1)
+        val pobProductSelectAdapter=PobProductAdapter(unSelectedProductList, passingSchemeList,this,1,productSearch_et)
         pobProduct_rv.adapter= pobProductSelectAdapter
+
+        val filterAdapter= ButtonFilterAdapter(categoryListFiltered, pobProductSelectAdapter)
+        filterRv.adapter=filterAdapter
 
         productSearch_et.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -901,9 +916,8 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
                     )
                     if(sendingList.size!=0)views.gift_rv.visibility=View.VISIBLE
                 }
-
-
             }
+
             if(selectionType==4)
             {
                 stokistArray= ArrayList<IdNameBoll_model>()
@@ -931,9 +945,7 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
         // setSelectedPOBRecycler(selectedList)
     }
 
-
-    fun setPobAdapter()
-    {
+    fun setPobAdapter() {
         requireActivity().runOnUiThread{
             /*   pobProductSelectAdapter=PobProductAdapter(unSelectedProductList, passingSchemeList,this)
                pobProduct_rv.adapter= pobProductSelectAdapter*/
@@ -1115,7 +1127,7 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
 
         val layoutManager = LinearLayoutManager(requireActivity())
         selectProduct.layoutManager=layoutManager
-        val pobProductSelectAdapter=PobProductAdapter(mainProductList, passingSchemeList,this,2)
+        val pobProductSelectAdapter=PobProductAdapter(mainProductList, passingSchemeList,this,2,productSearch_et)
 
         productSearch_et.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -1360,13 +1372,14 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
 
 
     }
+
     fun getUpdateData()
     {
         val runnable = java.lang.Runnable {
 
             val edetailingEditModel=Gson().fromJson(arguments?.getString("retailerData"),DailyDocVisitModel.Data.DcrDoctor::class.java)
 
-            arguments?.getString("retailerData")?.let { Log.e("dfosjdfposdjfoisd", it) }
+           /* arguments?.getString("retailerData")?.let { Log.e("dfosjdfposdjfoisd", it) }*/
 
             if(edetailingEditModel.dataSaveType?.lowercase().equals("s"))
             {
@@ -1494,6 +1507,7 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
                     views.doctorOne_et.setText(doctorRcpa1.name)
                     views.addBrandOne_btn.setAlpha(1f)
                     views.addBrandOne_btn.isEnabled=true
+                    views.doctorOne_et.isEnabled=false
                 }
                 if(size>=2)
                 {
@@ -1509,6 +1523,7 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
                     views.doctorTwo_et.setText(doctorRcpa2.name)
                     views.addBrandTwo_btn.setAlpha(1f)
                     views.addBrandTwo_btn.isEnabled=true
+                    views.doctorTwo_et.isEnabled=false
                 }
                 if(size>=3)
                 {
@@ -1524,58 +1539,11 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
                     views.doctorThree_et.setText(doctorRcpa3.name)
                     views.addBrandThree_btn.setAlpha(1f)
                     views.addBrandThree_btn.isEnabled=true
+                    views.doctorThree_et.isEnabled=false
                 }
             })
         }
         Thread(runnable).start()
     }
-    fun  addDoctorInStep(size: Int, edetailingEditModel: DailyDocVisitModel.Data.DcrDoctor)
-    {
-        Log.e("sdfsdfsdfdsgfsdf",size.toString())
-        if(size==1)
-        {
-            edetailingEditModel.RCPAList?.get(0)?.rCPADetailList?.let {
-                saveRcpaDetailList1.addAll(
-                    it
-                )
-            }
-            adapter1.notifyDataSetChanged()
-            doctorRcpa1=DocManagerModel()
-            doctorRcpa1.name= edetailingEditModel?.RCPAList?.get(0)?.docName.toString()
-            doctorRcpa1.id= edetailingEditModel?.RCPAList?.get(0)?.docId!!
-            views.doctorOne_et.setText(doctorRcpa1.name)
-            views.addBrandOne_btn.setAlpha(1f)
-            views.addBrandOne_btn.isEnabled=true
-        }
-        else if(size==2)
-        {
-            edetailingEditModel.RCPAList?.get(1)?.rCPADetailList?.let {
-                saveRcpaDetailList2.addAll(
-                    it
-                )
-            }
-            doctorRcpa2=DocManagerModel()
-            adapter2.notifyDataSetChanged()
-            doctorRcpa2.name= edetailingEditModel?.RCPAList?.get(1)?.docName.toString()
-            doctorRcpa2.id= edetailingEditModel?.RCPAList?.get(1)?.docId!!
-            views.doctorTwo_et.setText(doctorRcpa2.name)
-            views.addBrandTwo_btn.setAlpha(1f)
-            views.addBrandTwo_btn.isEnabled=true
-        }
-        else if(size==3)
-        {
-            edetailingEditModel.RCPAList?.get(2)?.rCPADetailList?.let {
-                saveRcpaDetailList3.addAll(
-                    it
-                )
-            }
-            doctorRcpa3=DocManagerModel()
-            adapter3.notifyDataSetChanged()
-            doctorRcpa3.name= edetailingEditModel?.RCPAList?.get(2)?.docName.toString()
-            doctorRcpa3.id= edetailingEditModel?.RCPAList?.get(2)?.docId!!
-            views.doctorThree_et.setText(doctorRcpa3.name)
-            views.addBrandThree_btn.setAlpha(1f)
-            views.addBrandThree_btn.isEnabled=true
-        }
-    }
+
 }

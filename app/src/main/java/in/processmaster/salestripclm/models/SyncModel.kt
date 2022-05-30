@@ -1462,6 +1462,10 @@ class SyncModel {
             @Expose
             var brandName: String? = ""
 
+            @SerializedName("categoryName")
+            @Expose
+            var categoryName: String? = ""
+
 
          /*   @SerializedName("prodCode")
             @Expose
@@ -1499,9 +1503,7 @@ class SyncModel {
 
 
 
-            @SerializedName("categoryName")
-            @Expose
-            var categoryName: String? = ""
+
 
 
 

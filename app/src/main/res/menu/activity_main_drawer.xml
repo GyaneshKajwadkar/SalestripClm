@@ -4,6 +4,7 @@
     tools:showIn="navigation_view">
 
     <group android:checkableBehavior="single">
+
         <item
             android:id="@+id/nav_home"
             android:icon="@drawable/ic_home_icon"
@@ -14,27 +15,28 @@
             android:icon="@drawable/ic_login_edit"
             android:title="Profile" />
 
-
         <item
+            android:visible="false"
             android:id="@+id/nav_schedule"
             android:icon="@drawable/ic_calendar"
             android:title="Schedule meeting" />
 
         <item
+            android:visible="false"
             android:id="@+id/nav_scheduled"
             android:icon="@drawable/ic_meeting"
             android:title="Scheduled meeting" />
+
+        <item
+            android:id="@+id/nav_createPresentation"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="Create Presentation" />
 
 
         <item
             android:id="@+id/sync_menu"
             android:icon="@drawable/ic_refresh"
             android:title="Sync" />
-
-          <item
-              android:id="@+id/nav_createPresentation"
-           android:icon="@drawable/ic_menu_gallery"
-           android:title="Create Presentation" />
 
       <!--  <item
             android:id="@+id/nav_screenshot"

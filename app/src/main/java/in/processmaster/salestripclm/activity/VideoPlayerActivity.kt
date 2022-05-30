@@ -116,6 +116,10 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
 
         slideBrandWiseInsert(startDateTime,brandId)
 
+        if(intent.getBooleanExtra("isPresentation",false)) {
+            currentProduct_btn.visibility=View.INVISIBLE
+            otherProduct_btn.visibility=View.INVISIBLE
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -283,7 +287,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
 
             filterListWebmage()
 
-            playerView.getVideoSurfaceView()?.setOnClickListener({ view ->
+           /* playerView.getVideoSurfaceView()?.setOnClickListener({ view ->
 
                 if(doubleclick)
                 {
@@ -304,7 +308,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
 
                 playerView.showController()
 
-            })
+            })*/
 
             likeCommentColor()
         }
@@ -468,6 +472,11 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
             {
                 holder.parent_llVideo.setBackgroundColor(ContextCompat.getColor(context, R.color.purple_500))
                 videoModel=downloadedfiles
+                if(videoModel?.brandId!=brandId)
+                {    brandId= videoModel?.brandId!!
+                    dbBase?.insertStartTimeSlide(startDateTime,doctorId,brandId,
+                        videoModel?.brandName,0,currentTime.toString())
+                }
                 likeCommentColor()
             }
             else{
@@ -480,6 +489,8 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
                 for (currentList in relativeViewList) {
                     currentList.setBackgroundColor(Color.TRANSPARENT)
                 }
+
+
                 holder.parent_llVideo.setBackgroundColor(ContextCompat.getColor(context, R.color.purple_500));
                 var filePath=File(downloadedfiles.filePath)
 
@@ -492,6 +503,11 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
                 mPlayer?.setPlayWhenReady(true)
 
                 videoModel=downloadedfiles
+                if(videoModel?.brandId!=brandId)
+                {    brandId= videoModel?.brandId!!
+                    dbBase?.insertStartTimeSlide(startDateTime,doctorId,brandId,
+                        videoModel?.brandName,0,currentTime.toString())
+                }
                 stringInterface.onClickString(filePath)
 
 
@@ -744,6 +760,11 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
             horizontalOther_rv.visibility=View.VISIBLE
             horizontal_rv.visibility=View.GONE
         }
+
+        val isPresentation=  intent.getBooleanExtra("isPresentation",false)
+        var presentationName=""
+        if(isPresentation) presentationName= intent.getStringExtra("presentationName").toString()
+
         horizontalOther_rv.setLayoutManager(LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false))
         val otherBrandAdapter= OtherBrandSelectionAdapter(
             this,
@@ -752,6 +773,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
             end_btn,
             doctorId,
             eDetailingId
+            ,presentationName,isPresentation
         )
         horizontalOther_rv.adapter=otherBrandAdapter
     }
@@ -770,7 +792,15 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
         val runnable= Runnable {  filterWebList.clear()
             filterImageList.clear()
 
-            val dowloadedAllList=dbBase.getAllDownloadedData(eDetailingId)
+            var dowloadedAllList: ArrayList<DownloadFileModel> = ArrayList()
+            if(intent.getBooleanExtra("isPresentation",false))
+            {
+                dowloadedAllList=dbBase.getAllPresentationItem(intent.getStringExtra("presentationName"))
+            }
+            else
+            {
+                dowloadedAllList=dbBase.getAllDownloadedData(eDetailingId)
+            }
 
             for(item in dowloadedAllList)
             {

@@ -25,16 +25,16 @@
             app:srcCompat="@drawable/ic_back"/>
 
 
-        <ViewFlipper
-            android:visibility="invisible"
-            android:layout_above="@+id/slideShowBtn"
-            android:id="@+id/imageFrames"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@android:drawable/screen_background_dark" >
-        </ViewFlipper>
+        <!--  <ViewFlipper
+              android:visibility="invisible"
+              android:layout_above="@+id/slideShowBtn"
+              android:id="@+id/imageFrames"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@android:drawable/screen_background_dark" >
+          </ViewFlipper>-->
 
-        <androidx.viewpager.widget.ViewPager
+        <in.processmaster.salestripclm.utils.CustomViewPager
             android:id="@+id/viewPagerMain"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
