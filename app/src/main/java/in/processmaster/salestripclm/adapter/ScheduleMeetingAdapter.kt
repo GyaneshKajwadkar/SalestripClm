@@ -42,7 +42,9 @@ class ScheduleMeetingAdapter(
 ) : RecyclerView.Adapter<ScheduleMeetingAdapter.MyViewHolder>(),
     Filterable
 {
-
+    val coroutineExceptionHandler = CoroutineExceptionHandler{_, throwable ->
+        throwable.printStackTrace()
+    }
     var filteredData =meetingList
 
     class MyViewHolder(view: View): RecyclerView.ViewHolder(view)  {
@@ -243,18 +245,26 @@ class ScheduleMeetingAdapter(
     fun initilizeDelete(position: Int)
     {
         AlertClass(context).showProgressAlert("Deleting data...")
-        val coroutine=CoroutineScope(Dispatchers.IO).launch {
-            val deleteSchedule= async {
-                setSheduleApi(filteredData?.get(position))
-            }
-            val deleteComplete= deleteSchedule.await()
-            if(deleteComplete!=null)
-            {
-                val getAllSchedule= async{
-                    getSheduleMeetingAPI(position)
+        val coroutine=CoroutineScope(Dispatchers.IO + coroutineExceptionHandler).launch {
+            try {
+                val deleteSchedule= async {
+                    setSheduleApi(filteredData?.get(position))
                 }
-                getAllSchedule.await()
+                val deleteComplete= deleteSchedule.await()
+                if(deleteComplete!=null)
+                {
+                    val getAllSchedule= async{
+                        getSheduleMeetingAPI(position)
+                    }
+                    getAllSchedule.await()
+                }
             }
+            catch (e:Exception)
+            {
+
+            }
+
+
         }
         coroutine.invokeOnCompletion {
             AlertClass(context).hideAlert()

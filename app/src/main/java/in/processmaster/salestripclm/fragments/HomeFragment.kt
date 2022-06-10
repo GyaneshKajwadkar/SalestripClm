@@ -18,6 +18,7 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.text.SpannableString
 import android.text.style.RelativeSizeSpan
 import android.text.style.StyleSpan
@@ -828,5 +829,8 @@ class HomeFragment : Fragment(), OnChartGestureListener {
           return s
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+
+    }
 
 }

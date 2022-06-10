@@ -6,10 +6,8 @@ import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.interfaceCode.StringInterface
 import `in`.processmaster.salestripclm.models.DevisionModel
 import `in`.processmaster.salestripclm.models.DownloadFileModel
-import android.app.Activity
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -25,13 +23,13 @@ import android.webkit.WebViewClient
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
-import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_create_presentation.*
@@ -221,6 +219,8 @@ class CreatePresentationActivity : BaseActivity(), StringInterface {
                 requestOptions.isMemoryCacheable
                 Glide.with(this@CreatePresentationActivity).setDefaultRequestOptions(requestOptions)
                     .load(Uri.fromFile(File(modeldata?.fileDirectoryPath, modeldata?.fileName)))
+                    .thumbnail(.1f)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .placeholder(circularProgressDrawable)
                     .into(holder.thumb_iv)
             }
@@ -251,6 +251,44 @@ class CreatePresentationActivity : BaseActivity(), StringInterface {
                     }
 
                 }
+                var click=true
+
+                holder.html_wv.setOnTouchListener(View.OnTouchListener { v, event ->
+
+                    Handler(Looper.getMainLooper()).postDelayed({
+                      click=true }, 1000)
+                    if(click)
+                    {
+                        val color = (holder.parent_llVideo.getBackground() as ColorDrawable).color
+
+                        if (color == Color.WHITE) {
+                            holder.parent_llVideo.setBackgroundColor(ContextCompat.getColor(
+                                this@CreatePresentationActivity,
+                                R.color.appColor
+                            ))
+                            modeldata?.let { it1 -> selectedViewList.add(it1) }
+
+                        } else {
+                            for ((index,data) in selectedViewList.withIndex())
+                            {
+                                if(data.fileId==modeldata?.fileId) {
+                                    selectedViewList.removeAt(index)
+                                    break;
+                                }
+                            }
+
+                            holder.parent_llVideo.setBackgroundColor(
+                                ContextCompat.getColor(
+                                    this@CreatePresentationActivity,
+                                    R.color.white
+                                ))
+                        }
+                        click=false
+                    }
+
+                    true
+                })
+
             }
             val filtered = selectedViewList!!.filter { it.fileId==modeldata?.fileId }
             if(filtered.size!=0)
@@ -350,15 +388,29 @@ class CreatePresentationActivity : BaseActivity(), StringInterface {
                     {generalClass.showSnackbar(it,"This name is already in use")
                         return@setOnClickListener}
                 }
-                dbBase.insertCreatePresentaionData(nameEditText.text.toString(),Gson().toJson(selectedViewList))
-                createdPresentatedList.clear()
-                createdPresentatedList=dbBase.getAllSavedPresentationName()
+
+                generalClass.hideKeyboard(this,it)
+                alertDialog.dismiss()
+
+                runBlocking {
+                    withContext(Dispatchers.IO) {
+                        launch {
+                            dbBase.insertCreatePresentaionData(nameEditText.text.toString(),Gson().toJson(selectedViewList))
+                            createdPresentatedList.clear()
+                            createdPresentatedList=dbBase.getAllSavedPresentationName()
+                        }
+
+                    }
+                }
 
                 if(createdPresentatedList.size!=0) editButton.visibility=View.VISIBLE
                 selectedViewList.clear()
-                brandAdapter.notifyDataSetChanged()
                 alertClass.commonAlert("","Presentation save successfully")
-                alertDialog.dismiss()
+
+                Handler(Looper.getMainLooper()).postDelayed({
+                    brandAdapter.notifyDataSetChanged()
+                },200)
+
             }
 
             cancel_btn.setOnClickListener {
@@ -399,6 +451,10 @@ class CreatePresentationActivity : BaseActivity(), StringInterface {
     override fun onClickString(passingString: String?) {
         if(::alertDialogEdit.isInitialized && alertDialogEdit!=null)
         { alertDialogEdit.dismiss()}
+
+       //  getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+
+
         updatePresentationName=passingString!!
         selectedViewList.clear()
         selectedViewList.addAll(dbBase.getAllPresentationItem(passingString))
@@ -406,7 +462,6 @@ class CreatePresentationActivity : BaseActivity(), StringInterface {
         editButton.text="Update"
         createButton.text="Create new"
         deleteButton.visibility=View.VISIBLE
-
     }
 
 

@@ -52,14 +52,15 @@
         android:textAllCaps="false" />
 
     <androidx.core.widget.NestedScrollView
-        android:layout_below="@+id/createButton"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/createButton">
+
         <androidx.recyclerview.widget.RecyclerView
-            android:nestedScrollingEnabled="false"
             android:id="@+id/customePresentataion_rv"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:nestedScrollingEnabled="false"
             android:padding="10dp" />
     </androidx.core.widget.NestedScrollView>
 

@@ -346,6 +346,8 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
             val filterSelectecd=selectedProductList.filter { s -> (s.notApi.isSaved==true) }
 
+            if(filterSelectecd.size!=0){
+
             if(intent.getStringExtra("apiDataDcr")?.isEmpty() == false)
             {
                 val edetailingEditModel=Gson().fromJson(intent.getStringExtra("apiDataDcr"),DailyDocVisitModel.Data.DcrDoctor::class.java)
@@ -390,6 +392,8 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
             if(selectedStockist.id!=null && selectedStockist.id!="" && filterSelectecd.size!=0)  saveModel.pobObject?.stockistId=selectedStockist.id.toInt()
 
+            }
+
             val dcrDetail= Gson().fromJson(sharePreferanceBase?.getPref("dcrObj"),GetDcrToday.Data.DcrData::class.java)
               if(dcrDetail?.routeId!=null)
               {
@@ -407,6 +411,8 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 alertClass.commonAlert("","Gift reporting is Mandatory")
                 return@setOnClickListener
             }
+
+            saveModel.reportedTime=generalClass.getCurrentDateTimeApiForamt()
 
             if(!GeneralClass(this).isInternetAvailable())
             {   dbBase.insertOrUpdateSaveAPI(doctorIdDisplayVisual, Gson().toJson(saveModel),"feedback")
@@ -963,7 +969,8 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         saveModel: DailyDocVisitModel.Data.DcrDoctor,
         quantityArray: ArrayList<CommonModel.QuantityModel.Data.EmployeeSampleBalance>
     ) {
-      Log.e("isgfuiosgfiosgfuisf",Gson().toJson(saveModel))
+
+       Log.e("isgfuiosgfiosgfuisf",Gson().toJson(saveModel))
      //  return
 
         alertClass?.showProgressAlert("")
@@ -1526,11 +1533,13 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             if(edetailingEditModel.dataSaveType?.lowercase().equals("s"))
             {
                checkIsDcrSave=true
-               selectBtn.visibility=View.GONE
-               pobProduct_btn.visibility=View.GONE
-               assignStockist.visibility=View.GONE
-               visitPurpose_spinner.isEnabled=false
-               submitDetailing_btn.visibility=View.INVISIBLE
+                runOnUiThread {
+                    selectBtn.visibility=View.GONE
+                    pobProduct_btn.visibility=View.GONE
+                    assignStockist.visibility=View.GONE
+                    visitPurpose_spinner.isEnabled=false
+                    submitDetailing_btn.visibility=View.INVISIBLE
+                }
             }
 
             for(intentProduct in edetailingEditModel.sampleList!!)

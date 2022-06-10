@@ -1,15 +1,11 @@
 package `in`.processmaster.salestripclm.fragments
 
 import `in`.processmaster.salestripclm.R
-import `in`.processmaster.salestripclm.activity.HomePage
-import `in`.processmaster.salestripclm.activity.HomePage.Companion.loginModelHomePage
-import `in`.processmaster.salestripclm.adapter.Edetailing_Adapter
 import `in`.processmaster.salestripclm.common_classes.AlertClass
-import `in`.processmaster.salestripclm.common_classes.GeneralClass
-import `in`.processmaster.salestripclm.models.DevisionModel
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
@@ -17,24 +13,14 @@ import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
-import android.util.Log
 import android.view.*
 import android.widget.EditText
 import android.widget.LinearLayout
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
-import com.google.gson.Gson
-import org.json.JSONObject
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import java.io.File
 
 class EdetailingDownloadFragment : Fragment() {
 
@@ -55,7 +41,8 @@ class EdetailingDownloadFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         var view= inflater.inflate(R.layout.activity_edetailing_, container, false)
-        if (activity != null && isAdded) { initView(view)  }
+
+        if (requireActivity() != null && isAdded) { initView(view)  }
 
         return view }
 
@@ -63,7 +50,7 @@ class EdetailingDownloadFragment : Fragment() {
     {
         filter_et=view.findViewById(R.id.filter_et)as EditText
         syncData_ll=view.findViewById(R.id.syncData_ll)as LinearLayout
-        sharePreferance = PreferenceClass(activity)
+        sharePreferance = PreferenceClass(requireActivity())
         db = DatabaseHandler(requireActivity())
         viewPager = view.findViewById<View>(R.id.viewpager) as ViewPager
         tabs = view.findViewById<View>(R.id.result_tabs) as TabLayout
@@ -242,8 +229,8 @@ class EdetailingDownloadFragment : Fragment() {
         Handler(Looper.getMainLooper()).postDelayed({
             calladapter()
         }, 10)
-
-
     }
+
+    override fun onSaveInstanceState(outState: Bundle) {}
 
 }

@@ -6,17 +6,18 @@ import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
-import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.ProgressBar
-import android.widget.RelativeLayout
 import com.google.android.material.snackbar.Snackbar
+import com.zipow.videobox.ptapp.PhoneProtos
+import kotlinx.coroutines.CoroutineExceptionHandler
 import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 class GeneralClass(val activity: Activity) {
 
@@ -138,6 +139,10 @@ class GeneralClass(val activity: Activity) {
             e.printStackTrace()
             return false
         }
+    }
+
+    val coroutineExceptionHandler = CoroutineExceptionHandler{_, throwable ->
+        throwable.printStackTrace()
     }
 
 }

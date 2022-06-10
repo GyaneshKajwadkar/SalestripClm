@@ -9,13 +9,14 @@ import java.util.concurrent.TimeUnit
 class APIClientKot {
 
     fun getUsersService(parent : Int, childUrl : String): APIInterface{
-        var commonUrl = ""
+        var commonUrl = "https://app.salestrip.in/api/"
 
         val interceptor = HttpLoggingInterceptor()
         interceptor.level = HttpLoggingInterceptor.Level.BODY
       //  val client = OkHttpClient.Builder().addInterceptor(interceptor).build()
         val client = OkHttpClient.Builder()
             .connectTimeout(100, TimeUnit.SECONDS)
+            .writeTimeout(100,TimeUnit.SECONDS)
             .readTimeout(100, TimeUnit.SECONDS).build()
         if (parent == 1) commonUrl = "https://app.salestrip.in/api/"
          else  commonUrl = childUrl
@@ -35,6 +36,7 @@ class APIClientKot {
         //val client = OkHttpClient.Builder().addInterceptor(interceptor).build()
         val client = OkHttpClient.Builder()
             .connectTimeout(100, TimeUnit.SECONDS)
+            .writeTimeout(100,TimeUnit.SECONDS)
             .readTimeout(100, TimeUnit.SECONDS).build()
         var commonUrl: String? = ""
 

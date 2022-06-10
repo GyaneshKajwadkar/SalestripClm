@@ -124,9 +124,9 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
         {
             alertClass.showProgressAlert("")
         }
-        val runnable= Runnable { initView() }
-        Thread(runnable).start()
-
+       // val runnable= Runnable { initView() }
+       // Thread(runnable).start()
+        initView()
     }
 
     fun initView(){
@@ -194,7 +194,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
             openBottomSheet_iv.setOnClickListener()
             {
-                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED)
+                runOnUiThread { bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED) }
             }
 
 

@@ -221,7 +221,18 @@ class PobProductAdapter(
 
      fun setSelction()
     {
-        productFilteringList?.let { sendProductInterface?.onClickButtonProduct(it,1) }
+        isFilterSelection=false
+        searchEdit?.setText("")
+        var  tempFilterList: ArrayList<SyncModel.Data.Product> = ArrayList()
+        for(item in productList!!)
+        {
+            if(item.notApi.totalQty!=null && item.notApi.totalQty!=0)
+            {
+                tempFilterList.add(item)
+            }
+        }
+
+        tempFilterList?.let { sendProductInterface?.onClickButtonProduct(it,1) }
     }
 
 

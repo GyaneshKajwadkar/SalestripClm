@@ -2,7 +2,6 @@ package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.staticSyncData
-import `in`.processmaster.salestripclm.adapter.PobProductAdapter
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.fragments.EdetailingDownloadFragment
 import `in`.processmaster.salestripclm.fragments.HomeFragment
@@ -23,13 +22,11 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
+import android.os.Handler
+import android.os.PersistableBundle
 import android.util.Log
 import android.view.*
-import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -37,8 +34,6 @@ import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -267,6 +262,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     //open fragment method
     private fun openFragment(fragment: Fragment)
     {
+
         val transaction = supportFragmentManager.beginTransaction()
         if(!retailerString.isEmpty())
         {
@@ -275,9 +271,12 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             fragment.arguments=bundle
         }
         transaction.replace(R.id.container, fragment)
-        transaction.commit()
+        transaction.commitAllowingStateLoss()
+       // transaction.commit()
         retailerString=""
     }
+
+
 
     //on back button press open exit alert
     override fun onBackPressed()
@@ -433,68 +432,76 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     fun callingMultipleAPI()
     {
         alertClass.showProgressAlert("")
-
+        var isException=false
     //    if (dbBase.getDatasCount() > 0) {
 
        // }
 
-        val coroutineScope= CoroutineScope(IO).launch {
+        val coroutineScope= CoroutineScope(IO+ generalClass.coroutineExceptionHandler).launch {
 
-            val deleteItem= async {  dbBase.deleteAll() }
+            try{
+                val profileApi= async { profileApi() }
+                profileApi.await()
+            }
+            catch (e:Exception)
+            {
+                isException=true
+                alertClass.hideAlert()
+                alertClass.lowNetworkAlert()
+            }
 
             val sync= async { callingSyncAPI() }
-
+            val deleteItem= async {  dbBase.deleteAll() }
             val divisionApi =async { callingDivisionAPI() }
-
             val credientialApi= async { getSheduleMeetingAPI() }
-
             val quantityApi= async { getQuantityAPI() }
-
             val sendEdetailing= async { submitDCRCo() }
-
-            val sendRetailerList= async { submitDCRRetailer() }
-
             val doctorGraphApi= async { getDoctorGraphAPI() }
-
             val getDocCall= async { getDocCallAPI() }
 
-            val profileApi= async { profileApi() }
-
+            val sendRetailerList= async { submitDCRRetailer() }
             val initilizeZoom= async {
-                val jsonObj= JSONObject(loginModelHomePage?.configurationSetting)
-                val checkZoom=jsonObj.getInt("SET059")
-                if(checkZoom!=0)
-                {
-                    var zoomSDKBase = ZoomSDK.getInstance()
-                    if(!zoomSDKBase.isLoggedIn)
+                     val jsonObj= JSONObject(loginModelHomePage?.configurationSetting)
+                    val checkZoom=jsonObj.getInt("SET059")
+                    if(checkZoom!=0)
                     {
-                        getCredientailAPI(this@HomePage)
+                        var zoomSDKBase = ZoomSDK.getInstance()
+                        if(!zoomSDKBase.isLoggedIn)
+                        {
+                            getCredientailAPI(this@HomePage)
+                        }
                     }
+
                 }
 
-            }
-            deleteItem.await()
-            sync.await()
-            divisionApi.await()
-            credientialApi.await()
-            quantityApi.await()
-            initilizeZoom.await()
-            sendEdetailing.await()
-            doctorGraphApi.await()
-            getDocCall.await()
-            profileApi.await()
-            sendRetailerList.await()
+                 deleteItem.await()
+                 sync.await()
+                divisionApi.await()
+                credientialApi.await()
+                quantityApi.await()
+                initilizeZoom.await()
+                sendEdetailing.await()
+                doctorGraphApi.await()
+                getDocCall.await()
+
+                sendRetailerList.await()
+
+
 
         }
         coroutineScope.invokeOnCompletion {
             coroutineScope.cancel()
-            this.runOnUiThread(java.lang.Runnable {
-                alertClass.hideAlert()
-                if(!firstCall) initView()
-                firstCall=true
-                bottomNavigation?.selectedItemId= R.id.landingPage
-              //  generalClass.disableProgress(progressView_parentRv!!)
-            })
+            if(!isException)
+            {
+                this.runOnUiThread(java.lang.Runnable {
+                    alertClass.hideAlert()
+                    if(!firstCall) initView()
+                    firstCall=true
+                    bottomNavigation?.selectedItemId= R.id.landingPage
+                    //  generalClass.disableProgress(progressView_parentRv!!)
+                })
+            }
+
         }
     }
 
@@ -506,8 +513,8 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             .error(android.R.mipmap.sym_def_app_icon)
 
         drawerProfileIv?.let {
-            Glide.with(this).load(loginModelHomePage.imageName).apply(options).into(it) }
-        Glide.with(this).load(loginModelHomePage.imageName).apply(options).into(profile_image)
+            Glide.with(applicationContext).load(loginModelHomePage.imageName).apply(options).into(it) }
+        Glide.with(applicationContext).load(loginModelHomePage.imageName).apply(options).into(profile_image)
     }
 
 
@@ -891,17 +898,34 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         if(generalClass?.isInternetAvailable() == true)
         {
             runOnUiThread(java.lang.Runnable { alertClass?.showProgressAlert("") })
+            try{
+                val coroutineScope = CoroutineScope(Dispatchers.IO + generalClass.coroutineExceptionHandler).launch {
 
-            val coroutineScope = CoroutineScope(Dispatchers.IO).launch {
-                val api = async { checkCurrentDCR_API(onMenuItemClickListener) }
-                api.await()
+                   try {
+                       val api = async { checkCurrentDCR_API(onMenuItemClickListener) }
+                       api.await()
+                   }
+                   catch (e:Exception)
+                   {
+                       runOnUiThread { alertClass?.hideAlert()
+                       alertClass?.networkAlert()
+                       }
+                   }
+                }
+
+                coroutineScope.invokeOnCompletion {
+                    coroutineScope.cancel()
+                    runOnUiThread(java.lang.Runnable {
+                        alertClass?.hideAlert() })
+                }
+            }
+            catch (e:Exception)
+            {
+                runOnUiThread { alertClass.networkAlert()
+                alertClass.hideAlert()}
+
             }
 
-            coroutineScope.invokeOnCompletion {
-                coroutineScope.cancel()
-                runOnUiThread(java.lang.Runnable {
-                    alertClass?.hideAlert() })
-            }
             //return false
         }
 
@@ -1104,11 +1128,12 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     }
 
 
-        fun selectRetailerForEdit(toJson: String) {
-            retailerString=toJson
-            bottomNavigation?.selectedItemId= R.id.callPage
+    fun selectRetailerForEdit(toJson: String) {
+        retailerString=toJson
+        bottomNavigation?.selectedItemId= R.id.callPage
 
-        }
+    }
+
     fun backToHome()
     {
         bottomNavigation?.selectedItemId= R.id.landingPage

@@ -35,16 +35,14 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.button.MaterialButton
 import com.google.gson.Gson
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import org.apache.commons.io.FileUtils
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.*
+import java.lang.Runnable
 import java.net.URL
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -76,6 +74,7 @@ class DownloadAdapter constructor() :
     var progressBarAlert: ProgressBar?=null
     var textViewAlert:TextView?=null
     var alertDialog: AlertDialog?=null
+
 
 
     class ViewHoldersVideo(view: View): RecyclerView.ViewHolder(view)
@@ -486,12 +485,20 @@ class DownloadAdapter constructor() :
         val downloadService: APIInterface =
             createService(APIInterface::class.java, "https://salestrip.blob.core.windows.net/")
 
-        val coroutineScope= CoroutineScope(Dispatchers.IO).launch {
-            val sendEdetailing= async {
-                val responseBody=downloadService.downloadFile(remainingurl).body()
-                responseBody?.let { it1 -> saveFile(it1,type,position,model,model.filePath!!) }
+        val coroutineScope= CoroutineScope(Dispatchers.IO+GeneralClass(context!!).coroutineExceptionHandler).launch {
+            try {
+                val sendEdetailing= async {
+                    val responseBody=downloadService.downloadFile(remainingurl).body()
+                    responseBody?.let { it1 -> saveFile(it1,type,position,model,model.filePath!!) }
+                }
+                sendEdetailing.await()
             }
-            sendEdetailing.await()
+            catch (e:Exception)
+            {
+                AlertClass(context!!).lowNetworkAlert()
+            }
+
+
         }
         coroutineScope.invokeOnCompletion {
              coroutineScope.cancel()

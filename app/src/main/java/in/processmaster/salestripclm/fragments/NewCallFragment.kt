@@ -84,6 +84,9 @@ class NewCallFragment : Fragment(),StringInterface {
         var retailerObj= SyncModel.Data.Retailer()
     }
 
+    val coroutineExceptionHandler = CoroutineExceptionHandler{_, throwable ->
+        throwable.printStackTrace()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -122,6 +125,15 @@ class NewCallFragment : Fragment(),StringInterface {
                     SplashActivity.staticSyncData?.retailerList?.let { retailerListArray.addAll(it) }
 
                     staticSyncData?.fieldStaffTeamList?.let { teamsList.addAll(it) }
+
+                    val iterator = teamsList.iterator()
+                    while(iterator.hasNext()){
+                        val item = iterator.next()
+                        if(item.empId == loginModelHomePage.empId){
+                            iterator.remove()
+                        }
+                    }
+
                     routeList = routeList?.filter { s -> s.headQuaterName !=""} as java.util.ArrayList<SyncModel.Data.Route>
 
                     val responseDocCall=db.getApiDetail(5)
@@ -338,16 +350,25 @@ class NewCallFragment : Fragment(),StringInterface {
     fun callCoroutineApi() {
         alertClass?.hideAlert()
         alertClass?.showProgressAlert("")
-        val coroutineScope = CoroutineScope(Dispatchers.IO).launch {
-            val api = async { checkCurrentDCR_API() }
-            api.await()
+        try{
+            val coroutineScope = CoroutineScope(Dispatchers.IO + generalClassObject!!?.coroutineExceptionHandler).launch {
+                val api = async { checkCurrentDCR_API() }
+                api.await()
+            }
+
+            coroutineScope.invokeOnCompletion {
+                requireActivity().runOnUiThread(java.lang.Runnable {
+                    alertClass?.hideAlert()
+                })
+            }
+        }
+        catch (e:Exception)
+        {
+            alertClass?.hideAlert()
+            alertClass?.lowNetworkAlert()
         }
 
-        coroutineScope.invokeOnCompletion {
-            requireActivity().runOnUiThread(java.lang.Runnable {
-                alertClass?.hideAlert()
-            })
-        }
+
     }
 
     fun openCloseModel()
@@ -1540,6 +1561,7 @@ class NewCallFragment : Fragment(),StringInterface {
 
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {}
 
     override fun onClickString(passingInterface: String?) {
         views?.selectDoctor_tv?.setBackgroundColor(Color.parseColor("#FA8072"))

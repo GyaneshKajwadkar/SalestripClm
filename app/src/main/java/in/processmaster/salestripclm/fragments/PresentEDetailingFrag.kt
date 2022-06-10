@@ -679,7 +679,7 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
         transaction2.replace(R.id.child_fragment_container, childFragment2).commit()
     }
 
-
+    override fun onSaveInstanceState(outState: Bundle) {}
 }
 
 

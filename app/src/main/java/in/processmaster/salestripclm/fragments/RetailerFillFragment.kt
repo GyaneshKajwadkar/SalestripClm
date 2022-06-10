@@ -527,6 +527,8 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
                 saveModel.routeId=dcrDetail.routeId.toString()
             }
 
+            saveModel.reportedTime=generalClass.getCurrentDateTimeApiForamt()
+
             if(!GeneralClass(requireActivity()).isInternetAvailable())
             {
                 saveModel.isOffline=true
@@ -564,6 +566,7 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
         saveModel: DailyDocVisitModel.Data.DcrDoctor,
         quantityArray: java.util.ArrayList<CommonModel.QuantityModel.Data.EmployeeSampleBalance>
     ) {
+
         val arrayModel:ArrayList<DailyDocVisitModel.Data.DcrDoctor> = ArrayList()
         arrayModel.add(saveModel)
         Log.e("isgfuiosgfiosgfuisf",Gson().toJson(arrayModel))

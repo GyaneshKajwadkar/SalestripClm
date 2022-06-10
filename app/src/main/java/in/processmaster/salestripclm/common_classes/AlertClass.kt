@@ -148,6 +148,35 @@ class AlertClass(val context : Context)
 
     }
 
+    //network alert for low connection when try to calling coroutine api
+    fun lowNetworkAlert() {
+        val activity = context as Activity
+        activity.runOnUiThread{
+            val dialogBuilder = AlertDialog.Builder(context)
+            val inflater = activity.layoutInflater
+            val dialogView: View = inflater.inflate(R.layout.networkalert, null)
+            dialogBuilder.setView(dialogView)
+
+            val alertDialog: AlertDialog = dialogBuilder.create()
+            alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+            val okBtn_rl = dialogView.findViewById<View>(R.id.okBtn_rl) as RelativeLayout
+            val subTitle_tv = dialogView.findViewById<View>(R.id.subTitle_tv) as TextView
+            subTitle_tv.setText("Network is slow please try again later")
+
+            okBtn_rl.setOnClickListener {
+
+                if(context?.javaClass?.simpleName.toString().equals("SplashActivity"))
+                {
+                    activity.finish()
+                }
+                alertDialog.dismiss()
+            }
+            alertDialog.show()
+        }
+
+    }
+
     fun commonAlert(headerString: String, message: String) {
         context as Activity
 

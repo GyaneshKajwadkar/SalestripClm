@@ -644,12 +644,19 @@ class DownloadedActivtiy : BaseActivity() {
         val downloadService: APIInterface =
             createService(APIInterface::class.java, "https://salestrip.blob.core.windows.net/")
 
-        val coroutineScope= CoroutineScope(Dispatchers.IO).launch {
-            val sendEdetailing= async {
-                val responseBody=downloadService.downloadFile(remainingurl).body()
-                responseBody?.let { it1 -> saveFile(it1,type,position,model,model.filePath!!,arrayListtype,downloadType) }
-            }
-            sendEdetailing.await()
+        val coroutineScope= CoroutineScope(Dispatchers.IO+generalClass.coroutineExceptionHandler).launch {
+
+         try {
+             val sendEdetailing= async {
+                 val responseBody=downloadService.downloadFile(remainingurl).body()
+                 responseBody?.let { it1 -> saveFile(it1,type,position,model,model.filePath!!,arrayListtype,downloadType) }
+             }
+             sendEdetailing.await()
+         }
+         catch (e:Exception)
+         {
+             runOnUiThread { alertClass.lowNetworkAlert() }
+         }
         }
         coroutineScope.invokeOnCompletion {
             coroutineScope.cancel()

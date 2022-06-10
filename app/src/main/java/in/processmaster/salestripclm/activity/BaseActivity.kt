@@ -23,6 +23,8 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import android.view.View
@@ -42,6 +44,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import us.zoom.sdk.*
+import java.io.IOException
 import java.lang.ref.WeakReference
 
 
@@ -53,6 +56,7 @@ open class BaseActivity : AppCompatActivity(){
     var zoomSDKBase: ZoomSDK? = null
     val generalClass=GeneralClass(this)
     val alertClass=AlertClass(this)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -105,42 +109,61 @@ open class BaseActivity : AppCompatActivity(){
         val eDetailingArray=dbBase.getAllSaveSend("feedback")
         val retailerArray=dbBase.getAllSaveSend("retailerFeedback")
 
+        var isLowNetwork=false
         if( eDetailingArray.size!=0)
         {
-            val coroutineScope= CoroutineScope(Dispatchers.IO).launch {
-                val sendEdetailing= async {
-                    submitDCRCo() }
-                sendEdetailing.await()
-            }
-            coroutineScope.invokeOnCompletion {
-                AlertClass(activity).commonAlert("","Offline DCR submit successfully")
-
-                if (activity is HomePage) {
-                    if(activity.getFragmentRefreshListener()!=null){
-                        activity?.getFragmentRefreshListener()?.onRefresh()
+            Handler(Looper.getMainLooper()).postDelayed({
+                val coroutineScope= CoroutineScope(Dispatchers.IO+ generalClass.coroutineExceptionHandler).launch {
+                    try {
+                        val sendEdetailing= async {
+                            submitDCRCo() }
+                        sendEdetailing.await()
+                    }
+                    catch (e: Exception)
+                    {
+                        isLowNetwork=true
                     }
                 }
+                coroutineScope.invokeOnCompletion {
 
-            }
+                    if(isLowNetwork==false)
+                    {
+                        AlertClass(activity).commonAlert("","Offline DCR submit successfully")
+                        if (activity is HomePage) {
+                            if(activity.getFragmentRefreshListener()!=null){
+                                activity?.getFragmentRefreshListener()?.onRefresh()
+                            }
+                        }
+                    }
+                }
+            },5000)
         }
 
         if(retailerArray.size!=0)
         {
-            val coroutineScope= CoroutineScope(Dispatchers.IO).launch {
-                val sendEdetailing= async {
-                    submitDCRRetailer() }
-                sendEdetailing.await()
-            }
-            coroutineScope.invokeOnCompletion {
-                AlertClass(activity).commonAlert("","Offline DCR submit successfully")
-
-                if (activity is HomePage) {
-                    if(activity.getFragmentRefreshListener()!=null){
-                        activity?.getFragmentRefreshListener()?.onRefresh()
+            Handler(Looper.getMainLooper()).postDelayed({
+                val coroutineScope= CoroutineScope(Dispatchers.IO+ generalClass.coroutineExceptionHandler).launch {
+                    try {
+                        val sendEdetailing= async {
+                            submitDCRRetailer() }
+                        sendEdetailing.await()
                     }
+                    catch (e:IOException)
+                    { isLowNetwork=true }
                 }
+                coroutineScope.invokeOnCompletion {
+                    if(isLowNetwork==false)
+                    {
+                        AlertClass(activity).commonAlert("","Offline DCR submit successfully")
+                        if (activity is HomePage) {
+                            if(activity.getFragmentRefreshListener()!=null){
+                                activity?.getFragmentRefreshListener()?.onRefresh()
+                            }
+                        } }
+                }
+            },5000)
 
-            }
+
         }
     }
 
@@ -413,6 +436,8 @@ open class BaseActivity : AppCompatActivity(){
         { getDocCallAPI()
             return }
 
+
+        Log.e("hdfuiosdghfiosdhfuisdhuifhsdiopf",Gson().toJson(eDetailingArray.get(0)))
 
         val response =
             sharePreferanceBase?.getPref("secondaryUrl")?.let {

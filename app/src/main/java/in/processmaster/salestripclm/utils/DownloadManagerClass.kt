@@ -78,9 +78,6 @@ class DownloadManagerClass(
     }
 
     private fun downloadFile(url: String, name: String, fileType: String){
-        Log.e("fromDownloadMangerUrl",url)
-        Log.e("fromDownloadMangerName",name)
-
         val setMime = if(fileType=="IMAGE")"image/*" else if(fileType=="VIDEO")"video/*" else "zip"
         val request = DownloadManager.Request(Uri.parse(url))
             .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
@@ -171,9 +168,9 @@ class DownloadManagerClass(
                     }
 
                 } catch (fnfe1: FileNotFoundException) {
-                    Log.e("tag", fnfe1.message.toString())
+                    Log.e("tagABCD", fnfe1.message.toString())
                 } catch (e: java.lang.Exception) {
-                    Log.e("tag", e.message!!)
+                    Log.e("tagABVRDF", e.message!!)
                 }
             }
             cutFile.await()

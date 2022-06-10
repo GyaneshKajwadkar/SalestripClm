@@ -79,7 +79,15 @@ class SplashActivity : BaseActivity()
                 }
 
                 generalClass.enableSimpleProgress(progressBar!!)
-                val scope= GlobalScope.launch { callingSyncAPI() }
+                val scope= GlobalScope.launch( generalClass.coroutineExceptionHandler) {
+                    try{
+                        callingSyncAPI()
+                    }
+                    catch (e:Exception)
+                    {
+                        alertClass.lowNetworkAlert()
+                    }
+                    }
                 scope.invokeOnCompletion {
                     this.runOnUiThread(java.lang.Runnable { generalClass.disableSimpleProgress(progressBar!!) })
                 }
@@ -101,6 +109,8 @@ class SplashActivity : BaseActivity()
 
         val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
         ).syncApiCoo("bearer " + loginModel?.accessToken)
+
+
         withContext(Dispatchers.Main) {
             var intent=Intent()
                 if (response?.code() == 200 && !response.body().toString().isEmpty())

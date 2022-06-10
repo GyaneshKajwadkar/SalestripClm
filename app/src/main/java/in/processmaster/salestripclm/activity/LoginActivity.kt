@@ -21,6 +21,7 @@ import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.progress_view.*
 import kotlinx.coroutines.*
+import org.json.JSONException
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
@@ -136,20 +137,26 @@ class LoginActivity : BaseActivity() {
 
                     val jsonObj= JSONObject(loginModel?.configurationSetting)
                     val jsonObjEmp= JSONObject(loginModel?.getEmployeeObj())
-                    val checkCLM=jsonObj.getInt("SET056")
-                    val checkUser=jsonObjEmp.getBoolean("IsCLMUser")
-                    if(checkCLM==0)
-                    {
-                        alertClass.hideAlert()
-                        alertClass?.commonAlert("Alert!","Salestrip CLM is not enable for this credential. Please contact to administration")
-                        return
+
+                    try {
+                        val checkCLM=jsonObj.getInt("SET056")
+                        val checkUser=jsonObjEmp.getBoolean("IsCLMUser")
+                        if(checkCLM==0)
+                        {
+                            alertClass.hideAlert()
+                            alertClass?.commonAlert("Alert!","Salestrip CLM is not enable for this credential. Please contact to administration")
+                            return
+                        }
+                        if(!checkUser)
+                        {
+                            alertClass.hideAlert()
+                            alertClass?.commonAlert("Alert!","Salestrip CLM is not enable for this user. Please contact to administration")
+                            return
+                        }
+                    } catch (e: JSONException) {
+                        Log.e("jsonNotFoundException",e.message.toString())
                     }
-                    if(!checkUser)
-                    {
-                        alertClass.hideAlert()
-                        alertClass?.commonAlert("Alert!","Salestrip CLM is not enable for this user. Please contact to administration")
-                        return
-                    }
+
 
                     sharePreferance?.setPref("userName_login", userName_et?.getText().toString())
                     sharePreferance?.setPrefBool("isLogin", true)

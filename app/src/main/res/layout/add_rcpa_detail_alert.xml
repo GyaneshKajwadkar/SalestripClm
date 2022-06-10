@@ -48,6 +48,7 @@
                     android:text="Own Brand*"
                     android:textColor="@color/black"/>
                 <EditText
+
                     android:inputType="none"
                     android:focusable="false"
                     android:cursorVisible="false"
@@ -329,7 +330,8 @@
             android:background="@drawable/edittext_capsul"
             android:drawableRight="@android:drawable/ic_menu_search"
             android:drawableTint="@color/appColor"
-            android:paddingRight="5dp" />
+            android:paddingRight="5dp"
+            android:paddingLeft="5dp"/>
     </LinearLayout>
 
 
