@@ -625,7 +625,7 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
         childFragment.setArguments(args)
 
         val transaction: FragmentTransaction = childFragmentManager.beginTransaction()
-        transaction.replace(R.id.child_fragment_container, childFragment).commit()
+        transaction.replace(R.id.child_fragment_container, childFragment).commitAllowingStateLoss()
     }
 
     fun onClickFavButton()
@@ -637,7 +637,7 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
         childFragment2.setArguments(args)
 
         val transaction2: FragmentTransaction = childFragmentManager.beginTransaction()
-        transaction2.replace(R.id.favBrand_frame, childFragment2).commit()
+        transaction2.replace(R.id.favBrand_frame, childFragment2).commitAllowingStateLoss()
     }
 
 
@@ -649,7 +649,7 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
         {
             val childFragment: Fragment = ShowDownloadedFragment()
             val transaction: FragmentTransaction = childFragmentManager.beginTransaction()
-            transaction.replace(R.id.child_fragment_container, childFragment).commit()
+            transaction.replace(R.id.child_fragment_container, childFragment).commitAllowingStateLoss()
         }
     }
 
@@ -676,7 +676,7 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
         childFragment2.setArguments(args)
 
         val transaction2: FragmentTransaction = childFragmentManager.beginTransaction()
-        transaction2.replace(R.id.child_fragment_container, childFragment2).commit()
+        transaction2.replace(R.id.child_fragment_container, childFragment2).commitAllowingStateLoss()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {}

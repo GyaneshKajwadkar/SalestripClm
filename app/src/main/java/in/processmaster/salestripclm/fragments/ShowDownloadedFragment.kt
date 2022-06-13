@@ -227,5 +227,6 @@ class ShowDownloadedFragment : Fragment() {
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {}
 
 }

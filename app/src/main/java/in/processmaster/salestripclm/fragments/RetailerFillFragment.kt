@@ -562,6 +562,10 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
         return views
     }
 
+    fun RetailerFillFragment(){
+
+    }
+
     fun submitDcr(
         saveModel: DailyDocVisitModel.Data.DcrDoctor,
         quantityArray: java.util.ArrayList<CommonModel.QuantityModel.Data.EmployeeSampleBalance>
@@ -1548,5 +1552,8 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
         }
         Thread(runnable).start()
     }
+
+
+    override fun onSaveInstanceState(outState: Bundle) {}
 
 }

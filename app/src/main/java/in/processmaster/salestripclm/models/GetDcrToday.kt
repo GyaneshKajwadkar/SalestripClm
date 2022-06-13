@@ -27,32 +27,36 @@ class GetDcrToday {
              var dcrDate: String? = null
              @SerializedName("otherDCR")
              var otherDCR: Int? = null
-           /*  @SerializedName("dcrType")
-             var dcrType: Int? = null
-             */
              @SerializedName("empId")
              var empId: Int? = null
-             /*@SerializedName("employeeId")
-             var employeeId: Int? = null*/
              @SerializedName("mode")
              var mode: Int? = null
              @SerializedName("routeId")
              var routeId: String? = null
              @SerializedName("remark")
              var remark: String? = null
+             @SerializedName("routeName")
+             var routeName: String? = null
+             @SerializedName("dataSaveType")
+             var dataSaveType: String = "D"
+             @SerializedName("rtpApproveStatus")
+             var rtpApproveStatus: String? = null
+             @SerializedName("headQuaterName")
+             var headQuaterName: String? = null
+           /*  @SerializedName("dcrType")
+             var dcrType: Int? = null
+             */
+             /*@SerializedName("employeeId")
+             var employeeId: Int? = null*/
+
         /*     @SerializedName("otherRemark")
              var otherRemark: String? = null
              @SerializedName("transportMode")
              var transportMode: Int? = null*/
-             @SerializedName("routeName")
-             var routeName: String? = null
+
           /*   @SerializedName("strDCRDate")
              var strDCRDate: String? = null*/
-             @SerializedName("dataSaveType")
-             var dataSaveType: String = "D"
 
-             @SerializedName("rtpApproveStatus")
-             var rtpApproveStatus: String? = null
           /*   @SerializedName("isRouteDeviated")
              var isRouteDeviated: Boolean? = null
              @SerializedName("concatEmployeeId")
@@ -179,8 +183,6 @@ class GetDcrToday {
              var hierarchyCode: String? = null
              @SerializedName("linkedStateName")
              var linkedStateName: String? = null*/
-             @SerializedName("headQuaterName")
-             var headQuaterName: String? = null
             /* @SerializedName("absolutePath")
              var absolutePath: String? = null
              @SerializedName("gender")

@@ -31,6 +31,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.google.gson.Gson
 import java.io.File
@@ -134,6 +135,8 @@ class DownloadedFolderAdapter(
                 Glide.with(context).setDefaultRequestOptions(requestOptions)
                     .load(Uri.fromFile(File(videomodel.fileDirectoryPath, videomodel.fileName)))
                     .placeholder(circularProgressDrawable)
+                    .thumbnail(.1f)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(videoView.videoThumb_iv)
 
 
@@ -202,6 +205,8 @@ class DownloadedFolderAdapter(
                 Glide.with(context).setDefaultRequestOptions(requestOptions)
                     .load(Uri.fromFile(File(imagemodel.fileDirectoryPath, imagemodel.fileName)))
                     .placeholder(circularProgressDrawable)
+                    .thumbnail(.1f)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(videoView.pics_iv)
 
                 videoView.pics_iv.setOnClickListener({
@@ -364,10 +369,10 @@ class DownloadedFolderAdapter(
                 val FilteredArrayNames: ArrayList<DownloadFileModel> = ArrayList()
 
                 // perform your search here using the searchConstraint String.
-                constraint = constraint.toString().toLowerCase()
+                constraint = constraint.toString().lowercase()
                 for (i in 0 until arraylist?.size!!) {
                     val dataNames: DownloadFileModel = arraylist?.get(i)!!
-                    if (dataNames.favFileName.toLowerCase().startsWith(constraint.toString())) {
+                    if (dataNames.favFileName.lowercase().startsWith(constraint.toString())) {
                         FilteredArrayNames.add(dataNames)
                     }
                 }

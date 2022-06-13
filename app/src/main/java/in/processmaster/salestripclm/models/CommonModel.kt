@@ -140,7 +140,7 @@ class CommonModel {
 
     }
 
-    class SaveRcpaDetail{
+  /*  class SaveRcpaDetail{
         var ownBrand=""
             get() = field
             set(value) { field = value }
@@ -172,7 +172,8 @@ class CommonModel {
             get() = field
             set(value) { field = value }
 
-    }
+    }*/
+
     class FilterModel
     {
         var categoryName=""
