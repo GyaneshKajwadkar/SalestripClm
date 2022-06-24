@@ -32,6 +32,10 @@
             android:icon="@drawable/ic_menu_gallery"
             android:title="Create Presentation" />
 
+        <item
+            android:id="@+id/nav_createpob"
+            android:icon="@drawable/ic_anno_pen_select"
+            android:title="Create POB" />
 
         <item
             android:id="@+id/sync_menu"

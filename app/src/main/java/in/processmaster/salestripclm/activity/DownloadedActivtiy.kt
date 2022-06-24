@@ -2,6 +2,7 @@ package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.adapter.DownloadAdapter
+import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.models.DownloadFileModel
 import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
@@ -584,6 +585,8 @@ class DownloadedActivtiy : BaseActivity() {
     override fun onResume() {
         super.onResume()
         createConnectivity(this)
+        alertClass = AlertClass(this)
+
     }
 
     override fun onPause() {
@@ -834,5 +837,7 @@ class DownloadedActivtiy : BaseActivity() {
             .build()
         return retrofit.create(serviceClass)
     }
+
+
 
 }

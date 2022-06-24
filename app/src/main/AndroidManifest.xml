@@ -2,12 +2,25 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="in.processmaster.salestripclm">
-    <!--
-          <supports-screens
-        android:anyDensity="true"
+
+    <supports-screens
         android:largeScreens="true"
-        android:resizeable="true" />
-    -->
+        android:normalScreens="false"
+        android:smallScreens="false"
+        android:xlargeScreens="false" />
+
+    <uses-feature android:name="android.hardware.camera" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+
     <application
         android:allowBackup="false"
         android:exported="false"
@@ -20,6 +33,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Salestrip"
         android:usesCleartextTraffic="true">
+        <activity
+            android:name=".activity.CreatePobActivity"
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:windowSoftInputMode="stateHidden"/>
         <activity
             android:name=".activity.CreatePresentationActivity"
             android:exported="false"
@@ -133,7 +151,6 @@
         <meta-data
             android:name="firebase_messaging_auto_init_enabled"
             android:value="false" />
-
         <meta-data
             android:name="firebase_analytics_collection_enabled"
             android:value="false" />
@@ -145,32 +162,17 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
+
                 android:resource="@xml/provider_paths" />
         </provider>
-        <receiver
+
+      <!--  <receiver
             android:name=".networkUtils.ConnectivityChangeReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
-        </receiver>
+        </receiver>-->
     </application>
-
-    <supports-screens
-        android:largeScreens="true"
-        android:normalScreens="true"
-        android:smallScreens="true"
-        android:xlargeScreens="false" />
-    <uses-feature android:name="android.hardware.camera" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.CAMERA" />
-
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
 </manifest>

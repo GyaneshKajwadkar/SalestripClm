@@ -71,7 +71,7 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
         savedInstanceState: Bundle?
     ): View? {
         views = inflater.inflate(R.layout.activity_display_visual, container, false)
-        db = DatabaseHandler(requireActivity())
+        db = DatabaseHandler(activity)
         sharePreferance = PreferenceClass(activity)
 
         doctor_et = views?.findViewById(R.id.doctor_et) as EditText
@@ -94,7 +94,7 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
         val createdPresentatedList=db.getAllSavedPresentationName()
 
 
-        views?.customPresentation_rv?.setLayoutManager(LinearLayoutManager(requireActivity()))
+        views?.customPresentation_rv?.setLayoutManager(LinearLayoutManager(activity))
         stringListAdapter=StringListAdapter(createdPresentatedList,this)
         views?.customPresentation_rv?.adapter = stringListAdapter
 
@@ -133,9 +133,9 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
             bottomSheetBehavior.state = state
         })
 */
-        views!!.close_imv?.setOnClickListener({
+       /* views!!.close_imv?.setOnClickListener({
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
-        })
+        })*/
 
         views!!.submitBtn?.setOnClickListener({
 
@@ -201,33 +201,44 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
             }
         }
 
+        activity?.let {
+            views?.allBrand_iv?.setColorFilter(ContextCompat.getColor(it, R.color.white))
+        }
 
-        views!!.allBrand_iv?.setColorFilter(ContextCompat.getColor(requireActivity(), R.color.white))
+
 
 
         views!!.allbrandparent_ll?.setOnClickListener({
 
-            views!!.allBrand_iv?.setColorFilter(ContextCompat.getColor(requireActivity(), R.color.white))
-            views!!.favBrand_iv?.setColorFilter(ContextCompat.getColor(requireActivity(), R.color.gray))
-            views!!.division_spinner?.isEnabled=true
+            activity?.let {
+                views?.allBrand_iv?.setColorFilter(ContextCompat.getColor(it, R.color.white))
+                views?.favBrand_iv?.setColorFilter(ContextCompat.getColor(it, R.color.gray))
+            }
+
+
+            views?.division_spinner?.isEnabled=true
             callDownloadFragment()
-            views!!.sideparent_rl?.visibility=View.VISIBLE
-            views!!.allBrandParent_ll?.visibility=View.VISIBLE
-            views!!.division_spinner?.visibility=View.VISIBLE
-            views!!.favBrand_frame?.visibility=View.GONE
+            views?.sideparent_rl?.visibility=View.VISIBLE
+            views?.allBrandParent_ll?.visibility=View.VISIBLE
+            views?.division_spinner?.visibility=View.VISIBLE
+            views?.favBrand_frame?.visibility=View.GONE
         })
 
-        views!!.favParent_ll?.setOnClickListener({
+        views?.favParent_ll?.setOnClickListener({
 
-            views!!.allBrand_iv?.setColorFilter(ContextCompat.getColor(requireActivity(), R.color.gray));
-            views!!.favBrand_iv?.setColorFilter(ContextCompat.getColor(requireActivity(), R.color.white));
-            views!!.division_spinner?.isEnabled=false
+            activity.let {
+
+            }
+
+            views?.allBrand_iv?.setColorFilter(ContextCompat.getColor(requireActivity(), R.color.gray));
+            views?.favBrand_iv?.setColorFilter(ContextCompat.getColor(requireActivity(), R.color.white));
+            views?.division_spinner?.isEnabled=false
             onClickFavButton()
             setDownloadListAdapter(downloadFilePathList)
-            views!!.sideparent_rl?.visibility=View.GONE
-            views!!.allBrandParent_ll?.visibility=View.GONE
-            views!!.division_spinner?.visibility=View.INVISIBLE
-            views!!.favBrand_frame?.visibility=View.VISIBLE
+            views?.sideparent_rl?.visibility=View.GONE
+            views?.allBrandParent_ll?.visibility=View.GONE
+            views?.division_spinner?.visibility=View.INVISIBLE
+            views?.favBrand_frame?.visibility=View.VISIBLE
         })
 
         db.deleteAllVisualAds()
@@ -524,8 +535,8 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
     //-------------------------------------initilize Visual file recycler view
     fun setDownloadListAdapter(list: ArrayList<DownloadFileModel>)
     {
-        adapterVisualFile = VisualFileAdapter(list, requireActivity(), 1, this)
-        views!!.brand_rv?.setLayoutManager(LinearLayoutManager(requireActivity()));
+        adapterVisualFile = VisualFileAdapter(list, activity, 1, this)
+        views!!.brand_rv?.setLayoutManager(LinearLayoutManager(activity));
         views!!.brand_rv?.itemAnimator = DefaultItemAnimator()
         views!!.brand_rv?.adapter = adapterVisualFile
     }

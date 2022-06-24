@@ -2,6 +2,7 @@ package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.adapter.ImageSelectorAdapter
+import `in`.processmaster.salestripclm.common_classes.AlertClass
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -254,6 +255,8 @@ class ImageSelectorActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         createConnectivity(this)
+        alertClass = AlertClass(this)
+
     }
 
     override fun onPause() {

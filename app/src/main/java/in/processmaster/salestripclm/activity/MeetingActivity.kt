@@ -169,6 +169,8 @@ class MeetingActivity : BaseActivity(), MeetingServiceListener, View.OnClickList
         val intentFilter = IntentFilter("android.net.conn.CONNECTIVITY_CHANGE")
         this.registerReceiver(connectivityChangeReceiver, intentFilter)
         setScheduleAdapter()
+        alertClass = AlertClass(this)
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

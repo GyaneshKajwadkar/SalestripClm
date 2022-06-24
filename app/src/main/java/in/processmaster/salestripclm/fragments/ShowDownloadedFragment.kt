@@ -23,9 +23,12 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -55,34 +58,39 @@ class ShowDownloadedFragment : Fragment() {
         var currentDate = ""
     }
 
+    lateinit var views : View
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-        var view= inflater.inflate(R.layout.fragment_show_downloaded, container, false)
+        views= inflater.inflate(R.layout.fragment_show_downloaded, container, false)
+        video_rv=views.findViewById(R.id.video_rv)
+        images_rv=views.findViewById(R.id.images_rv)
+        html_rv=views.findViewById(R.id.html_rv)
+        nodata_gif=views.findViewById(R.id.nodata_gif)
+        topSearchParent=views.findViewById(R.id.topSearchParent)
 
-        if (requireActivity() != null && isAdded) {
+        nestedScroll=views.findViewById(R.id.nestedScroll)
+        filterFavList_et=views.findViewById(R.id.filterFavList_et)
+
+        selection_tv=views.findViewById(R.id.selection_tv)
+
+        videoView_parent=views.findViewById(R.id.videoView_parent)
+        images_parent=views.findViewById(R.id.images_parent)
+        html_parent=views.findViewById(R.id.html_parent)
+        return views
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        if (isAdded) {
             if(currentDate.isEmpty()&& currentDate.isEmpty())
             {
                 currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
                 currentDate = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(Date())
             }
-
-            video_rv=view.findViewById(R.id.video_rv)
-            images_rv=view.findViewById(R.id.images_rv)
-            html_rv=view.findViewById(R.id.html_rv)
-            nodata_gif=view.findViewById(R.id.nodata_gif)
-            topSearchParent=view.findViewById(R.id.topSearchParent)
-
-            nestedScroll=view.findViewById(R.id.nestedScroll)
-            filterFavList_et=view.findViewById(R.id.filterFavList_et)
-
-            selection_tv=view.findViewById(R.id.selection_tv)
-
-            videoView_parent=view.findViewById(R.id.videoView_parent)
-            images_parent=view.findViewById(R.id.images_parent)
-            html_parent=view.findViewById(R.id.html_parent)
 
             var arraylistVideo:ArrayList<DownloadFileModel> = ArrayList()
             var arraylistImages:ArrayList<DownloadFileModel> = ArrayList()
@@ -95,122 +103,131 @@ class ShowDownloadedFragment : Fragment() {
                 nodata_gif?.visibility=View.VISIBLE
                 selection_tv?.setText("Doctor not selected")
                 selection_tv?.visibility=View.VISIBLE
-                nestedScroll?.visibility=View.GONE
+                nestedScroll?.visibility=View.INVISIBLE
             }
             else if(!doctor_et?.text.toString().isEmpty() && bundle==null)
             {
                 nodata_gif?.visibility=View.VISIBLE
                 selection_tv?.setText("Brand not selected")
                 selection_tv?.visibility=View.VISIBLE
-                nestedScroll?.visibility=View.GONE
+                nestedScroll?.visibility=View.INVISIBLE
             }
             else
             {
-                AlertClass(requireActivity()).showProgressAlert("")
-                val runnable= Runnable {
-                    var downloadList: ArrayList<DownloadFileModel> = ArrayList()
-                    db = DatabaseHandler(requireActivity())
+                activity?.let { AlertClass(it).showProgressAlert("") }
+                val coroutine= viewLifecycleOwner.lifecycleScope.launch{
+                    var call= async {
+                        var downloadList: ArrayList<DownloadFileModel> = ArrayList()
+                        db = DatabaseHandler(activity)
 
-                    isCustomePresentation=  requireArguments().getBoolean("presentation")
-                    var value = 0
-                    var brandID = 0
+                        isCustomePresentation=  requireArguments().getBoolean("presentation")
+                        var value = 0
+                        var brandID = 0
 
-                    if(isCustomePresentation){
-                        val presentationName=  requireArguments().getString("presentationName")
-                        db?.getAllPresentationItem(presentationName)?.let { downloadList.addAll(it) }
-                    }
-                    else
-                    {
-                        val selectionType = requireArguments().getInt("selectionType")
-                        value = requireArguments().getInt("eDetailingID")
-                        brandID = requireArguments().getInt("brandId")
-
-                        if(selectionType==1)
-                        {
-                            downloadList= db?.getAllDownloadedData(value) as ArrayList<DownloadFileModel>
+                        if(isCustomePresentation){
+                            val presentationName=  requireArguments().getString("presentationName")
+                            db?.getAllPresentationItem(presentationName)?.let { downloadList.addAll(it) }
                         }
                         else
                         {
-                            downloadList= db?.getAllFavList() as ArrayList<DownloadFileModel>
-                            if(downloadList.size==0) requireActivity().runOnUiThread {  nodata_gif?.visibility=View.VISIBLE }
-                            else requireActivity().runOnUiThread { topSearchParent?.visibility=View.VISIBLE }
-                        }
-                    }
+                            val selectionType = requireArguments().getInt("selectionType")
+                            value = requireArguments().getInt("eDetailingID")
+                            brandID = requireArguments().getInt("brandId")
 
-
-                    for ((index, valueDownload) in downloadList?.withIndex()!!)
-                    {
-                        if(valueDownload.downloadType.equals("VIDEO"))
-                        {
-                            //   valueDownload.eDetailingId=value
-                            arraylistVideo.add(valueDownload)
-                        }
-                        else  if(valueDownload.downloadType.equals("IMAGE"))
-                        {
-                            //  valueDownload.eDetailingId=value
-                            arraylistImages.add(valueDownload)
-                        }
-                        else
-                        {
-                            // valueDownload.eDetailingId=value
-                            arraylistZip.add(valueDownload)
-                        }
-                    }
-
-                    if(arraylistVideo.size==0) requireActivity().runOnUiThread{ videoView_parent?.visibility=View.GONE}
-
-                    if(arraylistImages.size==0) requireActivity().runOnUiThread{ images_parent?.visibility=View.GONE}
-
-                    if(arraylistZip.size==0)requireActivity().runOnUiThread{ html_parent?.visibility=View.GONE}
-                    var presentationName=""
-                    if(isCustomePresentation) presentationName= requireArguments().getString("presentationName")!!
-
-
-                    adapterVideo= DownloadedFolderAdapter(presentationName,"VIDEO",arraylistVideo, requireActivity(),doctorIdDisplayVisual,isCustomePresentation)
-                    adapterImage= DownloadedFolderAdapter(presentationName,"IMAGE", arraylistImages, requireActivity(), doctorIdDisplayVisual, isCustomePresentation)
-                    adapterWeb= DownloadedFolderAdapter(presentationName,"ZIP", arraylistZip, requireActivity(), doctorIdDisplayVisual, isCustomePresentation)
-
-
-                    requireActivity().runOnUiThread {
-                        nodata_gif?.visibility=View.GONE
-                        selection_tv?.setText("Please wait...")
-
-
-                        video_rv?.layoutManager = GridLayoutManager(requireActivity(), 5)
-                        video_rv?.itemAnimator = DefaultItemAnimator()
-                        video_rv?.adapter = adapterVideo
-
-                        images_rv?.layoutManager = GridLayoutManager(requireActivity(), 5)
-                        images_rv?.itemAnimator = DefaultItemAnimator()
-                        images_rv?.adapter = adapterImage
-
-                        html_rv?.layoutManager = GridLayoutManager(requireActivity(), 5)
-                        html_rv?.itemAnimator = DefaultItemAnimator()
-                        html_rv?.adapter = adapterWeb
-
-                        nestedScroll?.visibility=View.VISIBLE
-                        selection_tv?.visibility=View.GONE
-
-                        Handler(Looper.getMainLooper()).postDelayed({
-                            val activity: Activity? = activity
-
-                            if (activity != null && isAdded)
+                            if(selectionType==1)
                             {
-                                AlertClass(requireActivity()).hideAlert()
+                                downloadList= db?.getAllDownloadedData(value) as ArrayList<DownloadFileModel>
                             }
-                        },100)
+                            else
+                            {
+                                downloadList= db?.getAllFavList() as ArrayList<DownloadFileModel>
+                                if(downloadList.size==0) activity?.runOnUiThread {  nodata_gif?.visibility=View.VISIBLE }
+                                else activity?.runOnUiThread { topSearchParent?.visibility=View.VISIBLE }
+                            }
+                        }
+
+
+                        for ((index, valueDownload) in downloadList?.withIndex()!!)
+                        {
+                            if(valueDownload.downloadType.equals("VIDEO"))
+                            {
+                                //   valueDownload.eDetailingId=value
+                                arraylistVideo.add(valueDownload)
+                            }
+                            else  if(valueDownload.downloadType.equals("IMAGE"))
+                            {
+                                //  valueDownload.eDetailingId=value
+                                arraylistImages.add(valueDownload)
+                            }
+                            else
+                            {
+                                // valueDownload.eDetailingId=value
+                                arraylistZip.add(valueDownload)
+                            }
+                        }
+
+                        if(arraylistVideo.size==0) activity?.runOnUiThread{ videoView_parent?.visibility=View.GONE}
+
+                        if(arraylistImages.size==0) activity?.runOnUiThread{ images_parent?.visibility=View.GONE}
+
+                        if(arraylistZip.size==0)activity?.runOnUiThread{ html_parent?.visibility=View.GONE}
+                        var presentationName=""
+                        if(isCustomePresentation) presentationName= requireArguments().getString("presentationName")!!
+
+
+                        adapterVideo= activity?.let {
+                            DownloadedFolderAdapter(presentationName,"VIDEO",arraylistVideo,
+                                it,doctorIdDisplayVisual,isCustomePresentation)
+                        }
+                        adapterImage= activity?.let {
+                            DownloadedFolderAdapter(presentationName,"IMAGE", arraylistImages,
+                                it, doctorIdDisplayVisual, isCustomePresentation)
+                        }
+                        adapterWeb= activity?.let {
+                            DownloadedFolderAdapter(presentationName,"ZIP", arraylistZip,
+                                it, doctorIdDisplayVisual, isCustomePresentation)
+                        }
+
+
+                        activity?.runOnUiThread {
+                            nodata_gif?.visibility=View.GONE
+                            selection_tv?.setText("Please wait...")
+
+
+                            video_rv?.layoutManager = GridLayoutManager(activity, 5)
+                            video_rv?.itemAnimator = DefaultItemAnimator()
+                            video_rv?.adapter = adapterVideo
+
+                            images_rv?.layoutManager = GridLayoutManager(activity, 5)
+                            images_rv?.itemAnimator = DefaultItemAnimator()
+                            images_rv?.adapter = adapterImage
+
+                            html_rv?.layoutManager = GridLayoutManager(activity, 5)
+                            html_rv?.itemAnimator = DefaultItemAnimator()
+                            html_rv?.adapter = adapterWeb
+
+                            nestedScroll?.visibility=View.VISIBLE
+                            selection_tv?.visibility=View.GONE
+
+                            Handler(Looper.getMainLooper()).postDelayed({
+                                val activity: Activity? = activity
+
+                                if (activity != null && isAdded)
+                                {
+                                    AlertClass(activity).hideAlert()
+                                }
+                            },100)
+                        }
+
                     }
+                    call.await()
                 }
-                Thread(runnable).start()
-
             }
-
             filterFavList_et?.addTextChangedListener(filterTextWatcher)
 
         }
-
-        return view
     }
+
 
     //FilterUsingEdit
     val filterTextWatcher: TextWatcher = object : TextWatcher {

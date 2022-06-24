@@ -30,6 +30,7 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.mikephil.charting.charts.BarChart
@@ -196,64 +197,16 @@ class HomeFragment : Fragment(), OnChartGestureListener {
 
     override fun onResume() {
         super.onResume()
-        GlobalScope.launch(Dispatchers.Default) {
-            val default = async(Dispatchers.Default) { fetchData() }
-            default.await()
+        if(isAdded)
+        {
+            viewLifecycleOwner.lifecycleScope.launch {
+                val default = async { fetchData() }
+                default.await()
+            }
         }
     }
 
-  /*  override fun onResume() {
-        super.onResume()
-
-    *//*    val runnable = Runnable {
-            val responseData=db.getApiDetail(2)
-            val responseGraph=db.getApiDetail(4)
-            val responseDocCall=db.getApiDetail(5)
-            var getScheduleModel=GetScheduleModel()
-            if(!responseData.equals(""))
-            {
-                getScheduleModel= Gson().fromJson(responseData, GetScheduleModel::class.java)
-            }
-            if(!responseGraph.equals(""))
-            {
-                var doctorGraphModel=DoctorGraphModel.Data()
-                doctorGraphModel= Gson().fromJson(responseGraph, DoctorGraphModel.Data::class.java)
-                requireActivity().runOnUiThread{ setChart(doctorGraphModel) }
-
-            }
-
-            var arrayListString : ArrayList<String> = ArrayList()
-            arrayListString.add("Today's meetings")
-            arrayListString.add("Tommorow meetings")
-            arrayListString.add("This week meetings")
-            arrayListString.add("Next week meetings")
-            val adapter = MeetingExpandableHeaderAdapter(requireActivity(),arrayListString,getScheduleModel)
-
-            requireActivity().runOnUiThread{ expandable_Rv?.adapter = adapter }
-
-            if(!responseDocCall.equals(""))
-            {
-                val  docCallModel= Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
-                val docAdapter=CallDoctor_Adapter(docCallModel.dcrDoctorlist,requireActivity())
-
-                requireActivity().runOnUiThread {
-                    if(docCallModel.dcrDoctorlist?.size==0) { noDocCall_tv?.visibility = View.VISIBLE}
-                    dailyDoctorCall_rv?.layoutManager=LinearLayoutManager(requireActivity())
-                    dailyDoctorCall_rv?.adapter=docAdapter
-                    todaysCall_tv?.setText("Today's call- "+docCallModel.dcrDoctorlist?.size)
-                }
-            }
-        }
-        Thread(runnable).start()*//*
-
-   *//*    val gs= GlobalScope.launch(Dispatchers.Default) {
-            val default = async(Dispatchers.Default) { fetchData() }
-           default.await()
-       }*//*
-
-    }*/
-
-    suspend fun fetchData() {
+     fun fetchData() {
 
         val activity: Activity? = activity
         if (activity == null && !isAdded) {
@@ -298,8 +251,6 @@ class HomeFragment : Fragment(), OnChartGestureListener {
             activity?.runOnUiThread {
                 val buttonId: Int = toggleButton.getCheckedButtonId()
 
-                if(docCallModel.dcrDoctorlist?.size==0 && buttonId==R.id.doctorCall_btn) { noDocCall_tv?.visibility = View.VISIBLE}
-
                 docCallModel.dcrDoctorlist?.let { doctorList.addAll(it) }
                 docCallModel.dcrRetailerlist?.let { retailerList.addAll(it) }
 
@@ -308,10 +259,10 @@ class HomeFragment : Fragment(), OnChartGestureListener {
                 dailyDoctorCall_rv?.adapter=docAdapter
                 dailyRetailer_rv?.adapter=retailAdapter
 
-
-
                 val totalCall= doctorList.size+ retailerList.size
                 todaysCall_tv?.setText("Today's call- "+totalCall)
+                if(doctorList?.size==0 && buttonId==R.id.doctorCall_btn) { noDocCall_tv?.visibility = View.VISIBLE}
+
             }
         }
     }
@@ -605,7 +556,7 @@ class HomeFragment : Fragment(), OnChartGestureListener {
                 barData.barWidth = defaultBarWidth
             } else {
                 Toast.makeText(
-                        requireActivity(),
+                        activity,
                         "Default Barwdith $defaultBarWidth",
                         Toast.LENGTH_SHORT
                 ).show()
@@ -638,12 +589,12 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         val format = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy")
 
 
-        val dialogBuilder = AlertDialog.Builder(requireActivity())
+        val dialogBuilder = activity?.let { AlertDialog.Builder(it) }
         val inflater = this.layoutInflater
         val dialogView: View = inflater.inflate(R.layout.dateshedule_alert, null)
-        dialogBuilder.setView(dialogView)
+        dialogBuilder?.setView(dialogView)
 
-        val alertDialog: AlertDialog = dialogBuilder.create()
+        val alertDialog: AlertDialog = dialogBuilder?.create()!!
         alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         var selectedDate = dialogView.findViewById(R.id.selectedDate) as TextView
@@ -654,9 +605,12 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         {
             var getScheduleModel= Gson().fromJson(responseData, GetScheduleModel::class.java)
             val zoomSdk=ZoomSDK.getInstance()
-            var adapterRecycler= ScheduleMeetingAdapter(requireActivity(),1,
-                getScheduleModel.getData()?.meetingList as MutableList<GetScheduleModel.Data.Meeting>,zoomSdk)
-            scheduledMeeting_rv.layoutManager = LinearLayoutManager(requireActivity())
+            var adapterRecycler= activity?.let {
+                ScheduleMeetingAdapter(
+                    it,1,
+                    getScheduleModel.getData()?.meetingList as MutableList<GetScheduleModel.Data.Meeting>,zoomSdk)
+            }
+            scheduledMeeting_rv.layoutManager = LinearLayoutManager(activity)
             scheduledMeeting_rv.adapter = adapterRecycler
         }
 

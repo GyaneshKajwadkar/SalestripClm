@@ -9,6 +9,7 @@ import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.HomePage.Companion.apiInterface
 import `in`.processmaster.salestripclm.activity.HomePage.Companion.loginModelHomePage
 import `in`.processmaster.salestripclm.adapter.ImageSelectorAdapter
+import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.models.GenerateOTPModel
 import android.graphics.Color
@@ -341,14 +342,14 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
 
         var reqBody = RequestBody.create(MediaType.parse("text/plain"), paramObject.toString());
 
-        var call: Call<GenerateOTPModel> = surveyImagesParts?.let {
+        var call: Call<GenerateOTPModel>? = surveyImagesParts?.let {
             apiInterface?.sendEmail(
                 "bearer " + loginModelHomePage.accessToken,
                 it,reqBody
             )
-        } as Call<GenerateOTPModel>
+        } as? Call<GenerateOTPModel>
 
-        call.enqueue(object : Callback<GenerateOTPModel?> {
+        call?.enqueue(object : Callback<GenerateOTPModel?> {
             override fun onResponse(
                 call: Call<GenerateOTPModel?>?,
                 response: Response<GenerateOTPModel?>
@@ -385,5 +386,9 @@ class MailActivity : BaseActivity(),SelectorInterface,IntegerInterface {
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        alertClass = AlertClass(this)
 
+    }
 }

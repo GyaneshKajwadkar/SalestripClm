@@ -80,7 +80,7 @@
                     android:text="Rx Unit*"
                     android:textColor="@color/black"/>
                 <EditText
-                    android:inputType="number"
+                    android:inputType="number|textNoSuggestions"
                     android:id="@+id/rxunit_et"
                     android:paddingLeft="10dp"
                     android:background="@drawable/edittext_capsul"
@@ -111,7 +111,7 @@
                     android:text="Competitor 1 *"
                     android:textColor="@color/black"/>
                 <EditText
-                    android:inputType="text"
+                    android:inputType="text|textNoSuggestions"
                     android:id="@+id/competitor1_et"
                     android:paddingLeft="10dp"
                     android:background="@drawable/edittext_capsul"
@@ -134,7 +134,7 @@
                     android:text="CP1 Rx Unit*"
                     android:textColor="@color/black"/>
                 <EditText
-                    android:inputType="number"
+                    android:inputType="number|textNoSuggestions"
                     android:id="@+id/cp1unit_et"
                     android:paddingLeft="10dp"
                     android:background="@drawable/edittext_capsul"
@@ -164,7 +164,7 @@
                     android:text="Competitor 2*"
                     android:textColor="@color/black"/>
                 <EditText
-                    android:inputType="text"
+                    android:inputType="text|textNoSuggestions"
                     android:id="@+id/competitor2_et"
                     android:paddingLeft="10dp"
                     android:background="@drawable/edittext_capsul"
@@ -188,7 +188,7 @@
                     android:text="CP2 Rx Unit*"
                     android:textColor="@color/black"/>
                 <EditText
-                    android:inputType="number"
+                    android:inputType="number|textNoSuggestions"
                     android:id="@+id/cp2unit_et"
                     android:paddingLeft="10dp"
                     android:background="@drawable/edittext_capsul"
@@ -219,7 +219,7 @@
                     android:textColor="@color/black"/>
 
                 <EditText
-                    android:inputType="text"
+                    android:inputType="text|textNoSuggestions"
                     android:id="@+id/competitor3_et"
                     android:paddingLeft="10dp"
                     android:background="@drawable/edittext_capsul"
@@ -243,7 +243,7 @@
                     android:text="CP3 Unit"
                     android:textColor="@color/black"/>
                 <EditText
-                    android:inputType="number"
+                    android:inputType="number|textNoSuggestions"
                     android:id="@+id/cp3unit_et"
                     android:paddingLeft="10dp"
                     android:background="@drawable/edittext_capsul"
@@ -274,7 +274,7 @@
                     android:textColor="@color/black"/>
 
                 <EditText
-                    android:inputType="text"
+                    android:inputType="text|textNoSuggestions"
                     android:id="@+id/competitor4_et"
                     android:paddingLeft="10dp"
                     android:background="@drawable/edittext_capsul"
@@ -298,7 +298,7 @@
                     android:text="Rx Unit*"
                     android:textColor="@color/black"/>
                 <EditText
-                    android:inputType="number"
+                    android:inputType="number|textNoSuggestions"
                     android:id="@+id/cp4unit_et"
                     android:paddingLeft="10dp"
                     android:background="@drawable/edittext_capsul"

@@ -1,6 +1,7 @@
 package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import `in`.processmaster.salestripclm.networkUtils.APIInterface
@@ -27,6 +28,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.*
+import java.lang.Exception
 
 class LoginActivity : BaseActivity() {
     var apiInterface: APIInterface? = null
@@ -64,6 +66,7 @@ class LoginActivity : BaseActivity() {
         // password_et?.setText("NILESH")
          password_et?.setText("1@@@sanjaysahu")
          companyCode_et.setText("UAT2")
+
         //forgot click
         forgotPass_tv?.setOnClickListener {
             val intent = Intent(this, ForgotActivity::class.java)
@@ -124,11 +127,11 @@ class LoginActivity : BaseActivity() {
         alertClass.showProgressAlert("Verify User")
         apiInterface= APIClientKot().getClient(2, sharePreferance?.getPref("secondaryUrl")).create(APIInterface::class.java)
 
-        var call: Call<LoginModel> = apiInterface?.loginAPI(
+        var call: Call<LoginModel>? = apiInterface?.loginAPI(
             "password", userName_et?.getText().toString() + "," +
                     sharePreferance?.getPref("companyCode").toString(), password_et?.getText().toString()
-        ) as Call<LoginModel>
-        call.enqueue(object : Callback<LoginModel?> {
+        ) as? Call<LoginModel>
+        call?.enqueue(object : Callback<LoginModel?> {
             override fun onResponse(call: Call<LoginModel?>?, response: Response<LoginModel?>) {
                 Log.e("login_api", response.code().toString() + "")
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
@@ -195,10 +198,10 @@ class LoginActivity : BaseActivity() {
     {
         alertClass.showProgressAlert("Verify Company code")
 
-        var call: Call<String> = apiInterface?.checkCompanyCode(
+        var call: Call<String>? = apiInterface?.checkCompanyCode(
             companyCode_et?.getText().toString().uppercase()
-        ) as Call<String>
-        call.enqueue(object : Callback<String?> {
+        ) as? Call<String>
+        call?.enqueue(object : Callback<String?> {
             override fun onResponse(call: Call<String?>?, response: Response<String?>) {
                 Log.e("checkCC_api", response.code().toString() + "")
                 if (response.body().toString().isEmpty()) {
@@ -229,8 +232,8 @@ class LoginActivity : BaseActivity() {
     {
         alertClass.showProgressAlert("")
 
-        var call: Call<String> = apiInterface?.checkVersion() as Call<String>
-        call.enqueue(object : Callback<String?> {
+        var call: Call<String>? = apiInterface?.checkVersion() as? Call<String>
+        call?.enqueue(object : Callback<String?> {
             override fun onResponse(call: Call<String?>?, response: Response<String?>) {
                 Log.e("checkVersioin_api", response.body().toString() + "")
                 if (response.body().toString().isEmpty()) {
@@ -241,44 +244,18 @@ class LoginActivity : BaseActivity() {
                     val namesList: List<String> = onlineVersion.split(",")
                     companyVerfy_ll?.visibility = View.GONE
                     login_ll?.visibility = View.VISIBLE
-
                     try {
-                        val pInfo: PackageInfo =
+                        val pInfo: PackageInfo? =
                             getPackageManager().getPackageInfo(getPackageName(), 0)
-                        var version = pInfo.versionName.replace(".","").toInt()
-                         // version = "2.1.30".replace(".","").toInt()
+                        var version = pInfo?.versionName?.replace(".","")?.toInt()
+                        var verionLower :Int? = namesList.get(0).replace(".","").toInt()
+                        var versionHigher :Int? = namesList.get(1).replace(".","").toInt()
+                        if(verionLower!= null &&  versionHigher!=null && version!=null)
+                        {
+                            if( version < verionLower ||version > versionHigher ) { needUpdateAlert() }
+                        }
 
-                        //   var updateLower: Boolean = checkForUpdateLower(version, namesList.get(0))
-                        //   var updateHigher: Boolean = checkForUpdateHigher(version, namesList.get(1))
-
-                        val verionLower = namesList.get(0).replace(".","").toInt()
-                        var versionHigher = namesList.get(1).replace(".","").toInt()
-
-
-                      //  Log.e("version",version.toString())
-                      //  Log.e("verionLower",verionLower.toString())
-                      //  Log.e("versionHigher",versionHigher.toString())
-
-                        if(version<verionLower||version>versionHigher)
-                        { needUpdateAlert() }
-                    /*  if (updateLower) {
-                              try {
-                                  startActivity(
-                                          Intent(
-                                                  Intent.ACTION_VIEW,
-                                                  Uri.parse("market://details?id=$packageName")
-                                          )
-                                  )
-                              } catch (e: ActivityNotFoundException) {
-                                  startActivity(
-                                          Intent(
-                                                  Intent.ACTION_VIEW,
-                                                  Uri.parse("https://play.google.com/store/apps/details?id=$packageName")
-                                          )
-                                  )
-                              }
-                          }*/
-                    } catch (e: PackageManager.NameNotFoundException) {
+                    } catch (e: Exception) {
                         e.printStackTrace()
                     }
                 }
@@ -322,6 +299,7 @@ class LoginActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         initView()
+        alertClass = AlertClass(this)
         createConnectivity(this)
     }
 

@@ -1,6 +1,7 @@
 package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.common_classes.AlertClass
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -134,10 +135,10 @@ class ForgotActivity : BaseActivity() {
     {
         apiInterface= APIClientKot().getClient(1, "").create(APIInterface::class.java)
         alertClass.showProgressAlert("")
-        var call: Call<GenerateOTPModel> = apiInterface?.generateOtpApi(
+        var call: Call<GenerateOTPModel>? = apiInterface?.generateOtpApi(
             companyCode_et?.getText().toString().uppercase(), userName_et?.getText().toString() , "user"
-        ) as Call<GenerateOTPModel>
-        call.enqueue(object : Callback<GenerateOTPModel?> {
+        ) as? Call<GenerateOTPModel>
+        call?.enqueue(object : Callback<GenerateOTPModel?> {
             override fun onResponse(call: Call<GenerateOTPModel?>?, response: Response<GenerateOTPModel?>) {
                 Log.e("generateOTp_api", response.code().toString() + "")
                 if (response.code() == 200 && !response.body().toString().isEmpty())
@@ -184,10 +185,10 @@ class ForgotActivity : BaseActivity() {
         apiInterface= APIClientKot().getClient(1, "").create(APIInterface::class.java)
         alertClass.showProgressAlert("")
 
-        var call: Call<GenerateOTPModel> = apiInterface?.verifyOtpAPI(
+        var call: Call<GenerateOTPModel>? = apiInterface?.verifyOtpAPI(
             companyCode_et?.getText().toString().uppercase(), empId , otpString
-        ) as Call<GenerateOTPModel>
-        call.enqueue(object : Callback<GenerateOTPModel?> {
+        ) as? Call<GenerateOTPModel>
+        call?.enqueue(object : Callback<GenerateOTPModel?> {
             override fun onResponse(call: Call<GenerateOTPModel?>?, response: Response<GenerateOTPModel?>) {
                 Log.e("verifyeOTp_api", response.code().toString() + "")
                 if (response.code() == 200 && !response.body().toString().isEmpty())
@@ -226,10 +227,10 @@ class ForgotActivity : BaseActivity() {
 
         alertClass.showProgressAlert("")
 
-        var call: Call<GenerateOTPModel> = apiInterface?.changePassAPI(
+        var call: Call<GenerateOTPModel>? = apiInterface?.changePassAPI(
             companyCode_et?.getText().toString().uppercase(), generateModel?.getData()?.userData?.empId.toString() , conPass_et?.getText().toString()
-        ) as Call<GenerateOTPModel>
-        call.enqueue(object : Callback<GenerateOTPModel?> {
+        ) as? Call<GenerateOTPModel>
+        call?.enqueue(object : Callback<GenerateOTPModel?> {
             override fun onResponse(call: Call<GenerateOTPModel?>?, response: Response<GenerateOTPModel?>) {
                 Log.e("generateOTp_api", response.code().toString() + "")
                 if (response.code() == 200 && !response.body().toString().isEmpty())
@@ -265,6 +266,8 @@ class ForgotActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         createConnectivity(this)
+        alertClass = AlertClass(this)
+
     }
 
     override fun onPause() {

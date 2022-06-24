@@ -2,6 +2,8 @@ package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.staticSyncData
+import `in`.processmaster.salestripclm.common_classes.AlertClass
+import `in`.processmaster.salestripclm.common_classes.CheckDcrClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.fragments.EdetailingDownloadFragment
 import `in`.processmaster.salestripclm.fragments.HomeFragment
@@ -15,7 +17,6 @@ import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.utils.DownloadManagerClass
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.annotation.SuppressLint
-import android.app.DownloadManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
@@ -23,16 +24,16 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.os.Handler
-import android.os.PersistableBundle
 import android.util.Log
-import android.view.*
+import android.view.Gravity
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -62,7 +63,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     var openFragmentStr=""
     private var fragmentRefreshListener: FragmentRefreshListener? = null
     var stopDownload =false
-    lateinit var downloadManager :DownloadManager
     lateinit var objDownloadManager : DownloadManagerClass
     var retailerString=""
     var firstCall=false
@@ -76,41 +76,36 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_page)
 
+        alertClass = AlertClass(this)
+
         val sharePreferance = PreferenceClass(this)
         var profileData = sharePreferance.getPref("profileData")
 
          loginModelHomePage = Gson().fromJson(profileData, LoginModel::class.java)
         val jsonObj= JSONObject(loginModelHomePage?.configurationSetting)
-        val checkZoom=jsonObj.getInt("SET059")
-        if(checkZoom==0)
-        {
-            nav_view?.getMenu()?.getItem(3)?.setVisible(false)
+
+        try{
+            val checkZoom=jsonObj.getInt("SET059")
+            if(checkZoom==0)
+            {
+                nav_view?.getMenu()?.getItem(3)?.setVisible(false)
+            }
         }
+        catch (e:Exception){}
+
+
         apiInterface = APIClientKot().getClient(2, sharePreferance?.getPref("secondaryUrl")).create(
             APIInterface::class.java)
 
 
-        if(generalClass.isInternetAvailable()) callingMultipleAPI()
-        else {
-           /* if (dbBase?.getApiDetail(1) != "") {
-                val coroutineScope= CoroutineScope(Dispatchers.IO).launch {
-                    val syncSmallData= async {  staticSyncData= dbBase?.getSYNCApiData(0)}
-                    val syncRouteData= async {  staticSyncData?.routeList=dbBase?.allRoutes}
-                    val syncRetailerData= async {  staticSyncData?.retailerList=dbBase?.allRetailers}
-                    val syncProductData= async {  staticSyncData?.productList=dbBase?.allProduct}
+        if(generalClass.isInternetAvailable()) {
+            callingMultipleAPI()
 
-                    syncSmallData.await()
-                    syncRouteData.await()
-                    syncRetailerData.await()
-                    syncProductData.await()     }
-            }*/
+        }
+        else {
             initView()
             bottomNavigation?.selectedItemId= R.id.landingPage
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
     }
 
     @SuppressLint("RestrictedApi")
@@ -120,8 +115,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         bottomNavigation?.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
 
         userName_tv?.setText(loginModelHomePage.userName)
-        //change status bar colour
-        changeStatusBar()
 
         try
         {
@@ -166,14 +159,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         nav_view?.setNavigationItemSelectedListener(this)
         nav_view?.getMenu()?.getItem(0)?.setChecked(true)
 
-    }
-
-    //change status bar color
-    fun changeStatusBar()
-    {
-        val window: Window = this.getWindow()
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        window.setStatusBarColor(ContextCompat.getColor(this, R.color.appColor))
     }
 
     //set bottom navigation
@@ -235,26 +220,10 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                 if (openFragmentStr.equals("CallsFragment")) {
                     return@OnNavigationItemSelectedListener true
                 }
-                checkDCRusingShareP(item)
-               // checkDcrApi(item)
-            /*    if( && !setDcrCheck){
-                    return@OnNavigationItemSelectedListener false
-                }
-                else
-                {
-                    toolbarTv?.setText("Create Calls")
-
-                    if (openFragmentStr.equals("CallsFragment")) {
-                        return@OnNavigationItemSelectedListener true
-                    }
-                    val fragment = NewCallFragment()
-                    openFragment(fragment)
-                    openFragmentStr = "CallsFragment"
-                    return@OnNavigationItemSelectedListener true
-                }*/
-
-
+                CheckDcrClass(this,"homeActivity").checkDCR_UsingSP(item)
+               // checkDCRusingShareP(item)
             }
+
         }
         false
     }
@@ -275,8 +244,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
        // transaction.commit()
         retailerString=""
     }
-
-
 
     //on back button press open exit alert
     override fun onBackPressed()
@@ -343,14 +310,19 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                 R.id.nav_schedule -> {
                     var intent = Intent(this, SetSchedule_Activity::class.java)
                     startActivity(intent)
-                    overridePendingTransition(0, 0)
+                  //  overridePendingTransition(0, 0)
                 }
 
                    R.id.nav_createPresentation -> {
                   var intent = Intent(this, CreatePresentationActivity::class.java)
                   startActivity(intent)
-                  overridePendingTransition(0, 0)
+                 // overridePendingTransition(0, 0)
               }
+
+                R.id.sync_menu -> {
+                    if (generalClass.isInternetAvailable()) callingMultipleAPI() //  sync_api()
+                    else alertClass.networkAlert()
+                }
 
              /*   R.id.nav_screenshot -> {
                     var intent = Intent(this, ImageSelectorActivity::class.java)
@@ -360,21 +332,25 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                     overridePendingTransition(0, 0)
                 }*/
 
-                R.id.sync_menu -> {
-                    if (generalClass.isInternetAvailable()) callingMultipleAPI() //  sync_api()
-                    else alertClass.networkAlert()
-                }
+
 
                 R.id.nav_scheduled -> {
                     var intent = Intent(this, MeetingActivity::class.java)
                     startActivity(intent)
-                    overridePendingTransition(0, 0)
+                 //   overridePendingTransition(0, 0)
                 }
 
                 R.id.nav_logout ->
                 {
                     logoutAppAlert()
                 }
+
+                R.id.nav_createpob -> {
+                    var intent = Intent(this, CreatePobActivity::class.java)
+                    startActivity(intent)
+                  //  overridePendingTransition(0, 0)
+                }
+
             }
         }
         Thread(runnable).start()
@@ -389,6 +365,8 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     override fun onResume()
     {
         super.onResume()
+
+        alertClass = AlertClass(this)
 
         createConnectivity(this)
 
@@ -450,18 +428,16 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                 alertClass.lowNetworkAlert()
             }
 
-            val sync= async { callingSyncAPI() }
-            val deleteItem= async {  dbBase.deleteAll() }
-            val divisionApi =async { callingDivisionAPI() }
-            val credientialApi= async { getSheduleMeetingAPI() }
-            val quantityApi= async { getQuantityAPI() }
-            val sendEdetailing= async { submitDCRCo() }
-            val doctorGraphApi= async { getDoctorGraphAPI() }
-            val getDocCall= async { getDocCallAPI() }
-
-            val sendRetailerList= async { submitDCRRetailer() }
-            val initilizeZoom= async {
-                     val jsonObj= JSONObject(loginModelHomePage?.configurationSetting)
+            try {
+                val sync= async { callingSyncAPI() }
+                val deleteItem= async {  dbBase.deleteAll() }
+                val divisionApi =async { callingDivisionAPI() }
+                val credientialApi= async { getSheduleMeetingAPI() }
+                val quantityApi= async { getQuantityAPI() }
+                val doctorGraphApi= async { getDoctorGraphAPI() }
+                val getDocCall= async { getDocCallAPI() }
+                val initilizeZoom= async {
+                    val jsonObj= JSONObject(loginModelHomePage?.configurationSetting)
                     val checkZoom=jsonObj.getInt("SET059")
                     if(checkZoom!=0)
                     {
@@ -474,18 +450,20 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
                 }
 
-                 deleteItem.await()
-                 sync.await()
+                deleteItem.await()
+                sync.await()
                 divisionApi.await()
                 credientialApi.await()
                 quantityApi.await()
                 initilizeZoom.await()
-                sendEdetailing.await()
                 doctorGraphApi.await()
                 getDocCall.await()
-
-                sendRetailerList.await()
-
+            }
+            catch (e:Exception)
+            {
+                alertClass.hideAlert()
+                alertClass.commonAlert("OOps!","Something went wrong please try again later.")
+            }
 
 
         }
@@ -503,20 +481,34 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             }
 
         }
+
+      val offlineCoroutine=  CoroutineScope(IO+ generalClass.coroutineExceptionHandler).launch {
+            try {
+                val sendEdetailing= async { submitDCRCo() }
+                val sendRetailerList= async { submitDCRRetailer() }
+                sendEdetailing.await()
+                sendRetailerList.await()
+            }
+            catch (e:Exception)
+            { }
+      }
+        offlineCoroutine.invokeOnCompletion {
+            submitPOBAPI()
+        }
+
     }
 
     fun setImages()
     {
         val options: RequestOptions = RequestOptions()
             .centerCrop()
-            .placeholder(android.R.mipmap.sym_def_app_icon)
-            .error(android.R.mipmap.sym_def_app_icon)
+            .placeholder(R.mipmap.ic_launcher)
+            .error(R.mipmap.ic_launcher)
 
         drawerProfileIv?.let {
             Glide.with(applicationContext).load(loginModelHomePage.imageName).apply(options).into(it) }
         Glide.with(applicationContext).load(loginModelHomePage.imageName).apply(options).into(profile_image)
     }
-
 
     suspend fun callingDivisionAPI()
     {
@@ -856,7 +848,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
     }
 
-
     suspend fun profileApi()
     {
         val response =
@@ -975,7 +966,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             generalClass?.currentDateMMDDYY()
         )
 
-            if (response!!.isSuccessful) {
+            if (response?.isSuccessful==true) {
 
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
 
@@ -1138,5 +1129,14 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     {
         bottomNavigation?.selectedItemId= R.id.landingPage
     }
+
+    fun onDcrChecked()
+    {
+        toolbarTv?.setText("Create Calls")
+        val fragment = NewCallFragment()
+        openFragment(fragment)
+        openFragmentStr = "CallsFragment"
+    }
+
 
 }

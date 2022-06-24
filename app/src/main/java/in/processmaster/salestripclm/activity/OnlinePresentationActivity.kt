@@ -318,6 +318,8 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
     override fun onResume() {
         super.onResume()
         createConnectivity(this)
+        alertClass = AlertClass(this)
+
     }
 
 

@@ -183,4 +183,8 @@ class CommonModel {
             get() = field
             set(value) { field = value }
     }
+
+    /*if(value==null || value.isEmpty())field = ""
+else field = value*/
+
 }

@@ -3,6 +3,7 @@ package `in`.processmaster.salestripclm.activity
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.adapter.OtherBrandSelectionAdapter
 import `in`.processmaster.salestripclm.adapter.OtherFileAdapter
+import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.fragments.ShowDownloadedFragment
 import `in`.processmaster.salestripclm.interfaceCode.ItemClickDisplayVisual
 import `in`.processmaster.salestripclm.interfaceCode.StringInterface
@@ -41,6 +42,8 @@ import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.jsibbold.zoomage.ZoomageView
@@ -986,7 +989,13 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
             })
 
             runOnUiThread {
-                imageView.setImageBitmap(BitmapFactory.decodeFile(model.filePath))
+            //    imageView.setImageBitmap(BitmapFactory.decodeFile(model.filePath))
+                Glide.with(this@PhotoSlideShowActivity)
+                    .load(File(model.filePath))
+                    .diskCacheStrategy( DiskCacheStrategy.NONE )
+                    .skipMemoryCache( true )
+                    .fitCenter()
+                    .into(imageView)
                 Objects.requireNonNull(container).addView(itemView)
             }
 
@@ -1031,6 +1040,8 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
     override fun onResume() {
         super.onResume()
         createConnectivity(this)
+        alertClass = AlertClass(this)
+
     }
 
     override fun onPause() {

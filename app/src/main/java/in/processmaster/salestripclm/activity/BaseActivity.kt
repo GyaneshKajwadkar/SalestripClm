@@ -11,6 +11,7 @@ import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.fragments.HomeFragment
 import `in`.processmaster.salestripclm.models.*
 import `in`.processmaster.salestripclm.networkUtils.APIClientKot
+import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.networkUtils.ConnectivityChangeReceiver
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
@@ -55,7 +56,7 @@ open class BaseActivity : AppCompatActivity(){
     var dbBase= DatabaseHandler(this)
     var zoomSDKBase: ZoomSDK? = null
     val generalClass=GeneralClass(this)
-    val alertClass=AlertClass(this)
+    var alertClass=AlertClass(this)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -108,6 +109,7 @@ open class BaseActivity : AppCompatActivity(){
         sharePreferanceBase = PreferenceClass(activity)
         val eDetailingArray=dbBase.getAllSaveSend("feedback")
         val retailerArray=dbBase.getAllSaveSend("retailerFeedback")
+        val pobArray=dbBase.getAllSaveSend("createOnlyPOB")
 
         var isLowNetwork=false
         if( eDetailingArray.size!=0)
@@ -136,7 +138,7 @@ open class BaseActivity : AppCompatActivity(){
                         }
                     }
                 }
-            },5000)
+            },3000)
         }
 
         if(retailerArray.size!=0)
@@ -161,9 +163,14 @@ open class BaseActivity : AppCompatActivity(){
                             }
                         } }
                 }
+            },4000)
+        }
+
+        if(pobArray.size!=0)
+        {
+            Handler(Looper.getMainLooper()).postDelayed({
+                submitPOBAPI()
             },5000)
-
-
         }
     }
 
@@ -310,12 +317,12 @@ open class BaseActivity : AppCompatActivity(){
 
         var getResponseList=ArrayList<DocManagerModel>()
 
-        var call: Call<TeamsModel> = apiInterface?.getTeamsMember(
+        var call: Call<TeamsModel>? = apiInterface?.getTeamsMember(
             "bearer " + loginModelHomePage.accessToken,
             loginModelHomePage.empId.toString()
-        ) as Call<TeamsModel>
+        ) as? Call<TeamsModel>
 
-        call.enqueue(object : Callback<TeamsModel?> {
+        call?.enqueue(object : Callback<TeamsModel?> {
             override fun onResponse(
                 call: Call<TeamsModel?>?,
                 response: Response<TeamsModel?>
@@ -405,9 +412,9 @@ open class BaseActivity : AppCompatActivity(){
 
     fun getCredientail_api(context: Activity) {
 
-        var call: Call<ZoomCredientialModel> = apiInterface?.getZoomCredientail("bearer " + loginModelHomePage.accessToken, loginModelHomePage.empId
-        ) as Call<ZoomCredientialModel>
-        call.enqueue(object : Callback<ZoomCredientialModel?> {
+        var call: Call<ZoomCredientialModel>? = apiInterface?.getZoomCredientail("bearer " + loginModelHomePage.accessToken, loginModelHomePage.empId
+        ) as? Call<ZoomCredientialModel>
+        call?.enqueue(object : Callback<ZoomCredientialModel?> {
             override fun onResponse(call: Call<ZoomCredientialModel?>?, response: Response<ZoomCredientialModel?>) {
                 Log.e("getcrediential_api", response.code().toString() + "")
                 if (response.code() == 200 && response.body().toString().isEmpty())
@@ -436,15 +443,12 @@ open class BaseActivity : AppCompatActivity(){
         { getDocCallAPI()
             return }
 
-
-        Log.e("hdfuiosdghfiosdhfuisdhuifhsdiopf",Gson().toJson(eDetailingArray.get(0)))
-
         val response =
             sharePreferanceBase?.getPref("secondaryUrl")?.let {
                 APIClientKot().getUsersService(2, it
                 ).submitEdetailingApiCoo("bearer " + loginModelHomePage.accessToken,eDetailingArray.get(0))
             }
-        withContext(Dispatchers.Main) {
+        withContext(Dispatchers.IO) {
             if (response?.isSuccessful == true)
             {
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
@@ -529,6 +533,35 @@ open class BaseActivity : AppCompatActivity(){
             }
             else Log.e("getDocCallAPIERROR", response?.errorBody().toString())
 
+    }
+
+    fun submitPOBAPI()
+    {
+        val getPOBList=dbBase.getAllSavePOB("createOnlyPOB")
+        if(getPOBList.size==0)
+        { return }
+
+        apiInterface= APIClientKot().getClient(2, sharePreferanceBase?.getPref("secondaryUrl")).create(
+            APIInterface::class.java)
+
+        var call: Call<GenerateOTPModel>? = apiInterface?.submitPOB(
+            "bearer " + HomePage.loginModelHomePage.accessToken, getPOBList.get(0)
+        ) as? Call<GenerateOTPModel>
+        call?.enqueue(object : Callback<GenerateOTPModel?> {
+            override fun onResponse(call: Call<GenerateOTPModel?>?, response: Response<GenerateOTPModel?>) {
+                if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage?.isEmpty()==true) {
+                  Log.e("offlinePOB","saveSuccessfully")
+                    getPOBList.get(0).randomNumber?.let { dbBase.deleteSaveSend(it) }
+                    submitPOBAPI()
+                }
+                else{
+                    Log.e("offlinePOB","notSuccessfull")
+                }
+            }
+
+            override fun onFailure(call: Call<GenerateOTPModel?>, t: Throwable?) {
+            }
+        })
     }
 
 }

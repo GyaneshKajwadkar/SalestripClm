@@ -1466,7 +1466,9 @@ class SyncModel {
             @Expose
             var categoryName: String? = ""
 
-
+               var isAdded=false
+                   get() = field
+                   set(value) { field = value }
          /*   @SerializedName("prodCode")
             @Expose
             var prodCode: String? = ""
@@ -1501,13 +1503,7 @@ class SyncModel {
             @Expose
             var productTypeName: String? = ""
 
-
-
-
-
-
-
-            @SerializedName("priceToStockist")
+           @SerializedName("priceToStockist")
             @Expose
             var priceToStockist: Double = 0.0
 
@@ -1515,9 +1511,7 @@ class SyncModel {
             @Expose
             var targetPrice: Double = 0.0
 
-
-
-            @SerializedName("preProductName")
+             @SerializedName("preProductName")
             @Expose
             var preProductName: String? = ""
 
@@ -1639,7 +1633,6 @@ class SyncModel {
                         if(value==null || value.isEmpty())field = ""
                         else field = value
                     }
-
 
             }
 
@@ -1790,6 +1783,11 @@ class SyncModel {
             @SerializedName("mobileNo")
             @Expose
             var mobileNo: String? = ""
+
+            @SerializedName("fieldStaffId")
+            @Expose
+            var fieldStaffId: Int? = 0
+
             /*
 
                @SerializedName("address1")
@@ -2033,9 +2031,7 @@ class SyncModel {
                @Expose
                var nextApproverName: String? = ""
 
-               @SerializedName("fieldStaffId")
-               @Expose
-               var fieldStaffId: Int? = 0
+
 
                @SerializedName("fsCode")
                @Expose

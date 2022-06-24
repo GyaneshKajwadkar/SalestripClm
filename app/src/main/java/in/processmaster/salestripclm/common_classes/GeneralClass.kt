@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -113,6 +114,18 @@ class GeneralClass(val activity: Activity) {
     {
         val df: DateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
         return df.format(Calendar.getInstance().time)
+    }
+
+    fun convertApiDateTime_toDate(inputDate : String?) :String
+    {  var fetchDate=""
+        try {
+            var format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+            val startDate = format.parse(inputDate)
+            format = SimpleDateFormat("dd/MM/yyyy")
+            fetchDate = format.format(startDate)
+        }
+        catch (e: Exception){ Log.e("exception_FromConvertApiDate",e.message.toString()) }
+        return  fetchDate
     }
 
     fun currentDateMMDDYY():String{

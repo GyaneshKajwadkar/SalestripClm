@@ -93,6 +93,7 @@
                     android:id="@+id/changeProfile_mb"
                     android:textColor="@color/white"
                     app:iconGravity="textStart"
+                    android:visibility="gone"
                     style="@style/materialButtonWithImage"
                     android:layout_width="match_parent"
                     android:backgroundTint="@color/appColor"

@@ -1,6 +1,7 @@
 package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.models.DownloadFileModel
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import android.content.Intent
@@ -105,12 +106,15 @@ class AllDataSharingActivity : BaseActivity()
     override fun onResume() {
         super.onResume()
         createConnectivity(this)
+        alertClass = AlertClass(this)
     }
 
     override fun onPause() {
         super.onPause()
         stopConnectivity(this)
     }
+
+
 }
 
 

@@ -19,7 +19,7 @@ import java.util.*
 
 class VisualFileAdapter(
     var downloadList: ArrayList<DownloadFileModel>?,
-    var context: Context,
+    var context: Context?,
     var selectionType: Int,
     var mCallback: ItemClickDisplayVisual?
 ) :

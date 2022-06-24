@@ -49,6 +49,7 @@ class SelectedPobAdapter(
     }
 
 
+
     class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var titlePobproduct_tv = view.findViewById<TextView>(R.id.titlePobproduct_tv)
         var uom_tv = view.findViewById<TextView>(R.id.uom_tv)

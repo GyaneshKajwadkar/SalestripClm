@@ -99,6 +99,7 @@
                     android:layout_height="match_parent"
                     app:icon="@drawable/ic_menu_camera"
                     app:iconTint="@color/white"
+                    android:visibility="gone"
                     android:text="Change profile"/>
 
             </LinearLayout>

@@ -44,6 +44,10 @@ class TeamsModel {
         @Expose
         var employeeList: ArrayList<Employee>? = ArrayList()
 
+        @SerializedName("pobNo")
+        @Expose
+        var pobNo:  String = ""
+
         inner class Employee {
             @SerializedName("empId")
             @Expose
@@ -516,6 +520,10 @@ class TeamsModel {
             @SerializedName("strDeactivationDate")
             @Expose
             var strDeactivationDate:  String = ""*/
+
+            //this param is added only for get pob number in CreatePobActivity
+
+
         }
     }
 

@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_downloaded2.*
@@ -30,7 +31,8 @@ class DownloadedFragment : Fragment() {
     lateinit var db : DatabaseHandler
     var nodownload_tv: TextView?= null
     var isFirstTimeOpen=true
-    var   getAlleDetailListDb: ArrayList<DevisionModel.Data.EDetailing> = ArrayList()
+    var getAlleDetailListDb: ArrayList<DevisionModel.Data.EDetailing> = ArrayList()
+    lateinit var views: View
 
     companion object {
         var adapter : Edetailing_Adapter?=null
@@ -40,89 +42,94 @@ class DownloadedFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_downloaded2, container, false)
+        views = inflater.inflate(R.layout.fragment_downloaded2, container, false)
 
-        recyclerView=view.findViewById(R.id.recyclerView)as RecyclerView
-        nodownload_tv=view.findViewById(R.id.nodownload_tv)as TextView
-        nodata_gif=view.findViewById(R.id.nodata_gif)as GifImageView
+        recyclerView=views.findViewById(R.id.recyclerView)as RecyclerView
+        nodownload_tv=views.findViewById(R.id.nodownload_tv)as TextView
+        nodata_gif=views.findViewById(R.id.nodata_gif)as GifImageView
+        return views
 
-        runBlocking{
-            withContext(Dispatchers.Default){
-                launch {
-                    sharePreferance = PreferenceClass(activity)
-                    db = DatabaseHandler(requireActivity())
-                    getAlleDetailListDb= db.getSelectedeDetail(true)
+        }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        Log.e("oinScshdfuiosdudf","sdfsuiodfyhiosdfhsduifh")
+
+        val coroutine= viewLifecycleOwner.lifecycleScope.launch {
+            sharePreferance = PreferenceClass(activity)
+            db = DatabaseHandler(activity)
+            getAlleDetailListDb= db.getSelectedeDetail(true)
+        }
+        coroutine.invokeOnCompletion {
+            activity?.runOnUiThread {
+                if(getAlleDetailListDb!!.size==0)
+                {
+                    nodata_gif?.visibility=View.VISIBLE
+                    recyclerView?.visibility=View.INVISIBLE
                 }
-            }}
+                else
+                {
+                    nodata_gif?.visibility=View.GONE
+                    recyclerView?.visibility=View.VISIBLE
+                }
 
-        if(getAlleDetailListDb!!.size==0)
-        {
-            nodata_gif?.visibility=View.VISIBLE
-            recyclerView?.visibility=View.GONE
+                if(EdetailingDownloadFragment.filter_et?.text?.equals("") == false)
+                {
+                    editTextFilter(EdetailingDownloadFragment.filter_et?.text.toString())
+                }
+
+                isFirstTimeOpen=false
+
+                adapter =  Edetailing_Adapter(
+                    getAlleDetailListDb, sharePreferance, activity, db
+                )
+                val layoutManager = LinearLayoutManager(activity)
+                recyclerView?.layoutManager = layoutManager
+                recyclerView?.adapter = adapter
+            }
         }
-        else
-        {
-            nodata_gif?.visibility=View.GONE
-            recyclerView?.visibility=View.VISIBLE
-        }
 
-
-        if(EdetailingDownloadFragment.filter_et?.text?.equals("") == false)
-        {
-            editTextFilter(EdetailingDownloadFragment.filter_et?.text.toString())
-        }
-
-        isFirstTimeOpen=false
-
-
-
-
-        adapter =  Edetailing_Adapter(
-            getAlleDetailListDb, sharePreferance, requireActivity(), db
-        )
-        val layoutManager = LinearLayoutManager(activity)
-        recyclerView?.layoutManager = layoutManager
-        recyclerView?.adapter = adapter
-
-
-        return view
-        }
+        super.onActivityCreated(savedInstanceState)
+    }
 
     override fun onResume() {
         super.onResume()
 
+        if (!isAdded) return
+
         if(!isFirstTimeOpen)
         {
-
-            requireActivity().runOnUiThread(Runnable {
+            activity?.runOnUiThread(Runnable {
                 progressView.visibility=View.VISIBLE
-                recyclerView?.visibility=View.GONE
+                recyclerView?.visibility=View.INVISIBLE
             })
 
             Handler(Looper.getMainLooper())
                 .postDelayed({
-                    val coroutine= CoroutineScope(Dispatchers.IO).launch{
+                    val coroutine= viewLifecycleOwner.lifecycleScope.launch{
                         val notify= async {
                             var   getAlleDetail= db.getSelectedeDetail(true)
-                            getAlleDetailListDb.clear()
-                            getAlleDetailListDb.addAll(getAlleDetail)
+                            if(getAlleDetail.size!=getAlleDetailListDb.size)
+                            {
+                                getAlleDetailListDb.clear()
+                                getAlleDetailListDb.addAll(getAlleDetail)
 
-                            requireActivity().runOnUiThread(Runnable {
-                               // adapter?.notifyDataSetChanged()
-                                adapter =  Edetailing_Adapter(
-                                    getAlleDetailListDb, sharePreferance, requireActivity(), db
-                                )
-                                recyclerView?.adapter = adapter
-                                if(getAlleDetail.size!=0)
-                                {   nodata_gif?.visibility=View.GONE
-                                    recyclerView?.visibility=View.VISIBLE
-                                }
-                            })
+                                activity?.runOnUiThread(Runnable {
+                                    // adapter?.notifyDataSetChanged()
+                                    adapter =  Edetailing_Adapter(
+                                        getAlleDetailListDb, sharePreferance, activity, db
+                                    )
+                                    recyclerView?.adapter = adapter
+                                    if(getAlleDetail.size!=0)
+                                    {   nodata_gif?.visibility=View.GONE
+                                        recyclerView?.visibility=View.VISIBLE
+                                    }
+                                })
+                            }
                         }
                         notify.await()
                     }
                     coroutine.invokeOnCompletion {
-                        requireActivity().runOnUiThread(Runnable {
+                        activity?.runOnUiThread(Runnable {
                             progressView.visibility=View.GONE
                             recyclerView?.visibility=View.VISIBLE
                         }) }

@@ -8,8 +8,8 @@ import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.staticS
 import `in`.processmaster.salestripclm.activity.SubmitE_DetailingActivity
 import `in`.processmaster.salestripclm.adapter.LastRCPA_Adapter
 import `in`.processmaster.salestripclm.adapter.SimpleListAdapter
-import `in`.processmaster.salestripclm.adapter.StringListAdapter
 import `in`.processmaster.salestripclm.common_classes.AlertClass
+import `in`.processmaster.salestripclm.common_classes.CheckDcrClass
 import `in`.processmaster.salestripclm.common_classes.CommonListGetClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.interfaceCode.StringInterface
@@ -20,7 +20,6 @@ import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.location.Location
 import android.os.Bundle
 import android.os.Handler
@@ -34,11 +33,11 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.NonNull
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.AppCompatButton
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -56,7 +55,6 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class NewCallFragment : Fragment(),StringInterface {
@@ -82,6 +80,8 @@ class NewCallFragment : Fragment(),StringInterface {
     var isRetailerAttached=false
     companion object {
         var retailerObj= SyncModel.Data.Retailer()
+        var instance: NewCallFragment? = null
+
     }
 
     val coroutineExceptionHandler = CoroutineExceptionHandler{_, throwable ->
@@ -97,6 +97,7 @@ class NewCallFragment : Fragment(),StringInterface {
         if (activity != null && isAdded)
         {
             initView()
+            instance = this;
         }
         return views
     }
@@ -107,10 +108,10 @@ class NewCallFragment : Fragment(),StringInterface {
         bottomSheetBehavior = BottomSheetBehavior.from(views!!.bottomSheet)
 
         val strtext = arguments?.getString("retailerData")
-        db = DatabaseHandler(requireActivity())
+        db = DatabaseHandler(activity)
         sharePreferance = PreferenceClass(activity)
-        alertClass = AlertClass(requireActivity())
-        generalClassObject= GeneralClass(requireActivity())
+        alertClass = AlertClass(activity)
+        generalClassObject= activity?.let { GeneralClass(it) }
 
         if(strtext?.isEmpty()==false)
         {
@@ -118,7 +119,7 @@ class NewCallFragment : Fragment(),StringInterface {
         }
         else
         {
-            val coroutine=GlobalScope.launch(Dispatchers.Default) {
+            val coroutine=viewLifecycleOwner.lifecycleScope.launch {
                 val task=async {
                     SplashActivity.staticSyncData?.doctorList?.let   { doctorListArray.addAll(it) }
                     SplashActivity.staticSyncData?.routeList?.let    { routeList.addAll(it) }
@@ -166,7 +167,7 @@ class NewCallFragment : Fragment(),StringInterface {
             }
             coroutine.invokeOnCompletion {
                 coroutine.cancel()
-                requireActivity().runOnUiThread {
+                activity?.runOnUiThread {
                     if(SplashActivity.staticSyncData?.settingDCR?.roleType=="MAN")
                     {
                         views?.selectRoutesCv?.setEnabled(false)
@@ -191,13 +192,22 @@ class NewCallFragment : Fragment(),StringInterface {
                         if (isChecked) {
                             views?.selectDoctor_tv?.setText("Select Doctor")
                             views?.selectionDocRet_tv?.setText("Select Doctor")
-                            doctorHeader_tv.setTextColor(ContextCompat.getColorStateList(requireActivity(), R.color.darkBlue))
-                            retailerHeader_tv.setTextColor(ContextCompat.getColorStateList(requireActivity(), R.color.gray))
+
+                            activity?.let {
+                                doctorHeader_tv.setTextColor(ContextCompat.getColorStateList(it, R.color.darkBlue))
+                                retailerHeader_tv.setTextColor(ContextCompat.getColorStateList(it, R.color.gray))
+                            }
+
+
                         } else {
                             views?.selectDoctor_tv?.setText("Select Retailer")
                             views?.selectionDocRet_tv?.setText("Select Retailer")
-                            retailerHeader_tv.setTextColor(ContextCompat.getColorStateList(requireActivity(), R.color.darkBlue))
-                            doctorHeader_tv.setTextColor(ContextCompat.getColorStateList(requireActivity(), R.color.gray))
+
+                            activity?.let {
+                                retailerHeader_tv.setTextColor(ContextCompat.getColorStateList(it, R.color.darkBlue))
+                                doctorHeader_tv.setTextColor(ContextCompat.getColorStateList(it, R.color.gray))
+                            }
+
 
                         }
                         if(SplashActivity.staticSyncData?.settingDCR?.roleType=="MAN")
@@ -229,8 +239,19 @@ class NewCallFragment : Fragment(),StringInterface {
                     views?.selectTeamsCv?.setOnClickListener({
                         selectionType=0
                         views?.bottomSheetTitle_tv?.setText("Select Team")
-                        if(checkDCRusingShareP())
-                        { openCloseModel() }
+                        if(isAdded)
+                        {
+                            activity.let {
+                                if( CheckDcrClass(it,"callFragment").checkDCR_UsingSP())
+                                {
+                                    openCloseModel()
+                                }
+                            }
+
+
+                        }
+                    /*  if(checkDCRusingShareP())
+                        { openCloseModel() }*/
                     })
 
                     views?.selectRoutesCv?.setOnClickListener({
@@ -282,7 +303,7 @@ class NewCallFragment : Fragment(),StringInterface {
 
                     views?.selectDoctorsCv?.setEnabled(false)
 
-                    views?.close_imv?.setOnClickListener({ bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)})
+                    views?.close_selection_imv?.setOnClickListener({ bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)})
 
                     views?.doctorSearch_et?.addTextChangedListener(filterTextWatcher)
 
@@ -326,7 +347,11 @@ class NewCallFragment : Fragment(),StringInterface {
     //  checkDCRusingShareP(0)
     }
 
-    fun checkDCRusingShareP():Boolean
+    fun getInstance(): NewCallFragment? {
+        return instance
+    }
+
+/*    fun checkDCRusingShareP():Boolean
     {
         if(generalClassObject?.isInternetAvailable() == true)
         {
@@ -345,7 +370,7 @@ class NewCallFragment : Fragment(),StringInterface {
         return false
         }
         else{ return true }
-    }
+    }*/
 
     fun callCoroutineApi() {
         alertClass?.hideAlert()
@@ -357,7 +382,7 @@ class NewCallFragment : Fragment(),StringInterface {
             }
 
             coroutineScope.invokeOnCompletion {
-                requireActivity().runOnUiThread(java.lang.Runnable {
+                activity?.runOnUiThread(java.lang.Runnable {
                     alertClass?.hideAlert()
                 })
             }
@@ -373,10 +398,13 @@ class NewCallFragment : Fragment(),StringInterface {
 
     fun openCloseModel()
     {
+        if(!isAdded) return
+        if(::bottomSheetBehavior.isInitialized==false)return
+
         views?.doctorSearch_et?.setText("")
 
         adapter =BottomSheetDoctorAdapter()
-        views?.doctorList_rv?.setLayoutManager(GridLayoutManager(requireActivity(), 3))
+        views?.doctorList_rv?.setLayoutManager(GridLayoutManager(activity, 3))
         views?.doctorList_rv?.adapter = adapter
         adapter.notifyDataSetChanged()
 
@@ -670,17 +698,17 @@ class NewCallFragment : Fragment(),StringInterface {
 
                 if(isRetailerAttached==false) {
                     isRetailerAttached = true
-                    val transaction = requireActivity().supportFragmentManager.beginTransaction()
-                    transaction.replace(R.id.frameRetailer_view, RetailerFillFragment(this@NewCallFragment))
-                    transaction.disallowAddToBackStack()
-                    transaction.commit()
+                    val transaction = activity?.supportFragmentManager?.beginTransaction()
+                    transaction?.add(R.id.frameRetailer_view, RetailerFillFragment(this@NewCallFragment))
+                    transaction?.disallowAddToBackStack()
+                    transaction?.commit()
                 }
             }
             task.await()
         }
         coroutine.invokeOnCompletion {
             coroutine.cancel()
-            requireActivity().runOnUiThread {
+            activity?.runOnUiThread {
                 retailerObj=retailerModel
                 views?.selectDoctor_tv?.setText((retailerModel?.shopName))
                 views?.noData_gif?.visibility=View.GONE
@@ -812,7 +840,7 @@ class NewCallFragment : Fragment(),StringInterface {
         {
             if(staticSyncData?.settingDCR?.isDoctorFencingRequired == true && views?.docRetail_switch?.isChecked==true)
             {
-                val getGpsTracker=GPSTracker(requireActivity())
+                val getGpsTracker=GPSTracker(activity)
                 val jsonObj=JSONObject(staticSyncData?.configurationSetting)
                 val getRadius=jsonObj.getInt("SET011")
 
@@ -865,7 +893,7 @@ class NewCallFragment : Fragment(),StringInterface {
             else if(staticSyncData?.settingDCR?.isRetailerFencingRequired == true && views?.docRetail_switch?.isChecked==false){
                 val retailFirstFilter= SplashActivity.staticSyncData?.retailerList?.filter { s -> s.routeId == id } as java.util.ArrayList<SyncModel.Data.Retailer>
 
-                val getGpsTracker=GPSTracker(requireActivity())
+                val getGpsTracker=GPSTracker(activity)
                 val jsonObj=JSONObject(staticSyncData?.configurationSetting)
                 val getRadius=jsonObj.getInt("SET011")
 
@@ -915,8 +943,8 @@ class NewCallFragment : Fragment(),StringInterface {
         var loginModel = Gson().fromJson(profileData, LoginModel::class.java)
 
         //call submit visual ads api interfae post method
-        var call: Call<PreCallModel> = apiInterface?.priCallAnalysisApi("bearer " + loginModel?.accessToken,selectedDocID) as Call<PreCallModel>
-        call.enqueue(object : Callback<PreCallModel?> {
+        var call: Call<PreCallModel>? = apiInterface?.priCallAnalysisApi("bearer " + loginModel?.accessToken,selectedDocID) as? Call<PreCallModel>
+        call?.enqueue(object : Callback<PreCallModel?> {
             override fun onResponse(call: Call<PreCallModel?>?, response: Response<PreCallModel?>) {
                 Log.e("preCallAnalysisApi", response.code().toString() + "")
                 if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage?.isEmpty() == true) {
@@ -947,9 +975,9 @@ class NewCallFragment : Fragment(),StringInterface {
                     else{ views?.reportedTime_tv?.setText(analysisModel?.strReportedTime) }
 
 
-                    views?.brandList_rv?.layoutManager=LinearLayoutManager(requireActivity())
-                    views?.sampleGiven_rv?.layoutManager=LinearLayoutManager(requireActivity())
-                    views?.giftGiven_rv?.layoutManager=LinearLayoutManager(requireActivity())
+                    views?.brandList_rv?.layoutManager=LinearLayoutManager(activity)
+                    views?.sampleGiven_rv?.layoutManager=LinearLayoutManager(activity)
+                    views?.giftGiven_rv?.layoutManager=LinearLayoutManager(activity)
 
                     var mainList= ArrayList<String>()
                     var subList= ArrayList<Int>()
@@ -1043,7 +1071,7 @@ class NewCallFragment : Fragment(),StringInterface {
 
                         if(analysisModel?.lastRCPADetails?.size!=0)
                         {
-                            views?.lastRcpaDetail_rv?.layoutManager=LinearLayoutManager(requireActivity())
+                            views?.lastRcpaDetail_rv?.layoutManager=LinearLayoutManager(activity)
                             val adapter=LastRCPA_Adapter(analysisModel?.lastRCPADetails)
                             view?.lastRcpaDetail_rv?.adapter=adapter
                         }
@@ -1082,18 +1110,18 @@ class NewCallFragment : Fragment(),StringInterface {
             override fun onFailure(call: Call<PreCallModel?>, t: Throwable?) {
                 views?.analysisProgress?.visibility=View.GONE
                 views?.noData_gif?.visibility=View.VISIBLE
-                GeneralClass(requireActivity()).checkInternet() // check internet connection
+                activity?.let { GeneralClass(it).checkInternet() } // check internet connection
                 call.cancel()
             }
         })
     }
 
-    fun createDCRAlert(routeId: String)
+    /*fun createDCRAlert(routeId: String)
     { var activityId=0; var startingStation=0; var endingStation=0; var fieldStaffId=0
 
-        val dialogBuilder = AlertDialog.Builder(requireActivity()); val inflater = requireActivity().layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.dcr_entry, null)
-        dialogBuilder.setView(dialogView); dialogBuilder.setCancelable(false); val alertDialog = dialogBuilder.create()
+        val dialogBuilder = activity?.let { AlertDialog.Builder(it) }; val inflater = activity?.layoutInflater
+        val dialogView: View = inflater!!?.inflate(R.layout.dcr_entry, null)
+        dialogBuilder?.setView(dialogView); dialogBuilder?.setCancelable(false); val alertDialog = dialogBuilder?.create()
 
         val headerText = dialogView.findViewById<View>(R.id.doctorName_tv) as TextView
         val cancelImag = dialogView.findViewById<View>(R.id.back_iv) as ImageView
@@ -1110,21 +1138,33 @@ class NewCallFragment : Fragment(),StringInterface {
         val secondFilter= firstFilter.filter { s -> (s.routeId != -11)  }
         val thirdFilter= secondFilter.filter { s -> (s.routeId != -6)  }
 
-        val adapterRoute: ArrayAdapter<SyncModel.Data.Route> = ArrayAdapter<SyncModel.Data.Route>(requireActivity(),
-            android.R.layout.simple_spinner_dropdown_item, thirdFilter)
+        val adapterRoute: ArrayAdapter<SyncModel.Data.Route>? = activity?.let {
+            ArrayAdapter<SyncModel.Data.Route>(
+                it,
+                android.R.layout.simple_spinner_dropdown_item, thirdFilter)
+        }
         dialogView.activity_spin.setAdapter(adapterRoute)
 
-        val startEndRoute: ArrayAdapter<SyncModel.Data.Route> = ArrayAdapter<SyncModel.Data.Route>(requireActivity(),
-            android.R.layout.simple_spinner_dropdown_item, CommonListGetClass().getRouteListForSpinner())
+        val startEndRoute: ArrayAdapter<SyncModel.Data.Route>? = activity?.let {
+            ArrayAdapter<SyncModel.Data.Route>(
+                it,
+                android.R.layout.simple_spinner_dropdown_item, CommonListGetClass().getRouteListForSpinner())
+        }
         dialogView.startingStation_spin.setAdapter(startEndRoute)
         dialogView.ending_spin.setAdapter(startEndRoute)
 
-        val workingWithList: ArrayAdapter<SyncModel.Data.WorkingWith> = ArrayAdapter<SyncModel.Data.WorkingWith>(requireActivity(),
-            android.R.layout.simple_spinner_dropdown_item, CommonListGetClass().getAccListForSpinner())
+        val workingWithList: ArrayAdapter<SyncModel.Data.WorkingWith>? = activity?.let {
+            ArrayAdapter<SyncModel.Data.WorkingWith>(
+                it,
+                android.R.layout.simple_spinner_dropdown_item, CommonListGetClass().getAccListForSpinner())
+        }
         dialogView.accomp_spin.setAdapter(workingWithList)
 
-        val adapterField: ArrayAdapter<String> = ArrayAdapter<String>(requireActivity(),
-            android.R.layout.simple_spinner_dropdown_item, fieldWorkingList)
+        val adapterField: ArrayAdapter<String>? = activity?.let {
+            ArrayAdapter<String>(
+                it,
+                android.R.layout.simple_spinner_dropdown_item, fieldWorkingList)
+        }
         dialogView.workingArea_spin.setAdapter(adapterField)
 
         if(SplashActivity.staticSyncData?.settingDCR?.roleType=="MAN")
@@ -1270,7 +1310,7 @@ class NewCallFragment : Fragment(),StringInterface {
 
         alertDialog.show()
 
-    }
+    }*/
 
     suspend fun checkCurrentDCR_API() {
 
@@ -1336,7 +1376,8 @@ class NewCallFragment : Fragment(),StringInterface {
                             openCloseModel()
                             }
                     } else {
-                        GeneralClass(requireActivity()).checkInternet() }
+                        activity?.let { GeneralClass(it).checkInternet() }
+                    }
                 }
 
             }
@@ -1396,8 +1437,8 @@ class NewCallFragment : Fragment(),StringInterface {
 
     fun saveDCR_API(dcrObject: CommonModel.SaveDcrModel, alertDialog: AlertDialog, checked: Boolean) {
         alertClass?.showProgressAlert("")
-        var call: Call<JsonObject> = apiInterface?.saveDCS("bearer " + loginModelHomePage.accessToken,dcrObject) as Call<JsonObject>
-        call.enqueue(object : Callback<JsonObject?> {
+        var call: Call<JsonObject>? = apiInterface?.saveDCS("bearer " + loginModelHomePage.accessToken,dcrObject) as? Call<JsonObject>
+        call?.enqueue(object : Callback<JsonObject?> {
             override fun onResponse(call: Call<JsonObject?>?, response: Response<JsonObject?>) {
                 alertClass?.hideAlert()
                     Log.e("gsuifsdguifdgsf",Gson().toJson(response.body()))
@@ -1459,6 +1500,8 @@ class NewCallFragment : Fragment(),StringInterface {
 
     override fun onResume() {
         super.onResume()
+        if(::bottomSheetBehavior.isInitialized==false && views!=null) bottomSheetBehavior = BottomSheetBehavior.from(views!!.bottomSheet)
+
         if(isSecondTime && docRetail_switch.isChecked) {
             if(views==null) return
             views?.selectDoctor_tv?.setBackgroundColor(Color.parseColor("#A9A9A9"))
@@ -1491,10 +1534,10 @@ class NewCallFragment : Fragment(),StringInterface {
         val coroutine= CoroutineScope(Dispatchers.Default).launch {
             val task= async {
                 isRetailerAttached=true
-                val transaction = requireActivity().supportFragmentManager.beginTransaction()
-                transaction.replace(R.id.frameRetailer_view, RetailerFillFragment(this@NewCallFragment))
-                transaction.disallowAddToBackStack()
-                transaction.commit()
+                val transaction = activity?.supportFragmentManager?.beginTransaction()
+                transaction?.add(R.id.frameRetailer_view, RetailerFillFragment(this@NewCallFragment))
+                transaction?.disallowAddToBackStack()
+                transaction?.commit()
             }
             task.await()
         }
@@ -1531,8 +1574,8 @@ class NewCallFragment : Fragment(),StringInterface {
 
         views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#3CB371"))
         views?.selectDoctor_tv?.setBackgroundColor(Color.parseColor("#3CB371"))
-        views?.retailerHeader_tv?.setTextColor(ContextCompat.getColorStateList(requireActivity(), R.color.darkBlue))
-        views?.doctorHeader_tv?.setTextColor(ContextCompat.getColorStateList(requireActivity(), R.color.gray))
+        views?.retailerHeader_tv?.setTextColor(activity?.let { ContextCompat.getColorStateList(it, R.color.darkBlue) })
+        views?.doctorHeader_tv?.setTextColor(activity?.let { ContextCompat.getColorStateList(it, R.color.gray) })
 
         Handler(Looper.getMainLooper()).postDelayed({
             var  retailerModel= Gson().fromJson(strtext, DailyDocVisitModel.Data.DcrDoctor::class.java)
@@ -1542,13 +1585,13 @@ class NewCallFragment : Fragment(),StringInterface {
             bundle.putString("retailerData", strtext)
             retailerFragment.arguments=bundle
 
-            val transaction = requireActivity().supportFragmentManager.beginTransaction()
-            transaction.replace(R.id.frameRetailer_view, retailerFragment)
-            transaction.disallowAddToBackStack()
-            transaction.commit()
+            val transaction = activity?.supportFragmentManager?.beginTransaction()
+            transaction?.replace(R.id.frameRetailer_view, retailerFragment)
+            transaction?.disallowAddToBackStack()
+            transaction?.commit()
 
             Handler(Looper.getMainLooper()).postDelayed({
-                requireActivity().runOnUiThread {
+                activity?.runOnUiThread {
                     views?.selectRoute_tv?.text=retailerModel.routeName
                     views?.selectDoctor_tv?.text=retailerModel.shopName
                     views?.frameRetailer_view?.visibility=View.VISIBLE

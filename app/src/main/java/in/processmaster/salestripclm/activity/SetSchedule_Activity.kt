@@ -236,6 +236,8 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
     override fun onResume() {
         super.onResume()
         createConnectivity(this)
+        alertClass = AlertClass(this)
+
     }
 
     override fun onPause() {
@@ -725,11 +727,11 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
     {
         alertClass.showProgressAlert("")
 
-        var call: Call<TeamsModel> = apiInterface?.getTeamsMember(
+        var call: Call<TeamsModel>? = apiInterface?.getTeamsMember(
             "bearer " + HomePage.loginModelHomePage.accessToken,
             HomePage.loginModelHomePage.empId.toString()
-        ) as Call<TeamsModel>
-        call.enqueue(object : Callback<TeamsModel?> {
+        ) as? Call<TeamsModel>
+        call?.enqueue(object : Callback<TeamsModel?> {
             @RequiresApi(Build.VERSION_CODES.N)
             override fun onResponse(
                 call: Call<TeamsModel?>?,
@@ -844,11 +846,11 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
         val bodyRequest: RequestBody =
             RequestBody.create(MediaType.parse("application/json"), paramObject.toString())
 
-        var call: Call<GenerateOTPModel> = apiInterface?.setScheduleFirstApi(
+        var call: Call<GenerateOTPModel>? = apiInterface?.setScheduleFirstApi(
             "bearer " + HomePage.loginModelHomePage.accessToken,
             bodyRequest
-        ) as Call<GenerateOTPModel>
-        call.enqueue(object : Callback<GenerateOTPModel?> {
+        ) as? Call<GenerateOTPModel>
+        call?.enqueue(object : Callback<GenerateOTPModel?> {
             override fun onResponse(
                 call: Call<GenerateOTPModel?>?,
                 response: Response<GenerateOTPModel?>
@@ -918,9 +920,9 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
     }
 
     fun getsheduled_Meeting_api(){
-        var call: Call<GetScheduleModel> = apiInterface?.getScheduledMeeting("bearer " + HomePage.loginModelHomePage.accessToken,
-            HomePage.loginModelHomePage.empId.toString()) as Call<GetScheduleModel>
-        call.enqueue(object : Callback<GetScheduleModel?> {
+        var call: Call<GetScheduleModel>? = apiInterface?.getScheduledMeeting("bearer " + HomePage.loginModelHomePage.accessToken,
+            HomePage.loginModelHomePage.empId.toString()) as? Call<GetScheduleModel>
+        call?.enqueue(object : Callback<GetScheduleModel?> {
             override fun onResponse(call: Call<GetScheduleModel?>?, response: Response<GetScheduleModel?>) {
                 Log.e("getscheduled_api", response.code().toString() + "")
                 if (response.code() == 200 && !response.body().toString().isEmpty())

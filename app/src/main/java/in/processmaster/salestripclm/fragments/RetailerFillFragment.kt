@@ -35,6 +35,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -45,8 +46,6 @@ import kotlinx.android.synthetic.main.checkbox_bottom_sheet.*
 import kotlinx.android.synthetic.main.checkbox_bottom_sheet.view.*
 import kotlinx.android.synthetic.main.fragment_retailer_fill.*
 import kotlinx.android.synthetic.main.fragment_retailer_fill.view.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -56,10 +55,14 @@ import retrofit2.Response
 import java.util.*
 
 
-class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNameBoll_interface, PobProductTransfer,
+class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTransfer,
     productTransferIndividual
     , productTransfer, EditInterface,SelectorInterface,StringInterface {
 
+    lateinit var stringInter: StringInterface
+
+    constructor(stringInter: StringInterface) :this()
+    { this.stringInter=stringInter }
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     var workWithArray=ArrayList<IdNameBoll_model>()
@@ -106,126 +109,18 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
     ): View? {
         views= inflater.inflate(R.layout.fragment_retailer_fill, container, false)
 
-        bottomSheetBehavior = BottomSheetBehavior.from(views.bottomSheet)
-        views.workingWithRv.layoutManager= LinearLayoutManager(requireActivity())
-        views.gift_rv.layoutManager= LinearLayoutManager(requireActivity())
-        views.selectedPob_rv.layoutManager= LinearLayoutManager(requireActivity())
+        bottomSheetBehavior = BottomSheetBehavior.from(views.bottomSheet_submitScreen)
+        views.workingWithRv.layoutManager= LinearLayoutManager(activity)
+        views.gift_rv.layoutManager= LinearLayoutManager(activity)
+        views.selectedPob_rv.layoutManager= LinearLayoutManager(activity)
 
-        views.rcpaDetailOne_rv.layoutManager= LinearLayoutManager(requireActivity())
-        views.rcpaDetailTwo_rv.layoutManager= LinearLayoutManager(requireActivity())
-        views.rcpaDetailThree_rv.layoutManager= LinearLayoutManager(requireActivity())
+        views.rcpaDetailOne_rv.layoutManager= LinearLayoutManager(activity)
+        views.rcpaDetailTwo_rv.layoutManager= LinearLayoutManager(activity)
+        views.rcpaDetailThree_rv.layoutManager= LinearLayoutManager(activity)
 
-        val coroutine=GlobalScope.launch(Dispatchers.Default) {
-
-            val task= async {
-                alertClass= AlertClass(requireActivity())
-                dbBase= DatabaseHandler(requireActivity())
-                generalClass= GeneralClass(requireActivity())
-                sharePreferanceBase= PreferenceClass(requireActivity())
-
-                adapter1=AddedRcpa_Adapter(1,saveRcpaDetailList1)
-                adapter2=AddedRcpa_Adapter(2,saveRcpaDetailList2)
-                adapter3=AddedRcpa_Adapter(3,saveRcpaDetailList3)
-
-                val adapterVisit: ArrayAdapter<SyncModel.Data.WorkType> = ArrayAdapter<SyncModel.Data.WorkType>(requireActivity(),
-                    R.layout.spinner_txt, CommonListGetClass().getWorkTypeForSpinner())
-                requireActivity().runOnUiThread {  views.visitPurpose_spinner.setAdapter(adapterVisit) }
-
-                val quantityModel= Gson().fromJson(DatabaseHandler(requireActivity()).getApiDetail(3), CommonModel.QuantityModel.Data::class.java)
-                var Gift = quantityModel.employeeSampleBalanceList?.filter { s -> s.productType == "Gift"}
-                var listGift = Gift?.filter { s -> s.actualBalanceQty != 0}
-                var listStokist = SplashActivity.staticSyncData?.retailerList?.filter { s -> s.type == "STOCKIST" }
-
-                for(workWith in SplashActivity.staticSyncData?.workingWithList!!)
-                {
-                    val data =IdNameBoll_model()
-                    data.id= workWith.empId.toString()
-                    data.name= workWith.fullName.toString()
-                    workWithArray.add(data)
-                }
-
-                if (listGift != null) {
-                    for(gift in listGift) {
-                        val data =IdNameBoll_model()
-                        data.id= gift.productId.toString()
-                        data.name=gift?.productName!!
-                        data.availableQty=gift?.actualBalanceQty?.toInt()!!
-                        giftArray.add(data)
-                    }
-                }
-
-                if (listStokist != null) {
-                    for(stockist in listStokist) {
-                        val data =IdNameBoll_model()
-                        data.id= stockist.retailerId.toString()
-                        data.city= stockist.cityName.toString()
-                        data.name= stockist.shopName.toString()
-                        stokistArray.add(data)
-                    }
-                }
-
-                val string = Gson().toJson(SplashActivity.staticSyncData)
-                val data= Gson().fromJson(string, SyncModel.Data::class.java)
-                mainProductList.addAll(data.productList.filter { s -> (s.productType==1) } as ArrayList<SyncModel.Data.Product>)
-                unSelectedProductList=ArrayList(mainProductList)
-
-                val getSchemeList= SplashActivity.staticSyncData?.schemeList
-                val filterByTypeSchemeList= getSchemeList?.filter { data -> (data?.schemeFor=="S" || data?.schemeFor=="H") }
-                filterByTypeSchemeList?.sortedBy { it.schemeFor }?.let { getSchemeList?.addAll(it) }
-                val getDocDetail: SyncModel.Data.Doctor? = SplashActivity.staticSyncData?.doctorList?.find { it.doctorId == PresentEDetailingFrag.doctorIdDisplayVisual }
-
-                getSchemeList?.let { passingSchemeList.addAll(it)}
-
-                getSchemeList?.forEachIndexed { indexH, hElement ->
-
-                    val separated: Array<String>? = hElement.schemeForId?.split(",")?.toTypedArray()
-                    val event: String? = separated?.find { it ==getDocDetail?.fieldStaffId?.toString() }
-
-                    if(hElement.schemeFor.equals("H") && event!="")
-                    {
-                        getSchemeList?.forEachIndexed { indexS, SElement ->
-
-                            val separated: Array<String>? = SElement.schemeForId?.split(",")?.toTypedArray()
-                            val event: String? = separated?.find { it ==getDocDetail?.stateId?.toString() }
-                            if(SElement.schemeFor.equals("S") && event!="")
-                            {
-                                if(hElement.productId==SElement.productId) {
-                                    passingSchemeList.removeAt(indexS)
-                                }
-                            }
-                        }
-                    }
-                }
-
-                for(item in SplashActivity.staticSyncData?.doctorList!!)
-                {
-                    val selectorModel = DocManagerModel()
-                    selectorModel.name= item.doctorName.toString()
-                    selectorModel.routeName= item.routeName.toString()
-                    selectorModel.specialityName= item.specialityName.toString()
-                    selectorModel.id= item.doctorId!!
-                    selectorModel.mailId= item.emailId.toString()
-                    arrayListSelectorDoctor.add(selectorModel)
-                }
-
-                if(!sharePreferanceBase.getPref("dcrId").isEmpty())
-                {
-                    dcrId= sharePreferanceBase.getPref("dcrId").toInt()
-                }
-                if(arguments?.getString("retailerData")?.isEmpty() == false)
-                {getUpdateData() }
-
-            }
-            task.await()
-
-        }
-        coroutine.invokeOnCompletion {
-            requireActivity().runOnUiThread {
-                views.rcpaDetailOne_rv.adapter=adapter1
-                views.rcpaDetailTwo_rv.adapter=adapter2
-                views.rcpaDetailThree_rv.adapter=adapter3
-            }
-        }
+        adapter1=AddedRcpa_Adapter(1,saveRcpaDetailList1)
+        adapter2=AddedRcpa_Adapter(2,saveRcpaDetailList2)
+        adapter3=AddedRcpa_Adapter(3,saveRcpaDetailList3)
 
         views.visitPurpose_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
@@ -529,7 +424,7 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
 
             saveModel.reportedTime=generalClass.getCurrentDateTimeApiForamt()
 
-            if(!GeneralClass(requireActivity()).isInternetAvailable())
+            if(activity?.let { it1 -> GeneralClass(it1).isInternetAvailable() }==false)
             {
                 saveModel.isOffline=true
                 retailerObj.retailerId?.let { it1 ->
@@ -543,12 +438,12 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
                alertClass.commonAlert("","Data save successfully")
 
                 if(arguments?.getString("retailerData")?.isEmpty() == false) {
-                        (requireActivity() as HomePage).backToHome()
+                        (activity as HomePage).backToHome()
                 }
                 else{
-                    requireActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.frameRetailer_view, RetailerFillFragment(stringInter))
-                        .commit()
+                    activity?.getSupportFragmentManager()?.beginTransaction()
+                        ?.replace(R.id.frameRetailer_view, RetailerFillFragment(stringInter))
+                        ?.commit()
                     stringInter.onClickString("")
                 }
             }
@@ -558,12 +453,151 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
 
         })
 
+        views.refreshLayout_ll.setOnClickListener {
+
+            if(!isAdded) return@setOnClickListener
+
+            alertClass.showProgressAlert("")
+
+            activity?.runOnUiThread {
+                activity?.getSupportFragmentManager()?.beginTransaction()
+                    ?.replace(R.id.frameRetailer_view, RetailerFillFragment(stringInter))
+                    ?.commit()
+            }
+
+            Handler(Looper.getMainLooper()).postDelayed({
+                activity?.runOnUiThread {     alertClass.hideAlert() } },500)
+
+        }
+
 
         return views
     }
 
-    fun RetailerFillFragment(){
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
 
+        val coroutine=viewLifecycleOwner.lifecycleScope.launch {
+
+            try {
+                val task= async {
+                    if(!isAdded) return@async
+
+                    alertClass=  AlertClass(activity)
+                    dbBase= DatabaseHandler(activity)
+                    generalClass= activity?.let { GeneralClass(it) }!!
+                    sharePreferanceBase= PreferenceClass(activity)
+
+                    activity.let {
+                        val adapterVisit: ArrayAdapter<SyncModel.Data.WorkType>? = ArrayAdapter<SyncModel.Data.WorkType>(
+                            requireActivity(),
+                            R.layout.spinner_txt, CommonListGetClass().getWorkTypeForSpinner())
+                        activity?.runOnUiThread {  views.visitPurpose_spinner.setAdapter(adapterVisit) }
+                    }
+
+
+
+
+                    val quantityModel= Gson().fromJson(dbBase.getApiDetail(3), CommonModel.QuantityModel.Data::class.java)
+                    var Gift = quantityModel.employeeSampleBalanceList?.filter { s -> s.productType == "Gift"}
+                    var listGift = Gift?.filter { s -> s.actualBalanceQty != 0}
+                    var listStokist = SplashActivity.staticSyncData?.retailerList?.filter { s -> s.type == "STOCKIST" }
+
+                    for(workWith in SplashActivity.staticSyncData?.workingWithList!!)
+                    {
+                        val data =IdNameBoll_model()
+                        data.id= workWith.empId.toString()
+                        data.name= workWith.fullName.toString()
+                        workWithArray.add(data)
+                    }
+
+                    if (listGift != null) {
+                        for(gift in listGift) {
+                            val data =IdNameBoll_model()
+                            data.id= gift.productId.toString()
+                            data.name=gift?.productName!!
+                            data.availableQty=gift?.actualBalanceQty?.toInt()!!
+                            giftArray.add(data)
+                        }
+                    }
+
+                    if (listStokist != null) {
+                        for(stockist in listStokist) {
+                            val data =IdNameBoll_model()
+                            data.id= stockist.retailerId.toString()
+                            data.city= stockist.cityName.toString()
+                            data.name= stockist.shopName.toString()
+                            stokistArray.add(data)
+                        }
+                    }
+
+                    val string = Gson().toJson(SplashActivity.staticSyncData)
+                    val data= Gson().fromJson(string, SyncModel.Data::class.java)
+                    mainProductList.addAll(data.productList.filter { s -> (s.productType==1) } as ArrayList<SyncModel.Data.Product>)
+                    unSelectedProductList=ArrayList(mainProductList)
+
+                    val getSchemeList= SplashActivity.staticSyncData?.schemeList
+                    val filterByTypeSchemeList= getSchemeList?.filter { data -> (data?.schemeFor=="S" || data?.schemeFor=="H") }
+                    filterByTypeSchemeList?.sortedBy { it.schemeFor }?.let { getSchemeList?.addAll(it) }
+                    val getDocDetail: SyncModel.Data.Doctor? = SplashActivity.staticSyncData?.doctorList?.find { it.doctorId == PresentEDetailingFrag.doctorIdDisplayVisual }
+
+                    getSchemeList?.let { passingSchemeList.addAll(it)}
+
+                    getSchemeList?.forEachIndexed { indexH, hElement ->
+
+                        val separated: Array<String>? = hElement.schemeForId?.split(",")?.toTypedArray()
+                        val event: String? = separated?.find { it ==getDocDetail?.fieldStaffId?.toString() }
+
+                        if(hElement.schemeFor.equals("H") && event!="")
+                        {
+                            getSchemeList?.forEachIndexed { indexS, SElement ->
+
+                                val separated: Array<String>? = SElement.schemeForId?.split(",")?.toTypedArray()
+                                val event: String? = separated?.find { it ==getDocDetail?.stateId?.toString() }
+                                if(SElement.schemeFor.equals("S") && event!="")
+                                {
+                                    if(hElement.productId==SElement.productId) {
+                                        passingSchemeList.removeAt(indexS)
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    for(item in SplashActivity.staticSyncData?.doctorList!!)
+                    {
+                        val selectorModel = DocManagerModel()
+                        selectorModel.name= item.doctorName.toString()
+                        selectorModel.routeName= item.routeName.toString()
+                        selectorModel.specialityName= item.specialityName.toString()
+                        selectorModel.id= item.doctorId!!
+                        selectorModel.mailId= item.emailId.toString()
+                        arrayListSelectorDoctor.add(selectorModel)
+                    }
+
+                    if(!sharePreferanceBase.getPref("dcrId").isEmpty())
+                    {
+                        dcrId= sharePreferanceBase.getPref("dcrId").toInt()
+                    }
+                    if(arguments?.getString("retailerData")?.isEmpty() == false)
+                    {getUpdateData() }
+
+                }
+                task.await()
+            }
+            catch (e:Exception)
+            { }
+
+
+        }
+        coroutine.invokeOnCompletion {
+            activity?.runOnUiThread {
+                views.rcpaDetailOne_rv.adapter=adapter1
+                views.rcpaDetailTwo_rv.adapter=adapter2
+                views.rcpaDetailThree_rv.adapter=adapter3
+            }
+        }
+
+        super.onActivityCreated(savedInstanceState)
     }
 
     fun submitDcr(
@@ -577,8 +611,8 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
       //  return
 
         alertClass?.showProgressAlert("")
-        var call: Call<DailyDocVisitModel> = HomePage.apiInterface?.submitRetailer("bearer " + HomePage.loginModelHomePage.accessToken,arrayModel) as Call<DailyDocVisitModel>
-        call.enqueue(object : Callback<DailyDocVisitModel?> {
+        var call: Call<DailyDocVisitModel>? = HomePage.apiInterface?.submitRetailer("bearer " + HomePage.loginModelHomePage.accessToken,arrayModel) as? Call<DailyDocVisitModel>
+        call?.enqueue(object : Callback<DailyDocVisitModel?> {
             override fun onResponse(call: Call<DailyDocVisitModel?>?, response: Response<DailyDocVisitModel?>) {
 
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
@@ -610,17 +644,21 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
                         commonModel.employeeSampleBalanceList=quantityArray
                         dbBase.addAPIData(Gson().toJson(commonModel),3)
 
-                        if(arguments?.getString("retailerData")?.isEmpty() == false) {
-                            (requireActivity() as HomePage).backToHome()
-                        }
-                        else
+                        if(isAdded)
                         {
-                            requireActivity().getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.frameRetailer_view, RetailerFillFragment(stringInter))
-                                .commit()
+                            if(arguments?.getString("retailerData")?.isEmpty() == false) {
+                                (activity as HomePage).backToHome()
+                            }
+                            else
+                            {
+                                activity?.getSupportFragmentManager()?.beginTransaction()
+                                    ?.replace(R.id.frameRetailer_view, RetailerFillFragment(stringInter))
+                                    ?.commit()
 
-                            stringInter.onClickString("")
+                                stringInter.onClickString("")
+                            }
                         }
+
 
 
                        // dbBase.deleteApiData(7)
@@ -650,7 +688,7 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
         saveModel.visitPurpose=selectedPurposeID
         saveModel.empId= HomePage.loginModelHomePage.empId
 
-        val getGpsTracker= GPSTracker(requireActivity())
+        val getGpsTracker= GPSTracker(activity)
         saveModel.latitude=getGpsTracker.latitude
         saveModel.longitude=getGpsTracker.longitude
 
@@ -738,8 +776,8 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
         val filterRv = dialogView.findViewById<View>(R.id.filterRv) as RecyclerView
 
         val pobProduct_rv = dialogView.findViewById<View>(R.id.pobProduct_rv) as RecyclerView
-        pobProduct_rv.layoutManager=LinearLayoutManager(requireActivity())
-        filterRv.setLayoutManager(LinearLayoutManager(requireActivity(), LinearLayoutManager.HORIZONTAL, false))
+        pobProduct_rv.layoutManager=LinearLayoutManager(activity)
+        filterRv.setLayoutManager(LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false))
 
         val productSearch_et = dialogView.findViewById<View>(R.id.productSearch_et) as EditText
         productSearch_et?.addTextChangedListener(filterTextPobWatcher)
@@ -765,7 +803,7 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
 
         pobProduct_rv.setOnTouchListener(object : View.OnTouchListener{
             override fun onTouch(v: View, event: MotionEvent?): Boolean {
-                val imm = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                val imm = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 if (imm.isAcceptingText()) { imm?.hideSoftInputFromWindow(v.windowToken, 0) }
                 return false
             }
@@ -786,8 +824,9 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
         })
 
         okPob_iv.setOnClickListener{
-            requireActivity().runOnUiThread{
-                GeneralClass(requireActivity()).hideKeyboard(requireActivity(),it)
+            activity?.runOnUiThread{
+                if(isAdded)   GeneralClass(requireActivity()).hideKeyboard(requireActivity(),it)
+
             }
             pobProductSelectAdapter.setSelction()
             alertDialog.dismiss()
@@ -812,28 +851,28 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
 
         val runnable= Runnable {
             if(type==1) {
-                requireActivity().runOnUiThread {
+                activity?.runOnUiThread {
                     if (workWithArray.size == 0) noDataCheckAdapter_tv.visibility = View.VISIBLE else noDataCheckAdapter_tv.visibility = View.INVISIBLE
                 }
                 commonSlectionAdapter=   CheckboxSpinnerAdapter(workWithArray, this)
             }
 
             if(type==3) {
-                requireActivity().runOnUiThread {
+                activity?.runOnUiThread {
                     if (giftArray.size == 0) noDataCheckAdapter_tv.visibility = View.VISIBLE else noDataCheckAdapter_tv.visibility = View.INVISIBLE
                 }
                 commonSlectionAdapter= CheckboxSpinnerAdapter(giftArray,this)
             }
             if(type==4)
             {
-                requireActivity().runOnUiThread {
+                activity?.runOnUiThread {
                     if (stokistArray.size == 0) noDataCheckAdapter_tv.visibility = View.VISIBLE else noDataCheckAdapter_tv.visibility = View.INVISIBLE
                 }
                 commonSlectionAdapter = CheckboxSpinnerAdapter(stokistArray, this)
 
             }
 
-            requireActivity().runOnUiThread {
+            activity?.runOnUiThread {
                 views.checkRecyclerView_rv.adapter = commonSlectionAdapter
 
                 val state =
@@ -860,17 +899,17 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
 
     override fun onClickButtonProduct(productModel: SyncModel.Data.Product, positon: Int) {
 
-        GlobalScope.launch(Dispatchers.Default) {
-            for ((index,data) in SplashActivity.staticSyncData?.productList?.withIndex()!!)
+        viewLifecycleOwner.lifecycleScope.launch {
+            for ((index,data) in unSelectedProductList?.withIndex()!!)
             {
 
                 if(productModel?.productId==data.productId)
                 {
                     productModel.notApi=SyncModel.Data.Product.NotApiData()
-                    unSelectedProductList?.add(index, productModel)
+                    unSelectedProductList?.set(index, productModel)
                     selectedProductList.removeAt(positon)
 
-                    requireActivity().runOnUiThread{
+                    activity?.runOnUiThread{
                         setPobAdapter()
                         //  alertClass?.hideAlert()
                     }
@@ -883,7 +922,7 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
     override fun onChangeArray(
         passingArrayList: java.util.ArrayList<IdNameBoll_model>, isUpdate: Boolean,selectionTypeInterface: Int) {
 
-        GlobalScope.launch(Dispatchers.Default) {
+        viewLifecycleOwner.lifecycleScope.launch {
             var localSelection= if(selectionTypeInterface==0)selectionType else selectionTypeInterface
             if(localSelection==1)
             {
@@ -892,12 +931,12 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
 
                 var sendingList = workWithArray?.filter { s -> s.isChecked == true }
 
-                requireActivity().runOnUiThread {
+                activity?.runOnUiThread {
                     views.workingWithRv.adapter = TextWithEditAdapter(
                         sendingList as ArrayList<IdNameBoll_model>,
                         this@RetailerFillFragment,
                         0,
-                        requireActivity(),
+                        activity,
                         selectionType,
                         false
                     )
@@ -912,12 +951,12 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
 
                 var sendingList = giftArray?.filter { s -> s.isChecked == true }
 
-                requireActivity().runOnUiThread {
+                activity?.runOnUiThread {
                     views.gift_rv.adapter = TextWithEditAdapter(
                         sendingList as ArrayList<IdNameBoll_model>,
                         this@RetailerFillFragment,
                         1,
-                        requireActivity(),
+                        activity,
                         selectionType,
                         false
                     )
@@ -932,7 +971,7 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
                 stokistArray.forEachIndexed { index, element ->
                     if(element.isChecked) {
                         selectedStockist=element
-                        requireActivity().runOnUiThread {
+                        activity?.runOnUiThread {
                             views.stockistName.visibility=View.VISIBLE
                             views.stockistName.text="Stockist name - "+element.name }
                         }
@@ -940,7 +979,7 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
                     element.isChecked=false
                     stokistArray.set(index,element)
                 }
-                requireActivity().runOnUiThread {
+                activity?.runOnUiThread {
                     if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED)  bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
 
                 }
@@ -953,11 +992,11 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
     }
 
     fun setPobAdapter() {
-        requireActivity().runOnUiThread{
+        activity?.runOnUiThread{
             /*   pobProductSelectAdapter=PobProductAdapter(unSelectedProductList, passingSchemeList,this)
                pobProduct_rv.adapter= pobProductSelectAdapter*/
 
-            selectedPobAdapter=SelectedPobAdapter(selectedProductList,this,this,requireActivity(),false)
+            selectedPobAdapter=SelectedPobAdapter(selectedProductList,this,this,activity,false)
             selectedPob_rv.adapter= selectedPobAdapter
 
             calculateTotalProduct()
@@ -984,10 +1023,16 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
 
         if(type==100)
         {
-            val selectedProduct=selectedList.get(0)
-            ownBrand_et.setText(selectedProduct.productName)
-            brandId= selectedProduct.productId!!
+            if(selectedList.size!=0)
+            {
+                val selectedProduct=selectedList.get(0)
+                ownBrand_et.setText(selectedProduct.productName)
+                brandId= selectedProduct.productId!!
+            }
         }
+        if(selectedList.size==0) return
+
+
         if(type==1)
         {
            // alertClass.showProgressAlert("")
@@ -1007,14 +1052,10 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
                         selectedProductList.clear()
                         selectedProductList.addAll(hashSet)
 
-                        unSelectedProductList.removeAt(index)
-                        requireActivity().runOnUiThread {
-                            //   selectedPobAdapter.notifyItemChanged(index)
-                            //  pobProductSelectAdapter.notifyItemChanged(index)
-                        }
+                      //  unSelectedProductList.removeAt(index)
                     }
                 }
-                requireActivity().runOnUiThread {
+                activity?.runOnUiThread {
 
                     // pobProductSelectAdapter.notifyDataSetChanged()
                     setPobAdapter()
@@ -1045,7 +1086,7 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
         val dialogBuilder = AlertDialog.Builder(requireActivity())
         val inflater = this.layoutInflater
         val dialogView: View = inflater.inflate(R.layout.selectionalert, null)
-        dialogBuilder.setView(dialogView)
+        dialogBuilder?.setView(dialogView)
 
         alertDialog = dialogBuilder.create()
         alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -1056,7 +1097,7 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
         val headerTv= dialogView.findViewById<View>(R.id.headerTv) as TextView
         headerTv.setText("Select Doctor")
 
-        val layoutManager = LinearLayoutManager(requireActivity())
+        val layoutManager = LinearLayoutManager(activity)
         list_rv.layoutManager=layoutManager
         var adapterView : DoctorManagerSelector_Adapter? = null
 
@@ -1132,7 +1173,7 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
         }
 
 
-        val layoutManager = LinearLayoutManager(requireActivity())
+        val layoutManager = LinearLayoutManager(activity)
         selectProduct.layoutManager=layoutManager
         val pobProductSelectAdapter=PobProductAdapter(mainProductList, passingSchemeList,this,2,productSearch_et)
 
@@ -1420,7 +1461,7 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
                             if(workingWith.toInt() == getWorking.id.toInt()){
                                 getWorking.isChecked=true
                                 workWithArray.set(index,getWorking)
-                                requireActivity().runOnUiThread {
+                                activity?.runOnUiThread {
                                     workingWithRv.visibility=View.VISIBLE
                                 }
 
@@ -1433,7 +1474,7 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
 
             for (pobProducts in edetailingEditModel.pobObject?.pobDetailList!!)
             {
-                for((index,availableProduct) in mainProductList.withIndex())
+                for((index,availableProduct) in unSelectedProductList.withIndex())
                 {
                     if(availableProduct.productId==pobProducts.productId)
                     {
@@ -1452,7 +1493,7 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
                         availableProduct.notApi.pobId= pobProducts?.pobId!!
                         availableProduct.notApi.pobNo= pobProducts?.pobNo.toString()
 
-                        unSelectedProductList.removeAt(index)
+                        unSelectedProductList.set(index,availableProduct)
                         selectedProductList.add(availableProduct)
                     }
                 }
@@ -1468,13 +1509,13 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
             }
 
 
-            requireActivity().runOnUiThread(java.lang.Runnable {
+            activity?.runOnUiThread(java.lang.Runnable {
                 remark_Et.setText(edetailingEditModel.remark)
                 workingWithRv.adapter = TextWithEditAdapter(
                     passingWorking as ArrayList<IdNameBoll_model>,
                     this@RetailerFillFragment,
                     0,
-                    requireActivity(),
+                     activity,
                     selectionType,
                     checkIsDcrSave
                 )
@@ -1482,7 +1523,7 @@ class RetailerFillFragment(val stringInter: StringInterface) : Fragment(), IdNam
                     passingGift as ArrayList<IdNameBoll_model>,
                     this@RetailerFillFragment,
                     1,
-                    requireActivity(),
+                    activity,
                     selectionType,
                     checkIsDcrSave
                 )

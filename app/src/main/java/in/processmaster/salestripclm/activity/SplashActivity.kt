@@ -14,6 +14,7 @@ import android.os.Looper
 import android.util.Log
 import android.widget.ProgressBar
 import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
@@ -79,7 +80,7 @@ class SplashActivity : BaseActivity()
                 }
 
                 generalClass.enableSimpleProgress(progressBar!!)
-                val scope= GlobalScope.launch( generalClass.coroutineExceptionHandler) {
+                val scope= lifecycleScope.launch( generalClass.coroutineExceptionHandler) {
                     try{
                         callingSyncAPI()
                     }

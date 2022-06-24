@@ -464,5 +464,10 @@ class CreatePresentationActivity : BaseActivity(), StringInterface {
         deleteButton.visibility=View.VISIBLE
     }
 
+    override fun onResume() {
+        super.onResume()
+        alertClass = AlertClass(this)
+
+    }
 
 }

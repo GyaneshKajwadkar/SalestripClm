@@ -27,8 +27,9 @@ class PobProductAdapter(
     val searchEdit:EditText?
 ): RecyclerView.Adapter<PobProductAdapter.MyViewHolder>(), Filterable {
 
-    var productFilteringList= ArrayList(productList)
-    var  buttonFilterList: ArrayList<SyncModel.Data.Product> = ArrayList()
+    var productFilteringList= productList?.filter { s-> s.notApi.isSaved==false } as?  ArrayList<SyncModel.Data.Product>
+   // var productFilteringList= ArrayList(productList)
+    var  buttonFilterList: ArrayList<SyncModel.Data.Product>? = ArrayList()
     var searchText=""
     var isFilterSelection=false
 
@@ -51,6 +52,7 @@ class PobProductAdapter(
         var scheme_tv = view.findViewById<TextView>(R.id.scheme_tv)
         var qty_et = view.findViewById<EditText>(R.id.qty_et)
         var parentlinearL = view.findViewById<View>(R.id.parentlinearL)
+        var pobProduct_parentLl = view.findViewById<View>(R.id.pobProduct_parentLl)
     }
 
     override fun onBindViewHolder(
@@ -67,23 +69,25 @@ class PobProductAdapter(
             holder.qty_et.visibility=View.GONE
             holder.parentlinearL.setOnClickListener({
                 val tempList: ArrayList<SyncModel.Data.Product> = ArrayList()
-                tempList.add(model)
+                tempList.add(model!!)
                 sendProductInterface?.onClickButtonProduct(tempList,100)
             })
 
         }
         else{
             val model = productFilteringList?.get(position)
+            if(model?.notApi?.insertedProductId!=0 && model?.notApi?.isSaved == true)
+            {
+                holder.pobProduct_parentLl.visibility=View.GONE
+                return
+            }
             holder.titlePobproduct_tv.text=model?.productName
             holder.uom_tv.text="UOM: "+model?.packingTypeName
             holder.division_tv.text="Divison: "+model?.divisionName
             if (model?.notApi?.qty != null) {
                 holder.qty_et.setText(model.notApi?.qty.toString())
             }
-            if(model?.notApi?.insertedProductId!=0 && model?.notApi?.isSaved == true)
-            {
-                holder.parentlinearL.visibility=View.GONE
-            }
+
 
             schemeList?.forEachIndexed { index, element ->
                if(element.productId==model?.productId)
@@ -246,8 +250,10 @@ class PobProductAdapter(
 
     override fun getFilter(): Filter? {
         return object : Filter() {
-            override fun publishResults(constraint: CharSequence?, results: FilterResults) {
-                productFilteringList = results.values as java.util.ArrayList<SyncModel.Data.Product>
+            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+                if(results?.values==null)return
+
+                productFilteringList = results?.values as? java.util.ArrayList<SyncModel.Data.Product>
                 notifyDataSetChanged()
             }
             override fun performFiltering(constraint: CharSequence): FilterResults? {
@@ -269,8 +275,8 @@ class PobProductAdapter(
                 else
                 {
                     for (i in 0 until buttonFilterList?.size!!) {
-                        val docNames: SyncModel.Data.Product = buttonFilterList?.get(i)
-                        if (docNames.productName?.lowercase()?.contains(constraint.toString()) == true) {
+                        val docNames: SyncModel.Data.Product? = buttonFilterList?.get(i)
+                        if (docNames?.productName?.lowercase()?.contains(constraint.toString()) == true) {
                             FilteredArrayNames.add(docNames)
                         }
                     }
@@ -287,11 +293,12 @@ class PobProductAdapter(
     {
 
         var productListTemp: ArrayList<SyncModel.Data.Product> = ArrayList()
-        productFilteringList.clear()
-        buttonFilterList.clear()
+        productFilteringList?.clear()
+        buttonFilterList?.clear()
 
        if(selectedCategoryList.size==0) {
-           productList?.let { productFilteringList.addAll(it) }
+           productFilteringList= productList?.filter { s-> s.notApi.isSaved==false } as?  ArrayList<SyncModel.Data.Product>
+       //    productList?.let { productFilteringList.addAll(it) }
            notifyDataSetChanged()
            isFilterSelection=false
            return
@@ -308,9 +315,10 @@ class PobProductAdapter(
             }
         }
 
-        productFilteringList.addAll(productListTemp)
-        buttonFilterList.addAll(productListTemp)
-
+        productFilteringList= productListTemp?.filter { s-> s.notApi.isSaved==false } as?  ArrayList<SyncModel.Data.Product>
+        if(productFilteringList!=null) {
+            buttonFilterList?.addAll(productFilteringList!!)
+        }
         isFilterSelection=true
         notifyDataSetChanged()
         searchEdit?.setText("")

@@ -22,23 +22,29 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        if(context instanceof Activity)
-        {
-            Activity activity= (Activity) context;
-            BaseActivity baseActivity = new BaseActivity();
-
-            if(!isConnected(context))
+        try{
+            if(context instanceof Activity)
             {
-                if(SplashActivity.Companion.getShowNetworkAlert())
+                Activity activity= (Activity) context;
+                BaseActivity baseActivity = new BaseActivity();
+
+                if(!isConnected(context))
                 {
-                    SplashActivity.Companion.setShowNetworkAlert(false);
-                    baseActivity.networkAlertNotification(activity);
+                    if(SplashActivity.Companion.getShowNetworkAlert())
+                    {
+                        SplashActivity.Companion.setShowNetworkAlert(false);
+                        baseActivity.networkAlertNotification(activity);
+                    }
+                }
+                else {
+                    SplashActivity.Companion.setShowNetworkAlert(true);
+                    baseActivity.disableNetworkAlert(activity);
                 }
             }
-            else {
-                SplashActivity.Companion.setShowNetworkAlert(true);
-                baseActivity.disableNetworkAlert(activity);
-            }
+        }
+        catch (Exception e)
+        {
+            Log.e("exceptionInOnReceive",e.getMessage());
         }
     }
 

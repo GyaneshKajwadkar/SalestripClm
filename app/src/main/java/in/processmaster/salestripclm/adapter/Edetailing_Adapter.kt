@@ -24,7 +24,7 @@ import java.io.*
 class Edetailing_Adapter(
     var edetailidList: ArrayList<DevisionModel.Data.EDetailing>?,
     private var sharePreferance: PreferenceClass?,
-    var context: Activity,
+    var context: Activity?,
     var db: DatabaseHandler
 ) : RecyclerView.Adapter<Edetailing_Adapter.MyViewHolder>(), Filterable
 {
@@ -62,10 +62,13 @@ class Edetailing_Adapter(
            val runnable= Runnable {
                val checkDownloadStatus= db.getDownloadStatus(modeldata?.eretailDetailList!!)
 
-               context.runOnUiThread {
+               context?.runOnUiThread {
                    if(!checkDownloadStatus)
                    {
-                       holder.reDownload_rl.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.orange)));
+                       holder.reDownload_rl.setBackgroundTintList(context?.let {
+                           ContextCompat.getColor(
+                               it, R.color.orange)
+                       }?.let { ColorStateList.valueOf(it) });
                        holder.headerTv.setText("Pending Download")
                        holder.isPending_iv.setImageResource(R.drawable.ic_download)
                    }
@@ -183,7 +186,7 @@ class Edetailing_Adapter(
         args.putSerializable("ARRAYLIST", arrayListDownloadFileModel as Serializable?)
         intent.putExtra("BUNDLE",args);
 
-        context.startActivity(intent)
+        context?.startActivity(intent)
     }
 
 

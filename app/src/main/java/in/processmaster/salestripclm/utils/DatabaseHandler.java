@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import in.processmaster.salestripclm.models.CreatePOBModel;
 import in.processmaster.salestripclm.models.DailyDocVisitModel;
 import in.processmaster.salestripclm.models.DevisionModel;
 import in.processmaster.salestripclm.models.DownloadFileModel;
@@ -24,7 +25,7 @@ import java.util.ArrayList;
 public class DatabaseHandler extends SQLiteOpenHelper {
 
     Context context;
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     private static final String DATABASE_NAME = "SalesTrip_CLM_db";
     private static final String KEY_ID = "id";
 
@@ -204,18 +205,23 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
     {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SAVE_API);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SYNC_API);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SYNCROUTE_API);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SYNCRETAILER_API);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SYNCPRODUCT_API);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_EDETAILING);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SENDVISUALADS);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_EDETAILINGDOWNLOAD);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHILD_VISUAL_ADS);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SAVE_SEND_API);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SAVE_DOCTOR_EDETAIL);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CREATE_EDETAIL_PRESENTATION);
+        switch(oldVersion) {
+            case 1:
+                db.execSQL("DROP TABLE IF EXISTS " + TABLE_SAVE_API);
+                db.execSQL("DROP TABLE IF EXISTS " + TABLE_SYNC_API);
+                db.execSQL("DROP TABLE IF EXISTS " + TABLE_SYNCROUTE_API);
+                db.execSQL("DROP TABLE IF EXISTS " + TABLE_SYNCRETAILER_API);
+                db.execSQL("DROP TABLE IF EXISTS " + TABLE_SYNCPRODUCT_API);
+                db.execSQL("DROP TABLE IF EXISTS " + TABLE_EDETAILING);
+                db.execSQL("DROP TABLE IF EXISTS " + TABLE_SENDVISUALADS);
+                db.execSQL("DROP TABLE IF EXISTS " + TABLE_EDETAILINGDOWNLOAD);
+                db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHILD_VISUAL_ADS);
+                db.execSQL("DROP TABLE IF EXISTS " + TABLE_SAVE_SEND_API);
+                db.execSQL("DROP TABLE IF EXISTS " + TABLE_SAVE_DOCTOR_EDETAIL);
+            case 2:
+                db.execSQL("DROP TABLE IF EXISTS " + TABLE_CREATE_EDETAIL_PRESENTATION);
+        }
+
         onCreate(db);
     }
 
@@ -1220,6 +1226,27 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 
     @SuppressLint("Range")
+    public ArrayList<CreatePOBModel.Data.pobObject>getAllSavePOB(String type)
+    {
+        ArrayList<CreatePOBModel.Data.pobObject> edetailList = new ArrayList<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_SAVE_SEND_API, new String[] { APIKEY_DATA}, API_TYPE + "=?",
+                new String[] {type}, null, null, null, null);
+        if (cursor.moveToFirst()) {
+            do {
+                String data=cursor.getString(cursor.getColumnIndex(APIKEY_DATA));
+                CreatePOBModel.Data.pobObject getSaveModel  = new Gson().fromJson(data, CreatePOBModel.Data.pobObject.class);
+                edetailList.add(getSaveModel);
+            }
+            while (cursor.moveToNext());
+        }
+        cursor.close();
+        return edetailList;
+    }
+
+
+    @SuppressLint("Range")
     public ArrayList<DailyDocVisitModel.Data.DcrDoctor>getAllSaveSend(String type)
     {
         ArrayList<DailyDocVisitModel.Data.DcrDoctor> edetailList = new ArrayList<>();
@@ -1239,7 +1266,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             while (cursor.moveToNext());
         }
         cursor.close();
-        //db.close();
         return edetailList;
     }
 
@@ -1247,29 +1273,40 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public ArrayList<DailyDocVisitModel.Data.DcrDoctor>getAllSaveSendRetailer(String type)
     {
         ArrayList<DailyDocVisitModel.Data.DcrDoctor> edetailList = new ArrayList<>();
-
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_SAVE_SEND_API, new String[] { APIKEY_DATA}, API_TYPE + "=?",
                 new String[] {type}, null, null, null, null);
-        if (cursor.moveToFirst()) {
-            do {
-                String data=cursor.getString(cursor.getColumnIndex(APIKEY_DATA));
-                DailyDocVisitModel.Data.DcrDoctor getSaveModel  = new Gson().fromJson(data, DailyDocVisitModel.Data.DcrDoctor.class);
-               getSaveModel.setSaveInDb(true);
-                edetailList.add(getSaveModel);
+
+        db.beginTransactionNonExclusive();
+        try {
+            if (cursor.moveToFirst()) {
+                do {
+                    String data=cursor.getString(cursor.getColumnIndex(APIKEY_DATA));
+                    DailyDocVisitModel.Data.DcrDoctor getSaveModel  = new Gson().fromJson(data, DailyDocVisitModel.Data.DcrDoctor.class);
+                    getSaveModel.setSaveInDb(true);
+                    edetailList.add(getSaveModel);
+                }
+                while (cursor.moveToNext());
             }
-            while (cursor.moveToNext());
+        } finally {
+            db.endTransaction();
+            cursor.close();
         }
-        cursor.close();
         //db.close();
         return edetailList;
     }
 
 
-    public boolean  deleteSaveSend(int id) {
+    public  void deleteSaveSend(int id) {
+
         SQLiteDatabase db = this.getWritableDatabase();
-        return  db.delete(TABLE_SAVE_SEND_API, KEY_ID + " = ?",
-                new String[] { String.valueOf(id) }) > 0;
+        db.beginTransactionNonExclusive();
+        try {
+           boolean bool= db.delete(TABLE_SAVE_SEND_API, KEY_ID + " = ?", new String[] { String.valueOf(id) }) > 0;
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
     }
 
     public void deleteSendEdetailing()

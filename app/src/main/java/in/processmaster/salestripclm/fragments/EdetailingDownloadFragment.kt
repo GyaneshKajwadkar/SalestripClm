@@ -19,8 +19,10 @@ import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
+import kotlinx.coroutines.launch
 
 class EdetailingDownloadFragment : Fragment() {
 
@@ -29,6 +31,8 @@ class EdetailingDownloadFragment : Fragment() {
     var viewPager: ViewPager?=null
     var tabs: TabLayout? = null
     var syncData_ll: LinearLayout?=null
+    lateinit var views:View
+    var alertClass : AlertClass?=null
 
     companion object {
         var filter_et : EditText?=null
@@ -40,26 +44,29 @@ class EdetailingDownloadFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        var view= inflater.inflate(R.layout.activity_edetailing_, container, false)
+        views= inflater.inflate(R.layout.activity_edetailing_, container, false)
 
-        if (requireActivity() != null && isAdded) { initView(view)  }
+        if (isAdded) { initView(views)  }
 
-        return view }
+        Handler(Looper.getMainLooper()).postDelayed({
+            if (isAdded)  calladapter()
+        }, 100)
+
+        return views }
 
     fun initView(view: View)
     {
         filter_et=view.findViewById(R.id.filter_et)as EditText
         syncData_ll=view.findViewById(R.id.syncData_ll)as LinearLayout
-        sharePreferance = PreferenceClass(requireActivity())
-        db = DatabaseHandler(requireActivity())
+        sharePreferance = PreferenceClass(activity)
+        db = DatabaseHandler(activity)
+        alertClass= activity?.let { AlertClass(it) }
         viewPager = view.findViewById<View>(R.id.viewpager) as ViewPager
         tabs = view.findViewById<View>(R.id.result_tabs) as TabLayout
 
         filter_et!!.addTextChangedListener(filterTextWatcher)
 
-      /*  syncData_ll?.setOnClickListener({ division_api()})*/
-
-        AlertClass(requireActivity()).showProgressAlert("")
+        alertClass?.showProgressAlert("")
     }
 
     val filterTextWatcher: TextWatcher = object : TextWatcher {
@@ -71,76 +78,18 @@ class EdetailingDownloadFragment : Fragment() {
         override fun afterTextChanged(s: Editable) {}
     }
 
-   /* private fun division_api()
-    {
-        AlertClass(requireActivity()).showProgressAlert("Sync data")
-        val jsonObject = JSONObject(loginModelHomePage?.getEmployeeObj().toString())
-
-        var call: Call<DevisionModel> = HomePage.apiInterface?.detailingApi(
-            "bearer " + loginModelHomePage?.accessToken, jsonObject.getString(
-                "Division"
-            )
-        ) as Call<DevisionModel>
-        call.enqueue(object : Callback<DevisionModel?> {
-            override fun onResponse(
-                call: Call<DevisionModel?>?,
-                response: Response<DevisionModel?>
-            )
-            {
-                Log.e("division_api", response.code().toString() + "")
-                if (response.code() == 200 && !response.body().toString().isEmpty())
-                {
-
-                    for ((index, value) in response.body()?.getData()?.geteDetailingList()?.withIndex()!!) {
-                        val gson = Gson()
-                        db.insertOrUpdateEDetail(value.geteDetailId().toString(), gson.toJson(value))
-
-                        if (index == response.body()?.getData()?.geteDetailingList()!!.size - 1)
-                        {  }
-                    }
-
-                    // clear database
-                    for(dbList in db.getAlleDetail())
-                    {
-                        var isSet=false
-                        for (mainList in response.body()?.getData()?.geteDetailingList()!!)
-                        {
-                            if (mainList.geteDetailId() == dbList.geteDetailId())
-                            { isSet = true }
-                        }
-
-                        //this clear database and files from device which is not in used
-                        if(!isSet)
-                        {
-                           db.deleteEdetailingData(dbList.geteDetailId().toString())
-                            var downloadModelArrayList=db.getAllDownloadedData(dbList.geteDetailId()!!)
-                            for(item in downloadModelArrayList)
-                            {
-                                val someDir = File(item.fileDirectoryPath)
-                                someDir.deleteRecursively()
-                            }
-                            db.deleteEdetailDownloada(dbList.geteDetailId().toString())
-
-                        }}
-                    calladapter()
-                }
-                AlertClass(requireActivity()).hideAlert()
-            }
-
-            override fun onFailure(call: Call<DevisionModel?>, t: Throwable?) {
-                GeneralClass(requireActivity()).checkInternet()
-                AlertClass(requireActivity()).hideAlert()
-                call.cancel()
-            }
-        })
-    }*/
-
     //set recycler view
     fun calladapter()
     {
-        setupViewPager(viewPager!!)
-        tabs?.setupWithViewPager(viewPager)
-        AlertClass(requireActivity()).hideAlert()
+        if(views==null || isAdded==false) return
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            activity?.runOnUiThread {
+                viewPager?.let { setupViewPager(it) }
+                tabs?.setupWithViewPager(viewPager)
+
+                alertClass?.hideAlert()
+            } }
     }
 
     // Add Fragments to Tabs
@@ -221,14 +170,6 @@ class EdetailingDownloadFragment : Fragment() {
             return isPagingEnabled && super.onInterceptTouchEvent(event)
         }
 
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        Handler(Looper.getMainLooper()).postDelayed({
-            calladapter()
-        }, 10)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {}

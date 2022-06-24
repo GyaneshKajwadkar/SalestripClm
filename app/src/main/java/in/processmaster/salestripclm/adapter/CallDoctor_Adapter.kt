@@ -3,6 +3,7 @@ package `in`.processmaster.salestripclm.adapter
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.HomePage
 import `in`.processmaster.salestripclm.activity.SubmitE_DetailingActivity
+import `in`.processmaster.salestripclm.common_classes.CheckDcrClass
 import `in`.processmaster.salestripclm.models.DailyDocVisitModel
 import android.app.Activity
 import android.content.Intent
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.util.*
 
 class CallDoctor_Adapter(
     val doctorList: List<DailyDocVisitModel.Data.DcrDoctor>?,
@@ -37,6 +39,7 @@ class CallDoctor_Adapter(
         if(modeldata?.saveInDb==true)
         {
             holder.needsync.visibility=View.VISIBLE
+
             holder.editDoctorCall_mb.visibility=View.GONE
 
             if(modeldata.callTiming.equals("E"))  holder.callTime_tv.setText("Evening")
@@ -44,8 +47,15 @@ class CallDoctor_Adapter(
 
             holder.speciality_tv.setText( "-")
             holder.workWithName_tv.setText("-")
-            holder.reportedTime_tv.setText("-")
             holder.visitPurpose_tv.setText("-")
+            try {
+                val sdf =   SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+                val dateFormatterSet = SimpleDateFormat("dd/MM/yyyy hh:mm a")
+                val startDate: Date = sdf.parse(modeldata?.reportedTime)
+                holder.reportedTime_tv.setText( dateFormatterSet.format(startDate))
+            }
+            catch (e: Exception)
+            { }
         }
         else {
             holder.needsync.visibility = View.GONE
@@ -75,9 +85,15 @@ class CallDoctor_Adapter(
         holder.editDoctorCall_mb.setOnClickListener({
             if(type.equals("doc"))
             {
-                val intent = Intent(requireActivity, SubmitE_DetailingActivity::class.java)
-                intent.putExtra("apiDataDcr", Gson().toJson(modeldata))
-                requireActivity.startActivity(intent)
+                if(CheckDcrClass(requireActivity,"doctorAdapter",Gson().toJson(modeldata)).checkDCR_UsingSP())
+                {
+                    val intent = Intent(requireActivity, SubmitE_DetailingActivity::class.java)
+                    intent.putExtra("apiDataDcr", Gson().toJson(modeldata))
+                    requireActivity.startActivity(intent)
+                }
+
+
+
             }
             else{
                 requireActivity as HomePage

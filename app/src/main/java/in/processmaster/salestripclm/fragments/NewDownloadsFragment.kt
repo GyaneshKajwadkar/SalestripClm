@@ -23,6 +23,7 @@ class NewDownloadsFragment : Fragment() {
     var nodownload_tv: TextView?= null
     var getAlleDetailListDb: ArrayList<DevisionModel.Data.EDetailing> = ArrayList()
     var isFirstTimeOpen=true
+    lateinit var views:View
     companion object { var adapter : Edetailing_Adapter?=null }
 
     override fun onCreateView(
@@ -31,42 +32,49 @@ class NewDownloadsFragment : Fragment() {
     ): View?
     {
         // Inflate the layout for this fragment
-        val view= inflater.inflate(R.layout.fragment_new_downloads, container, false)
+         views= inflater.inflate(R.layout.fragment_new_downloads, container, false)
 
-        recyclerView=view.findViewById(R.id.recyclerView)as RecyclerView
-        nodownload_tv=view.findViewById(R.id.nodownload_tv)as TextView
-
-        sharePreferance = PreferenceClass(activity)
-        db = DatabaseHandler(requireActivity())
-
-        Handler(Looper.getMainLooper()).postDelayed({
-
-        getAlleDetailListDb= db.getSelectedeDetail(false)
-
-        if(getAlleDetailListDb.size==0)nodownload_tv?.visibility=View.VISIBLE
-
-        adapter =  Edetailing_Adapter(
-            getAlleDetailListDb, sharePreferance, requireActivity(), db)
-
-        val layoutManager = LinearLayoutManager(activity)
-        recyclerView?.layoutManager = layoutManager
-        recyclerView?.adapter = adapter
-
-        if(EdetailingDownloadFragment.filter_et?.text?.equals("") == false)
-        {
-            editTextFilter(EdetailingDownloadFragment.filter_et?.text.toString())
-        }
-
-        isFirstTimeOpen=false
-            }, 10)
-        return view
+        recyclerView=views.findViewById(R.id.recyclerView)as RecyclerView
+        nodownload_tv=views.findViewById(R.id.nodownload_tv)as TextView
+        return views
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        if(isAdded)
+        {
+            sharePreferance = PreferenceClass(activity)
+            db = DatabaseHandler(activity)
+
+            Handler(Looper.getMainLooper()).postDelayed({
+
+                getAlleDetailListDb= db.getSelectedeDetail(false)
+
+                if(getAlleDetailListDb.size==0)nodownload_tv?.visibility=View.VISIBLE
+
+
+                adapter =  Edetailing_Adapter(
+                    getAlleDetailListDb, sharePreferance, activity, db)
+
+                val layoutManager = LinearLayoutManager(activity)
+                recyclerView?.layoutManager = layoutManager
+                recyclerView?.adapter = adapter
+
+                if(EdetailingDownloadFragment.filter_et?.text?.equals("") == false)
+                {
+                    editTextFilter(EdetailingDownloadFragment.filter_et?.text.toString())
+                }
+
+                isFirstTimeOpen=false
+            }, 10)
+        }
+    }
 
 
     override fun onResume() {
         super.onResume()
 
+        if(isAdded){
        var geteDetail= db.getSelectedeDetail(false)
         if(geteDetail.size!=getAlleDetailListDb.size && !isFirstTimeOpen)
         {
@@ -75,11 +83,11 @@ class NewDownloadsFragment : Fragment() {
             if(getAlleDetailListDb.size==0)nodownload_tv?.visibility=View.VISIBLE
 
             adapter =  Edetailing_Adapter(
-                getAlleDetailListDb, sharePreferance, requireActivity(), db
+                getAlleDetailListDb, sharePreferance, activity, db
             )
             recyclerView?.adapter = adapter
             //adapter?.notifyDataSetChanged()
-        }
+        }}
     }
 
     fun editTextFilter(string: String)

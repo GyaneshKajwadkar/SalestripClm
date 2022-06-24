@@ -4,6 +4,7 @@ import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.adapter.HorizontalWebViewAdapter
 import `in`.processmaster.salestripclm.adapter.OtherBrandSelectionAdapter
 import `in`.processmaster.salestripclm.adapter.OtherFileAdapter
+import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.fragments.ShowDownloadedFragment
 import `in`.processmaster.salestripclm.interfaceCode.ItemClickDisplayVisual
 import `in`.processmaster.salestripclm.interfaceCode.StoreVisualInterface
@@ -837,6 +838,7 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
     override fun onResume() {
         super.onResume()
         createConnectivity(this)
+        alertClass = AlertClass(this)
     }
 
     override fun onPause() {

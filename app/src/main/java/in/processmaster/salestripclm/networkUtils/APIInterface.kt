@@ -153,6 +153,13 @@ interface APIInterface
         @Query("date") date:String?
     ): Response<GetDcrToday>
 
+    @GET("api/dcr/byDCRDate/{empId}")
+    fun checkDCR__API(
+        @Header("Authorization") authorization: String?,
+        @Path("empId") empId: Int?,
+        @Query("date") date:String?
+    ): Call<GetDcrToday>
+
     @POST("api/dcr")
     fun saveDCS(
         @Header("Authorization") authorization: String?,
@@ -210,5 +217,30 @@ interface APIInterface
     @Streaming
     @GET
     suspend fun downloadFile(@Url fileUrl:String): Response<ResponseBody>
+
+
+    @GET("api/pob/number")
+    fun getPobNumber(
+        @Header("Authorization") authorization: String?,
+    ): Call<TeamsModel?>?
+
+    @POST("api/pob")
+    fun submitPOB(
+        @Header("Authorization") authorization: String?,
+        @Body creatModel: CreatePOBModel.Data.pobObject
+    ): Call<GenerateOTPModel?>?
+
+    @GET("api/pob")
+    fun fetchPreviousPOB(
+        @Header("Authorization") authorization: String?,
+        @Query("fromDate") fromDate:String,
+        @Query("toDate") toDate:String
+    ): Call<CreatePOBModel?>?
+
+    @GET("api/pob/{id}")
+    fun getPOBByID(
+        @Header("Authorization") authorization: String?,
+        @Path("id") id:Int
+    ): Call<CreatePOBModel?>?
 
 }

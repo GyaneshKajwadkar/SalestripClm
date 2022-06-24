@@ -3,6 +3,7 @@ package `in`.processmaster.salestripclm.activity
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.adapter.OtherBrandSelectionAdapter
 import `in`.processmaster.salestripclm.adapter.OtherFileAdapter
+import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.interfaceCode.ItemClickDisplayVisual
 import `in`.processmaster.salestripclm.interfaceCode.StoreVisualInterface
 import `in`.processmaster.salestripclm.models.DevisionModel
@@ -342,6 +343,8 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onResume() {
         super.onResume()
+        alertClass = AlertClass(this)
+
 
         createConnectivity(this)
 

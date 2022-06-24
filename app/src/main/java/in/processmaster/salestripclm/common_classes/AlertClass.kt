@@ -14,9 +14,9 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.snackbar.Snackbar
 import com.google.gson.JsonObject
 import kotlinx.android.synthetic.main.dcr_entry.view.*
 import retrofit2.Call
@@ -24,7 +24,8 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.util.*
 
-class AlertClass(val context : Context)
+
+class AlertClass(val context : Context?)
 {
     companion object {
          var retunDialog=false
@@ -36,6 +37,9 @@ class AlertClass(val context : Context)
        subtitleMessage: String, mainHeading: String, r: Runnable
    )
     {
+        //check if activity is finish or not
+        if(checkActivityIsfinishOrnot()){return}
+
         retunDialog=false
         var subtitleFull=""
         when(subTitleInput)
@@ -84,6 +88,10 @@ class AlertClass(val context : Context)
         {
             alertDialog?.dismiss()
         }
+
+        //check if activity is finish or not
+        if(checkActivityIsfinishOrnot()){return}
+
         val activity = context as Activity
         activity.runOnUiThread {
             val dialogBuilder = AlertDialog.Builder(activity)
@@ -112,18 +120,27 @@ class AlertClass(val context : Context)
 
     fun hideAlert()
     {
+        //check if activity is finish or not
+        if(checkActivityIsfinishOrnot()){return}
+
+        val activity = context as? Activity
+
         if(alertDialog!=null&& alertDialog!!.isShowing)
             alertDialog?.dismiss()
             alertDialog?.cancel()
 
-        val activity = context as Activity
-        activity.runOnUiThread(Runnable {
-            activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+
+        activity?.runOnUiThread(Runnable {
+            activity?.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
         })
     }
     //network alert
     fun networkAlert() {
+        //check if activity is finish or not
+        if(checkActivityIsfinishOrnot()){return}
+
         val activity = context as Activity
+
         activity.runOnUiThread{
             val dialogBuilder = AlertDialog.Builder(context)
             val inflater = activity.layoutInflater
@@ -150,7 +167,12 @@ class AlertClass(val context : Context)
 
     //network alert for low connection when try to calling coroutine api
     fun lowNetworkAlert() {
+
+        //check if activity is finish or not
+        if(checkActivityIsfinishOrnot()){return}
+
         val activity = context as Activity
+
         activity.runOnUiThread{
             val dialogBuilder = AlertDialog.Builder(context)
             val inflater = activity.layoutInflater
@@ -178,6 +200,10 @@ class AlertClass(val context : Context)
     }
 
     fun commonAlert(headerString: String, message: String) {
+
+        //check if activity is finish or not
+        if(checkActivityIsfinishOrnot()){return}
+
         context as Activity
 
         context.runOnUiThread{
@@ -210,7 +236,12 @@ class AlertClass(val context : Context)
 
 
     fun commonAlertWithRunnable(headerString: String, message: String,r: Runnable) {
+
+        //check if activity is finish or not
+        if(checkActivityIsfinishOrnot()){return}
+
         context as Activity
+
         val dialogBuilder = AlertDialog.Builder(context)
         val inflater = context.layoutInflater
         val dialogView: View = inflater.inflate(R.layout.common_alert, null)
@@ -240,7 +271,11 @@ class AlertClass(val context : Context)
     }
 
     fun createDCRAlert(routeId: String, routeNameData: String)
-    { var activityId=0; var startingStation=0; var endingStation=0; var fieldStaffId=0
+    {
+        //check if activity is finish or not
+        if(checkActivityIsfinishOrnot()){return}
+
+        var activityId=0; var startingStation=0; var endingStation=0; var fieldStaffId=0
         context as Activity
 
         val generalClass=GeneralClass(context)
@@ -441,10 +476,15 @@ class AlertClass(val context : Context)
     }
 
     fun saveDCR_API(dcrObject: CommonModel.SaveDcrModel, alertDialog: AlertDialog, checked: Boolean) {
+
+        //check if activity is finish or not
+        if(checkActivityIsfinishOrnot()){return}
+
         context as Activity
+
         showProgressAlert("")
-        var call: Call<JsonObject> = HomePage.apiInterface?.saveDCS("bearer " + HomePage.loginModelHomePage.accessToken,dcrObject) as Call<JsonObject>
-        call.enqueue(object : Callback<JsonObject?> {
+        var call: Call<JsonObject>? = HomePage.apiInterface?.saveDCS("bearer " + HomePage.loginModelHomePage.accessToken,dcrObject) as? Call<JsonObject>
+        call?.enqueue(object : Callback<JsonObject?> {
             override fun onResponse(call: Call<JsonObject?>?, response: Response<JsonObject?>) {
                 hideAlert()
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
@@ -479,6 +519,15 @@ class AlertClass(val context : Context)
                 call.cancel()
             }
         })
+    }
+
+    fun checkActivityIsfinishOrnot() :Boolean
+    {
+        if ((context as AppCompatActivity).isFinishing) { return true }
+        val activity = context as Activity
+        if(activity?.isDestroyed==true) return true
+        if(activity?.isFinishing==true)return true
+       return  false
     }
 
 }

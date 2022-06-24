@@ -301,13 +301,13 @@ class ScheduleMeetingAdapter(
         val response = APIClientKot().getUsersService(2, PreferenceClass(context)?.getPref("secondaryUrl")!!
         ).setScheduleMeetingApi("bearer " + Gson().fromJson(profileData, LoginModel::class.java)?.accessToken,bodyRequest)
         withContext(Dispatchers.Main) {
-            if (response!!.isSuccessful)
+            if (response?.isSuccessful == true)
             {
                 Log.e("meetingAPiIS",response.body().toString())
             }
             else
             {
-                Log.e("responseERROR", response.errorBody().toString())
+                Log.e("responseERROR", response?.errorBody().toString())
             }
         }
     }
@@ -321,7 +321,7 @@ class ScheduleMeetingAdapter(
         ).getScheduledMeetingCoo("bearer " + profile?.accessToken,profile.empId.toString())
         withContext(Dispatchers.Main) {
             Log.e("getScheduleAPI",response.toString())
-            if (response!!.isSuccessful)
+            if (response?.isSuccessful==true)
             {
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
                     val gson = Gson()
@@ -341,7 +341,7 @@ class ScheduleMeetingAdapter(
                 }
             }
             else
-            {   Log.e("scheduleERROR", response.errorBody().toString())
+            {   Log.e("scheduleERROR", response?.errorBody().toString())
             }
         }
 

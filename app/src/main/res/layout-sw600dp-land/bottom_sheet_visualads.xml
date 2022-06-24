@@ -41,7 +41,7 @@
 
 
                 <ImageView
-                    android:id="@+id/close_imv"
+                    android:id="@+id/close_selection_imv"
                     android:layout_width="25dp"
                     android:layout_height="25dp"
                     android:layout_alignParentEnd="true"

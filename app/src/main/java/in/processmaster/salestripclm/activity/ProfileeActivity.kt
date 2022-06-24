@@ -4,6 +4,7 @@ import `in`.processmaster.salestripclm.BuildConfig
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.HomePage.Companion.apiInterface
 import `in`.processmaster.salestripclm.activity.HomePage.Companion.loginModelHomePage
+import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.models.GenerateOTPModel
 import `in`.processmaster.salestripclm.models.GetScheduleModel
@@ -236,43 +237,45 @@ class ProfileeActivity : BaseActivity() {
     //Result for selected image
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+
+        if(resultCode == RESULT_CANCELED ){return}
+
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_TAKE_PHOTO) {
                 try {
-                    //   mPhotoFile = mCompressor.compressToFile(mPhotoFile)
+                    Glide.with(this)
+                        .load(mPhotoFile)
+                        .apply(
+                            RequestOptions().centerCrop()
+                                .circleCrop()
+                                .placeholder(R.drawable.zm_menu_icon_profile)
+                        )
+                        .into(changeProfilePic_civ)
+                    updateProfilePic()
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
-                Glide.with(this)
-                    .load(mPhotoFile)
-                    .apply(
-                        RequestOptions().centerCrop()
-                            .circleCrop()
-                            .placeholder(R.drawable.zm_menu_icon_profile)
-                    )
-                    .into(changeProfilePic_civ)
-                updateProfilePic()
+
             }
             else if (requestCode == REQUEST_GALLERY_PHOTO) {
                 val selectedImage = data?.data
                 try {
                     mPhotoFile = /*mCompressor.compressToFile*/(File(getRealPathFromUri(selectedImage)))
+                    Glide.with(this)
+                        .load(mPhotoFile)
+                        .apply(
+                            RequestOptions().centerCrop()
+                                .circleCrop()
+                                .placeholder(R.drawable.zm_menu_icon_profile)
+                        )
+                        .into(changeProfilePic_civ)
+                    updateProfilePic()
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
-                Glide.with(this)
-                    .load(mPhotoFile)
-                    .apply(
-                        RequestOptions().centerCrop()
-                            .circleCrop()
-                            .placeholder(R.drawable.zm_menu_icon_profile)
-                    )
-                    .into(changeProfilePic_civ)
-                updateProfilePic()
+
             }
         }
-
-
     }
 
     //select using gallery
@@ -608,11 +611,11 @@ class ProfileeActivity : BaseActivity() {
         paramObject.put("oldPassword", oldPassword.text.toString())
         paramObject.put("newPassword", newPassword.text.toString())
 
-        var call: Call<GenerateOTPModel> = apiInterface?.changePassword(
+        var call: Call<GenerateOTPModel>? = apiInterface?.changePassword(
             "bearer " + loginModelHomePage.accessToken,
             paramObject
-        ) as Call<GenerateOTPModel>
-        call.enqueue(object : Callback<GenerateOTPModel?> {
+        ) as? Call<GenerateOTPModel>
+        call?.enqueue(object : Callback<GenerateOTPModel?> {
 
             override fun onResponse(
                 call: Call<GenerateOTPModel?>?,
@@ -666,20 +669,22 @@ class ProfileeActivity : BaseActivity() {
         paramObject.put("ImageExt",  mPhotoFile?.absolutePath?.substring(mPhotoFile?.absolutePath?.lastIndexOf(".")?.plus(1)!!))
         paramObject.put("AbsolutePath", mPhotoFile?.absolutePath.toString())
 
+        Log.e("udisfguisdfgsdui",Gson().toJson(paramObject))
+
         var reqBody = RequestBody.create(MediaType.parse("text/plain"), paramObject.toString());
 
-        var call: Call<GenerateOTPModel> = apiInterface?.changeProflePic(
+        var call: Call<GenerateOTPModel>? = apiInterface?.changeProflePic(
             "bearer " + loginModelHomePage.accessToken,
             filePart,reqBody
-        ) as Call<GenerateOTPModel>
-        call.enqueue(object : Callback<GenerateOTPModel?> {
+        ) as? Call<GenerateOTPModel>
+        call?.enqueue(object : Callback<GenerateOTPModel?> {
             @RequiresApi(Build.VERSION_CODES.O)
             override fun onResponse(
                 call: Call<GenerateOTPModel?>?,
                 response: Response<GenerateOTPModel?>
             )
             {
-                if (response.code() == 200 && !response.body().toString().isEmpty())
+                if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage.toString().isEmpty())
                 {
                     var getObject=response.body()
                     loginModelHomePage.imageName=getObject?.getData()?.imageName.toString()
@@ -695,6 +700,7 @@ class ProfileeActivity : BaseActivity() {
                     Toast.makeText(this@ProfileeActivity, "Server error ", Toast.LENGTH_SHORT).show()
 
                 }
+                Log.e("uuiuiuiuiuiuiuiui",response.code().toString())
 
                 alertClass.hideAlert()
             }
@@ -702,12 +708,19 @@ class ProfileeActivity : BaseActivity() {
             override fun onFailure(call: Call<GenerateOTPModel?>, t: Throwable?) {
                 call.cancel()
                 alertClass.hideAlert()
+                Log.e("tetrtetetetettt",t?.message.toString())
                 Toast.makeText(this@ProfileeActivity, "Server error ", Toast.LENGTH_SHORT).show()
 
             }
             //TechnoSpark
 
         })
+
+    }
+
+    override fun onResume() {
+        super.onResume()
+        alertClass = AlertClass(this)
 
     }
 
