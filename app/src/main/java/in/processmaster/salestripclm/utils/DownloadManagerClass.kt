@@ -4,6 +4,8 @@ import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.HomePage
 import `in`.processmaster.salestripclm.models.DevisionModel
 import `in`.processmaster.salestripclm.models.DownloadFileModel
+import `in`.processmaster.salestripclm.models.LoginModel
+import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.DownloadManager
@@ -46,8 +48,14 @@ class DownloadManagerClass(
     lateinit var downloadNumber_tv : TextView
     var downloadId: Long =0
 
+    companion object {
+        var cancelAutoDownload= false
+    }
+
     fun startDownloading()
     {
+        if( cancelAutoDownload==true) return
+
         if(getNumber==0)
         {
             context.registerReceiver(downloadReceiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
@@ -269,12 +277,18 @@ class DownloadManagerClass(
         downloadNumber_tv=dialogView.findViewById<TextView>(R.id.downloadNumber_tv)
         downloadNumber_tv.setText(getNumber.toString()+"/"+allProductList.size.toString())
         headerTv.setText("Please wait for your content to be downloaded")
-        val okBtn_rl =
-            dialogView.findViewById<View>(R.id.update_btn) as Button
+        val okBtn_rl = dialogView.findViewById<View>(R.id.update_btn) as Button
+        val cancel_btn = dialogView.findViewById<View>(R.id.cancel_btn) as Button
+        cancel_btn.visibility=View.VISIBLE
         okBtn_rl.setText("Ok")
         okBtn_rl.setOnClickListener {
             alertDialog.dismiss()
         }
+        cancel_btn.setOnClickListener {
+            cancelAutoDownload=true
+            alertDialog.dismiss()
+        }
+
         alertDialog.show()
     }
 

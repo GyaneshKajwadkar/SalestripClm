@@ -23,6 +23,8 @@
         android:layout_weight="1"
         android:orientation="vertical">
 
+
+
         <TextView
             android:padding="1dp"
             android:layout_width="match_parent"

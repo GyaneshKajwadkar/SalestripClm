@@ -2,15 +2,10 @@ package `in`.processmaster.salestripclm.fragments
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.HomePage.Companion.apiInterface
 import `in`.processmaster.salestripclm.activity.HomePage.Companion.loginModelHomePage
-import `in`.processmaster.salestripclm.activity.OnlinePresentationActivity
 import `in`.processmaster.salestripclm.activity.SplashActivity
 import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.staticSyncData
-import `in`.processmaster.salestripclm.activity.SubmitE_DetailingActivity
-import `in`.processmaster.salestripclm.adapter.LastRCPA_Adapter
-import `in`.processmaster.salestripclm.adapter.SimpleListAdapter
 import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.common_classes.CheckDcrClass
-import `in`.processmaster.salestripclm.common_classes.CommonListGetClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.interfaceCode.StringInterface
 import `in`.processmaster.salestripclm.models.*
@@ -18,7 +13,6 @@ import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import `in`.processmaster.salestripclm.networkUtils.GPSTracker
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
-import android.content.Intent
 import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
@@ -37,9 +31,9 @@ import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.Gson
@@ -81,7 +75,6 @@ class NewCallFragment : Fragment(),StringInterface {
     companion object {
         var retailerObj= SyncModel.Data.Retailer()
         var instance: NewCallFragment? = null
-
     }
 
     val coroutineExceptionHandler = CoroutineExceptionHandler{_, throwable ->
@@ -104,7 +97,6 @@ class NewCallFragment : Fragment(),StringInterface {
 
     fun initView()
     {
-
         bottomSheetBehavior = BottomSheetBehavior.from(views!!.bottomSheet)
 
         val strtext = arguments?.getString("retailerData")
@@ -139,7 +131,6 @@ class NewCallFragment : Fragment(),StringInterface {
 
                     val responseDocCall=db.getApiDetail(5)
                     if(!responseDocCall.equals("")) {
-
                         docCallModel = Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
                     }
                     if(staticSyncData?.settingDCR?.isRestrictedParty==true)
@@ -192,14 +183,13 @@ class NewCallFragment : Fragment(),StringInterface {
                         if (isChecked) {
                             views?.selectDoctor_tv?.setText("Select Doctor")
                             views?.selectionDocRet_tv?.setText("Select Doctor")
-
                             activity?.let {
                                 doctorHeader_tv.setTextColor(ContextCompat.getColorStateList(it, R.color.darkBlue))
                                 retailerHeader_tv.setTextColor(ContextCompat.getColorStateList(it, R.color.gray))
                             }
-
-
-                        } else {
+                        }
+                        else
+                        {
                             views?.selectDoctor_tv?.setText("Select Retailer")
                             views?.selectionDocRet_tv?.setText("Select Retailer")
 
@@ -223,17 +213,33 @@ class NewCallFragment : Fragment(),StringInterface {
                             views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
                         }
 
-                        views?.doctorDetail_parent?.visibility=View.INVISIBLE
-                        views?.precall_parent?.visibility=View.INVISIBLE
-                        views?.parentButton?.visibility=View.INVISIBLE
-                        views?.noData_gif?.visibility=View.VISIBLE
-                        views?.frameRetailer_view?.visibility=View.INVISIBLE
-                        views?.retailer_parent?.visibility=View.GONE
+                        activity?.runOnUiThread {
+                            views?.doctorDetail_parent?.visibility=View.INVISIBLE
+                         //   views?.precall_parent?.visibility=View.INVISIBLE
+                         //   views?.parentButton?.visibility=View.INVISIBLE
+                            views?.noData_gif?.visibility=View.VISIBLE
+                            views?.frameRetailer_view?.visibility=View.GONE
+                            views?.framePreCall_view?.visibility=View.GONE
+                            views?.retailer_parent?.visibility=View.GONE
+                            views?.selectRoute_tv?.setText("Select route")
+                            views?.selectDoctor_tv?.setBackgroundColor(Color.parseColor("#A9A9A9"))
+                            views?.selectTeam_tv?.setText("Select team")
+                            views?.selectDoctorsCv?.setEnabled(false)
+                        }
+                       /* Handler(Looper.getMainLooper()).postDelayed({
+                            if(!isChecked){
+                                if(isRetailerAttached==false) {
+                                    isRetailerAttached = true
+                                    activity?.runOnUiThread {
+                                        val transaction = activity?.supportFragmentManager?.beginTransaction()
+                                        transaction?.replace(R.id.frameRetailer_view, RetailerFillFragment(this@NewCallFragment))
+                                        transaction?.disallowAddToBackStack()
+                                        transaction?.commit()
+                                    }
+                                }
+                            }
+                        },50)*/
 
-                        views?.selectRoute_tv?.setText("Select route")
-                        views?.selectDoctor_tv?.setBackgroundColor(Color.parseColor("#A9A9A9"))
-                        views?.selectTeam_tv?.setText("Select team")
-                        views?.selectDoctorsCv?.setEnabled(false)
                     }
 
                     views?.selectTeamsCv?.setOnClickListener({
@@ -307,7 +313,7 @@ class NewCallFragment : Fragment(),StringInterface {
 
                     views?.doctorSearch_et?.addTextChangedListener(filterTextWatcher)
 
-                    views?.startDetailing_btn?.setOnClickListener({
+                  /*  views?.startDetailing_btn?.setOnClickListener({
 
                         val isAlreadyContain=docCallModel.dcrDoctorlist?.any{ s -> s.doctorId == selectedDocID }
                         if(isAlreadyContain == true) {
@@ -333,7 +339,7 @@ class NewCallFragment : Fragment(),StringInterface {
                         intent.putExtra("doctorName", selectedDocName)
                         intent.putExtra("skip", true)
                         startActivityForResult(intent,3)
-                    })
+                    })*/
                 }
                 alertClass?.hideAlert()
             }
@@ -506,10 +512,15 @@ class NewCallFragment : Fragment(),StringInterface {
                     holder.speciality_tv.setText("Speciality- " + modeldata?.specialityName)
 
                     holder.parent_cv.setOnClickListener({
-                        views?.selectDoctor_tv?.setText((modeldata?.doctorName))
+
                         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
-                        setDoctor(modeldata)
+                        views?.selectDoctor_tv?.setText((modeldata?.doctorName))
                         onSelection()
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            activity?.runOnUiThread {
+                                setDoctor(modeldata)
+                            }
+                        },400)
                     })
                 }
                 else{
@@ -681,28 +692,27 @@ class NewCallFragment : Fragment(),StringInterface {
         val isAlreadyContain=docCallModel.dcrRetailerlist?.any{ s -> s.retailerId == retailerModel.retailerId }
         if(isAlreadyContain == true) {
             views?.selectDoctor_tv?.setText("Select Retailer")
-            views?.parentButton?.visibility=View.GONE
+           // views?.parentButton?.visibility=View.GONE
             alertClass?.commonAlert("Alert!","Dcr already done for this retailer")
             alertClass?.hideAlert()
             views?.noData_gif?.visibility=View.VISIBLE
             views?.retailer_parent?.visibility=View.GONE
-            views?.frameRetailer_view?.visibility=View.INVISIBLE
+            views?.frameRetailer_view?.visibility=View.GONE
+            views?.framePreCall_view?.visibility=View.GONE
             views?.selectDoctor_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
             return
         }
 
         onSelection()
 
-        val coroutine= CoroutineScope(Dispatchers.Default).launch {
+        val coroutine= CoroutineScope(Dispatchers.IO).launch {
             val task= async {
 
-                if(isRetailerAttached==false) {
-                    isRetailerAttached = true
-                    val transaction = activity?.supportFragmentManager?.beginTransaction()
-                    transaction?.add(R.id.frameRetailer_view, RetailerFillFragment(this@NewCallFragment))
-                    transaction?.disallowAddToBackStack()
-                    transaction?.commit()
-                }
+               val transaction = childFragmentManager.beginTransaction()
+               transaction?.replace(R.id.frameRetailer_view, RetailerFillFragment(this@NewCallFragment))
+               transaction?.disallowAddToBackStack()
+               transaction?.commit()
+
             }
             task.await()
         }
@@ -726,28 +736,19 @@ class NewCallFragment : Fragment(),StringInterface {
                     views?.cityParentRetailer?.visibility=View.GONE
 
                 views?.frameRetailer_view?.visibility=View.VISIBLE
+                views?.framePreCall_view?.visibility=View.GONE
                 Handler(Looper.getMainLooper()).postDelayed({
                     alertClass?.hideAlert()
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)}, 2)
             }
 
         }
-
-
-
-
-
-      //  views?.qualifiction_tv?.setText(retailerModel.qualificationName)
-     //   selectedDocID= retailerModel.retailerId!!
-        //selectedDocName= retailerModel.doctorName.toString()
-       // doctorObject=retailerModel;
-
     }
 
 
     fun setDoctor(doctorDetailModel: SyncModel.Data.Doctor)
     {
-        views?.precall_parent?.visibility=View.GONE
+      //  views?.precall_parent?.visibility=View.GONE
         views?.doctorDetail_parent?.visibility=View.VISIBLE
         views?.doctorName_tv?.setText(doctorDetailModel.doctorName)
         views?.routeName_tv?.setText(doctorDetailModel.routeName)
@@ -770,11 +771,20 @@ class NewCallFragment : Fragment(),StringInterface {
 
 
         if(generalClassObject?.isInternetAvailable() == true) {
-            noInternet_tv.visibility = View.GONE
-            preCallAnalysisApi(doctorDetailModel)
-        }
-        else noInternet_tv.visibility=View.VISIBLE; views?.parentButton?.visibility=View.VISIBLE
 
+                    views?.frameRetailer_view?.visibility=View.GONE
+                    views?.framePreCall_view?.visibility=View.VISIBLE
+                    val transaction = childFragmentManager.beginTransaction()
+                    transaction?.replace(R.id.framePreCall_view, PreCallsFragment(doctorDetailModel))
+                    transaction?.disallowAddToBackStack()
+                    transaction?.commit()
+
+                     views?.noInternet_tv?.visibility = View.GONE
+                     views?.noData_gif?.visibility = View.GONE
+
+         //   preCallAnalysisApi(doctorDetailModel)
+        }
+        else noInternet_tv.visibility=View.VISIBLE; /*views?.parentButton?.visibility=View.VISIBLE*/
 
     }
 
@@ -784,8 +794,8 @@ class NewCallFragment : Fragment(),StringInterface {
 
      if(selectionType==0)
      {   views?.doctorDetail_parent?.visibility=View.GONE
-         views?.precall_parent?.visibility=View.GONE
-         views?.parentButton?.visibility=View.GONE
+       // views?.precall_parent?.visibility=View.GONE
+       // views?.parentButton?.visibility=View.GONE
          views?.noData_gif?.visibility=View.VISIBLE
          views?.selectTeam_tv?.setBackgroundColor(Color.parseColor("#3CB371"))
          views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
@@ -794,14 +804,15 @@ class NewCallFragment : Fragment(),StringInterface {
          views?.selectDoctor_tv?.setText("Select Doctor")
          views?.selectRoutesCv?.setEnabled(true)
          views?.selectDoctorsCv?.setEnabled(false)
-         views?.frameRetailer_view?.visibility=View.INVISIBLE
+         views?.frameRetailer_view?.visibility=View.GONE
+         views?.framePreCall_view?.visibility=View.GONE
          views?.retailer_parent?.visibility=View.GONE
      }
      else if(selectionType==1)
      {
          views?.doctorDetail_parent?.visibility=View.GONE
-         views?.precall_parent?.visibility=View.GONE
-         views?.parentButton?.visibility=View.GONE
+       //  views?.precall_parent?.visibility=View.GONE
+       //  views?.parentButton?.visibility=View.GONE
          views?.noData_gif?.visibility=View.VISIBLE
          views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#3CB371"))
          views?.selectDoctor_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
@@ -809,7 +820,8 @@ class NewCallFragment : Fragment(),StringInterface {
              else  views?.selectDoctor_tv?.setText("Select Retailer")
 
          views?.selectDoctorsCv?.setEnabled(true)
-         views?.frameRetailer_view?.visibility=View.INVISIBLE
+         views?.frameRetailer_view?.visibility=View.GONE
+         views?.framePreCall_view?.visibility=View.GONE
          views?.retailer_parent?.visibility=View.GONE
      }
      else
@@ -934,7 +946,7 @@ class NewCallFragment : Fragment(),StringInterface {
 
     }
 
-    private fun preCallAnalysisApi(doctorDetailModel: SyncModel.Data.Doctor) {
+   /* private fun preCallAnalysisApi(doctorDetailModel: SyncModel.Data.Doctor) {
 
         views?.noData_gif?.visibility=View.GONE
         views?.analysisProgress?.visibility=View.VISIBLE
@@ -1080,12 +1092,12 @@ class NewCallFragment : Fragment(),StringInterface {
                    // viewDetail_lRcpaDetail
                    // viewDetail_lpobDetail
 
-                /*    if(generalClassObject?.checkStringNullEmpty(analysisModel?.lastPOBDetails!!.strPobDate!!)!!)
+                *//*    if(generalClassObject?.checkStringNullEmpty(analysisModel?.lastPOBDetails!!.strPobDate!!)!!)
                     { views!!.datePob_tv.setText("Date: --") }
                     else{
                         if(generalClassObject!!.checkDateValidation(analysisModel?.lastPOBDetails?.strPobDate!!))
                         { views!!.datePob_tv.setText("Date: "+analysisModel?.lastPOBDetails?.strPobDate) }
-                        else{ views!!.datePob_tv.setText("Date: ----")} }*/
+                        else{ views!!.datePob_tv.setText("Date: ----")} }*//*
 
 
 
@@ -1093,14 +1105,14 @@ class NewCallFragment : Fragment(),StringInterface {
             //        views!!.demoSales_tv.setText("Sales: "+analysisModel?.docLastRCPADetail?.ownSales)
             //        views!!.dateRCPA_tv.setText("Date: "+analysisModel?.docLastRCPADetail?.strRCPADate)
 
-                    /*if(generalClassObject?.checkStringNullEmpty(analysisModel?.docLastRCPADetail!!.strRCPADate!!)!!)
+                    *//*if(generalClassObject?.checkStringNullEmpty(analysisModel?.docLastRCPADetail!!.strRCPADate!!)!!)
                     { views?.dateRCPA_tv?.setText("Date: --") }
                     else{ views?.dateRCPA_tv?.setText("Date: "+analysisModel?.docLastRCPADetail?.strRCPADate) }
 
                     if(generalClassObject?.checkStringNullEmpty(analysisModel?.docLastRCPADetail!!.ownSales!!)!!)
                     { views!!.demoSales_tv.setText("Sales: --") }
                     else{ views!!.demoSales_tv.setText("Sales: "+analysisModel?.docLastRCPADetail?.ownSales)}
-*/
+*//*
                 }
                 else views?.noData_gif?.visibility=View.VISIBLE
 
@@ -1114,202 +1126,6 @@ class NewCallFragment : Fragment(),StringInterface {
                 call.cancel()
             }
         })
-    }
-
-    /*fun createDCRAlert(routeId: String)
-    { var activityId=0; var startingStation=0; var endingStation=0; var fieldStaffId=0
-
-        val dialogBuilder = activity?.let { AlertDialog.Builder(it) }; val inflater = activity?.layoutInflater
-        val dialogView: View = inflater!!?.inflate(R.layout.dcr_entry, null)
-        dialogBuilder?.setView(dialogView); dialogBuilder?.setCancelable(false); val alertDialog = dialogBuilder?.create()
-
-        val headerText = dialogView.findViewById<View>(R.id.doctorName_tv) as TextView
-        val cancelImag = dialogView.findViewById<View>(R.id.back_iv) as ImageView
-        val toggleSwitch = dialogView.findViewById<View>(R.id.toggleSwitch) as Switch
-        val selectActivityHeader = dialogView.findViewById<View>(R.id.selectActivityHeader) as TextView
-
-        headerText.setText("New DCR")
-        dialogView.dcr_date_tv.setText(generalClassObject?.getCurrentDate())
-        cancelImag.setOnClickListener({alertDialog.dismiss()})
-
-        var fieldWorkingList= arrayOf("Select","HQ ","Ex Station","Out Station")
-
-        val firstFilter= CommonListGetClass().getNonRouteListForSpinner().filter { s -> (s.routeId != -7)  }
-        val secondFilter= firstFilter.filter { s -> (s.routeId != -11)  }
-        val thirdFilter= secondFilter.filter { s -> (s.routeId != -6)  }
-
-        val adapterRoute: ArrayAdapter<SyncModel.Data.Route>? = activity?.let {
-            ArrayAdapter<SyncModel.Data.Route>(
-                it,
-                android.R.layout.simple_spinner_dropdown_item, thirdFilter)
-        }
-        dialogView.activity_spin.setAdapter(adapterRoute)
-
-        val startEndRoute: ArrayAdapter<SyncModel.Data.Route>? = activity?.let {
-            ArrayAdapter<SyncModel.Data.Route>(
-                it,
-                android.R.layout.simple_spinner_dropdown_item, CommonListGetClass().getRouteListForSpinner())
-        }
-        dialogView.startingStation_spin.setAdapter(startEndRoute)
-        dialogView.ending_spin.setAdapter(startEndRoute)
-
-        val workingWithList: ArrayAdapter<SyncModel.Data.WorkingWith>? = activity?.let {
-            ArrayAdapter<SyncModel.Data.WorkingWith>(
-                it,
-                android.R.layout.simple_spinner_dropdown_item, CommonListGetClass().getAccListForSpinner())
-        }
-        dialogView.accomp_spin.setAdapter(workingWithList)
-
-        val adapterField: ArrayAdapter<String>? = activity?.let {
-            ArrayAdapter<String>(
-                it,
-                android.R.layout.simple_spinner_dropdown_item, fieldWorkingList)
-        }
-        dialogView.workingArea_spin.setAdapter(adapterField)
-
-        if(SplashActivity.staticSyncData?.settingDCR?.roleType=="MAN")
-        {
-            dialogView.managerParent_ll.visibility=View.VISIBLE
-        }
-
-
-
-        dialogView.workingArea_spin.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
-               if(position==3)
-                   dialogView.startEndParent.visibility=View.VISIBLE
-                else
-                   dialogView.startEndParent.visibility=View.GONE
-            }
-            override fun onNothingSelected(parentView: AdapterView<*>?) {}
-        })
-
-        dialogView.startingStation_spin.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
-                startingStation = CommonListGetClass().getRouteListForSpinner()[position].routeId!!
-            }
-            override fun onNothingSelected(parentView: AdapterView<*>?) {}
-        })
-
-        dialogView.ending_spin.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
-                if(position!=0)
-                    endingStation = CommonListGetClass().getRouteListForSpinner()[position].routeId!!
-            }
-            override fun onNothingSelected(parentView: AdapterView<*>?) {}
-        })
-
-        dialogView.accomp_spin.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
-                if(position!=0)
-                    fieldStaffId = CommonListGetClass().getAccListForSpinner()[position].empId!!
-
-            }
-            override fun onNothingSelected(parentView: AdapterView<*>?) {}
-        })
-
-        dialogView.activity_spin.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
-                if(position!=0) {
-                    activityId =
-                        CommonListGetClass().getNonRouteListForSpinner()[position].routeId!!
-                    if(toggleSwitch.isChecked) dialogView.additionalParent.visibility=View.VISIBLE
-
-                }
-                else{
-                    if(toggleSwitch.isChecked) dialogView.additionalParent.visibility=View.GONE
-                }
-            }
-            override fun onNothingSelected(parentView: AdapterView<*>?) {}
-        })
-
-
-        toggleSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
-        if(isChecked) { selectActivityHeader.setText("Additional activity")
-        if(!dialogView.activity_spin.getSelectedItem().toString().equals("Select")){dialogView.additionalParent.visibility=View.VISIBLE}
-            if(SplashActivity.staticSyncData?.settingDCR?.roleType=="MAN")
-            {
-                dialogView.managerParent_ll.visibility=View.VISIBLE
-            }
-        }
-        else{
-            dialogView.managerParent_ll.visibility=View.GONE
-            selectActivityHeader.setText("Select activity")
-            dialogView.additionalParent.visibility=View.GONE}
-        }
-
-        dialogView.save_btn.setOnClickListener({
-            val activitySeletd: String = dialogView.activity_spin.getSelectedItem().toString()
-            val endingSeletd: String = dialogView.ending_spin.getSelectedItem().toString()
-            val workAreaSeletd: String = dialogView.workingArea_spin.getSelectedItem().toString()
-            val startingSeletd: String = dialogView.startingStation_spin.getSelectedItem().toString()
-            val accompaniedstr: String = dialogView.accomp_spin.getSelectedItem().toString()
-
-            if(workAreaSeletd.equals("Select")) {generalClassObject?.showSnackbar(it,"Working area not selected"); return@setOnClickListener}
-            if(activitySeletd.equals("Select") && !toggleSwitch.isChecked) {generalClassObject?.showSnackbar(it,"Activity not selected"); return@setOnClickListener}
-            if(startingSeletd.equals("Select") && dialogView.startEndParent.visibility==View.VISIBLE) {generalClassObject?.showSnackbar(it,"Start date not selected"); return@setOnClickListener}
-            if(endingSeletd.equals("Select") && dialogView.startEndParent.visibility==View.VISIBLE) {generalClassObject?.showSnackbar(it,"End station not selected"); return@setOnClickListener}
-
-            if(SplashActivity.staticSyncData?.settingDCR?.roleType=="MAN")
-            {
-                if(dialogView.objDayEt.text.isEmpty() && toggleSwitch.isChecked) {generalClassObject?.showSnackbar(it,"Objective of day is empty"); return@setOnClickListener}
-                if(dialogView.fieldStaffEt.text.isEmpty() && toggleSwitch.isChecked) {generalClassObject?.showSnackbar(it,"Field staff is empty"); return@setOnClickListener}
-            }
-
-            if(dialogView.remarkEt.text.isEmpty() && !toggleSwitch.isChecked) {generalClassObject?.showSnackbar(it,"Remark is empty"); return@setOnClickListener}
-            if(dialogView.additionalEt.text.isEmpty() && toggleSwitch.isChecked && !activitySeletd.equals("Select")) {generalClassObject?.showSnackbar(it,"Additional activity remark is empty"); return@setOnClickListener}
-            val i: Int = workAreaSeletd.indexOf(' ')
-
-            val c = Calendar.getInstance()
-            val year = c[Calendar.YEAR]
-            val month = c[Calendar.MONTH]
-
-            val commonSaveDcrModel=CommonModel.SaveDcrModel()
-            commonSaveDcrModel.dcrDate= generalClassObject?.currentDateMMDDYY().toString()
-            commonSaveDcrModel.empId= loginModelHomePage.empId?:0
-            commonSaveDcrModel.employeeId= loginModelHomePage.empId?:0
-            commonSaveDcrModel.workingType=workAreaSeletd.substring(0, i).toString().uppercase()
-            commonSaveDcrModel.remark=dialogView.remarkEt.text.toString()
-            commonSaveDcrModel.routeId=routeId
-            commonSaveDcrModel.monthNo=month+1
-            commonSaveDcrModel.year=year
-            commonSaveDcrModel.dayCount="0"
-
-            if(toggleSwitch.isChecked)
-            {
-                commonSaveDcrModel.additionalActivityId=activityId
-                commonSaveDcrModel.additionalActivityName=activitySeletd
-            }
-            else
-            {
-                commonSaveDcrModel.OtherDCR=activityId
-            }
-            commonSaveDcrModel.dayCount="0"
-            commonSaveDcrModel.additionalActivityRemark=dialogView.additionalEt.text.toString()
-            commonSaveDcrModel.dcrType=if(toggleSwitch.isChecked) 0  else 1
-
-            if(SplashActivity.staticSyncData?.settingDCR?.roleType=="MAN")
-            {
-                commonSaveDcrModel.accompaniedWith=fieldStaffId
-                commonSaveDcrModel.objectiveOfDay=dialogView.objDayEt.text.toString()
-                commonSaveDcrModel.feedBack=dialogView.fieldStaffEt.text.toString()
-            }
-
-            if(dialogView.startEndParent.visibility==View.VISIBLE)
-            {
-                commonSaveDcrModel.startingStation=startingStation
-                commonSaveDcrModel.endingStation=endingStation
-            }
-            saveDCR_API(commonSaveDcrModel,alertDialog,toggleSwitch.isChecked)
-        })
-
-        alertDialog.show()
-
     }*/
 
     suspend fun checkCurrentDCR_API() {
@@ -1506,10 +1322,10 @@ class NewCallFragment : Fragment(),StringInterface {
             if(views==null) return
             views?.selectDoctor_tv?.setBackgroundColor(Color.parseColor("#A9A9A9"))
             views?.doctorDetail_parent?.visibility=View.GONE
-            views?.precall_parent?.visibility=View.GONE
-            views?.parentButton?.visibility=View.GONE
+          // views?.precall_parent?.visibility=View.GONE
+          // views?.parentButton?.visibility=View.GONE
             views?.noData_gif?.visibility=View.VISIBLE
-
+            views?.framePreCall_view?.visibility=View.GONE
             val responseDocCall=db.getApiDetail(5)
             if(!responseDocCall.equals("")) {
                 docCallModel = Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
@@ -1520,40 +1336,11 @@ class NewCallFragment : Fragment(),StringInterface {
         if(views?.frameRetailer_view?.visibility==View.VISIBLE)
         {
             views?.selectDoctor_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
-            views?.frameRetailer_view?.visibility=View.INVISIBLE
+            views?.frameRetailer_view?.visibility=View.GONE
+            views?.framePreCall_view?.visibility=View.GONE
             views?.noData_gif?.visibility=View.VISIBLE
             views?.retailer_parent?.visibility=View.VISIBLE
         }
-
-    }
-
-    fun attachRetailerFrag()
-    {
-       // alertClass?.showProgressAlert("")
-
-        val coroutine= CoroutineScope(Dispatchers.Default).launch {
-            val task= async {
-                isRetailerAttached=true
-                val transaction = activity?.supportFragmentManager?.beginTransaction()
-                transaction?.add(R.id.frameRetailer_view, RetailerFillFragment(this@NewCallFragment))
-                transaction?.disallowAddToBackStack()
-                transaction?.commit()
-            }
-            task.await()
-        }
-        coroutine.invokeOnCompletion {
-            coroutine.cancel()
-        }
-
-
-
-    /*    val thread=Thread(Runnable {
-
-        })
-        thread.start() // spawn thread
-        thread.join()
-        thread.interrupt()
-        alertClass?.hideAlert()*/
 
     }
 
@@ -1585,7 +1372,7 @@ class NewCallFragment : Fragment(),StringInterface {
             bundle.putString("retailerData", strtext)
             retailerFragment.arguments=bundle
 
-            val transaction = activity?.supportFragmentManager?.beginTransaction()
+            val transaction = childFragmentManager.beginTransaction()
             transaction?.replace(R.id.frameRetailer_view, retailerFragment)
             transaction?.disallowAddToBackStack()
             transaction?.commit()
@@ -1608,8 +1395,10 @@ class NewCallFragment : Fragment(),StringInterface {
 
     override fun onClickString(passingInterface: String?) {
         views?.selectDoctor_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
-        views?.frameRetailer_view?.visibility=View.INVISIBLE
+        views?.frameRetailer_view?.visibility=View.GONE
+        views?.framePreCall_view?.visibility=View.GONE
         views?.noData_gif?.visibility=View.VISIBLE
         views?.retailer_parent?.visibility=View.GONE
     }
+
 }

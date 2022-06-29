@@ -265,70 +265,12 @@
                             android:background="@drawable/box_boarder" />
 
                         <LinearLayout
-                            android:id="@+id/pobParent"
+                            android:id="@+id/pobParentSubmitEdetailing"
                             android:visibility="gone"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical">
-                            <com.google.android.material.button.MaterialButton
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                app:cornerRadius="20dp"
-                                android:text="Assign Stockist"
-                                style="@style/materialButtonWithImage"
-                                android:backgroundTint="@color/darkBlue"
-                                android:textColor="@color/white"
-                                app:icon="@drawable/zm_ic_im_search"
-                                app:iconTint="@color/white"
-                                android:drawableTint="@color/white"
-                                android:id="@+id/assignStockist"/>
-                            <RelativeLayout
-                                android:layout_marginRight="10dp"
-                                android:layout_marginLeft="10dp"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content">
-
-                                <TextView
-                                    android:layout_centerVertical="true"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textColor="@color/black"
-                                    android:id="@+id/totalProductPrice_tv"
-                                    android:text="Order total: 00"/>
-
-                                <com.google.android.material.button.MaterialButton
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="40dp"
-                                    android:backgroundTint="@color/lightred"
-                                    android:textColor="@color/white"
-                                    android:text="Product"
-                                    android:id="@+id/pobProduct_btn"
-                                    android:textAllCaps="false"
-                                    android:layout_alignParentEnd="true"
-                                    app:icon="@drawable/zm_ic_im_search"/>
-
-                            </RelativeLayout>
-
-                            <TextView
-                                android:visibility="gone"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:id="@+id/stockistName"
-                                android:padding="5dp"
-                                android:textAlignment="center"
-                                android:textSize="18sp"
-                                android:textColor="@color/black"/>
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="1dp"
-                                android:background="@color/gray"/>
-
-                            <androidx.recyclerview.widget.RecyclerView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:id="@+id/selectedPob_rv"/>
-
-
+                            <include layout="@layout/pob_view"/>
                         </LinearLayout>
 
 

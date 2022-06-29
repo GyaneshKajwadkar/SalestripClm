@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:showIn="navigation_view">
 
     <group android:checkableBehavior="single">
@@ -38,6 +39,12 @@
             android:title="Create POB" />
 
         <item
+            android:id="@+id/nav_sob"
+            android:icon="@drawable/ic_home"
+            android:title="Stockist Order booking" />
+
+
+        <item
             android:id="@+id/sync_menu"
             android:icon="@drawable/ic_refresh"
             android:title="Sync" />
@@ -46,6 +53,15 @@
             android:id="@+id/nav_screenshot"
             android:icon="@drawable/ic_menu_gallery"
             android:title="Screenshots" />-->
+
+        <item
+            android:visible="false"
+            android:icon="@drawable/ic_download"
+            android:id="@+id/nav_autoDownload"
+            android:title="Auto download"
+            app:actionLayout="@layout/switch_menu"
+            app:showAsAction="always" />
+
 
         <item
             android:id="@+id/nav_logout"

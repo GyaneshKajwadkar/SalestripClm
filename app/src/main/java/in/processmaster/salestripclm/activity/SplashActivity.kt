@@ -11,15 +11,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.widget.ProgressBar
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
 import kotlinx.coroutines.*
-import us.zoom.sdk.ZoomSDK
 
 
 class SplashActivity : BaseActivity()
@@ -102,6 +98,7 @@ class SplashActivity : BaseActivity()
                 finish()
             }, 2000)
         }
+
     }
     suspend fun callingSyncAPI()
     {

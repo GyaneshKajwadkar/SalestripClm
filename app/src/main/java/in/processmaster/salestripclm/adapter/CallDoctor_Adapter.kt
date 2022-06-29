@@ -21,8 +21,8 @@ import java.util.*
 
 class CallDoctor_Adapter(
     val doctorList: List<DailyDocVisitModel.Data.DcrDoctor>?,
-    val requireActivity: Activity,
-    val type: String
+    val requireActivity: Activity?,
+    val type: String?
 ) : RecyclerView.Adapter<CallDoctor_Adapter.ViewHolders>()
 {
 
@@ -89,11 +89,8 @@ class CallDoctor_Adapter(
                 {
                     val intent = Intent(requireActivity, SubmitE_DetailingActivity::class.java)
                     intent.putExtra("apiDataDcr", Gson().toJson(modeldata))
-                    requireActivity.startActivity(intent)
+                    requireActivity?.startActivity(intent)
                 }
-
-
-
             }
             else{
                 requireActivity as HomePage

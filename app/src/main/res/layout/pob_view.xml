@@ -9,18 +9,74 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-        <com.google.android.material.button.MaterialButton
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cornerRadius="20dp"
-            android:text="Assign Stockist"
-            style="@style/materialButtonWithImage"
-            android:backgroundTint="@color/darkBlue"
-            android:textColor="@color/white"
-            app:icon="@drawable/zm_ic_im_search"
-            app:iconTint="@color/white"
-            android:drawableTint="@color/white"
-            android:id="@+id/assignStockist"/>
+            android:orientation="horizontal"
+            android:weightSum="2">
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.3">
+                <TextView
+                    android:id="@+id/remarkHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@+id/remark_cv"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="5dp"
+                    android:text="POB Remark"
+                    android:textColor="@color/appColor" />
+
+                <EditText
+                    android:maxLength="400"
+                    android:id="@+id/remarkPOB_Et"
+                    style="@style/editTextWithRound"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/round_shape_edit"
+                    android:lines="3" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_gravity="center"
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.7">
+
+                <TextView
+                    android:textStyle="bold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/stockistName"
+                    android:padding="2dp"
+                    android:textAlignment="center"
+                    android:textSize="12sp"
+                    android:textColor="@color/black"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cornerRadius="5dp"
+                    android:text="Assign Stockist"
+                    style="@style/materialButtonWithImage"
+                    android:backgroundTint="@color/darkBlue"
+                    android:textColor="@color/white"
+                    app:icon="@drawable/zm_ic_im_search"
+                    app:iconTint="@color/white"
+                    android:textSize="14sp"
+                    android:textAllCaps="false"
+                    android:drawableTint="@color/white"
+                    android:id="@+id/assignStockist"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
         <RelativeLayout
             android:layout_marginRight="10dp"
             android:layout_marginLeft="10dp"
@@ -48,15 +104,7 @@
 
         </RelativeLayout>
 
-        <TextView
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/stockistName"
-            android:padding="2dp"
-            android:textAlignment="center"
-            android:textSize="16sp"
-            android:textColor="@color/black"/>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"

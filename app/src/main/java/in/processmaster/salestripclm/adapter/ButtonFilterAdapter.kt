@@ -47,7 +47,6 @@ class ButtonFilterAdapter(
             holder.togglebutton.text=value.categoryName
         }
 
-
         if(value.isSelected==false) holder.togglebutton.isChecked=false
 
         holder.togglebutton.setOnClickListener {
@@ -66,8 +65,6 @@ class ButtonFilterAdapter(
                 { category.isSelected=false }
                 selectedCategoryList.clear()
             }
-
-
             pobProductSelectAdapter.filterUsingSelection(selectedCategoryList)
             notifyDataSetChanged()
         }

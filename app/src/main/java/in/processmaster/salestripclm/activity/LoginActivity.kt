@@ -1,15 +1,18 @@
 package `in`.processmaster.salestripclm.activity
 
+import `in`.processmaster.salestripclm.BuildConfig
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.common_classes.AlertClass
+import `in`.processmaster.salestripclm.models.CommonModel
+import `in`.processmaster.salestripclm.models.GenerateOTPModel
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.utils.PreferenceClass
+import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
@@ -20,15 +23,11 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.progress_view.*
-import kotlinx.coroutines.*
 import org.json.JSONException
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.io.*
-import java.lang.Exception
 
 class LoginActivity : BaseActivity() {
     var apiInterface: APIInterface? = null
@@ -116,7 +115,7 @@ class LoginActivity : BaseActivity() {
         {
             companyVerfy_ll?.visibility = View.GONE
             login_ll?.visibility = View.VISIBLE
-            checkVersioin_api(sharePreferance?.getPref("companyCode").toString())
+            checkVersioin_api()
         }
     }
 
@@ -137,6 +136,7 @@ class LoginActivity : BaseActivity() {
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
 
                     var loginModel = response.body()
+                    sendDeviceDetail_api(loginModel)
 
                     val jsonObj= JSONObject(loginModel?.configurationSetting)
                     val jsonObjEmp= JSONObject(loginModel?.getEmployeeObj())
@@ -160,7 +160,6 @@ class LoginActivity : BaseActivity() {
                         Log.e("jsonNotFoundException",e.message.toString())
                     }
 
-
                     sharePreferance?.setPref("userName_login", userName_et?.getText().toString())
                     sharePreferance?.setPrefBool("isLogin", true)
                     sharePreferance?.setPref(
@@ -170,6 +169,7 @@ class LoginActivity : BaseActivity() {
                     sharePreferance?.setPref("password", password_et?.getText().toString())
                     val gson = Gson()
                     sharePreferance?.setPref("profileData", gson.toJson(loginModel))
+
                     callHomePage()
                 }
                 else {
@@ -185,6 +185,30 @@ class LoginActivity : BaseActivity() {
             }
         })
     }
+
+    //Login APi
+    private fun sendDeviceDetail_api(loginModel: LoginModel?)
+    {
+        var deviceDetailModel= CommonModel.SendDeviceDetailModel()
+        deviceDetailModel.manufacturer= android.os.Build.MANUFACTURER
+        deviceDetailModel.model= android.os.Build.MODEL
+        deviceDetailModel.osVersion=Build.VERSION.SDK_INT
+        deviceDetailModel.mobileAppVersion= BuildConfig.VERSION_NAME
+        if(loginModel?.empId!=null) deviceDetailModel.userId= loginModel?.empId!!
+
+        apiInterface= APIClientKot().getClient(2, sharePreferance?.getPref("secondaryUrl")).create(APIInterface::class.java)
+
+        var call: Call<GenerateOTPModel>? = apiInterface?.sendDeviceDetailApi(deviceDetailModel) as? Call<GenerateOTPModel>
+        call?.enqueue(object : Callback<GenerateOTPModel?> {
+            override fun onResponse(call: Call<GenerateOTPModel?>?, response: Response<GenerateOTPModel?>) {
+                Log.e("sendDeviceDetail_api", response.code().toString() + "")
+                if (response.code() == 200 && !response.body().toString().isEmpty()) { }
+                else { }
+            }
+            override fun onFailure(call: Call<GenerateOTPModel?>, t: Throwable?) {}
+        })
+    }
+
 
     fun callHomePage()
     {
@@ -214,7 +238,7 @@ class LoginActivity : BaseActivity() {
                         "companyCode",
                         companyCode_et?.getText().toString().uppercase()
                     )
-                    checkVersioin_api(companyCode_et?.getText().toString().uppercase())
+                    checkVersioin_api()
                 }
                 alertClass.hideAlert()
             }
@@ -228,7 +252,7 @@ class LoginActivity : BaseActivity() {
     }
 
     //check Version API
-    fun  checkVersioin_api(companyCode: String)
+    fun  checkVersioin_api()
     {
         alertClass.showProgressAlert("")
 
@@ -296,11 +320,13 @@ class LoginActivity : BaseActivity() {
         alertDialog.show()
     }
 
+    @SuppressLint("MissingPermission")
     override fun onResume() {
         super.onResume()
         initView()
         alertClass = AlertClass(this)
         createConnectivity(this)
+
     }
 
     override fun onPause() {

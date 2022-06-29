@@ -184,6 +184,26 @@ class CommonModel {
             set(value) { field = value }
     }
 
+    class SendDeviceDetailModel
+    {
+        var userId=0
+            get() = field
+            set(value) { field = value }
+        var manufacturer=""
+            get() = field
+            set(value) { field = value }
+        var model=""
+            get() = field
+            set(value) { field = value }
+        var osVersion=0
+            get() = field
+            set(value) { field = value }
+        var mobileAppVersion=""
+            get() = field
+            set(value) { field = value }
+
+    }
+
     /*if(value==null || value.isEmpty())field = ""
 else field = value*/
 

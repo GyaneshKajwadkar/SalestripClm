@@ -48,6 +48,10 @@ class TeamsModel {
         @Expose
         var pobNo:  String = ""
 
+        @SerializedName("sobNo")
+        @Expose
+        var sobNo:  String = ""
+
         inner class Employee {
             @SerializedName("empId")
             @Expose

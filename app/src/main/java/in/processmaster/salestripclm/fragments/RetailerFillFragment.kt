@@ -11,6 +11,7 @@ import `in`.processmaster.salestripclm.adapter.*
 import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.common_classes.CommonListGetClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
+import `in`.processmaster.salestripclm.common_classes.PobCommonClass
 import `in`.processmaster.salestripclm.fragments.NewCallFragment.Companion.retailerObj
 import `in`.processmaster.salestripclm.interfaceCode.*
 import `in`.processmaster.salestripclm.models.*
@@ -46,6 +47,9 @@ import kotlinx.android.synthetic.main.checkbox_bottom_sheet.*
 import kotlinx.android.synthetic.main.checkbox_bottom_sheet.view.*
 import kotlinx.android.synthetic.main.fragment_retailer_fill.*
 import kotlinx.android.synthetic.main.fragment_retailer_fill.view.*
+import kotlinx.android.synthetic.main.fragment_retailer_fill.view.pobParent
+import kotlinx.android.synthetic.main.pob_view.*
+import kotlinx.android.synthetic.main.pob_view.view.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -79,7 +83,7 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
     var dcrId=0
 
     var selectedStockist=IdNameBoll_model()
-    lateinit var views:View
+    lateinit var vParent:View
     var passingSchemeList:ArrayList<SyncModel.Data.Scheme> = ArrayList()
     var arrayListSelectorDoctor: ArrayList<DocManagerModel> = ArrayList()
     var checkIsDcrSave=false
@@ -107,22 +111,22 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        views= inflater.inflate(R.layout.fragment_retailer_fill, container, false)
+        vParent= inflater.inflate(R.layout.fragment_retailer_fill, container, false)
 
-        bottomSheetBehavior = BottomSheetBehavior.from(views.bottomSheet_submitScreen)
-        views.workingWithRv.layoutManager= LinearLayoutManager(activity)
-        views.gift_rv.layoutManager= LinearLayoutManager(activity)
-        views.selectedPob_rv.layoutManager= LinearLayoutManager(activity)
+        bottomSheetBehavior = BottomSheetBehavior.from(vParent.bottomSheet_submitScreen)
+        vParent.workingWithRv.layoutManager= LinearLayoutManager(activity)
+        vParent.gift_rv.layoutManager= LinearLayoutManager(activity)
+        vParent.selectedPob_rv.layoutManager= LinearLayoutManager(activity)
 
-        views.rcpaDetailOne_rv.layoutManager= LinearLayoutManager(activity)
-        views.rcpaDetailTwo_rv.layoutManager= LinearLayoutManager(activity)
-        views.rcpaDetailThree_rv.layoutManager= LinearLayoutManager(activity)
+        vParent.rcpaDetailOne_rv.layoutManager= LinearLayoutManager(activity)
+        vParent.rcpaDetailTwo_rv.layoutManager= LinearLayoutManager(activity)
+        vParent.rcpaDetailThree_rv.layoutManager= LinearLayoutManager(activity)
 
         adapter1=AddedRcpa_Adapter(1,saveRcpaDetailList1)
         adapter2=AddedRcpa_Adapter(2,saveRcpaDetailList2)
         adapter3=AddedRcpa_Adapter(3,saveRcpaDetailList3)
 
-        views.visitPurpose_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        vParent.visitPurpose_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 if(position!=0)
                     selectedPurposeID = CommonListGetClass().getWorkTypeForSpinner()[position].workId!!
@@ -130,53 +134,55 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
-        views.toggleButton.forEach { button ->
+        vParent.toggleButton.forEach { button ->
             button.setOnClickListener { (button as MaterialButton).isChecked = true }
         }
 
-        views.close_imv.setOnClickListener({   bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)})
+        vParent.close_imv.setOnClickListener({   bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)})
 
-        views.assignStockist.setOnClickListener({
+        vParent.assignStockist.setOnClickListener({
             commonSearch_et.visibility=View.INVISIBLE
             openCloseModel(4)})
 
-        views.toggleButton.addOnButtonCheckedListener(MaterialButtonToggleGroup.OnButtonCheckedListener { group, checkedId, isChecked ->
+        vParent.toggleButton.addOnButtonCheckedListener(MaterialButtonToggleGroup.OnButtonCheckedListener { group, checkedId, isChecked ->
 
             if (isChecked && R.id.rcpa_btn == checkedId) {
                 hideAllSelection()
-                views.rcpaNestedScroll.visibility = View.VISIBLE
-                views.selectBtn.visibility = View.INVISIBLE
+                vParent.rcpaNestedScroll.visibility = View.VISIBLE
+                vParent.selectBtn.visibility = View.INVISIBLE
             } else if (isChecked && R.id.workingWith_btn == checkedId) {
                 hideAllSelection()
-                views?.selectBtn?.setText("Select Working with")
-                views?.selectHeader_tv?.setText("Select Working with")
-                views?.workingWithRv?.visibility = View.VISIBLE
-                views?.selectBtn?.visibility = View.VISIBLE
+                vParent?.selectBtn?.setText("Select Working with")
+                vParent?.selectHeader_tv?.setText("Select Working with")
+                vParent?.workingWithRv?.visibility = View.VISIBLE
+                vParent?.selectBtn?.visibility = View.VISIBLE
             } else if (isChecked && R.id.gifts_btn == checkedId) {
                 hideAllSelection()
-                views?.selectBtn.setText("Select Gifts")
-                views?.selectHeader_tv.setText("Select Gifts")
-                views?.gift_rv.visibility = View.VISIBLE
-                views?.selectBtn.visibility = View.VISIBLE
+                vParent?.selectBtn.setText("Select Gifts")
+                vParent?.selectHeader_tv.setText("Select Gifts")
+                vParent?.gift_rv.visibility = View.VISIBLE
+                vParent?.selectBtn.visibility = View.VISIBLE
             } else if (isChecked && R.id.pob_btn == checkedId) {
                 hideAllSelection()
-                views.pobParent.visibility = View.VISIBLE
+                vParent.pobParent.visibility = View.VISIBLE
             }
         })
 
-        views.selectBtn.setOnClickListener({
+        vParent.selectBtn.setOnClickListener({
             if(selectBtn.text.equals("Select Working with")){ openCloseModel(1)}
             if(selectBtn.text.equals("Select Samples")){ openCloseModel(2)}
             if(selectBtn.text.equals("Select Gifts")){   openCloseModel(3)}
         })
 
-        views.pobProduct_btn.setOnClickListener({
+        vParent.pobProduct_btn.setOnClickListener({
             //    closeBottomSheet()
-            callPobSelectAlert()
+           //     callPobSelectAlert()
+            activity?.let { it1 -> PobCommonClass(it1).callPobSelectAlert(filterTextPobWatcher,mainProductList,unSelectedProductList,passingSchemeList,this) }
+
         })
 
-        views.doctorOne_et.setOnClickListener { selectDoctorManager_alert(10)}
-        views.doctorTwo_et.setOnClickListener {
+        vParent.doctorOne_et.setOnClickListener { selectDoctorManager_alert(10)}
+        vParent.doctorTwo_et.setOnClickListener {
             if(saveRcpaDetailList1.size==0)
             {
                 generalClass.showSnackbar(it ,"Doctor 1 brand detail is empty")
@@ -184,7 +190,7 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
             }
             selectDoctorManager_alert(20)}
 
-        views.doctorThree_et.setOnClickListener {
+        vParent.doctorThree_et.setOnClickListener {
             if(saveRcpaDetailList1.size==0) {
                 generalClass.showSnackbar(it ,"Doctor 1 brand detail is empty")
                 return@setOnClickListener
@@ -195,21 +201,21 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
             }
             selectDoctorManager_alert(30)}
 
-        views.addBrandOne_btn.setAlpha(0.5f)
-        views.addBrandOne_btn.isEnabled=false
-        views.addBrandTwo_btn.setAlpha(0.5f)
-        views.addBrandTwo_btn.isEnabled=false
-        views.addBrandThree_btn.setAlpha(0.5f)
-        views.addBrandThree_btn.isEnabled=false
+        vParent.addBrandOne_btn.setAlpha(0.5f)
+        vParent.addBrandOne_btn.isEnabled=false
+        vParent.addBrandTwo_btn.setAlpha(0.5f)
+        vParent.addBrandTwo_btn.isEnabled=false
+        vParent.addBrandThree_btn.setAlpha(0.5f)
+        vParent.addBrandThree_btn.isEnabled=false
 
-        views.addBrandOne_btn.setOnClickListener {
+        vParent.addBrandOne_btn.setOnClickListener {
 
            if(::alertDialog.isInitialized  && alertDialog.isShowing) { alertDialog.dismiss() }
 
             AddRCPA_alert(1)
         }
 
-        views.addBrandTwo_btn.setOnClickListener {
+        vParent.addBrandTwo_btn.setOnClickListener {
             if(saveRcpaDetailList1.size==0)
             {
                 generalClass.showSnackbar(it,"First RCPA detail not fill")
@@ -220,7 +226,7 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
             AddRCPA_alert(2)
         }
 
-        views.addBrandThree_btn.setOnClickListener {
+        vParent.addBrandThree_btn.setOnClickListener {
             if(saveRcpaDetailList1.size==0)
             {
                 generalClass.showSnackbar(it,"First RCPA detail not fill")
@@ -236,7 +242,7 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
             AddRCPA_alert(3)
         }
 
-        views.submit_btn.setOnClickListener({
+        vParent.submit_btn.setOnClickListener({
 
             var firstGift=giftArray?.filter { s -> s.isChecked == true }
             var giftyQTy = firstGift?.filter { s -> s.qty >= 0}
@@ -380,6 +386,8 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
                     saveModel.pobObject?.pobDate=generalClass.getCurrentDateTimeApiForamt()
                     saveModel.pobObject?.partyId= PresentEDetailingFrag.doctorIdDisplayVisual
                     saveModel.pobObject?.employeeId= loginModelHomePage.empId
+                    saveModel.pobObject?.remark=vParent?.remarkPOB_Et.text.toString()
+
                 }
 
                 saveModel.pobObject?.pobDetailList=ArrayList()
@@ -453,7 +461,7 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
 
         })
 
-        views.refreshLayout_ll.setOnClickListener {
+        vParent.refreshLayout_ll.setOnClickListener {
 
             if(!isAdded) return@setOnClickListener
 
@@ -471,37 +479,29 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
         }
 
 
-        return views
+        return vParent
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
 
+        alertClass=  AlertClass(activity)
+        dbBase= DatabaseHandler(activity)
+        generalClass= activity?.let { GeneralClass(it) }!!
+        sharePreferanceBase= PreferenceClass(activity)
+
+        activity.let {
+            val adapterVisit: ArrayAdapter<SyncModel.Data.WorkType>? = ArrayAdapter<SyncModel.Data.WorkType>(
+                requireActivity(),
+                R.layout.spinner_txt, CommonListGetClass().getWorkTypeForSpinner())
+            activity?.runOnUiThread {  vParent.visitPurpose_spinner.setAdapter(adapterVisit) }
+        }
+
         val coroutine=viewLifecycleOwner.lifecycleScope.launch {
 
             try {
+               val pobObj=PobCommonClass(activity)
                 val task= async {
                     if(!isAdded) return@async
-
-                    alertClass=  AlertClass(activity)
-                    dbBase= DatabaseHandler(activity)
-                    generalClass= activity?.let { GeneralClass(it) }!!
-                    sharePreferanceBase= PreferenceClass(activity)
-
-                    activity.let {
-                        val adapterVisit: ArrayAdapter<SyncModel.Data.WorkType>? = ArrayAdapter<SyncModel.Data.WorkType>(
-                            requireActivity(),
-                            R.layout.spinner_txt, CommonListGetClass().getWorkTypeForSpinner())
-                        activity?.runOnUiThread {  views.visitPurpose_spinner.setAdapter(adapterVisit) }
-                    }
-
-
-
-
-                    val quantityModel= Gson().fromJson(dbBase.getApiDetail(3), CommonModel.QuantityModel.Data::class.java)
-                    var Gift = quantityModel.employeeSampleBalanceList?.filter { s -> s.productType == "Gift"}
-                    var listGift = Gift?.filter { s -> s.actualBalanceQty != 0}
-                    var listStokist = SplashActivity.staticSyncData?.retailerList?.filter { s -> s.type == "STOCKIST" }
-
                     for(workWith in SplashActivity.staticSyncData?.workingWithList!!)
                     {
                         val data =IdNameBoll_model()
@@ -509,6 +509,32 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
                         data.name= workWith.fullName.toString()
                         workWithArray.add(data)
                     }
+
+                    for(item in SplashActivity.staticSyncData?.doctorList!!)
+                    {
+                        val selectorModel = DocManagerModel()
+                        selectorModel.name= item.doctorName.toString()
+                        selectorModel.routeName= item.routeName.toString()
+                        selectorModel.specialityName= item.specialityName.toString()
+                        selectorModel.id= item.doctorId!!
+                        selectorModel.mailId= item.emailId.toString()
+                        arrayListSelectorDoctor.add(selectorModel)
+                    }
+
+                    if(!sharePreferanceBase.getPref("dcrId").isEmpty())
+                    {
+                        dcrId= sharePreferanceBase.getPref("dcrId").toInt()
+                    }
+                    if(arguments?.getString("retailerData")?.isEmpty() == false)
+                    {getUpdateData() }
+
+                }
+                task.await()
+
+                val task1= async {
+                    val quantityModel= Gson().fromJson(dbBase.getApiDetail(3), CommonModel.QuantityModel.Data::class.java)
+                    var Gift = quantityModel.employeeSampleBalanceList?.filter { s -> s.productType == "Gift"}
+                    var listGift = Gift?.filter { s -> s.actualBalanceQty != 0}
 
                     if (listGift != null) {
                         for(gift in listGift) {
@@ -520,6 +546,10 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
                         }
                     }
 
+                }
+                task1.await()
+                val task2= async {
+                   /* var listStokist = SplashActivity.staticSyncData?.retailerList?.filter { s -> s.type == "STOCKIST" }
                     if (listStokist != null) {
                         for(stockist in listStokist) {
                             val data =IdNameBoll_model()
@@ -528,14 +558,24 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
                             data.name= stockist.shopName.toString()
                             stokistArray.add(data)
                         }
-                    }
+                    }*/
+                    stokistArray.addAll(pobObj.getStockist())
+                }
+                task2.await()
 
-                    val string = Gson().toJson(SplashActivity.staticSyncData)
+                val task3 = async {
+                    mainProductList.addAll(pobObj.getProductList())
+                    unSelectedProductList.addAll(pobObj.getProductList())
+                  /*  val string = Gson().toJson(SplashActivity.staticSyncData)
                     val data= Gson().fromJson(string, SyncModel.Data::class.java)
                     mainProductList.addAll(data.productList.filter { s -> (s.productType==1) } as ArrayList<SyncModel.Data.Product>)
-                    unSelectedProductList=ArrayList(mainProductList)
+                    unSelectedProductList=ArrayList(mainProductList)*/
+                }
+                task3.await()
 
-                    val getSchemeList= SplashActivity.staticSyncData?.schemeList
+                val task4= async {
+                    passingSchemeList.addAll(pobObj.getSchemeList())
+                /* val getSchemeList= SplashActivity.staticSyncData?.schemeList
                     val filterByTypeSchemeList= getSchemeList?.filter { data -> (data?.schemeFor=="S" || data?.schemeFor=="H") }
                     filterByTypeSchemeList?.sortedBy { it.schemeFor }?.let { getSchemeList?.addAll(it) }
                     val getDocDetail: SyncModel.Data.Doctor? = SplashActivity.staticSyncData?.doctorList?.find { it.doctorId == PresentEDetailingFrag.doctorIdDisplayVisual }
@@ -561,39 +601,20 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
                                 }
                             }
                         }
-                    }
-
-                    for(item in SplashActivity.staticSyncData?.doctorList!!)
-                    {
-                        val selectorModel = DocManagerModel()
-                        selectorModel.name= item.doctorName.toString()
-                        selectorModel.routeName= item.routeName.toString()
-                        selectorModel.specialityName= item.specialityName.toString()
-                        selectorModel.id= item.doctorId!!
-                        selectorModel.mailId= item.emailId.toString()
-                        arrayListSelectorDoctor.add(selectorModel)
-                    }
-
-                    if(!sharePreferanceBase.getPref("dcrId").isEmpty())
-                    {
-                        dcrId= sharePreferanceBase.getPref("dcrId").toInt()
-                    }
-                    if(arguments?.getString("retailerData")?.isEmpty() == false)
-                    {getUpdateData() }
-
+                    }*/
                 }
-                task.await()
+                task4.await()
             }
+
             catch (e:Exception)
             { }
-
 
         }
         coroutine.invokeOnCompletion {
             activity?.runOnUiThread {
-                views.rcpaDetailOne_rv.adapter=adapter1
-                views.rcpaDetailTwo_rv.adapter=adapter2
-                views.rcpaDetailThree_rv.adapter=adapter3
+                vParent.rcpaDetailOne_rv.adapter=adapter1
+                vParent.rcpaDetailTwo_rv.adapter=adapter2
+                vParent.rcpaDetailThree_rv.adapter=adapter3
             }
         }
 
@@ -873,7 +894,7 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
             }
 
             activity?.runOnUiThread {
-                views.checkRecyclerView_rv.adapter = commonSlectionAdapter
+                vParent.checkRecyclerView_rv.adapter = commonSlectionAdapter
 
                 val state =
                     if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED)
@@ -888,12 +909,12 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
     }
 
     fun hideAllSelection()
-    {   views.commonSearch_et.setText("")
-        views.pobParent.visibility=View.INVISIBLE
-        views.rcpaNestedScroll.visibility=View.INVISIBLE
-        views.gift_rv.visibility=View.INVISIBLE
-        views.workingWithRv.visibility=View.INVISIBLE
-        views.selectBtn.visibility=View.INVISIBLE
+    {   vParent.commonSearch_et.setText("")
+        vParent.pobParent.visibility=View.INVISIBLE
+        vParent.rcpaNestedScroll.visibility=View.INVISIBLE
+        vParent.gift_rv.visibility=View.INVISIBLE
+        vParent.workingWithRv.visibility=View.INVISIBLE
+        vParent.selectBtn.visibility=View.INVISIBLE
     }
 
 
@@ -932,7 +953,7 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
                 var sendingList = workWithArray?.filter { s -> s.isChecked == true }
 
                 activity?.runOnUiThread {
-                    views.workingWithRv.adapter = TextWithEditAdapter(
+                    vParent.workingWithRv.adapter = TextWithEditAdapter(
                         sendingList as ArrayList<IdNameBoll_model>,
                         this@RetailerFillFragment,
                         0,
@@ -940,7 +961,7 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
                         selectionType,
                         false
                     )
-                    if(sendingList.size!=0)views.workingWithRv.visibility=View.VISIBLE
+                    if(sendingList.size!=0)vParent.workingWithRv.visibility=View.VISIBLE
                 }
 
             }
@@ -952,7 +973,7 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
                 var sendingList = giftArray?.filter { s -> s.isChecked == true }
 
                 activity?.runOnUiThread {
-                    views.gift_rv.adapter = TextWithEditAdapter(
+                    vParent.gift_rv.adapter = TextWithEditAdapter(
                         sendingList as ArrayList<IdNameBoll_model>,
                         this@RetailerFillFragment,
                         1,
@@ -960,7 +981,7 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
                         selectionType,
                         false
                     )
-                    if(sendingList.size!=0)views.gift_rv.visibility=View.VISIBLE
+                    if(sendingList.size!=0)vParent.gift_rv.visibility=View.VISIBLE
                 }
             }
 
@@ -972,8 +993,8 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
                     if(element.isChecked) {
                         selectedStockist=element
                         activity?.runOnUiThread {
-                            views.stockistName.visibility=View.VISIBLE
-                            views.stockistName.text="Stockist name - "+element.name }
+                            vParent.stockistName.visibility=View.VISIBLE
+                            vParent.stockistName.text="Stockist name - "+element.name }
                         }
 
                     element.isChecked=false
@@ -1326,17 +1347,17 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
                     }
                 if(selectionType==10){
                     doctorRcpa1=item
-                    views.doctorOne_et.setText(item.name)
-                    views.addBrandOne_btn.setAlpha(1f)
-                    views.addBrandOne_btn.isEnabled=true}
-                if(selectionType==20){ views.doctorTwo_et.setText(item.name)
+                    vParent.doctorOne_et.setText(item.name)
+                    vParent.addBrandOne_btn.setAlpha(1f)
+                    vParent.addBrandOne_btn.isEnabled=true}
+                if(selectionType==20){ vParent.doctorTwo_et.setText(item.name)
                     doctorRcpa2=item
-                    views.addBrandTwo_btn.setAlpha(1f)
-                    views.addBrandTwo_btn.isEnabled=true}
-                if(selectionType==30){ views.doctorThree_et.setText(item.name)
+                    vParent.addBrandTwo_btn.setAlpha(1f)
+                    vParent.addBrandTwo_btn.isEnabled=true}
+                if(selectionType==30){ vParent.doctorThree_et.setText(item.name)
                     doctorRcpa3=item
-                    views.addBrandThree_btn.setAlpha(1f)
-                    views.addBrandThree_btn.isEnabled=true}
+                    vParent.addBrandThree_btn.setAlpha(1f)
+                    vParent.addBrandThree_btn.isEnabled=true}
             }
         }
     }
@@ -1413,7 +1434,6 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
             var cp4rx_tv=view.findViewById<TextView>(R.id.cp4rx_tv)
             var cp3Parent=view.findViewById<LinearLayout>(R.id.cp3Parent)
             var cp4Parent=view.findViewById<LinearLayout>(R.id.cp4Parent)
-
             var editClick_iv=view.findViewById<ImageView>(R.id.editClick_iv)
             var deleteClick_iv=view.findViewById<ImageView>(R.id.deleteClick_iv)
         }
@@ -1436,7 +1456,7 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
                 pobProduct_btn.visibility=View.GONE
                 assignStockist.visibility=View.GONE
                 visitPurpose_spinner.isEnabled=false
-                views.submit_btn.visibility=View.INVISIBLE
+                vParent.submit_btn.visibility=View.INVISIBLE
             }
 
             for(intentGift in edetailingEditModel.giftList!!)
@@ -1529,6 +1549,9 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
                 )
 
                 remark_Et.isEnabled=false
+                remarkPOB_Et.isEnabled=false
+                remarkPOB_Et.setText(edetailingEditModel?.pobObject?.remark)
+
                 visitPurpose_spinner.setSelection(spinnerSelect)
                 stokistArray.forEachIndexed { index, element ->
                     if(element.id.toInt() == edetailingEditModel.pobObject?.stockistId) {
@@ -1552,10 +1575,10 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
                     doctorRcpa1=DocManagerModel()
                     doctorRcpa1.name= edetailingEditModel?.RCPAList?.get(0)?.docName.toString()
                     doctorRcpa1.id= edetailingEditModel?.RCPAList?.get(0)?.docId!!
-                    views.doctorOne_et.setText(doctorRcpa1.name)
-                    views.addBrandOne_btn.setAlpha(1f)
-                    views.addBrandOne_btn.isEnabled=true
-                    views.doctorOne_et.isEnabled=false
+                    vParent.doctorOne_et.setText(doctorRcpa1.name)
+                    vParent.addBrandOne_btn.setAlpha(1f)
+                    vParent.addBrandOne_btn.isEnabled=true
+                    vParent.doctorOne_et.isEnabled=false
                 }
                 if(size>=2)
                 {
@@ -1568,10 +1591,10 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
                     adapter2.notifyDataSetChanged()
                     doctorRcpa2.name= edetailingEditModel?.RCPAList?.get(1)?.docName.toString()
                     doctorRcpa2.id= edetailingEditModel?.RCPAList?.get(1)?.docId!!
-                    views.doctorTwo_et.setText(doctorRcpa2.name)
-                    views.addBrandTwo_btn.setAlpha(1f)
-                    views.addBrandTwo_btn.isEnabled=true
-                    views.doctorTwo_et.isEnabled=false
+                    vParent.doctorTwo_et.setText(doctorRcpa2.name)
+                    vParent.addBrandTwo_btn.setAlpha(1f)
+                    vParent.addBrandTwo_btn.isEnabled=true
+                    vParent.doctorTwo_et.isEnabled=false
                 }
                 if(size>=3)
                 {
@@ -1584,10 +1607,10 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
                     adapter3.notifyDataSetChanged()
                     doctorRcpa3.name= edetailingEditModel?.RCPAList?.get(2)?.docName.toString()
                     doctorRcpa3.id= edetailingEditModel?.RCPAList?.get(2)?.docId!!
-                    views.doctorThree_et.setText(doctorRcpa3.name)
-                    views.addBrandThree_btn.setAlpha(1f)
-                    views.addBrandThree_btn.isEnabled=true
-                    views.doctorThree_et.isEnabled=false
+                    vParent.doctorThree_et.setText(doctorRcpa3.name)
+                    vParent.addBrandThree_btn.setAlpha(1f)
+                    vParent.addBrandThree_btn.isEnabled=true
+                    vParent.doctorThree_et.isEnabled=false
                 }
             })
         }

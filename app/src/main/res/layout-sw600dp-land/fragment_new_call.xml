@@ -549,7 +549,7 @@
                 android:layout_weight="1.5"
                 android:layout_height="match_parent">
 
-                <LinearLayout
+          <!--      <LinearLayout
                     android:visibility="gone"
                     android:id="@+id/parentButton"
                     android:layout_width="wrap_content"
@@ -963,7 +963,7 @@
 
                         </LinearLayout>
                     </ScrollView>
-                </RelativeLayout>
+                </RelativeLayout>-->
 
                 <ImageView
                     android:id="@+id/noData_gif"
@@ -996,11 +996,15 @@
                     android:id="@+id/analysisProgress"/>
 
                 <FrameLayout
-                    android:visibility="invisible"
+                    android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/frameRetailer_view"/>
-
+                <FrameLayout
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/framePreCall_view"/>
 
             </RelativeLayout>
 

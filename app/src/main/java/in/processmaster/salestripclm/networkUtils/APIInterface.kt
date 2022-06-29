@@ -35,6 +35,11 @@ interface APIInterface
     ): Call<LoginModel?>?
 
 
+    @POST("api/users/clmUser-device-info")
+    fun sendDeviceDetailApi(
+        @Body params: CommonModel.SendDeviceDetailModel,
+        ): Call<GenerateOTPModel?>?
+
     @GET("api/common/syncData") //sync api
     suspend fun
             syncApiCoo(@Header("Authorization") authorization: String?): Response<SyncModel?>?
@@ -224,10 +229,21 @@ interface APIInterface
         @Header("Authorization") authorization: String?,
     ): Call<TeamsModel?>?
 
+    @GET("api/sob/number")
+    fun getSobNumber(
+        @Header("Authorization") authorization: String?,
+    ): Call<TeamsModel?>?
+
     @POST("api/pob")
     fun submitPOB(
         @Header("Authorization") authorization: String?,
-        @Body creatModel: CreatePOBModel.Data.pobObject
+        @Body creatModel: CreatePOBModel.Data.pobObject?
+    ): Call<GenerateOTPModel?>?
+
+    @POST("api/sob")
+    fun submitSOB(
+        @Header("Authorization") authorization: String?,
+        @Body creatModel: CreatePOBModel.Data.SobObject?
     ): Call<GenerateOTPModel?>?
 
     @GET("api/pob")
@@ -237,8 +253,21 @@ interface APIInterface
         @Query("toDate") toDate:String
     ): Call<CreatePOBModel?>?
 
+    @GET("api/sob")
+    fun fetchPreviousSOB(
+        @Header("Authorization") authorization: String?,
+        @Query("fromDate") fromDate:String,
+        @Query("toDate") toDate:String
+    ): Call<CreatePOBModel?>?
+
     @GET("api/pob/{id}")
     fun getPOBByID(
+        @Header("Authorization") authorization: String?,
+        @Path("id") id:Int
+    ): Call<CreatePOBModel?>?
+
+    @GET("api/sob/{id}")
+    fun getSOBByID(
         @Header("Authorization") authorization: String?,
         @Path("id") id:Int
     ): Call<CreatePOBModel?>?

@@ -63,6 +63,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="POB number"
+                                    android:id="@+id/pobNumber_tv"
                                     android:textColor="@color/appColor" />
 
                                 <EditText
@@ -152,6 +153,7 @@
                             </LinearLayout>
 
                             <LinearLayout
+                                android:id="@+id/partyParent_ll"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="2dp"
@@ -207,28 +209,7 @@
                         </LinearLayout>
 
 
-                        <TextView
-                            android:id="@+id/remarkHeader"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_above="@+id/remark_cv"
-                            android:layout_marginLeft="10dp"
-                            android:layout_marginTop="5dp"
-                            android:text="POB Remark"
-                            android:textColor="@color/appColor" />
-
-                        <EditText
-                            android:maxLength="400"
-                            android:id="@+id/remarkPOB_Et"
-                            style="@style/editTextWithRound"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/round_shape_edit"
-                            android:lines="3" />
-
-
                         <include layout="@layout/pob_view" />
-
 
                     </LinearLayout>
 
@@ -266,6 +247,7 @@
                     android:layout_height="wrap_content"
                     android:padding="5dp"
                     android:textSize="18sp"
+                    android:id="@+id/previousPob_tv"
                     android:textColor="@color/white"
                     android:background="@color/appDarkColor"
                     android:text="Previous POB"

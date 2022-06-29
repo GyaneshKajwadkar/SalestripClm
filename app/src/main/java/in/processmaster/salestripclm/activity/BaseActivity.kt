@@ -110,6 +110,7 @@ open class BaseActivity : AppCompatActivity(){
         val eDetailingArray=dbBase.getAllSaveSend("feedback")
         val retailerArray=dbBase.getAllSaveSend("retailerFeedback")
         val pobArray=dbBase.getAllSaveSend("createOnlyPOB")
+        val sobArray=dbBase.getAllSaveSend("createOnlySOB")
 
         var isLowNetwork=false
         if( eDetailingArray.size!=0)
@@ -170,6 +171,13 @@ open class BaseActivity : AppCompatActivity(){
         {
             Handler(Looper.getMainLooper()).postDelayed({
                 submitPOBAPI()
+            },5000)
+        }
+
+        if(sobArray.size!=0)
+        {
+            Handler(Looper.getMainLooper()).postDelayed({
+                submitSOBAPI()
             },5000)
         }
     }
@@ -556,6 +564,35 @@ open class BaseActivity : AppCompatActivity(){
                 }
                 else{
                     Log.e("offlinePOB","notSuccessfull")
+                }
+            }
+
+            override fun onFailure(call: Call<GenerateOTPModel?>, t: Throwable?) {
+            }
+        })
+    }
+
+    fun submitSOBAPI()
+    {
+        val getSOBList=dbBase.getAllSaveSOB("createOnlySOB")
+        if(getSOBList.size==0)
+        { return }
+
+        apiInterface= APIClientKot().getClient(2, sharePreferanceBase?.getPref("secondaryUrl")).create(
+            APIInterface::class.java)
+
+        var call: Call<GenerateOTPModel>? = apiInterface?.submitSOB(
+            "bearer " + HomePage.loginModelHomePage.accessToken, getSOBList.get(0)
+        ) as? Call<GenerateOTPModel>
+        call?.enqueue(object : Callback<GenerateOTPModel?> {
+            override fun onResponse(call: Call<GenerateOTPModel?>?, response: Response<GenerateOTPModel?>) {
+                if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage?.isEmpty()==true) {
+                    Log.e("offlineSOB","saveSuccessfully")
+                    getSOBList.get(0).randomNumber?.let { dbBase.deleteSaveSend(it) }
+                    submitSOBAPI()
+                }
+                else{
+                    Log.e("offlineSOB","notSuccessfull")
                 }
             }
 

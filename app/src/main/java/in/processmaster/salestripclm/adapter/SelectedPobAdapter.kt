@@ -1,9 +1,11 @@
 package `in`.processmaster.salestripclm.adapter
 
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.activity.CreatePobActivity
 import `in`.processmaster.salestripclm.activity.HomePage
 import `in`.processmaster.salestripclm.activity.SplashActivity
 import `in`.processmaster.salestripclm.activity.SubmitE_DetailingActivity
+import `in`.processmaster.salestripclm.common_classes.GeneralClass
 import `in`.processmaster.salestripclm.fragments.PresentEDetailingFrag
 import `in`.processmaster.salestripclm.fragments.RetailerFillFragment
 import `in`.processmaster.salestripclm.interfaceCode.EditInterface
@@ -217,21 +219,26 @@ class SelectedPobAdapter(
                 return@setOnClickListener
             }
 
-           val returnModel= model?.let { it1 -> getSchemeObject(it1,alertqty_et.text.toString()) }
-            returnModel?.let { it1 -> sendEDetailingArray?.set(position, it1) }
-            if ( activity is SubmitE_DetailingActivity )
-            {
-                activity.updateSpecificElement(returnModel,position)
-            }
-            else if(context is HomePage)
-            {
-                model?.let { it1 -> editupdate?.onClickEdit(it1,position) }
-            }
-            notifyDataSetChanged()
-         //   returnModel?.let { it1 -> sendEDetailingArray?.set(position, it1) }
-         //   sendEDetailingArray?.let { mCallback?.onClickButtonPOB(it) }
-
+            Handler(Looper.getMainLooper()).postDelayed({
+                val returnModel= model?.let { it1 -> getSchemeObject(it1,alertqty_et.text.toString()) }
+                returnModel?.let { it1 -> sendEDetailingArray?.set(position, it1) }
+                if ( activity is SubmitE_DetailingActivity )
+                {
+                    activity.updateSpecificElement(returnModel,position)
+                }
+                else if(context is HomePage)
+                {
+                    model?.let { it1 -> editupdate?.onClickEdit(it1,position) }
+                }
+                else if(activity is CreatePobActivity)
+                {
+                    activity.updateSpecificElement(returnModel,position)
+                }
+                notifyDataSetChanged()
+            },100)
+            GeneralClass(activity).hideKeyboard(activity,it)
             alertDialog.dismiss()
+
         }
 
         cancel_btn.setOnClickListener{

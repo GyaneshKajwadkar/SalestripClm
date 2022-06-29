@@ -91,336 +91,280 @@
             </LinearLayout>
         </LinearLayout>
         <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-                <com.google.android.material.button.MaterialButtonToggleGroup
-                    android:id="@+id/toggleButton"
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/toggleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:weightSum="4"
+
+                app:checkedButton="@+id/workingWith_btn"
+                app:singleSelection="true">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/workingWith_btn"
+                    style="@style/ToggleButtonGroupStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:insetLeft="2dp"
+                    android:insetRight="2dp"
+                    android:text="Working with" />
+
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/rcpa_btn"
+                    style="@style/ToggleButtonGroupStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:insetLeft="2dp"
+                    android:insetRight="2dp"
+                    android:text="RCPA" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/gifts_btn"
+                    style="@style/ToggleButtonGroupStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:insetLeft="2dp"
+                    android:insetRight="2dp"
+                    android:text="Gifts"
+
+                    />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/pob_btn"
+                    style="@style/ToggleButtonGroupStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:insetLeft="2dp"
+                    android:insetRight="2dp"
+                    android:text="POB" />
+
+
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:weightSum="4"
-
-                    app:checkedButton="@+id/workingWith_btn"
-                    app:singleSelection="true">
+                    android:orientation="vertical">
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/workingWith_btn"
-                        style="@style/ToggleButtonGroupStyle"
-                        android:layout_width="0dp"
+                        android:id="@+id/selectBtn"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:insetLeft="2dp"
-                        android:insetRight="2dp"
-                        android:text="Working with" />
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:backgroundTint="@color/appColorlight"
+                        android:text="Select Working with"
+                        android:textAllCaps="false"
+                        app:cornerRadius="7dp" />
 
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/rcpa_btn"
-                        style="@style/ToggleButtonGroupStyle"
-                        android:layout_width="0dp"
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/workingWithRv"
+                        style="@style/marginTenLeftRight"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:insetLeft="2dp"
-                        android:insetRight="2dp"
-                        android:text="RCPA" />
+                        android:background="@drawable/box_boarder"
+                        android:visibility="gone" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/gifts_btn"
-                        style="@style/ToggleButtonGroupStyle"
-                        android:layout_width="0dp"
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/sample_rv"
+                        style="@style/marginTenLeftRight"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:insetLeft="2dp"
-                        android:insetRight="2dp"
-                        android:text="Gifts"
+                        android:background="@drawable/box_boarder"
+                        android:visibility="gone" />
 
-                        />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/pob_btn"
-                        style="@style/ToggleButtonGroupStyle"
-                        android:layout_width="0dp"
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/gift_rv"
+                        style="@style/marginTenLeftRight"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:insetLeft="2dp"
-                        android:insetRight="2dp"
-                        android:text="POB" />
+                        android:background="@drawable/box_boarder"
+                        android:visibility="gone" />
+                </LinearLayout>
 
-
-                </com.google.android.material.button.MaterialButtonToggleGroup>
-
-                <RelativeLayout
+                <androidx.core.widget.NestedScrollView
+                    android:descendantFocusability="blocksDescendants"
+                    android:id="@+id/rcpaNestedScroll"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:visibility="gone">
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/selectBtn"
+                        <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"
-                            android:layout_marginRight="10dp"
-                            android:backgroundTint="@color/appColorlight"
-                            android:text="Select Working with"
-                            android:textAllCaps="false"
-                            app:cornerRadius="7dp" />
+                            android:layout_gravity="center"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:orientation="horizontal"
+                            android:weightSum="3">
 
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/workingWithRv"
-                            style="@style/marginTenLeftRight"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/box_boarder"
-                            android:visibility="gone" />
+                            <EditText
+                                android:id="@+id/doctorOne_et"
+                                android:layout_width="0dp"
+                                android:layout_height="40dp"
+                                android:layout_marginLeft="5dp"
+                                android:layout_marginRight="5dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/edittext_capsul"
+                                android:cursorVisible="false"
+                                android:drawableRight="@android:drawable/ic_menu_search"
+                                android:drawableTint="@color/appColor"
+                                android:focusable="false"
+                                android:hint="Doctor 1 *"
+                                android:inputType="none"
+                                android:paddingLeft="5dp"
+                                android:paddingRight="5dp" />
 
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/sample_rv"
-                            style="@style/marginTenLeftRight"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/box_boarder"
-                            android:visibility="gone" />
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/addBrandOne_btn"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="0.5"
+                                android:text="Add brand"
+                                app:cornerRadius="10dp" />
 
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/gift_rv"
-                            style="@style/marginTenLeftRight"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/box_boarder"
-                            android:visibility="gone" />
-                    </LinearLayout>
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:focusable="false"
+                                android:focusableInTouchMode="true"
+                                android:id="@+id/rcpaDetailOne_rv"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:layout_marginRight="5dp"
+                                android:layout_weight="1.5"
+                                android:nestedScrollingEnabled="false" />
 
-                    <androidx.core.widget.NestedScrollView
-                        android:descendantFocusability="blocksDescendants"
-                        android:id="@+id/rcpaNestedScroll"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:visibility="gone">
+                        </LinearLayout>
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical">
+                            android:layout_gravity="center"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:orientation="horizontal"
+                            android:weightSum="3">
 
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
+                            <EditText
+                                android:id="@+id/doctorTwo_et"
+                                android:layout_width="0dp"
+                                android:layout_height="40dp"
                                 android:layout_marginLeft="5dp"
                                 android:layout_marginRight="5dp"
-                                android:orientation="horizontal"
-                                android:weightSum="3">
-
-                                <EditText
-                                    android:id="@+id/doctorOne_et"
-                                    android:layout_width="0dp"
-                                    android:layout_height="40dp"
-                                    android:layout_marginLeft="5dp"
-                                    android:layout_marginRight="5dp"
-                                    android:layout_weight="1"
-                                    android:background="@drawable/edittext_capsul"
-                                    android:cursorVisible="false"
-                                    android:drawableRight="@android:drawable/ic_menu_search"
-                                    android:drawableTint="@color/appColor"
-                                    android:focusable="false"
-                                    android:hint="Doctor 1 *"
-                                    android:inputType="none"
-                                    android:paddingLeft="5dp"
-                                    android:paddingRight="5dp" />
-
-                                <com.google.android.material.button.MaterialButton
-                                    android:id="@+id/addBrandOne_btn"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="0.5"
-                                    android:text="Add brand"
-                                    app:cornerRadius="10dp" />
-
-                                <androidx.recyclerview.widget.RecyclerView
-                                    android:focusable="false"
-                                    android:focusableInTouchMode="true"
-                                    android:id="@+id/rcpaDetailOne_rv"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginLeft="5dp"
-                                    android:layout_marginRight="5dp"
-                                    android:layout_weight="1.5"
-                                    android:nestedScrollingEnabled="false" />
-
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:layout_marginLeft="5dp"
-                                android:layout_marginRight="5dp"
-                                android:orientation="horizontal"
-                                android:weightSum="3">
-
-                                <EditText
-                                    android:id="@+id/doctorTwo_et"
-                                    android:layout_width="0dp"
-                                    android:layout_height="40dp"
-                                    android:layout_marginLeft="5dp"
-                                    android:layout_marginRight="5dp"
-                                    android:layout_weight="1"
-                                    android:background="@drawable/edittext_capsul"
-                                    android:cursorVisible="false"
-                                    android:drawableRight="@android:drawable/ic_menu_search"
-                                    android:drawableTint="@color/appColor"
-                                    android:focusable="false"
-                                    android:hint="Doctor 2"
-                                    android:inputType="none"
-                                    android:paddingLeft="5dp"
-                                    android:paddingRight="5dp"/>
-
-                                <com.google.android.material.button.MaterialButton
-                                    android:id="@+id/addBrandTwo_btn"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="0.5"
-                                    android:text="Add brand"
-                                    app:cornerRadius="10dp" />
-
-                                <androidx.recyclerview.widget.RecyclerView
-                                    android:focusable="false"
-                                    android:focusableInTouchMode="true"
-                                    android:id="@+id/rcpaDetailTwo_rv"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginLeft="5dp"
-                                    android:layout_marginRight="5dp"
-                                    android:layout_weight="1.5"
-                                    android:nestedScrollingEnabled="false" />
-
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:layout_marginLeft="5dp"
-                                android:layout_marginRight="5dp"
-                                android:orientation="horizontal"
-                                android:weightSum="3">
-
-                                <EditText
-                                    android:id="@+id/doctorThree_et"
-                                    android:layout_width="0dp"
-                                    android:layout_height="40dp"
-                                    android:layout_marginLeft="5dp"
-                                    android:layout_marginRight="5dp"
-                                    android:layout_weight="1"
-                                    android:background="@drawable/edittext_capsul"
-                                    android:cursorVisible="false"
-                                    android:drawableRight="@android:drawable/ic_menu_search"
-                                    android:drawableTint="@color/appColor"
-                                    android:focusable="false"
-                                    android:hint="Doctor 3"
-                                    android:inputType="none"
-                                    android:paddingLeft="5dp"
-                                    android:paddingRight="5dp" />
-
-                                <com.google.android.material.button.MaterialButton
-                                    android:id="@+id/addBrandThree_btn"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="0.5"
-                                    android:text="Add brand"
-                                    app:cornerRadius="10dp" />
-
-                                <androidx.recyclerview.widget.RecyclerView
-                                    android:focusable="false"
-                                    android:focusableInTouchMode="true"
-                                    android:id="@+id/rcpaDetailThree_rv"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginLeft="5dp"
-                                    android:layout_marginRight="5dp"
-                                    android:layout_weight="1.5"
-                                    android:nestedScrollingEnabled="false" />
-
-                            </LinearLayout>
-                        </LinearLayout>
-
-
-                    </androidx.core.widget.NestedScrollView>
-
-                    <LinearLayout
-                        android:id="@+id/pobParent"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:visibility="gone">
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/assignStockist"
-                            style="@style/materialButtonWithImage"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:backgroundTint="@color/darkBlue"
-                            android:drawableTint="@color/white"
-                            android:text="Assign Stockist"
-                            android:textColor="@color/white"
-                            app:cornerRadius="20dp"
-                            app:icon="@drawable/zm_ic_im_search"
-                            app:iconTint="@color/white" />
-
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"
-                            android:layout_marginRight="10dp">
-
-                            <TextView
-                                android:id="@+id/totalProductPrice_tv"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerVertical="true"
-                                android:text="Order total: 00"
-                                android:textColor="@color/black" />
+                                android:layout_weight="1"
+                                android:background="@drawable/edittext_capsul"
+                                android:cursorVisible="false"
+                                android:drawableRight="@android:drawable/ic_menu_search"
+                                android:drawableTint="@color/appColor"
+                                android:focusable="false"
+                                android:hint="Doctor 2"
+                                android:inputType="none"
+                                android:paddingLeft="5dp"
+                                android:paddingRight="5dp"/>
 
                             <com.google.android.material.button.MaterialButton
-                                android:id="@+id/pobProduct_btn"
-                                android:layout_width="wrap_content"
-                                android:layout_height="40dp"
-                                android:layout_alignParentEnd="true"
-                                android:backgroundTint="@color/lightred"
-                                android:text="Product"
-                                android:textAllCaps="false"
-                                android:textColor="@color/white"
-                                app:icon="@drawable/zm_ic_im_search" />
+                                android:id="@+id/addBrandTwo_btn"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="0.5"
+                                android:text="Add brand"
+                                app:cornerRadius="10dp" />
 
-                        </RelativeLayout>
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:focusable="false"
+                                android:focusableInTouchMode="true"
+                                android:id="@+id/rcpaDetailTwo_rv"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:layout_marginRight="5dp"
+                                android:layout_weight="1.5"
+                                android:nestedScrollingEnabled="false" />
 
-                        <TextView
-                            android:id="@+id/stockistName"
+                        </LinearLayout>
+
+                        <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textAlignment="center"
-                            android:textColor="@color/black"
-                            android:textSize="16sp"
-                            android:visibility="invisible" />
+                            android:layout_gravity="center"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:orientation="horizontal"
+                            android:weightSum="3">
 
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="@color/gray" />
+                            <EditText
+                                android:id="@+id/doctorThree_et"
+                                android:layout_width="0dp"
+                                android:layout_height="40dp"
+                                android:layout_marginLeft="5dp"
+                                android:layout_marginRight="5dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/edittext_capsul"
+                                android:cursorVisible="false"
+                                android:drawableRight="@android:drawable/ic_menu_search"
+                                android:drawableTint="@color/appColor"
+                                android:focusable="false"
+                                android:hint="Doctor 3"
+                                android:inputType="none"
+                                android:paddingLeft="5dp"
+                                android:paddingRight="5dp" />
 
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/selectedPob_rv"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/addBrandThree_btn"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="0.5"
+                                android:text="Add brand"
+                                app:cornerRadius="10dp" />
+
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:focusable="false"
+                                android:focusableInTouchMode="true"
+                                android:id="@+id/rcpaDetailThree_rv"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:layout_marginRight="5dp"
+                                android:layout_weight="1.5"
+                                android:nestedScrollingEnabled="false" />
+
+                        </LinearLayout>
                     </LinearLayout>
 
-                </RelativeLayout>
 
-            </LinearLayout>
+                </androidx.core.widget.NestedScrollView>
+
+                <LinearLayout
+                    android:id="@+id/pobParent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <include layout="@layout/pob_view" />
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+        </LinearLayout>
 
     </LinearLayout>
 

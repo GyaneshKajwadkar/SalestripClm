@@ -54,12 +54,12 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var bottomSheet: ConstraintLayout
     lateinit var db : DatabaseHandler
-    var adapter: BottomSheetDoctorAdapter? = null
+  //  var adapter: BottomSheetDoctorAdapter? = null
     lateinit var adapterVisualFile: VisualFileAdapter
     var sharePreferance: PreferenceClass? = null
     var contextFragment= getContext()
     var edetailingList: ArrayList<DevisionModel.Data.EDetailing>? = null
-    var edetailingFavList: ArrayList<DevisionModel.Data.EDetailing>? = null
+   // var edetailingFavList: ArrayList<DevisionModel.Data.EDetailing>? = null
     var downloadFilePathList: ArrayList<DownloadFileModel> = ArrayList()
     var storedDownloadedList: ArrayList<DownloadFileModel> = ArrayList()
     var views:View?=null
@@ -161,7 +161,7 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
        // setDoctorList()
         setAdapter()
         setSelectorAdapter(downloadFilePathList)
-        setUserFavAdapter()
+      //  setUserFavAdapter()
 
         callDownloadFragment()
 
@@ -269,7 +269,7 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
         else storedDownloadedList.add(tempData)
     }
 
-    fun setDoctorList()
+  /*  fun setDoctorList()
     {
         adapter = BottomSheetDoctorAdapter(
             SplashActivity.staticSyncData?.doctorList as ArrayList<SyncModel.Data.Doctor>,
@@ -279,7 +279,7 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
         views!!.doctorList_rv?.itemAnimator = DefaultItemAnimator()
         views!!.doctorList_rv?.adapter = adapter
         views!!.doctorSearch_et!!.addTextChangedListener(filterTextWatcher)
-    }
+    }*/
 
     fun setSelectorAdapter(list: ArrayList<DownloadFileModel>)
     {
@@ -341,7 +341,7 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
         adapterVisualFile?.notifyDataSetChanged()
     }
 
-    //-------------------------------------text watcher- filter doctor list using edit text
+  /*  //-------------------------------------text watcher- filter doctor list using edit text
     val filterTextWatcher: TextWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
         override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
@@ -349,7 +349,7 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
         }
 
         override fun afterTextChanged(s: Editable) {}
-    }
+    }*/
 
     //-------------------------------------check end page of web view and enable submit button according to it
     override fun onResume() {
@@ -451,7 +451,7 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
     }
 
 
-    fun setUserFavAdapter()
+   /* fun setUserFavAdapter()
     {
         edetailingFavList = db.getAllFavBrands()
 
@@ -469,7 +469,7 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
             downloadFilePathLocal.eDetailingId=value.geteDetailId()!!
 
         }
-    }
+    }*/
 
     //-------------------------------------rearrange linkedBrandList according to priority
     fun rearrangeDownloadedList()
@@ -542,6 +542,7 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
     }
 
 
+/*
     //==========================================DoctorList_BottomSheet adapter==============================================
     inner class BottomSheetDoctorAdapter(
         public var doctorList: ArrayList<SyncModel.Data.Doctor>,
@@ -617,6 +618,7 @@ class PresentEDetailingFrag : Fragment(),  SortingDisplayVisual, ItemClickDispla
     }
 
     //==========================================DoctorList_BottomSheet adapter==============================================
+*/
 
 
     override fun onClickDisplayVisual(eDetailinId: Int,brandID: Int,selectionType: Int)

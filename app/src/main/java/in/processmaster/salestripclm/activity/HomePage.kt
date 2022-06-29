@@ -25,15 +25,14 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
-import android.view.Gravity
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
+import android.view.*
+import android.widget.CompoundButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
+import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -66,6 +65,8 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     lateinit var objDownloadManager : DownloadManagerClass
     var retailerString=""
     var firstCall=false
+    private var isAutoDownload = false
+
 
     companion object {
         var loginModelHomePage= LoginModel()
@@ -106,6 +107,17 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             initView()
             bottomNavigation?.selectedItemId= R.id.landingPage
         }
+
+      isAutoDownload= sharePreferanceBase?.getPrefBool("isAutoDownload") == true
+
+        val menuItem = nav_view.menu.findItem(R.id.nav_autoDownload)
+        val switch_id = menuItem.actionView.findViewById<SwitchCompat>(R.id.switch_id)
+        switch_id.setChecked(isAutoDownload)
+        switch_id.setOnClickListener(View.OnClickListener {
+            if(isAutoDownload){isAutoDownload=false}
+            else {isAutoDownload=true}
+            sharePreferanceBase?.setPrefBool("isAutoDownload", isAutoDownload)
+        })
     }
 
     @SuppressLint("RestrictedApi")
@@ -180,7 +192,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
             R.id.downloadVisualPage -> {
 
-                if(::objDownloadManager.isInitialized && generalClass.isInternetAvailable())
+                if(::objDownloadManager.isInitialized && generalClass.isInternetAvailable() && DownloadManagerClass.cancelAutoDownload==false)
                 {
                     if(objDownloadManager?.getNumber<objDownloadManager?.allProductList.size)
                     {
@@ -208,7 +220,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             }
 
             R.id.callPage->{
-                if(::objDownloadManager.isInitialized && generalClass.isInternetAvailable())
+                if(::objDownloadManager.isInitialized && generalClass.isInternetAvailable() && DownloadManagerClass.cancelAutoDownload==false)
                 {
                     if(objDownloadManager?.getNumber<objDownloadManager?.allProductList.size)
                     {
@@ -294,10 +306,10 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         })
     }
 
+
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
 
-        val runnable= java.lang.Runnable {
-            when (item.itemId) {
+        when (item.itemId) {
 
                 R.id.nav_home -> { }
 
@@ -322,6 +334,8 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                 R.id.sync_menu -> {
                     if (generalClass.isInternetAvailable()) callingMultipleAPI() //  sync_api()
                     else alertClass.networkAlert()
+                    drawer_layout?.closeDrawers()
+                    return false
                 }
 
              /*   R.id.nav_screenshot -> {
@@ -332,7 +346,10 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                     overridePendingTransition(0, 0)
                 }*/
 
-
+                R.id.nav_autoDownload -> {
+                    drawer_layout?.closeDrawers()
+                    return false
+                }
 
                 R.id.nav_scheduled -> {
                     var intent = Intent(this, MeetingActivity::class.java)
@@ -347,17 +364,19 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
                 R.id.nav_createpob -> {
                     var intent = Intent(this, CreatePobActivity::class.java)
+                    intent.putExtra("action","pob")
                     startActivity(intent)
-                  //  overridePendingTransition(0, 0)
+                }
+
+                R.id.nav_sob -> {
+                    var intent = Intent(this, CreatePobActivity::class.java)
+                    intent.putExtra("action","stock")
+                    startActivity(intent)
                 }
 
             }
-        }
-        Thread(runnable).start()
 
-        runOnUiThread{
-            drawer_layout?.closeDrawers()
-        }
+         drawer_layout?.closeDrawers()
         return true
     }
 

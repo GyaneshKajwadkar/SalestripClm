@@ -5,7 +5,7 @@ import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.HomePage.Companion.apiInterface
 import `in`.processmaster.salestripclm.adapter.*
 import `in`.processmaster.salestripclm.common_classes.AlertClass
-import `in`.processmaster.salestripclm.fragments.PresentEDetailingFrag
+import `in`.processmaster.salestripclm.common_classes.PobCommonClass
 import `in`.processmaster.salestripclm.interfaceCode.EditInterface
 import `in`.processmaster.salestripclm.interfaceCode.IdNameBoll_interface
 import `in`.processmaster.salestripclm.interfaceCode.productTransfer
@@ -15,9 +15,6 @@ import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.InsetDrawable
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -29,7 +26,6 @@ import android.view.*
 import android.widget.*
 import androidx.annotation.NonNull
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -51,6 +47,7 @@ import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -81,43 +78,99 @@ class CreatePobActivity : BaseActivity(), IdNameBoll_interface, productTransfer,
     var passingSchemeList:ArrayList<SyncModel.Data.Scheme> = ArrayList()
     var selectedDoctorId=0
     var globalSaveModel: CreatePOBModel.Data.pobObject?= null
+    var globalSaveModelSOB: CreatePOBModel.Data.SobObject?= null
+    var openType=1 // 1 for pob 2 for stock
+    val pobClassObj= PobCommonClass(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_pob)
 
-        Handler(Looper.getMainLooper()).postDelayed({
-            initView()
-        },500)
+        if(intent.getStringExtra("action").equals("pob")) openType=1
+            else openType=2
 
+            initView()
     }
 
    fun  initView()
     {
+        if(openType==1)
+        {
+            bottomSheetDocRetSelect = BottomSheetBehavior.from(bottomSheet)
+
+            if(SplashActivity.staticSyncData?.settingDCR?.roleType=="MAN")
+            {
+                isManager=true
+            }
+            else if(SplashActivity.staticSyncData?.settingDCR?.roleType=="FS") {
+                checkUser_ll.visibility = View.GONE
+                isManager=false
+            }
+
+            selectParty_et.setOnClickListener {
+                if(isManager){
+                    if(selectTeam_et.text.toString().isEmpty()){
+                        generalClass.showSnackbar(it,"Select Team first")
+                        return@setOnClickListener }
+                }
+                selectionType=2
+                if(docRetail_switch?.isChecked == true)
+                {
+                    bottomSheetTitle_tv?.setText("Select Doctor")
+                    if(doctorListArray.size<=0)
+                    {
+                        alertClass?.commonAlert("This route has no doctor","")
+                        return@setOnClickListener
+                    }
+                }
+                else{
+                    bottomSheetTitle_tv?.setText("Select Retailer")
+                    if(retailerListArray.size<=0)
+                    {
+                        alertClass?.commonAlert("This route has no Retailer","")
+                        return@setOnClickListener
+                    }
+                }
+                openCloseModel()
+            }
+
+            docRetail_switch.setOnCheckedChangeListener { buttonView, isChecked ->
+                if (isChecked) {
+                    doctorHeader_tv.setTextColor(ContextCompat.getColorStateList(this, R.color.darkBlue))
+                    retailerHeader_tv.setTextColor(ContextCompat.getColorStateList(this, R.color.gray))
+                } else {
+                    retailerHeader_tv.setTextColor(ContextCompat.getColorStateList(this, R.color.darkBlue))
+                    doctorHeader_tv.setTextColor(ContextCompat.getColorStateList(this, R.color.gray))
+                }
+                selectTeam_et.setText("")
+                selectParty_et.setText("")
+            }
+
+            selectTeam_et?.setOnClickListener({
+                selectionType=1
+                bottomSheetTitle_tv?.setText("Select Team")
+                openCloseModel()
+            })
+
+            doctorSearch_et?.addTextChangedListener(filterTextWatcher)
+
+            close_selection_imv.setOnClickListener({ bottomSheetDocRetSelect.setState(BottomSheetBehavior.STATE_COLLAPSED)})
+
+        }
+
         back_iv.setOnClickListener { onBackPressed() }
         doctorName_tv.setText("Create POB")
         doctorName_tv.visibility= View.VISIBLE
-        bottomSheetDocRetSelect = BottomSheetBehavior.from(bottomSheet)
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet_submitScreen)
+
         selectedPob_rv.layoutManager=LinearLayoutManager(this)
         pobApiList_rv.layoutManager=LinearLayoutManager(this)
-
-        if(SplashActivity.staticSyncData?.settingDCR?.roleType=="MAN")
-        {
-            isManager=true
-        }
-        else if(SplashActivity.staticSyncData?.settingDCR?.roleType=="FS") {
-            checkUser_ll.visibility = View.GONE
-            isManager=false
-        }
 
         getPobNumber()
 
         var datePicker= DatePickerDialog(this, date, myCalendar[Calendar.YEAR], myCalendar[Calendar.MONTH],
             myCalendar[Calendar.DAY_OF_MONTH])
 
-      //  datePicker.getDatePicker().setMinDate(myCalendar.getTimeInMillis())
-       // myCalendar.add(Calendar.MONTH, +1)
         datePicker.getDatePicker().setMaxDate(myCalendar.getTimeInMillis())
 
         selectDate_et.setOnClickListener {
@@ -129,6 +182,7 @@ class CreatePobActivity : BaseActivity(), IdNameBoll_interface, productTransfer,
             dateSelection=2
             datePicker.show()
         }
+
         startDatePOB_et.setOnClickListener {
             dateSelection=2
             datePicker.show()
@@ -148,97 +202,36 @@ class CreatePobActivity : BaseActivity(), IdNameBoll_interface, productTransfer,
             openCloseBottomSheet()
         }
 
-        selectParty_et.setOnClickListener {
-            if(isManager){
-                if(selectTeam_et.text.toString().isEmpty()){
-                    generalClass.showSnackbar(it,"Select Team first")
-                    return@setOnClickListener }
-            }
-            selectionType=2
-            if(docRetail_switch?.isChecked == true)
-            {
-                bottomSheetTitle_tv?.setText("Select Doctor")
-                if(doctorListArray.size<=0)
-                {
-                    alertClass?.commonAlert("This route has no doctor","")
-                    return@setOnClickListener
-                }
-            }
-            else{
-                bottomSheetTitle_tv?.setText("Select Retailer")
-                if(retailerListArray.size<=0)
-                {
-                    alertClass?.commonAlert("This route has no Retailer","")
-                    return@setOnClickListener
-                }
-            }
-
-            openCloseModel()
-        }
-
-
         val coroutine= CoroutineScope(
             Dispatchers.IO).launch {
-            val filterOne = async {
-                var listStokist = SplashActivity.staticSyncData?.retailerList?.filter { s -> s.type == "STOCKIST" }
-                if (listStokist != null) {
-                    for(stockist in listStokist) {
-                        val data =IdNameBoll_model()
-                        data.id= stockist.retailerId.toString()
-                        data.city= stockist.cityName.toString()
-                        data.name= stockist.shopName.toString()
-                        stokistArray.add(data)
-                    }
-                }}
-            val filterTwo = async {
-                val string = Gson().toJson(SplashActivity.staticSyncData)
-                val data= Gson().fromJson(string, SyncModel.Data::class.java)
-                mainProductList.addAll(data.productList.filter { s -> (s.productType==1) } as ArrayList<SyncModel.Data.Product>)
-                unSelectedProductList=ArrayList(mainProductList)
-            }
-            val filterThree = async {
-                val getSchemeList= SplashActivity.staticSyncData?.schemeList
-                val filterByTypeSchemeList= getSchemeList?.filter { data -> (data?.schemeFor=="S" || data?.schemeFor=="H") }
 
-                val getDocDetail: SyncModel.Data.Doctor? = SplashActivity.staticSyncData?.doctorList?.find { it.doctorId == PresentEDetailingFrag.doctorIdDisplayVisual }
-
-                getSchemeList?.clear()
-                filterByTypeSchemeList?.sortedBy { it.schemeFor }?.let { getSchemeList?.addAll(it) }
-
-                getSchemeList?.let { passingSchemeList.addAll(it)}
-
-                getSchemeList?.forEachIndexed { indexH, hElement ->
-
-                    val separated: Array<String>? = hElement.schemeForId?.split(",")?.toTypedArray()
-                    val event: String? = separated?.find { it ==getDocDetail?.fieldStaffId?.toString() }
-
-                    if(hElement.schemeFor.equals("H") && event!="")
-                    {
-                        getSchemeList?.forEachIndexed { indexS, SElement ->
-
-                            val separated: Array<String>? = SElement.schemeForId?.split(",")?.toTypedArray()
-                            val event: String? = separated?.find { it ==getDocDetail?.stateId?.toString() }
-                            if(SElement.schemeFor.equals("S") && event!="")
-                            {
-                                if(hElement.productId==SElement.productId) {
-                                    passingSchemeList.removeAt(indexS)
-                                }
-                            }
-                        }
-                    }
+            if(openType==1)
+            {
+                val filterFour = async {
+                    SplashActivity.staticSyncData?.doctorList?.let   { doctorListArray.addAll(it) }
+                    SplashActivity.staticSyncData?.retailerList?.let { retailerListArray.addAll(it) }
+                    SplashActivity.staticSyncData?.fieldStaffTeamList?.let { teamsList.addAll(it) }
                 }
+                filterFour.await()
             }
-            val filterFour = async {
-                SplashActivity.staticSyncData?.doctorList?.let   { doctorListArray.addAll(it) }
-                SplashActivity.staticSyncData?.retailerList?.let { retailerListArray.addAll(it) }
-                SplashActivity.staticSyncData?.fieldStaffTeamList?.let { teamsList.addAll(it) }
+
+            val filterOne = async { stokistArray.addAll(pobClassObj.getStockist()) }
+
+            val filterTwo = async {
+                mainProductList.addAll(pobClassObj.getProductList())
+                unSelectedProductList.addAll(pobClassObj.getProductList())
+            }
+
+            val filterThree = async {
+                passingSchemeList.addAll(pobClassObj.getSchemeList())
             }
 
             filterOne.await()
             filterTwo.await()
             filterThree.await()
-            filterFour.await()
+
             }
+
         coroutine.invokeOnCompletion {
             runOnUiThread {
                 checkRecyclerView_rv.layoutManager= LinearLayoutManager(this)
@@ -248,41 +241,16 @@ class CreatePobActivity : BaseActivity(), IdNameBoll_interface, productTransfer,
         }
 
         pobProduct_btn.setOnClickListener({
-            callPobSelectAlert()
+            pobClassObj.callPobSelectAlert(filterTextPobWatcher,mainProductList,unSelectedProductList,passingSchemeList,this)
         })
-
-        docRetail_switch.setOnCheckedChangeListener { buttonView, isChecked ->
-            if (isChecked) {
-                doctorHeader_tv.setTextColor(ContextCompat.getColorStateList(this, R.color.darkBlue))
-                retailerHeader_tv.setTextColor(ContextCompat.getColorStateList(this, R.color.gray))
-            } else {
-                retailerHeader_tv.setTextColor(ContextCompat.getColorStateList(this, R.color.darkBlue))
-                doctorHeader_tv.setTextColor(ContextCompat.getColorStateList(this, R.color.gray))
-            }
-            selectTeam_et.setText("")
-            selectParty_et.setText("")
-        }
-
-        selectTeam_et?.setOnClickListener({
-            selectionType=1
-            bottomSheetTitle_tv?.setText("Select Team")
-            openCloseModel()
-        })
-
-        doctorSearch_et?.addTextChangedListener(filterTextWatcher)
-
-        close_selection_imv.setOnClickListener({ bottomSheetDocRetSelect.setState(BottomSheetBehavior.STATE_COLLAPSED)})
 
         submitBtn.setOnClickListener {
-           /* if(pobNumber_et.text.toString().isEmpty())
-            {  alertClass.commonAlert("OOPS!","Something went wrong please try again later")
-               return@setOnClickListener
-            }*/
-             if(selectDate_et.text.toString().isEmpty())
+            if(selectDate_et.text.toString().isEmpty())
             {  alertClass.commonAlert("","Please select POB date")
                 return@setOnClickListener
             }
-            else if(selectParty_et.text.toString().isEmpty())
+
+            else if(openType==1 && selectParty_et.text.toString().isEmpty())
             {  alertClass.commonAlert("","Please select Party")
                 return@setOnClickListener
             }
@@ -292,7 +260,9 @@ class CreatePobActivity : BaseActivity(), IdNameBoll_interface, productTransfer,
                 remarkPOB_Et.setError("Required")
                 return@setOnClickListener
             }
-            submitPobModel()
+
+            if(openType==1) submitPobModel()
+            else submitSobModel()
         }
 
         selectDate_et.setText(generalClass.getCurrentDate())
@@ -307,17 +277,29 @@ class CreatePobActivity : BaseActivity(), IdNameBoll_interface, productTransfer,
                 generalClass.showSnackbar(it,"End date is greater then start date")
                 return@setOnClickListener
             }
-            fetchPreviousPOB_API()
+           fetchPreviousPOB_API()
+
+
         }
 
         createNew_btn.setOnClickListener {
             mode=1
-          //  setEditShow(2)
             setToDefault()
             createNew_btn.visibility=View.GONE
         }
 
         fetchPreviousPOB_API()
+
+        if(openType==2)
+        {
+            pobNumber_tv.setText("Stockist POB No:")
+            partyParent_ll.visibility=View.GONE
+            checkUser_ll.visibility=View.GONE
+            previousPob_tv.setText("Previous Stockist POB")
+            doctorName_tv.setText("Create Stockist POB")
+            assignStockist.setText("Stockist")
+
+        }
     }
 
     val filterTextWatcher: TextWatcher = object : TextWatcher {
@@ -336,26 +318,6 @@ class CreatePobActivity : BaseActivity(), IdNameBoll_interface, productTransfer,
             else
                 BottomSheetBehavior.STATE_EXPANDED
         bottomSheetBehavior.state = state
-    }
-
-
-    fun getPobNumber(){
-        var call: Call<TeamsModel>? = apiInterface?.getPobNumber("bearer " + HomePage.loginModelHomePage.accessToken) as? Call<TeamsModel>
-        call?.enqueue(object : Callback<TeamsModel?> {
-            override fun onResponse(call: Call<TeamsModel?>?, response: Response<TeamsModel?>) {
-                Log.e("getPobNumber_api", response.code().toString() + "")
-                if (response.code() == 200 && !response.body().toString().isEmpty())
-                {
-                    pobNumber_et.setText(response.body()?.getData()?.pobNo)
-                }
-                else
-                { }
-            }
-
-            override fun onFailure(call: Call<TeamsModel?>, t: Throwable?) {
-                call.cancel()
-            }
-        })
     }
 
     var date: DatePickerDialog.OnDateSetListener = object : DatePickerDialog.OnDateSetListener {
@@ -379,13 +341,55 @@ class CreatePobActivity : BaseActivity(), IdNameBoll_interface, productTransfer,
         if(dateSelection==1) {
             selectDate_et.setText(sdf.format(myCalendar.getTime()))
         }
-            else if(dateSelection==2)  startDatePOB_et.setText(sdf.format(myCalendar.getTime()))
-             else
-             {
-                 endDatePOB_et.setText(sdf.format(myCalendar.getTime()))
-             }
+        else if(dateSelection==2)  startDatePOB_et.setText(sdf.format(myCalendar.getTime()))
+        else
+        {
+            endDatePOB_et.setText(sdf.format(myCalendar.getTime()))
+        }
     }
 
+    val filterTextPobWatcher: TextWatcher = object : TextWatcher {
+        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+            pobProductSelectAdapter?.getFilter()?.filter(s.toString())
+        }
+        override fun afterTextChanged(editable: Editable) {}
+    }
+
+    fun setPobAdapter()
+    {
+        runOnUiThread{
+            selectedPobAdapter= SelectedPobAdapter(selectedProductList,this,this,this,checkIsDcrSave)
+            selectedPob_rv.adapter= selectedPobAdapter
+            pobClassObj.calculateTotalProduct(selectedProductList,totalProductPrice_tv)
+        }
+    }
+
+    fun updateSpecificElement(returnModel: SyncModel.Data.Product?, position: Int)
+    {
+        returnModel?.let { selectedProductList.set(position, it) }
+        pobClassObj.calculateTotalProduct(selectedProductList,totalProductPrice_tv)
+    }
+
+
+    fun openCloseModel()
+    {
+        doctorSearch_et?.setText("")
+
+        adapter =BottomSheetDoctorAdapter()
+        doctorList_rv?.setLayoutManager(GridLayoutManager(this, 3))
+        doctorList_rv?.adapter = adapter
+        adapter.notifyDataSetChanged()
+
+        val state =
+            if (bottomSheetDocRetSelect.state == BottomSheetBehavior.STATE_EXPANDED)
+                BottomSheetBehavior.STATE_COLLAPSED
+            else
+                BottomSheetBehavior.STATE_EXPANDED
+        bottomSheetDocRetSelect.state = state
+    }
+
+    // INTERFACE =================================================
     override fun onChangeArray(
         passingArrayList: ArrayList<IdNameBoll_model>,
         isUpdate: Boolean,
@@ -403,91 +407,6 @@ class CreatePobActivity : BaseActivity(), IdNameBoll_interface, productTransfer,
         }
         if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED)  bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
 
-    }
-
-    fun callPobSelectAlert()
-    {
-        val dialogBuilder = AlertDialog.Builder(this, R.style.my_dialog)
-        val inflater = this.layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.pobcreatealert, null)
-
-        dialogBuilder.setView(dialogView)
-
-        val alertDialog: AlertDialog = dialogBuilder.create()
-        val back = ColorDrawable(Color.TRANSPARENT)
-        val inset = InsetDrawable(back, 25)
-        alertDialog.getWindow()?.setBackgroundDrawable(inset)
-
-        val wmlp: WindowManager.LayoutParams? = alertDialog.getWindow()?.getAttributes()
-
-        wmlp?.gravity = Gravity.TOP or Gravity.RIGHT
-
-
-        val closePob_iv = dialogView.findViewById<View>(R.id.closePob_iv) as ImageView
-        val okPob_iv = dialogView.findViewById<View>(R.id.okPob_iv) as TextView
-        val filterRv = dialogView.findViewById<View>(R.id.filterRv) as RecyclerView
-        val pobProduct_rv = dialogView.findViewById<View>(R.id.pobProduct_rv) as RecyclerView
-        pobProduct_rv.layoutManager=LinearLayoutManager(this)
-        filterRv.setLayoutManager(LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false))
-
-        val productSearch_et = dialogView.findViewById<View>(R.id.productSearch_et) as EditText
-        productSearch_et?.addTextChangedListener(filterTextPobWatcher)
-
-        var categoryList:ArrayList<String> =ArrayList<String>()
-
-        for(categoryName in mainProductList)
-        {
-            categoryName.categoryName?.let { categoryList.add(it) }
-        }
-
-        val uniqueValues: HashSet<String> = HashSet(categoryList)
-        val categoryListFiltered :ArrayList<CommonModel.FilterModel> =ArrayList<CommonModel.FilterModel>()
-
-        for(categoryName in uniqueValues)
-        {
-            val filterModel= CommonModel.FilterModel()
-            filterModel.categoryName= categoryName.toString()
-            categoryListFiltered.add(filterModel)
-        }
-
-
-        val pobProductSelectAdapter=
-            PobProductAdapter(unSelectedProductList, passingSchemeList,this,1,productSearch_et)
-        pobProduct_rv.adapter= pobProductSelectAdapter
-
-        val filterAdapter= ButtonFilterAdapter(categoryListFiltered, pobProductSelectAdapter)
-        filterRv.adapter=filterAdapter
-
-        productSearch_et.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                pobProductSelectAdapter?.getFilter()?.filter(s.toString())
-            }
-            override fun afterTextChanged(editable: Editable) {}
-        })
-
-        okPob_iv.setOnClickListener{
-            runOnUiThread{
-                generalClass.hideKeyboard(this,it)
-            }
-            pobProductSelectAdapter.setSelction()
-            alertDialog.dismiss()
-        }
-
-        closePob_iv.setOnClickListener{
-
-            alertDialog.dismiss()
-        }
-        alertDialog.show()
-
-    }
-
-    val filterTextPobWatcher: TextWatcher = object : TextWatcher {
-        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-            pobProductSelectAdapter?.getFilter()?.filter(s.toString())
-        }
-        override fun afterTextChanged(editable: Editable) {}
     }
 
     override fun onClickButtonProduct(selectedList: ArrayList<SyncModel.Data.Product>, type: Int) {
@@ -513,10 +432,7 @@ class CreatePobActivity : BaseActivity(), IdNameBoll_interface, productTransfer,
                     }
                 }
                 runOnUiThread {
-
-                    // pobProductSelectAdapter.notifyDataSetChanged()
                     setPobAdapter()
-                    //pobProduct_rv.scrollToPosition(0)
                     Handler(Looper.getMainLooper()).postDelayed({
                         //   closeBottomSheet()
                         alertClass.hideAlert()
@@ -525,38 +441,12 @@ class CreatePobActivity : BaseActivity(), IdNameBoll_interface, productTransfer,
             }
             Thread(runnable).start()
         }
-        else
-        {
-
-        }
-    }
-
-    fun setPobAdapter()
-    {
-        runOnUiThread{
-            /*   pobProductSelectAdapter=PobProductAdapter(unSelectedProductList, passingSchemeList,this)
-               pobProduct_rv.adapter= pobProductSelectAdapter*/
-
-            selectedPobAdapter= SelectedPobAdapter(selectedProductList,this,this,this,checkIsDcrSave)
-            selectedPob_rv.adapter= selectedPobAdapter
-
-            calculateTotalProduct()
-        }
-    }
-
-    fun calculateTotalProduct()
-    {
-        val filterSelectecd=selectedProductList.filter { s -> (s.notApi.isSaved==true) }
-        var calculation=0.0
-        for(data in filterSelectecd)
-        { calculation= data.notApi.amount?.plus(calculation)!! }
-        totalProductPrice_tv.setText("Grand Total: "+String.format("%.2f", calculation))
+        else { }
     }
 
     override fun onClickButtonProduct(productModel: SyncModel.Data.Product, positon: Int) {
         for ((index,data) in unSelectedProductList?.withIndex()!!)
         {
-
             if(productModel?.productId==data.productId)
             {
                 productModel.notApi=SyncModel.Data.Product.NotApiData()
@@ -572,23 +462,6 @@ class CreatePobActivity : BaseActivity(), IdNameBoll_interface, productTransfer,
         }    }
 
     override fun onClickEdit(productModel: SyncModel.Data.Product, positon: Int) {
-    }
-
-    fun openCloseModel()
-    {
-        doctorSearch_et?.setText("")
-
-        adapter =BottomSheetDoctorAdapter()
-        doctorList_rv?.setLayoutManager(GridLayoutManager(this, 3))
-        doctorList_rv?.adapter = adapter
-        adapter.notifyDataSetChanged()
-
-        val state =
-            if (bottomSheetDocRetSelect.state == BottomSheetBehavior.STATE_EXPANDED)
-                BottomSheetBehavior.STATE_COLLAPSED
-            else
-                BottomSheetBehavior.STATE_EXPANDED
-        bottomSheetDocRetSelect.state = state
     }
 
     inner class BottomSheetDoctorAdapter() :
@@ -623,12 +496,10 @@ class CreatePobActivity : BaseActivity(), IdNameBoll_interface, productTransfer,
               holder.route_tv.setText("Head Quater Name- " + modeldata?.headQuaterName)
               holder.speciality_tv.visibility=View.GONE
 
-
                 holder.parent_cv.setOnClickListener({
                     selectTeam_et?.setText((modeldata?.fullName))
                     bottomSheetDocRetSelect.setState(BottomSheetBehavior.STATE_COLLAPSED)
                     modeldata.fieldStaffId?.let { it1 -> applySelectionFilter(it1) }
-
                 })
             }
 
@@ -645,7 +516,6 @@ class CreatePobActivity : BaseActivity(), IdNameBoll_interface, productTransfer,
                         selectParty_et?.setText((modeldata?.doctorName))
                         bottomSheetDocRetSelect.setState(BottomSheetBehavior.STATE_COLLAPSED)
                         selectedDoctorId= modeldata?.doctorId!!
-
                     })
                 }
                 else{
@@ -680,14 +550,8 @@ class CreatePobActivity : BaseActivity(), IdNameBoll_interface, productTransfer,
                     }
                     else
                     {
-                        if(docRetail_switch?.isChecked == true)
-                        {
-                            filteredDataDoctor = results.values as java.util.ArrayList<SyncModel.Data.Doctor>
-                        }
-                        else
-                        {
-                            filteredDataRetailer= results.values as java.util.ArrayList<SyncModel.Data.Retailer>
-                        }
+                        if(docRetail_switch?.isChecked == true) filteredDataDoctor = results.values as java.util.ArrayList<SyncModel.Data.Doctor>
+                        else filteredDataRetailer= results.values as java.util.ArrayList<SyncModel.Data.Retailer>
                     }
                     notifyDataSetChanged()
                 }
@@ -741,7 +605,6 @@ class CreatePobActivity : BaseActivity(), IdNameBoll_interface, productTransfer,
                             results.values = FilteredArrayNames
                             return results
                         }
-
                     }
                 }
             }
@@ -766,18 +629,88 @@ class CreatePobActivity : BaseActivity(), IdNameBoll_interface, productTransfer,
         }
     }
 
+    fun submitSobModel()
+    {
+        var pobSaveModel= CreatePOBModel.Data.SobObject()
+        if(mode==2){
+            if(globalSaveModelSOB!=null) pobSaveModel = globalSaveModelSOB!!
+        }
+        else{
+            try{
+                val originalFormat: DateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
+                val targetFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+                val date: Date = originalFormat.parse(selectDate_et.text.toString())
+                pobSaveModel.sobDate=   targetFormat.format(date)
+                pobSaveModel.strSOBDate= targetFormat.format(date)
+            } catch (e:Exception){}
+        }
+
+        pobSaveModel.partyId= selectedDoctorId
+        pobSaveModel.employeeId= HomePage.loginModelHomePage.empId
+        pobSaveModel.empId= HomePage.loginModelHomePage.empId
+        pobSaveModel.remark=remarkPOB_Et.text.toString()
+        pobSaveModel.sobNo=pobNumber_et.text.toString()
+        pobSaveModel.isProductWiseSOB=true
+        pobSaveModel.sobType="STOCKIST"
+        pobSaveModel.mode=mode
+
+        val filterSelectecd=selectedProductList.filter { s -> (s.notApi.isSaved==true) }
+
+        if(filterSelectecd.size==0) {
+            alertClass?.commonAlert("","Please fill at least one POB")
+            return
+        }
+
+        pobSaveModel.sobDetailList= ArrayList()
+        for(dataObj in filterSelectecd)
+        {
+            val pobObje= CreatePOBModel.Data.SobObject.SobDetailList()
+            pobObje.productId=dataObj.notApi.insertedProductId
+            pobObje.rate=dataObj.notApi.rate
+            pobObje.qty=dataObj.notApi.qty
+            pobObje.amount=dataObj.notApi.amount
+            pobObje.schemeId=dataObj.notApi.schemeId
+            pobObje.totalQty=dataObj.notApi.totalQty
+            pobObje.freeQty=dataObj.notApi.freeQty
+            pobObje.pobId=dataObj.notApi.pobId
+            pobObje.pobNo=dataObj.notApi.pobNo
+            pobSaveModel.sobDetailList?.add(pobObje)
+        }
+        if(filterSelectecd.size!=0)
+        {
+            val jsonObj= JSONObject(SplashActivity.staticSyncData?.configurationSetting)
+            val checkStockistRequired=jsonObj.getInt("SET014")
+            if(checkStockistRequired==1)
+            {
+                alertClass.commonAlert("Stockist unselected","Please assign stockist in POB section")
+                return
+            }
+        }
+
+        if(selectedStockist.id!=null && selectedStockist.id!="" && filterSelectecd.size!=0) pobSaveModel.stockistId=selectedStockist.id.toInt()
+
+        val parentObj= CreatePOBModel.Data()
+        parentObj.sobData=pobSaveModel
+
+        if(!generalClass.isInternetAvailable()) saveIfServerNotWork(parentObj)
+        else submitTO_API(parentObj)
+    }
+
     fun submitPobModel()
     {
         var pobSaveModel= CreatePOBModel.Data.pobObject()
         if(mode==2){
-            if(globalSaveModel!=null)
-            {
-                pobSaveModel = globalSaveModel!!
-            }
+            if(globalSaveModel!=null) pobSaveModel = globalSaveModel!!
         }
         else{
-            pobSaveModel.pobDate=generalClass.getCurrentDateTimeApiForamt()
-            pobSaveModel.strPOBDate=generalClass.getCurrentDateTimeApiForamt()
+
+            try{
+                val originalFormat: DateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
+                val targetFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+                val date: Date = originalFormat.parse(selectDate_et.text.toString())
+                pobSaveModel.pobDate=   targetFormat.format(date)
+                pobSaveModel.strPOBDate= targetFormat.format(date)
+            } catch (e:Exception){}
         }
 
         pobSaveModel.partyId= selectedDoctorId
@@ -826,49 +759,91 @@ class CreatePobActivity : BaseActivity(), IdNameBoll_interface, productTransfer,
         if(selectedStockist.id!=null && selectedStockist.id!="" && filterSelectecd.size!=0) pobSaveModel.stockistId=selectedStockist.id.toInt()
 
 
-        if(!generalClass.isInternetAvailable())
-        {
-            saveIfServerNotWork(pobSaveModel)
-        }
-        else
-        {
-            submitDCR_API(pobSaveModel)
-        }
+        val parentObj= CreatePOBModel.Data()
+        parentObj.pobData=pobSaveModel
+
+        if(!generalClass.isInternetAvailable()) saveIfServerNotWork(parentObj)
+        else submitTO_API(parentObj)
 
     }
 
-    fun saveIfServerNotWork(pobSaveModel: CreatePOBModel.Data.pobObject)
+    fun saveIfServerNotWork(pobSaveModel: CreatePOBModel.Data)
     {
-        val min = 10
-        val max = 90
-        val random = Random().nextInt(max - min + 1) + min
-        pobSaveModel.randomNumber=random
-        dbBase.insertOrUpdateSaveAPI(random, Gson().toJson(pobSaveModel),"createOnlyPOB")
+
+        if(openType==1)
+        {
+            val min = 100
+            val max = 900
+            val random = Random().nextInt(max - min + 1) + min
+
+            pobSaveModel.pobData?.randomNumber=random
+            dbBase.insertOrUpdateSaveAPI(random, Gson().toJson(pobSaveModel.pobData),"createOnlyPOB")
+
+        }
+        else
+        {
+            val min = 1000
+            val max = 9000
+            val random = Random().nextInt(max - min + 1) + min
+
+            pobSaveModel.sobData?.randomNumber=random
+            dbBase.insertOrUpdateSaveAPI(random, Gson().toJson(pobSaveModel.sobData),"createOnlySOB")
+        }
+
         alertClass.commonAlert("","Offline data save successfully")
         setToDefault()
     }
 
+    // API CALLING SECTION========================================
 
-    //Submit pob to server
-    private fun submitDCR_API(pobSaveModel: CreatePOBModel.Data.pobObject)
+    fun getPobNumber(){
+
+        var call: Call<TeamsModel>? =null
+
+        if(openType==2)   call = apiInterface?.getSobNumber("bearer " + HomePage.loginModelHomePage.accessToken) as? Call<TeamsModel>
+        else  call= apiInterface?.getPobNumber("bearer " + HomePage.loginModelHomePage.accessToken) as? Call<TeamsModel>
+
+        call?.enqueue(object : Callback<TeamsModel?> {
+            override fun onResponse(call: Call<TeamsModel?>?, response: Response<TeamsModel?>) {
+                Log.e("getPobNumber_api", response.code().toString() + "")
+                if (response.code() == 200 && !response.body().toString().isEmpty())
+                {
+                    if(openType==2) pobNumber_et.setText(response.body()?.getData()?.sobNo)
+                    else  pobNumber_et.setText(response.body()?.getData()?.pobNo)
+                }
+                else
+                { }
+            }
+
+            override fun onFailure(call: Call<TeamsModel?>, t: Throwable?) {
+                call.cancel()
+            }
+        })
+    }
+
+    //Submit sob to server
+    private fun submitTO_API(model: CreatePOBModel.Data)
     {
         alertClass.showProgressAlert("")
         apiInterface= APIClientKot().getClient(2, sharePreferanceBase?.getPref("secondaryUrl")).create(
             APIInterface::class.java)
 
-        var call: Call<GenerateOTPModel>? = apiInterface?.submitPOB(
-            "bearer " + HomePage.loginModelHomePage.accessToken, pobSaveModel
-        ) as? Call<GenerateOTPModel>
+        var call: Call<GenerateOTPModel>?= null
+        if(openType==1)  call= apiInterface?.submitPOB("bearer " + HomePage.loginModelHomePage.accessToken, model.pobData) as? Call<GenerateOTPModel>
+        else call= apiInterface?.submitSOB("bearer " + HomePage.loginModelHomePage.accessToken, model.sobData) as? Call<GenerateOTPModel>
+
         call?.enqueue(object : Callback<GenerateOTPModel?> {
             override fun onResponse(call: Call<GenerateOTPModel?>?, response: Response<GenerateOTPModel?>) {
+
                 if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage?.isEmpty()==true) {
                     alertClass.commonAlert("",response.body()?.getData()?.message.toString())
                     setToDefault()
-                    callServerDocRetailerApi()
+                    if(openType==1) callServerDocRetailerApi()
                 }
                 else {
                     alertClass.commonAlert("",response.body()?.getErrorObj()?.errorMessage.toString())
-                    saveIfServerNotWork(pobSaveModel)
+                   // saveIfServerNotWork(model)
+
                 }
                 alertClass.hideAlert()
             }
@@ -877,7 +852,8 @@ class CreatePobActivity : BaseActivity(), IdNameBoll_interface, productTransfer,
                 generalClass.checkInternet()
                 call.cancel()
                 alertClass.hideAlert()
-                saveIfServerNotWork(pobSaveModel)
+                // saveIfServerNotWork(model)
+
             }
         })
     }
@@ -894,29 +870,38 @@ class CreatePobActivity : BaseActivity(), IdNameBoll_interface, productTransfer,
         val outputDate = format.format(endDate)
 
         alertClass.showProgressAlert("")
-       // progressBar_pb.visibility=View.VISIBLE
         apiInterface= APIClientKot().getClient(2, sharePreferanceBase?.getPref("secondaryUrl")).create(
             APIInterface::class.java)
 
-        var call: Call<CreatePOBModel>? = apiInterface?.fetchPreviousPOB(
-            "bearer " + HomePage.loginModelHomePage.accessToken, inputDate,outputDate) as? Call<CreatePOBModel>
+        var call: Call<CreatePOBModel>?= null
+        if(openType==1)call = apiInterface?.fetchPreviousPOB(
+        "bearer " + HomePage.loginModelHomePage.accessToken, inputDate,outputDate) as? Call<CreatePOBModel>
+            else call= apiInterface?.fetchPreviousSOB(
+        "bearer " + HomePage.loginModelHomePage.accessToken, inputDate,outputDate) as? Call<CreatePOBModel>
+
         call?.enqueue(object : Callback<CreatePOBModel?> {
             override fun onResponse(call: Call<CreatePOBModel?>?, response: Response<CreatePOBModel?>) {
-               // Log.e("fetchPreviousPOB_api", Gson().toJson(response.body()))
+                Log.e("fetchPreviousPOB_api", Gson().toJson(response.body()))
                 if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage?.isEmpty()==true) {
-
-                    if(response?.body()?.getData()?.pobList?.size!=0)
-                    {
                         noData_tv.visibility=View.GONE
                         pobApiList_rv.visibility=View.VISIBLE
-                        pobApiList_rv.adapter= response.body()?.getData()
-                            ?.let { PobApiListAdapter(it?.pobList,this@CreatePobActivity,this@CreatePobActivity) }
-                    }
-                    else
+
+                     if(openType==1)
+                     {
+
+                         pobApiList_rv.adapter= response.body()?.getData()
+                             ?.let { PobApiListAdapter(openType,it?.pobList,response?.body()?.getData()?.sobList,this@CreatePobActivity,this@CreatePobActivity) }
+                     }
+                     else {
+                         pobApiList_rv.adapter= response.body()?.getData()
+                             ?.let { PobApiListAdapter(openType,response?.body()?.getData()?.pobList,it?.sobList,this@CreatePobActivity,this@CreatePobActivity) }
+                     }
+                    if(response?.body()?.getData()?.pobList?.size==0 && response?.body()?.getData()?.sobList?.size==0 )
                     {
                         noData_tv.visibility=View.VISIBLE
                         pobApiList_rv.visibility=View.GONE
                     }
+
                 }
                 else { alertClass.commonAlert("",response.body()?.getErrorObj()?.errorMessage.toString()) }
                 alertClass.hideAlert()
@@ -939,74 +924,150 @@ class CreatePobActivity : BaseActivity(), IdNameBoll_interface, productTransfer,
         apiInterface= APIClientKot().getClient(2, sharePreferanceBase?.getPref("secondaryUrl")).create(
             APIInterface::class.java)
 
-        var call: Call<CreatePOBModel>? = apiInterface?.getPOBByID(
-            "bearer " + HomePage.loginModelHomePage.accessToken, id) as? Call<CreatePOBModel>
+        var call: Call<CreatePOBModel>? = null
+        if(openType==1)
+        {
+            call=  apiInterface?.getPOBByID(
+                "bearer " + HomePage.loginModelHomePage.accessToken, id) as? Call<CreatePOBModel>
+        }
+        else
+        {
+             call= apiInterface?.getSOBByID(
+                "bearer " + HomePage.loginModelHomePage.accessToken, id) as? Call<CreatePOBModel>
+        }
+
         call?.enqueue(object : Callback<CreatePOBModel?> {
             override fun onResponse(call: Call<CreatePOBModel?>?, response: Response<CreatePOBModel?>) {
                 Log.e("fetchPOB_ById_API", Gson().toJson(response.body()))
                 if (response.code() == 200 && response.body()
                         ?.getErrorObj()?.errorMessage?.isEmpty()==true)
                 {
-                    val modelObj=response.body()?.getData()?.pobData
-                    if (modelObj != null) {
-                        globalSaveModel=modelObj
-                    }
 
-                    selectTeam_et.setText("")
-
-                    pobNumber_et.setText(modelObj?.pobNo)
-                    remarkPOB_Et.setText(modelObj?.remark)
-                    stockistName.text="Stockist name - "+modelObj?.stockistName
-                    if(modelObj?.stockistName?.isEmpty()==false) stockistName.visibility=View.VISIBLE
-                     val filterDate=generalClass.convertApiDateTime_toDate(modelObj?.pobDate)
-                    if(filterDate.isEmpty()==false) selectDate_et.setText(filterDate)
-                    if(modelObj?.pobType.equals("DOCTOR")) {
-                        docRetail_switch.isChecked = true
-                        doctorHeader_tv.setTextColor(ContextCompat.getColorStateList(this@CreatePobActivity, R.color.darkBlue))
-                        retailerHeader_tv.setTextColor(ContextCompat.getColorStateList(this@CreatePobActivity, R.color.gray))
-                    }
-                    else {
-                        docRetail_switch.isChecked = false
-                        doctorHeader_tv.setTextColor(ContextCompat.getColorStateList(this@CreatePobActivity, R.color.gray))
-                        retailerHeader_tv.setTextColor(ContextCompat.getColorStateList(this@CreatePobActivity, R.color.darkBlue))
-                    }
-
-                    if( modelObj?.pobDetailList?.size!=0)
+                    if(openType==1)
                     {
-                        selectedProductList.clear()
-                        for (pobProducts in modelObj?.pobDetailList!!)
+                        val modelObj=response.body()?.getData()?.pobData
+                        if (modelObj != null) {
+                            globalSaveModel=modelObj
+                        }
+
+                        selectTeam_et.setText("")
+
+                        pobNumber_et.setText(modelObj?.pobNo)
+                        remarkPOB_Et.setText(modelObj?.remark)
+                        stockistName.text="Stockist name - "+modelObj?.stockistName
+                        if(modelObj?.stockistName?.isEmpty()==false) stockistName.visibility=View.VISIBLE
+                        val filterDate=generalClass.convertApiDateTime_toDate(modelObj?.pobDate)
+                        if(filterDate.isEmpty()==false) selectDate_et.setText(filterDate)
+                        if(modelObj?.pobType.equals("DOCTOR")) {
+                            docRetail_switch.isChecked = true
+                            doctorHeader_tv.setTextColor(ContextCompat.getColorStateList(this@CreatePobActivity, R.color.darkBlue))
+                            retailerHeader_tv.setTextColor(ContextCompat.getColorStateList(this@CreatePobActivity, R.color.gray))
+                        }
+                        else {
+                            docRetail_switch.isChecked = false
+                            doctorHeader_tv.setTextColor(ContextCompat.getColorStateList(this@CreatePobActivity, R.color.gray))
+                            retailerHeader_tv.setTextColor(ContextCompat.getColorStateList(this@CreatePobActivity, R.color.darkBlue))
+                        }
+
+                        if( modelObj?.pobDetailList?.size!=0)
                         {
-                            for((index,availableProduct) in unSelectedProductList.withIndex())
+                            selectedProductList.clear()
+                            for (pobProducts in modelObj?.pobDetailList!!)
                             {
-                                if(availableProduct.productId==pobProducts.productId)
+                                for((index,availableProduct) in unSelectedProductList.withIndex())
                                 {
-                                    availableProduct.notApi.amount=pobProducts.amount
-                                    availableProduct.notApi.rate=pobProducts.rate
-                                    availableProduct.notApi.qty=pobProducts.qty
-                                    availableProduct.notApi.totalQty=pobProducts.totalQty
-                                    availableProduct.notApi.scheme=pobProducts.schemeNameWithQty
-                                    availableProduct.notApi.schemeId=pobProducts.schemeId
-                                    availableProduct.notApi.salesQty=pobProducts.schemeSalesQty
-                                    availableProduct.notApi.salesQtyMain=pobProducts.schemeSalesQty
-                                    availableProduct.notApi.freeQty=pobProducts.freeQty
-                                    availableProduct.notApi.freeQtyMain=pobProducts.schemeFreeQty
-                                    availableProduct.notApi.insertedProductId=pobProducts.productId
-                                    availableProduct.notApi.isSaved=true
-                                    availableProduct.notApi.pobId= pobProducts?.pobId!!
-                                    availableProduct.notApi.pobNo= pobProducts?.pobNo.toString()
+                                    if(availableProduct.productId==pobProducts.productId)
+                                    {
+                                        availableProduct.notApi.amount=pobProducts.amount
+                                        availableProduct.notApi.rate=pobProducts.rate
+                                        availableProduct.notApi.qty=pobProducts.qty
+                                        availableProduct.notApi.totalQty=pobProducts.totalQty
+                                        availableProduct.notApi.scheme=pobProducts.schemeNameWithQty
+                                        availableProduct.notApi.schemeId=pobProducts.schemeId
+                                        availableProduct.notApi.salesQty=pobProducts.schemeSalesQty
+                                        availableProduct.notApi.salesQtyMain=pobProducts.schemeSalesQty
+                                        availableProduct.notApi.freeQty=pobProducts.freeQty
+                                        availableProduct.notApi.freeQtyMain=pobProducts.schemeFreeQty
+                                        availableProduct.notApi.insertedProductId=pobProducts.productId
+                                        availableProduct.notApi.isSaved=true
+                                        availableProduct.notApi.pobId= pobProducts?.pobId!!
+                                        availableProduct.notApi.pobNo= pobProducts?.pobNo.toString()
 
-                                    unSelectedProductList.set(index,availableProduct)
-                                    selectedProductList.add(availableProduct)
+                                        unSelectedProductList.set(index,availableProduct)
+                                        selectedProductList.add(availableProduct)
 
+                                    }
                                 }
                             }
+                            setPobAdapter()
                         }
-                        setPobAdapter()
+                        selectedDoctorId= modelObj.partyId!!
+                        createNew_btn.visibility=View.VISIBLE
+                        pobClassObj.calculateTotalProduct(selectedProductList,totalProductPrice_tv)
+
+                        selectParty_et.setText(modelObj?.partyName)
                     }
-                    selectedDoctorId= modelObj.partyId!!
-                    createNew_btn.visibility=View.VISIBLE
-                    calculateTotalProduct()
-                    selectParty_et.setText(modelObj?.partyName)
+                    else
+                    {
+                        val modelObj=response.body()?.getData()?.sobData
+                        if (modelObj != null) {
+                            globalSaveModelSOB=modelObj
+                        }
+
+                        selectTeam_et.setText("")
+
+                        pobNumber_et.setText(modelObj?.sobNo)
+                        remarkPOB_Et.setText(modelObj?.remark)
+                        stockistName.text="Stockist name - "+modelObj?.stockistName
+                        if(modelObj?.stockistName?.isEmpty()==false) stockistName.visibility=View.VISIBLE
+                        val filterDate=generalClass.convertApiDateTime_toDate(modelObj?.sobDate)
+                        if(filterDate.isEmpty()==false) selectDate_et.setText(filterDate)
+
+                        if( modelObj?.sobDetailList?.size!=0)
+                        {
+                            selectedProductList.clear()
+                            for (pobProducts in modelObj?.sobDetailList!!)
+                            {
+                                for((index,availableProduct) in unSelectedProductList.withIndex())
+                                {
+                                    if(availableProduct.productId==pobProducts.productId)
+                                    {
+                                        availableProduct.notApi.amount=pobProducts.amount
+                                        availableProduct.notApi.rate=pobProducts.rate
+                                        availableProduct.notApi.qty=pobProducts.qty
+                                        availableProduct.notApi.totalQty=pobProducts.totalQty
+                                        availableProduct.notApi.scheme=pobProducts.schemeNameWithQty
+                                        availableProduct.notApi.schemeId=pobProducts.schemeId
+                                        availableProduct.notApi.salesQty=pobProducts.schemeSalesQty
+                                        availableProduct.notApi.salesQtyMain=pobProducts.schemeSalesQty
+                                        availableProduct.notApi.freeQty=pobProducts.freeQty
+                                        availableProduct.notApi.freeQtyMain=pobProducts.schemeFreeQty
+                                        availableProduct.notApi.insertedProductId=pobProducts.productId
+                                        availableProduct.notApi.isSaved=true
+                                        availableProduct.notApi.pobId= pobProducts?.pobId!!
+                                        availableProduct.notApi.pobNo= pobProducts?.pobNo.toString()
+
+                                        unSelectedProductList.set(index,availableProduct)
+                                        selectedProductList.add(availableProduct)
+
+                                    }
+                                }
+                            }
+                            setPobAdapter()
+                        }
+                        createNew_btn.visibility=View.VISIBLE
+                        pobClassObj.calculateTotalProduct(selectedProductList,totalProductPrice_tv)
+                    }
+                    assignStockist.isClickable=false
+                    selectDate_et.setFocusable(false);
+                    selectDate_et.setEnabled(false);
+                    docRetail_switch.setFocusable(false);
+                    docRetail_switch.setEnabled(false);
+                    selectTeam_et.setFocusable(false);
+                    selectTeam_et.setEnabled(false);
+                    selectParty_et.setFocusable(false);
+                    selectParty_et.setEnabled(false);
+
                 }
                 else { alertClass.commonAlert("",response.body()?.getErrorObj()?.errorMessage.toString()) }
                 alertClass.hideAlert()
@@ -1025,7 +1086,7 @@ class CreatePobActivity : BaseActivity(), IdNameBoll_interface, productTransfer,
     {
         mode=2
         id?.let { fetchPOB_ById_API(it) }
-       // setEditShow(selectionType)
+
     }
 
     //use for set layout to its default
@@ -1039,6 +1100,15 @@ class CreatePobActivity : BaseActivity(), IdNameBoll_interface, productTransfer,
         totalProductPrice_tv.setText("Order total: 00")
         stockistName.visibility=View.GONE
         pobNumber_et.setText("")
+        assignStockist.isClickable=true
+        selectDate_et.setFocusable(true);
+        selectDate_et.setEnabled(true);
+        docRetail_switch.setFocusable(true);
+        docRetail_switch.setEnabled(true);
+        selectTeam_et.setFocusable(true);
+        selectTeam_et.setEnabled(true);
+        selectParty_et.setFocusable(true);
+        selectParty_et.setEnabled(true);
 
        for((index,unSelected) in unSelectedProductList.withIndex())
        {
@@ -1050,10 +1120,25 @@ class CreatePobActivity : BaseActivity(), IdNameBoll_interface, productTransfer,
            }
 
        }
-
         selectedProductList = ArrayList()
         setPobAdapter()
         getPobNumber()
+    }
+
+    fun callServerDocRetailerApi()
+    {
+        val coroutineScope= CoroutineScope(Dispatchers.IO + generalClass.coroutineExceptionHandler).launch {
+            try
+            {
+                val getDocCall= async { getDocCallAPI() }
+                getDocCall.await()
+            }
+            catch (e:Exception)
+            { }
+        }
+        coroutineScope.invokeOnCompletion {
+            coroutineScope.cancel()
+        }
     }
 
     override fun onResume() {
@@ -1067,7 +1152,6 @@ class CreatePobActivity : BaseActivity(), IdNameBoll_interface, productTransfer,
         super.onPause()
         stopConnectivity(this)
     }
-
 
     /*  fun checkCurrentDCR_API() {
         var format = SimpleDateFormat("dd/MM/yyyy")
@@ -1146,21 +1230,4 @@ class CreatePobActivity : BaseActivity(), IdNameBoll_interface, productTransfer,
             }
         }
     }*/
-
-    fun callServerDocRetailerApi()
-    {
-        val coroutineScope= CoroutineScope(Dispatchers.IO + generalClass.coroutineExceptionHandler).launch {
-            try
-            {
-                val getDocCall= async { getDocCallAPI() }
-                getDocCall.await()
-            }
-            catch (e:Exception)
-            { }
-        }
-        coroutineScope.invokeOnCompletion {
-            coroutineScope.cancel()
-        }
-    }
-
 }

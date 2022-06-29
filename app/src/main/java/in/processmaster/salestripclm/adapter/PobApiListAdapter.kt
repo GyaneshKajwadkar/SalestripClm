@@ -2,10 +2,7 @@ package `in`.processmaster.salestripclm.adapter
 
 import IntegerInterface
 import `in`.processmaster.salestripclm.R
-import `in`.processmaster.salestripclm.adapter.ButtonFilterAdapter
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
-import `in`.processmaster.salestripclm.interfaceCode.StringInterface
-import `in`.processmaster.salestripclm.models.CommonModel
 import `in`.processmaster.salestripclm.models.CreatePOBModel
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -20,8 +17,12 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 
-class PobApiListAdapter(val pobList: List<CreatePOBModel.Data.pobObject>?, val intergerInterface :IntegerInterface?,
-val activity: Activity?
+class PobApiListAdapter(
+    val openType:Int,
+    val pobList: List<CreatePOBModel.Data.pobObject>?,
+    val sobList: List<CreatePOBModel.Data.SobObject>?,
+    val intergerInterface :IntegerInterface?,
+    val activity: Activity?
 ) : RecyclerView.Adapter<PobApiListAdapter.MyViewHolder>() {
 
     override fun onCreateViewHolder(
@@ -47,35 +48,58 @@ val activity: Activity?
         holder: MyViewHolder,
         @SuppressLint("RecyclerView") position: Int
     ) {
-        val modelClass= pobList?.get(position)
-        holder.name_tv.setText(modelClass?.partyName)
-        modelClass?.pobNo?.let { holder.pobId_tv.setText(it) }
-        holder.orderValue_tv.setText("Order value: "+ modelClass?.totalPOB.toString())
+        if(openType==1)
+        {
+            val modelClass= pobList?.get(position)
+            holder.name_tv.setText(modelClass?.partyName)
+            modelClass?.pobNo?.let { holder.pobId_tv.setText(it) }
+            holder.orderValue_tv.setText("Order value: "+ modelClass?.totalPOB.toString())
 
-        if(modelClass?.pobType.equals("DOCTOR")) holder.pobSelection_mb.setBackgroundTintList(
-            activity?.let { ContextCompat.getColorStateList(it, R.color.orange) })
-        else  holder.pobSelection_mb.setBackgroundTintList(activity?.let {
-            ContextCompat.getColorStateList(
-                it, R.color.appColor)
-        })
+            if(modelClass?.pobType.equals("DOCTOR")) holder.pobSelection_mb.setBackgroundTintList(
+                activity?.let { ContextCompat.getColorStateList(it, R.color.orange) })
+            else  holder.pobSelection_mb.setBackgroundTintList(activity?.let {
+                ContextCompat.getColorStateList(
+                    it, R.color.appColor)
+            })
 
-        holder.pobSelection_mb.setText(modelClass?.pobType)
+            holder.pobSelection_mb.setText(modelClass?.pobType)
 
-        holder.view_iv.setOnClickListener {
-            modelClass?.pobId?.let { it1 -> intergerInterface?.passid(it1,1) } //selection type for view=1 and selectrion type for edit=2
+            holder.view_iv.setOnClickListener {
+                modelClass?.pobId?.let { it1 -> intergerInterface?.passid(it1,1) } //selection type for view=1 and selectrion type for edit=2
+            }
+
+            holder.edit_iv.setOnClickListener {
+                modelClass?.pobId?.let { it1 -> intergerInterface?.passid(it1,2) } //selection type for view=1 and selectrion type for edit=2
+            }
+
+            val filterDate= activity?.let { GeneralClass(it).convertApiDateTime_toDate(modelClass?.pobDate) }
+            if(filterDate?.isEmpty()==false) holder.date_tv.setText(filterDate)
         }
+        else {
+            val modelClass= sobList?.get(position)
+            holder.name_tv.setText(modelClass?.stockistName)
+            modelClass?.sobNo?.let { holder.pobId_tv.setText(it) }
+            holder.orderValue_tv.setText("Order value: "+ modelClass?.totalSOB.toString())
+            //modelClass?.stockistName
+            holder.pobSelection_mb.setText("Stockist")
 
-        holder.edit_iv.setOnClickListener {
-            modelClass?.pobId?.let { it1 -> intergerInterface?.passid(it1,2) } //selection type for view=1 and selectrion type for edit=2
+            holder.view_iv.setOnClickListener {
+                modelClass?.sobId?.let { it1 -> intergerInterface?.passid(it1,1) } //selection type for view=1 and selectrion type for edit=2
+            }
+
+            holder.edit_iv.setOnClickListener {
+                modelClass?.sobId?.let { it1 -> intergerInterface?.passid(it1,2) } //selection type for view=1 and selectrion type for edit=2
+            }
+
+            val filterDate= activity?.let { GeneralClass(it).convertApiDateTime_toDate(modelClass?.sobDate) }
+            if(filterDate?.isEmpty()==false) holder.date_tv.setText(filterDate)
         }
-
-        val filterDate= activity?.let { GeneralClass(it).convertApiDateTime_toDate(modelClass?.pobDate) }
-        if(filterDate?.isEmpty()==false) holder.date_tv.setText(filterDate)
-
     }
 
     override fun getItemCount(): Int {
-        return pobList?.size!!
+        if(openType==1)  return pobList?.size!!
+        else  return sobList?.size!!
+
     }
 
     override fun getItemId(position: Int): Long {

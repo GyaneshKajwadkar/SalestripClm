@@ -41,6 +41,7 @@ import kotlinx.android.synthetic.main.checkbox_bottom_sheet.*
 import kotlinx.android.synthetic.main.checkbox_bottom_sheet.noDataCheckAdapter_tv
 import kotlinx.android.synthetic.main.common_toolbar.*
 import kotlinx.android.synthetic.main.pob_product_bottom_sheet.*
+import kotlinx.android.synthetic.main.pob_view.*
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -231,7 +232,6 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
-
         checkRecyclerView_rv.layoutManager=LinearLayoutManager(this)
         workingWithRv.layoutManager=LinearLayoutManager(this)
         sample_rv.layoutManager=LinearLayoutManager(this)
@@ -292,7 +292,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             else if(isChecked && R.id.pob_btn == checkedId)
             {
                 hideAllSelection()
-                pobParent.visibility=View.VISIBLE
+                pobParentSubmitEdetailing.visibility=View.VISIBLE
             }
         })
 
@@ -363,6 +363,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 saveModel.pobObject?.pobDate=generalClass.getCurrentDateTimeApiForamt()
                 saveModel.pobObject?.partyId=doctorIdDisplayVisual
                 saveModel.pobObject?.employeeId= loginModelHomePage.empId
+                saveModel.pobObject?.remark= remarkPOB_Et.text.toString()
             }
             saveModel.pobObject?.pobDetailList= ArrayList()
             for(dataObj in filterSelectecd)
@@ -802,7 +803,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
     fun hideAllSelection()
     {   commonSearch_et.setText("")
-        pobParent.visibility=View.GONE
+        pobParentSubmitEdetailing.visibility=View.GONE
         sample_rv.visibility=View.GONE
         gift_rv.visibility=View.GONE
         workingWithRv.visibility=View.GONE
@@ -1621,6 +1622,9 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                     checkIsDcrSave
                 )
                 remark_Et.isEnabled=false
+                remarkPOB_Et.isEnabled=false
+                remarkPOB_Et.setText(edetailingEditModel?.pobObject?.remark)
+
                 edetailing_rv.adapter=EdetallingAdapter()
                 visitPurpose_spinner.setSelection(spinnerSelect)
                 stokistArray.forEachIndexed { index, element ->
@@ -1667,6 +1671,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 saveModel.pobObject?.pobDate=generalClass.getCurrentDateTimeApiForamt()
                 saveModel.pobObject?.partyId=doctorIdDisplayVisual
                 saveModel.pobObject?.employeeId= loginModelHomePage.empId
+                saveModel.pobObject?.remark= remarkPOB_Et.text.toString()
             }
 
             if(selectedStockist.id!=null && selectedStockist.id!="" && filterSelectecd.size!=0)  saveModel.pobObject?.stockistId=selectedStockist.id.toInt()
@@ -1780,7 +1785,6 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
     }
 
     override fun onClickEdit(productModel: SyncModel.Data.Product, positon: Int) {
-
     }
 
     override fun onResume() {

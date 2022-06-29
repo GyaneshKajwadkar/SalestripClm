@@ -26,9 +26,7 @@ class PobProductAdapter(
     val viewType:Int,
     val searchEdit:EditText?
 ): RecyclerView.Adapter<PobProductAdapter.MyViewHolder>(), Filterable {
-
     var productFilteringList= productList?.filter { s-> s.notApi.isSaved==false } as?  ArrayList<SyncModel.Data.Product>
-   // var productFilteringList= ArrayList(productList)
     var  buttonFilterList: ArrayList<SyncModel.Data.Product>? = ArrayList()
     var searchText=""
     var isFilterSelection=false
@@ -59,7 +57,6 @@ class PobProductAdapter(
         holder: MyViewHolder,
         @SuppressLint("RecyclerView") position: Int
     ) {
-
         if(viewType==2)
         {
             val model = productFilteringList?.get(position)
@@ -88,7 +85,6 @@ class PobProductAdapter(
                 holder.qty_et.setText(model.notApi?.qty.toString())
             }
 
-
             schemeList?.forEachIndexed { index, element ->
                if(element.productId==model?.productId)
                {
@@ -102,6 +98,7 @@ class PobProductAdapter(
             }
 
             holder.qty_et.setTag(position)
+
             holder.setIsRecyclable(false)
 
             holder.qty_et.setFilters(arrayOf<InputFilter>(InputFilter.LengthFilter(5)))
@@ -118,9 +115,7 @@ class PobProductAdapter(
                         {
                             model?.notApi?.scheme=holder.scheme_tv.text.toString()
                             model?.notApi?.schemeId=model?.notApi?.schemeId
-
                             val getFree=s.toString().toInt()/ model?.notApi?.salesQty!! * model?.notApi?.freeQtyMain!!
-
                             model?.notApi?.freeQty=getFree
                             val totalQty=getFree+s.toString().toInt()
                             model?.notApi?.totalQty=totalQty
@@ -133,32 +128,6 @@ class PobProductAdapter(
                            model?.notApi?.qty=s.toString().toInt()
                            model?.notApi?.totalQty=s.toString().toInt()
                         }
-                    /*   if(sendEDetailingArray?.size==0)
-                        {
-                            val getCurrentObj= Send_EDetailingModel.PobObj.PobDetailList()
-                            sendEDetailingArray?.add(getSchemeObject(getCurrentObj,model!!,holder,s))
-
-                        }
-
-                        for((index,getId) in sendEDetailingArray?.withIndex()!!)
-                        {
-                            if(getId.productId==model?.productId) checkSelected=true
-                            if(index==sendEDetailingArray!!.size-1)
-                            {
-                                if(checkSelected)
-                                {
-                                    val getCurrentObj: Send_EDetailingModel.PobObj.PobDetailList? = sendEDetailingArray!!.find { it.productId == model?.productId }
-                                    val position=sendEDetailingArray?.indexOf(getCurrentObj)
-                                    position?.let { sendEDetailingArray?.set(it, getSchemeObject(getCurrentObj,model!!,holder,s)) }
-                                }
-                                else
-                                {
-                                    val getCurrentObj= Send_EDetailingModel.PobObj.PobDetailList()
-                                    sendEDetailingArray?.add(getSchemeObject(getCurrentObj,model!!,holder,s))
-                                }
-                            }
-                        }*/
-
                     }
                     else model?.notApi=SyncModel.Data.Product.NotApiData()
                 }
@@ -166,64 +135,14 @@ class PobProductAdapter(
                 override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 }
             })
-
-          /*  holder.qty_et.setOnFocusChangeListener(object : View.OnFocusChangeListener {
-                override fun onFocusChange(v: View, hasFocus: Boolean) {
-                    if (hasFocus) {
-                        v.postDelayed({
-                            if (!v.hasFocus()) {
-                                v.requestFocus()
-                            }
-                        }, 100)
-                    }
-                }
-            })*/
-            }
+        }
     }
 
-  /*  fun getSchemeObject(
-        getCurrentObj: Send_EDetailingModel.PobObj.PobDetailList?,
-        model: SyncModel.Data.Product,
-        holder: MyViewHolder,
-        s: Editable
-    ):Send_EDetailingModel.PobObj.PobDetailList
-    {
-        getCurrentObj?.rate=model.price
-        getCurrentObj?.packingTypeName=model.packingTypeName
-        getCurrentObj?.productName=model.productName
-        getCurrentObj?.productId=model.productId
-        getCurrentObj?.salesQtyMain=model.notApi?.salesQty
-        if( holder.scheme_tv.visibility==View.VISIBLE)
-        {
-            getCurrentObj?.scheme=holder.scheme_tv.text.toString()
-            getCurrentObj?.schemeId=model.notApi?.schemeId
-
-            val getFree=s.toString().toInt()/ model.notApi?.salesQty!! * model.notApi?.freeQty!!
-
-
-            getCurrentObj?.freeQty=getFree
-            val totalQty=getFree+s.toString().toInt()
-            getCurrentObj?.totalQty=totalQty
-            getCurrentObj?.qty=s.toString().toInt()
-            getCurrentObj?.amount=totalQty*model.price
-            getCurrentObj?.freeQtyMain=model.notApi?.freeQty
-
-        }
-        else
-        {
-            getCurrentObj?.amount=s.toString().toInt()*model.price
-            getCurrentObj?.qty=s.toString().toInt()
-            getCurrentObj?.totalQty=s.toString().toInt()
-        }
-       return getCurrentObj!!
-    }
-*/
     override fun getItemCount(): Int {
         return productFilteringList?.size!!
     }
 
-
-     fun setSelction()
+    fun setSelction()
     {
         isFilterSelection=false
         searchEdit?.setText("")
@@ -238,7 +157,6 @@ class PobProductAdapter(
 
         tempFilterList?.let { sendProductInterface?.onClickButtonProduct(it,1) }
     }
-
 
     override fun getItemId(position: Int): Long {
         return position.toLong()
@@ -324,5 +242,4 @@ class PobProductAdapter(
         searchEdit?.setText("")
       //  getFilter()?.filter(searchText)
     }
-
 }

@@ -1245,6 +1245,26 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return edetailList;
     }
 
+    @SuppressLint("Range")
+    public ArrayList<CreatePOBModel.Data.SobObject>getAllSaveSOB(String type)
+    {
+        ArrayList<CreatePOBModel.Data.SobObject> list = new ArrayList<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_SAVE_SEND_API, new String[] { APIKEY_DATA}, API_TYPE + "=?",
+                new String[] {type}, null, null, null, null);
+        if (cursor.moveToFirst()) {
+            do {
+                String data=cursor.getString(cursor.getColumnIndex(APIKEY_DATA));
+                CreatePOBModel.Data.SobObject getSaveModel  = new Gson().fromJson(data, CreatePOBModel.Data.SobObject.class);
+                list.add(getSaveModel);
+            }
+            while (cursor.moveToNext());
+        }
+        cursor.close();
+        return list;
+    }
+
 
     @SuppressLint("Range")
     public ArrayList<DailyDocVisitModel.Data.DcrDoctor>getAllSaveSend(String type)
