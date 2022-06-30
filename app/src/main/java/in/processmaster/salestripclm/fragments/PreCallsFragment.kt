@@ -108,7 +108,15 @@ class PreCallsFragment() : Fragment() {
             startActivityForResult(intent,3)
         })
 
-        preCallAnalysisApi(doctorDetailModel)
+        if(generalClassObject?.isInternetAvailable() == true) {
+            preCallAnalysisApi(doctorDetailModel)
+        }
+        else {
+            viewParent?.parentButton?.visibility=View.VISIBLE
+            viewParent?.analysisProgress?.visibility=View.GONE
+            viewParent?.noData_gif?.visibility=View.VISIBLE
+            viewParent?.noInternet_tv?.visibility=View.VISIBLE
+        }
     }
 
     private fun preCallAnalysisApi(doctorDetailModel: SyncModel.Data.Doctor) {

@@ -198,7 +198,7 @@ class LoginActivity : BaseActivity() {
 
         apiInterface= APIClientKot().getClient(2, sharePreferance?.getPref("secondaryUrl")).create(APIInterface::class.java)
 
-        var call: Call<GenerateOTPModel>? = apiInterface?.sendDeviceDetailApi(deviceDetailModel) as? Call<GenerateOTPModel>
+        var call: Call<GenerateOTPModel>? = apiInterface?.sendDeviceDetailApi("bearer " + loginModel?.accessToken,deviceDetailModel) as? Call<GenerateOTPModel>
         call?.enqueue(object : Callback<GenerateOTPModel?> {
             override fun onResponse(call: Call<GenerateOTPModel?>?, response: Response<GenerateOTPModel?>) {
                 Log.e("sendDeviceDetail_api", response.code().toString() + "")

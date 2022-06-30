@@ -6,59 +6,65 @@
     android:orientation="vertical"
     tools:context=".fragments.PreCallsFragment">
 
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/parentButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="end"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/skipDetailing_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:backgroundTint="#CC5500"
+            android:padding="10dp"
+            android:text="Skip detailing"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:visibility="invisible" />
+
+        <Button
+            android:id="@+id/startDetailing_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:backgroundTint="@color/appDarkColor"
+            android:padding="10dp"
+            android:text="Start detailing"
+            android:textAllCaps="false"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+
+
     <androidx.core.widget.NestedScrollView
-        android:visibility="invisible"
+        android:layout_below="@+id/parentButton"
         android:id="@+id/parentPreCall_nv"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:visibility="invisible">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_gravity="end"
-                android:id="@+id/parentButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_alignParentRight="true">
 
-                <Button
-                    android:visibility="invisible"
-                    android:layout_margin="3dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="10dp"
-                    android:textColor="@color/white"
-                    android:text="Skip detailing"
-                    android:id="@+id/skipDetailing_btn"
-                    android:backgroundTint="#CC5500"
-                    android:textAllCaps="false"/>
-
-                <Button
-                    android:layout_margin="3dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="10dp"
-                    android:textColor="@color/white"
-                    android:text="Start detailing"
-                    android:id="@+id/startDetailing_btn"
-                    android:backgroundTint="@color/appDarkColor"
-                    android:textAllCaps="false"/>
-
-            </LinearLayout>
 
             <RelativeLayout
-                android:layout_below="@+id/parentButton"
+                android:id="@+id/precall_parent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/precall_parent">
+                android:layout_below="@+id/parentButton">
 
                 <ScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    >
+                    android:layout_height="wrap_content">
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -69,13 +75,14 @@
                             android:layout_height="wrap_content"
                             android:padding="10dp"
                             android:text="Precall Analysis"
-                            android:textStyle="bold"
+                            android:textColor="@color/zm_red"
                             android:textSize="25sp"
-                            android:textColor="@color/zm_red"/>
+                            android:textStyle="bold" />
+
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
-                            android:background="@color/appDarkColor"/>
+                            android:background="@color/appDarkColor" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -88,91 +95,101 @@
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal"
                                 android:weightSum="2.001">
+
                                 <TableLayout
-                                    android:layout_weight="1"
                                     android:layout_width="0dp"
-                                    android:layout_height="wrap_content">
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1">
 
                                     <TableRow
                                         android:id="@+id/lastVisit_tr"
                                         android:layout_width="0dp"
                                         android:layout_height="wrap_content"
                                         android:weightSum="1">
+
                                         <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
                                             android:layout_weight="0.1"
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
                                             android:text="Last visit data"
-                                            android:textSize="16sp"
-                                            android:textColor="@color/black" />
+                                            android:textColor="@color/black"
+                                            android:textSize="16sp" />
+
                                         <TextView
-                                            android:layout_weight="0.9"
+                                            android:id="@+id/lastVisitDate_tv"
                                             android:layout_width="match_parent"
                                             android:layout_height="wrap_content"
+                                            android:layout_weight="0.9"
                                             android:text=""
-                                            android:textSize="16sp"
-                                            android:id="@+id/lastVisitDate_tv" />
+                                            android:textSize="16sp" />
                                     </TableRow>
+
                                     <TableRow
                                         android:id="@+id/workingWith_tr"
                                         android:layout_width="0dp"
                                         android:layout_height="wrap_content"
                                         android:weightSum="1">
+
                                         <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
                                             android:layout_weight="0.1"
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
                                             android:text="Working with"
-                                            android:textSize="16sp"
-                                            android:textColor="@color/black" />
+                                            android:textColor="@color/black"
+                                            android:textSize="16sp" />
+
                                         <TextView
-                                            android:layout_weight="0.9"
+                                            android:id="@+id/workingWith_tv"
                                             android:layout_width="match_parent"
                                             android:layout_height="wrap_content"
+                                            android:layout_weight="0.9"
                                             android:text=""
-                                            android:id="@+id/workingWith_tv"
                                             android:textSize="16sp" />
                                     </TableRow>
+
                                     <TableRow
                                         android:id="@+id/reportedTime_tr"
                                         android:layout_width="0dp"
                                         android:layout_height="wrap_content"
                                         android:weightSum="1">
+
                                         <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
                                             android:layout_weight="0.1"
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
                                             android:text="Reported time"
-                                            android:textSize="16sp"
                                             android:textColor="@color/black"
-                                            />
+                                            android:textSize="16sp" />
+
                                         <TextView
-                                            android:layout_weight="0.9"
+                                            android:id="@+id/reportedTime_tv"
                                             android:layout_width="match_parent"
                                             android:layout_height="wrap_content"
+                                            android:layout_weight="0.9"
                                             android:text=""
-                                            android:id="@+id/reportedTime_tv"
                                             android:textSize="16sp" />
                                     </TableRow>
+
                                     <TableRow
                                         android:id="@+id/visitPurpose_tr"
                                         android:layout_width="0dp"
                                         android:layout_height="wrap_content"
                                         android:weightSum="1">
+
                                         <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
                                             android:layout_weight="0.1"
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
                                             android:text="Visit purpose"
-                                            android:textSize="16sp"
                                             android:textColor="@color/black"
-                                            />
+                                            android:textSize="16sp" />
+
                                         <TextView
-                                            android:layout_weight="0.9"
+                                            android:id="@+id/visitPurpose_tv"
                                             android:layout_width="match_parent"
                                             android:layout_height="wrap_content"
+                                            android:layout_weight="0.9"
                                             android:text=""
-                                            android:id="@+id/visitPurpose_tv"
                                             android:textSize="16sp" />
                                     </TableRow>
                                 </TableLayout>
@@ -180,26 +197,27 @@
 
                                 <LinearLayout
                                     android:id="@+id/remark_ll"
-                                    android:layout_weight="1"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:orientation="horizontal"
-                                    android:layout_marginLeft="5dp">
+                                    android:layout_marginLeft="5dp"
+                                    android:layout_weight="1"
+                                    android:orientation="horizontal">
+
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
+                                        android:padding="2dp"
                                         android:text="Remark"
-                                        android:textSize="18sp"
                                         android:textColor="@color/black"
-                                        android:padding="2dp" />
+                                        android:textSize="18sp" />
+
                                     <TextView
+                                        android:id="@+id/remark_tv"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:text=""
-                                        android:textSize="18sp"
                                         android:padding="2dp"
-                                        android:id="@+id/remark_tv"
-                                        />
+                                        android:text=""
+                                        android:textSize="18sp" />
                                 </LinearLayout>
 
                             </LinearLayout>
@@ -207,134 +225,134 @@
                             <View
                                 android:layout_width="match_parent"
                                 android:layout_height="0.5dp"
-                                android:background="@color/appColor"/>
+                                android:background="@color/appColor" />
+
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal"
                                 android:padding="5dp"
                                 android:weightSum="2.01">
+
                                 <LinearLayout
-                                    android:layout_gravity="top"
                                     android:layout_width="0dp"
                                     android:layout_height="match_parent"
-                                    android:orientation="vertical"
-                                    android:layout_weight="1">
+                                    android:layout_gravity="top"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
 
                                     <TextView
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
                                         android:text="Last POB Details"
-                                        android:textSize="18sp"
-                                        android:textColor="@color/black" />
+                                        android:textColor="@color/black"
+                                        android:textSize="18sp" />
+
                                     <TextView
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
                                         android:text="Assigned stocklist:"
-                                        android:textColor="@color/appColor"
-                                        />
+                                        android:textColor="@color/appColor" />
+
                                     <TextView
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
                                         android:id="@+id/total_tv"
-                                        />
-                                    <TextView
                                         android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
+                                        android:layout_height="wrap_content" />
+
+                                    <TextView
                                         android:id="@+id/remarkPOB_tv"
-                                        />
-                                    <TextView
                                         android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
+                                        android:layout_height="wrap_content" />
+
+                                    <TextView
                                         android:id="@+id/datePob_tv"
-                                        />
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content" />
 
                                     <Button
+                                        android:id="@+id/viewDetail_lpobDetail"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:text="View detail"
+                                        android:layout_gravity="bottom"
+                                        android:layout_margin="5dp"
                                         android:backgroundTint="@color/appDarkColor"
                                         android:shadowRadius="20"
-                                        android:visibility="gone"
-                                        android:layout_margin="5dp"
-                                        android:layout_gravity="bottom"
-                                        android:id="@+id/viewDetail_lpobDetail"/>
+                                        android:text="View detail"
+                                        android:visibility="gone" />
                                 </LinearLayout>
 
                                 <View
                                     android:layout_width="0dp"
                                     android:layout_height="match_parent"
                                     android:layout_weight="0.01"
-                                    android:background="@color/gray"/>
+                                    android:background="@color/gray" />
 
                                 <LinearLayout
-                                    android:layout_marginLeft="10dp"
                                     android:layout_width="0dp"
                                     android:layout_height="match_parent"
-                                    android:orientation="vertical"
-                                    android:layout_weight="1">
+                                    android:layout_marginLeft="10dp"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
                                     <TextView
-                                        android:layout_weight="0.1"
+                                        android:id="@+id/lastRcpaHeader_tv"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
+                                        android:layout_weight="0.1"
                                         android:text="Last RCPA Details"
-                                        android:textSize="18sp"
-                                        android:id="@+id/lastRcpaHeader_tv"
                                         android:textColor="@color/black"
-                                        />
+                                        android:textSize="18sp" />
 
                                     <androidx.recyclerview.widget.RecyclerView
+                                        android:id="@+id/lastRcpaDetail_rv"
                                         android:layout_width="match_parent"
-                                        android:layout_height="match_parent"
-                                        android:id="@+id/lastRcpaDetail_rv"/>
+                                        android:layout_height="match_parent" />
 
                                 </LinearLayout>
                             </LinearLayout>
 
                             <LinearLayout
-                                android:background="@color/orange"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:background="@color/orange"
                                 android:orientation="horizontal"
                                 android:weightSum="3">
 
                                 <LinearLayout
                                     android:layout_width="0dp"
                                     android:layout_height="match_parent"
-                                    android:orientation="vertical"
+                                    android:layout_margin="0.5dp"
                                     android:layout_weight="1"
                                     android:background="@color/white"
-                                    android:layout_margin="0.5dp">
+                                    android:orientation="vertical">
 
                                     <TextView
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
+                                        android:background="@color/orange"
+                                        android:padding="2dp"
                                         android:text="Brand List"
-                                        android:textSize="18sp"
                                         android:textColor="@color/white"
-                                        android:background="@color/orange"
-                                        android:padding="2dp"
-                                        />
+                                        android:textSize="18sp" />
 
                                     <TextView
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
                                         android:id="@+id/noDataBrand"
-                                        android:textSize="16sp"
-                                        android:padding="5dp"
-                                        android:textAlignment="center"
-                                        android:text="No data available"
-                                        android:visibility="gone"
-                                        />
-
-                                    <androidx.recyclerview.widget.RecyclerView
-                                        android:layout_weight="0.9"
-                                        android:padding="3dp"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:nestedScrollingEnabled="false"
+                                        android:padding="5dp"
+                                        android:text="No data available"
+                                        android:textAlignment="center"
+                                        android:textSize="16sp"
+                                        android:visibility="gone" />
+
+                                    <androidx.recyclerview.widget.RecyclerView
                                         android:id="@+id/brandList_rv"
-                                        android:clipToPadding="true" />
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="0.9"
+                                        android:clipToPadding="true"
+                                        android:nestedScrollingEnabled="false"
+                                        android:padding="3dp" />
 
 
                                 </LinearLayout>
@@ -342,40 +360,38 @@
                                 <LinearLayout
                                     android:layout_width="0dp"
                                     android:layout_height="match_parent"
-                                    android:orientation="vertical"
+                                    android:layout_margin="0.5dp"
                                     android:layout_weight="1"
                                     android:background="@color/white"
-                                    android:layout_margin="0.5dp">
+                                    android:orientation="vertical">
 
                                     <TextView
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
+                                        android:background="@color/orange"
+                                        android:padding="2dp"
                                         android:text="Sample Given"
-                                        android:textSize="18sp"
                                         android:textColor="@color/white"
-                                        android:background="@color/orange"
-                                        android:padding="2dp"
-                                        />
+                                        android:textSize="18sp" />
 
                                     <TextView
+                                        android:id="@+id/noDataSample"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:id="@+id/noDataSample"
-                                        android:textSize="16sp"
                                         android:padding="5dp"
-                                        android:textAlignment="center"
                                         android:text="No data available"
-                                        android:visibility="gone"
-                                        />
+                                        android:textAlignment="center"
+                                        android:textSize="16sp"
+                                        android:visibility="gone" />
 
                                     <androidx.recyclerview.widget.RecyclerView
-                                        android:layout_weight="0.9"
+                                        android:id="@+id/sampleGiven_rv"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
+                                        android:layout_weight="0.9"
+                                        android:clipToPadding="true"
                                         android:nestedScrollingEnabled="false"
-                                        android:id="@+id/sampleGiven_rv"
-                                        android:padding="3dp"
-                                        android:clipToPadding="true" />
+                                        android:padding="3dp" />
 
 
                                 </LinearLayout>
@@ -383,40 +399,38 @@
                                 <LinearLayout
                                     android:layout_width="0dp"
                                     android:layout_height="match_parent"
-                                    android:orientation="vertical"
+                                    android:layout_margin="0.5dp"
                                     android:layout_weight="1"
                                     android:background="@color/white"
-                                    android:layout_margin="0.5dp">
+                                    android:orientation="vertical">
 
                                     <TextView
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:text="Gifts"
-                                        android:textSize="18sp"
-                                        android:textColor="@color/white"
                                         android:background="@color/orange"
                                         android:padding="2dp"
-                                        />
+                                        android:text="Gifts"
+                                        android:textColor="@color/white"
+                                        android:textSize="18sp" />
 
                                     <TextView
+                                        android:id="@+id/noDataGift"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:id="@+id/noDataGift"
-                                        android:textSize="16sp"
                                         android:padding="5dp"
-                                        android:textAlignment="center"
                                         android:text="No data available"
-                                        android:visibility="gone"
-                                        />
+                                        android:textAlignment="center"
+                                        android:textSize="16sp"
+                                        android:visibility="gone" />
 
                                     <androidx.recyclerview.widget.RecyclerView
-                                        android:layout_weight="0.9"
-                                        android:padding="3dp"
+                                        android:id="@+id/giftGiven_rv"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
+                                        android:layout_weight="0.9"
+                                        android:clipToPadding="true"
                                         android:nestedScrollingEnabled="false"
-                                        android:id="@+id/giftGiven_rv"
-                                        android:clipToPadding="true" />
+                                        android:padding="3dp" />
 
                                 </LinearLayout>
 
@@ -432,25 +446,32 @@
 
     </androidx.core.widget.NestedScrollView>
 
-    <ImageView
-        android:visibility="gone"
-        android:id="@+id/noData_gif"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
+    <LinearLayout
         android:layout_centerInParent="true"
-        android:src="@drawable/no_data_found" />
-
-    <TextView
-        android:id="@+id/noInternet_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/noData_gif"
-        android:layout_centerHorizontal="true"
-        android:text="No Internet connection"
-        android:textAlignment="center"
-        android:textColor="@color/zm_red"
-        android:textSize="22sp"
-        android:visibility="gone" />
+        android:orientation="vertical">
+
+        <ImageView
+            android:visibility="gone"
+            android:id="@+id/noData_gif"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:src="@drawable/no_data_found" />
+
+        <TextView
+            android:visibility="gone"
+            android:layout_gravity="center"
+            android:id="@+id/noInternet_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="No Internet connection"
+            android:textAlignment="center"
+            android:textColor="@color/zm_red"
+            android:textSize="22sp"
+             />
+    </LinearLayout>
 
     <ProgressBar
         android:layout_width="wrap_content"

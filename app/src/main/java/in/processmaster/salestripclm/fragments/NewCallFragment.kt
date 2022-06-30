@@ -770,21 +770,23 @@ class NewCallFragment : Fragment(),StringInterface {
 
 
 
-        if(generalClassObject?.isInternetAvailable() == true) {
+    /*    if(generalClassObject?.isInternetAvailable() == true) {*/
 
                     views?.frameRetailer_view?.visibility=View.GONE
                     views?.framePreCall_view?.visibility=View.VISIBLE
+                    views?.noInternet_tv?.visibility = View.GONE
+                    views?.noData_gif?.visibility = View.GONE
+
                     val transaction = childFragmentManager.beginTransaction()
                     transaction?.replace(R.id.framePreCall_view, PreCallsFragment(doctorDetailModel))
                     transaction?.disallowAddToBackStack()
                     transaction?.commit()
 
-                     views?.noInternet_tv?.visibility = View.GONE
-                     views?.noData_gif?.visibility = View.GONE
+
 
          //   preCallAnalysisApi(doctorDetailModel)
-        }
-        else noInternet_tv.visibility=View.VISIBLE; /*views?.parentButton?.visibility=View.VISIBLE*/
+/*        }
+        else noInternet_tv.visibility=View.VISIBLE; *//*views?.parentButton?.visibility=View.VISIBLE*/
 
     }
 

@@ -37,6 +37,7 @@ interface APIInterface
 
     @POST("api/users/clmUser-device-info")
     fun sendDeviceDetailApi(
+        @Header("Authorization") authorization: String?,
         @Body params: CommonModel.SendDeviceDetailModel,
         ): Call<GenerateOTPModel?>?
 
