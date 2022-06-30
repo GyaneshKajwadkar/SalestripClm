@@ -7,6 +7,7 @@ import `in`.processmaster.salestripclm.adapter.*
 import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.common_classes.CommonListGetClass
 import `in`.processmaster.salestripclm.common_classes.GeneralClass
+import `in`.processmaster.salestripclm.common_classes.PobCommonClass
 import `in`.processmaster.salestripclm.fragments.PresentEDetailingFrag.Companion.doctorIdDisplayVisual
 import `in`.processmaster.salestripclm.interfaceCode.*
 import `in`.processmaster.salestripclm.models.*
@@ -144,10 +145,14 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 }
             }
 
-            val string = Gson().toJson(staticSyncData)
-            val data= Gson().fromJson(string, SyncModel.Data::class.java)
-            mainProductList.addAll(data.productList.filter { s -> (s.productType==1) } as ArrayList<SyncModel.Data.Product>)
-            unSelectedProductList=ArrayList(mainProductList)
+          //  val string = Gson().toJson(staticSyncData)
+          //  val data= Gson().fromJson(string, SyncModel.Data::class.java)
+          //  mainProductList.addAll(data.productList.filter { s -> (s.productType==1) } as ArrayList<SyncModel.Data.Product>)
+          //  unSelectedProductList=ArrayList(mainProductList)
+
+            mainProductList.addAll(PobCommonClass(this).getProductList())
+            unSelectedProductList.addAll(PobCommonClass(this).getProductList())
+
 
             val getSchemeList=staticSyncData?.schemeList
             val filterByTypeSchemeList= getSchemeList?.filter { data -> (data?.schemeFor=="S" || data?.schemeFor=="H") }
