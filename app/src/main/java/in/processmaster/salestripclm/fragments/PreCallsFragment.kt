@@ -6,6 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import `in` .processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.HomePage
+import `in`.processmaster.salestripclm.activity.HomePage.Companion.homePageAlertClass
+import `in`.processmaster.salestripclm.activity.HomePage.Companion.homePageDataBase
+import `in`.processmaster.salestripclm.activity.HomePage.Companion.homePageGeneralClass
+import `in`.processmaster.salestripclm.activity.HomePage.Companion.homePageSharePref
 import `in`.processmaster.salestripclm.activity.OnlinePresentationActivity
 import `in`.processmaster.salestripclm.adapter.LastRCPA_Adapter
 import `in`.processmaster.salestripclm.adapter.SimpleListAdapter
@@ -56,59 +60,19 @@ import java.util.ArrayList
 class PreCallsFragment() : Fragment() {
 
     var viewParent:View?=null
-    var alertClass:AlertClass?=null
     var  docCallModel : DailyDocVisitModel.Data= DailyDocVisitModel.Data()
-    lateinit var db : DatabaseHandler
-    var sharePreferance: PreferenceClass? = null
-    var generalClassObject:GeneralClass?=null
-
-    lateinit var doctorDetailModel: SyncModel.Data.Doctor
-
-    constructor(doctorDetailModel: SyncModel.Data.Doctor) :this()
-    { this.doctorDetailModel=doctorDetailModel }
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        viewParent= inflater.inflate(R.layout.fragment_pre_calls, container, false)
-        initView()
+        viewParent= inflater.inflate(`in`.processmaster.salestripclm.R.layout.fragment_pre_calls, container, false)
         return  viewParent
         }
 
-    private fun initView() {
-
-        alertClass= AlertClass(activity)
-        db = DatabaseHandler(activity)
-        sharePreferance = PreferenceClass(activity)
-        generalClassObject = activity?.let { GeneralClass(it) }
-
-        val responseDocCall=db.getApiDetail(5)
-        if(!responseDocCall.equals("")) {
-            docCallModel = Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
-        }
-
-        viewParent?.startDetailing_btn?.setOnClickListener({
-
-            val isAlreadyContain=docCallModel.dcrDoctorlist?.any{ s -> s.doctorId == doctorDetailModel.doctorId }
-            if(isAlreadyContain == true) {
-                viewParent?.parentButton?.visibility=View.GONE
-
-                alertClass?.commonAlert("Alert!","This doctor DCR is already submitted")
-                return@setOnClickListener
-            }
-
-            val intent = Intent(activity, OnlinePresentationActivity::class.java)
-            intent.putExtra("doctorID", doctorDetailModel.doctorId)
-            intent.putExtra("doctorName", doctorDetailModel.doctorName)
-            intent.putExtra("skip", false)
-            intent.putExtra("doctorObj", Gson().toJson(doctorDetailModel))
-            intent.putExtra("isPresentation", true)
-            startActivityForResult(intent,3)
-        })
-
-        if(generalClassObject?.isInternetAvailable() == true) {
+    fun setViewPreCall(doctorDetailModel: SyncModel.Data.Doctor){
+        if(homePageGeneralClass?.isInternetAvailable() == true) {
+            viewParent?.noInternet_tv?.visibility=View.INVISIBLE
             preCallAnalysisApi(doctorDetailModel)
         }
         else {
@@ -116,14 +80,42 @@ class PreCallsFragment() : Fragment() {
             viewParent?.analysisProgress?.visibility=View.GONE
             viewParent?.noData_gif?.visibility=View.VISIBLE
             viewParent?.noInternet_tv?.visibility=View.VISIBLE
+            viewParent?.parentPreCall_nv?.visibility=View.INVISIBLE
         }
-    }
 
-    private fun preCallAnalysisApi(doctorDetailModel: SyncModel.Data.Doctor) {
+         viewParent?.startDetailing_btn?.setOnClickListener({
+
+             val responseDocCall=homePageDataBase?.getApiDetail(5)
+             if(!responseDocCall.equals("")) {
+                 docCallModel = Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
+             }
+
+             val isAlreadyContain=docCallModel.dcrDoctorlist?.any{ s -> s.doctorId == doctorDetailModel.doctorId }
+             if(isAlreadyContain == true) {
+                 viewParent?.parentButton?.visibility=View.GONE
+
+                 homePageAlertClass?.commonAlert("Alert!","This doctor DCR is already submitted")
+                 return@setOnClickListener
+             }
+
+             val intent = Intent(activity, OnlinePresentationActivity::class.java)
+             intent.putExtra("doctorID", doctorDetailModel.doctorId)
+             intent.putExtra("doctorName", doctorDetailModel.doctorName)
+             intent.putExtra("skip", false)
+             intent.putExtra("doctorObj", Gson().toJson(doctorDetailModel))
+             intent.putExtra("isPresentation", true)
+             startActivityForResult(intent,3)
+         })
+
+     }
+
+
+     fun preCallAnalysisApi(doctorDetailModel: SyncModel.Data.Doctor) {
 
         viewParent?.analysisProgress?.visibility=View.VISIBLE
+         viewParent?.parentPreCall_nv?.visibility=View.INVISIBLE
 
-        var profileData = sharePreferance?.getPref("profileData")           //get profile data from share preferance
+        var profileData = homePageSharePref?.getPref("profileData")           //get profile data from share preferance
         var loginModel = Gson().fromJson(profileData, LoginModel::class.java)
 
         //call submit visual ads api interfae post method
@@ -147,23 +139,23 @@ class PreCallsFragment() : Fragment() {
 
                     //remark_ll
                     if(analysisModel?.visitPurpose?.let {
-                            generalClassObject?.checkStringNullEmpty(it) } == true)
+                            homePageGeneralClass?.checkStringNullEmpty(it) } == true)
                     { viewParent?.visitPurpose_tr?.visibility=View.GONE }
                     else{ viewParent?.visitPurpose_tv?.setText(analysisModel?.visitPurpose) }
 
-                    if(analysisModel?.workWithName?.let { generalClassObject?.checkStringNullEmpty(it) } == true)
+                    if(analysisModel?.workWithName?.let { homePageGeneralClass?.checkStringNullEmpty(it) } == true)
                     { viewParent?.workingWith_tr?.visibility=View.GONE }
                     else{ viewParent?.workingWith_tv?.setText(analysisModel?.workWithName) }
 
-                    if(analysisModel?.strDcrDate?.let { generalClassObject?.checkStringNullEmpty(it) } == true)
+                    if(analysisModel?.strDcrDate?.let { homePageGeneralClass?.checkStringNullEmpty(it) } == true)
                     { viewParent?.lastVisit_tr?.visibility=View.GONE }
                     else{ viewParent?.lastVisitDate_tv?.setText(analysisModel?.strDcrDate) }
 
-                    if(analysisModel?.remarks?.let { generalClassObject?.checkStringNullEmpty(it) } == true)
+                    if(analysisModel?.remarks?.let { homePageGeneralClass?.checkStringNullEmpty(it) } == true)
                     { viewParent?.remark_ll?.visibility=View.GONE }
                     else{ viewParent?.remark_tv?.setText(analysisModel?.remarks) }
 
-                    if(analysisModel?.strReportedTime?.let { generalClassObject?.checkStringNullEmpty(it) } == true)
+                    if(analysisModel?.strReportedTime?.let { homePageGeneralClass?.checkStringNullEmpty(it) } == true)
                     { viewParent?.reportedTime_tr?.visibility=View.GONE }
                     else{ viewParent?.reportedTime_tv?.setText(analysisModel?.strReportedTime) }
 
@@ -216,7 +208,7 @@ class PreCallsFragment() : Fragment() {
                         val isAlreadyContain=docCallModel.dcrDoctorlist?.any{ s -> s.doctorId == doctorDetailModel.doctorId }
                         if(isAlreadyContain == true) {
                             viewParent?.parentButton?.visibility=View.GONE
-                            alertClass?.commonAlert("Alert!","Doctor e-detailing already done for today")
+                            homePageAlertClass?.commonAlert("Alert!","Doctor e-detailing already done for today")
                         }
 
                     }
@@ -254,11 +246,11 @@ class PreCallsFragment() : Fragment() {
                     viewParent?.total_tv?.setText("Total: "+analysisModel?.lastPOBDetails?.totalPOB)
 
 
-                    if(analysisModel?.lastPOBDetails?.remark?.let { generalClassObject?.checkStringNullEmpty(it) } == true)
+                    if(analysisModel?.lastPOBDetails?.remark?.let { homePageGeneralClass?.checkStringNullEmpty(it) } == true)
                     { viewParent?.remarkPOB_tv?.visibility=View.GONE }
                     else{ viewParent?.remarkPOB_tv?.setText("Remark: "+analysisModel?.lastPOBDetails?.remark) }
 
-                    if(analysisModel?.lastPOBDetails?.strPobDate?.let { generalClassObject?.checkStringNullEmpty(it) } == true)
+                    if(analysisModel?.lastPOBDetails?.strPobDate?.let { homePageGeneralClass?.checkStringNullEmpty(it) } == true)
                     { viewParent?.datePob_tv?.visibility=View.GONE }
                     else{ viewParent?.datePob_tv?.setText("Date: "+analysisModel?.lastPOBDetails?.strPobDate) }
 

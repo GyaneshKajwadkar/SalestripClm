@@ -102,7 +102,9 @@ class CreatePobActivity : BaseActivity(), IdNameBoll_interface, productTransfer,
             {
                 isManager=true
             }
-            else if(SplashActivity.staticSyncData?.settingDCR?.roleType=="FS") {
+
+            else if(SplashActivity.staticSyncData?.settingDCR?.roleType=="FS")
+            {
                 checkUser_ll.visibility = View.GONE
                 isManager=false
             }
@@ -777,7 +779,7 @@ class CreatePobActivity : BaseActivity(), IdNameBoll_interface, productTransfer,
             val random = Random().nextInt(max - min + 1) + min
 
             pobSaveModel.pobData?.randomNumber=random
-            dbBase.insertOrUpdateSaveAPI(random, Gson().toJson(pobSaveModel.pobData),"createOnlyPOB")
+            dbBase?.insertOrUpdateSaveAPI(random, Gson().toJson(pobSaveModel.pobData),"createOnlyPOB")
 
         }
         else
@@ -787,7 +789,7 @@ class CreatePobActivity : BaseActivity(), IdNameBoll_interface, productTransfer,
             val random = Random().nextInt(max - min + 1) + min
 
             pobSaveModel.sobData?.randomNumber=random
-            dbBase.insertOrUpdateSaveAPI(random, Gson().toJson(pobSaveModel.sobData),"createOnlySOB")
+            dbBase?.insertOrUpdateSaveAPI(random, Gson().toJson(pobSaveModel.sobData),"createOnlySOB")
         }
 
         alertClass.commonAlert("","Offline data save successfully")

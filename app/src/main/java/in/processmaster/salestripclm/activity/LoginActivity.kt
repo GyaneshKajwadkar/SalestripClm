@@ -276,7 +276,9 @@ class LoginActivity : BaseActivity() {
                         var versionHigher :Int? = namesList.get(1).replace(".","").toInt()
                         if(verionLower!= null &&  versionHigher!=null && version!=null)
                         {
-                            if( version < verionLower ||version > versionHigher ) { needUpdateAlert() }
+                            if( version < verionLower ||version > versionHigher ) {
+                            //    needUpdateAlert()
+                            }
                         }
 
                     } catch (e: Exception) {

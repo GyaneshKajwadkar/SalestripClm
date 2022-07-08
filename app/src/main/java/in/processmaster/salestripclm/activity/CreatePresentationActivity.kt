@@ -87,7 +87,7 @@ class CreatePresentationActivity : BaseActivity(), StringInterface {
                     generalClass.showSnackbar(it,"No item selected")
                     return@setOnClickListener}
 
-                dbBase.updatePresentaionData(updatePresentationName,Gson().toJson(selectedViewList))
+                dbBase?.updatePresentaionData(updatePresentationName,Gson().toJson(selectedViewList))
                 editButton.text="View presentation"
                 deleteButton.visibility=View.INVISIBLE
                 selectedViewList.clear()
@@ -103,11 +103,11 @@ class CreatePresentationActivity : BaseActivity(), StringInterface {
                 override fun run() {
                     if(AlertClass.retunDialog)
                     {
-                        dbBase.deletePresentaionData(updatePresentationName)
+                        dbBase?.deletePresentaionData(updatePresentationName)
                         runBlocking {
                             withContext(Dispatchers.IO){
                                 launch {
-                                    createdPresentatedList=dbBase.getAllSavedPresentationName()
+                                    createdPresentatedList= dbBase?.getAllSavedPresentationName() as ArrayList<String>
                                     if(createdPresentatedList.size==0) runOnUiThread { editButton.visibility=View.INVISIBLE }
                                 }
                             }
@@ -131,12 +131,12 @@ class CreatePresentationActivity : BaseActivity(), StringInterface {
 
     suspend fun processAllPages() = withContext(Dispatchers.Default) {
         launch {
-            val edetailingList = dbBase.getSelectedeDetail(true)
-            brandAdapter=Brand_Adapter(edetailingList)
+            val edetailingList = dbBase?.getSelectedeDetail(true)
+            brandAdapter= edetailingList?.let { Brand_Adapter(it) }!!
             runOnUiThread {  customePresentataion_rv.adapter=brandAdapter }
         }
         launch {
-            createdPresentatedList=dbBase.getAllSavedPresentationName()
+            createdPresentatedList= dbBase?.getAllSavedPresentationName() as ArrayList<String>
             if(createdPresentatedList.size==0) runOnUiThread { editButton.visibility=View.INVISIBLE }
         }
     }
@@ -161,7 +161,7 @@ class CreatePresentationActivity : BaseActivity(), StringInterface {
             runBlocking {
                 withContext(Dispatchers.Default){
                     launch {
-                        val itemList= modeldata?.geteDetailId()?.let { dbBase.getAllDownloadedData(it) }
+                        val itemList= modeldata?.geteDetailId()?.let { dbBase?.getAllDownloadedData(it) }
                         itemList?.removeAll { it.downloadType == "" }
 
                         Collections.sort(itemList, Comparator<DownloadFileModel?> { a1, a2 ->
@@ -395,9 +395,9 @@ class CreatePresentationActivity : BaseActivity(), StringInterface {
                 runBlocking {
                     withContext(Dispatchers.IO) {
                         launch {
-                            dbBase.insertCreatePresentaionData(nameEditText.text.toString(),Gson().toJson(selectedViewList))
+                            dbBase?.insertCreatePresentaionData(nameEditText.text.toString(),Gson().toJson(selectedViewList))
                             createdPresentatedList.clear()
-                            createdPresentatedList=dbBase.getAllSavedPresentationName()
+                            createdPresentatedList= dbBase?.getAllSavedPresentationName() as ArrayList<String>
                         }
 
                     }
@@ -457,7 +457,7 @@ class CreatePresentationActivity : BaseActivity(), StringInterface {
 
         updatePresentationName=passingString!!
         selectedViewList.clear()
-        selectedViewList.addAll(dbBase.getAllPresentationItem(passingString))
+        dbBase?.getAllPresentationItem(passingString)?.let { selectedViewList.addAll(it) }
         brandAdapter.notifyDataSetChanged()
         editButton.text="Update"
         createButton.text="Create new"

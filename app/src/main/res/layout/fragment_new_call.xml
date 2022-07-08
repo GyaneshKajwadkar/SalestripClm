@@ -982,9 +982,7 @@
                     android:textAlignment="center"
                     android:textColor="@color/zm_red"
                     android:textSize="22sp"
-                    android:visibility="gone"
-
-                    />
+                    android:visibility="gone" />
 
 
                 <ProgressBar
@@ -996,11 +994,15 @@
                     android:id="@+id/analysisProgress"/>
 
                 <FrameLayout
-                    android:visibility="invisible"
+                    android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/frameRetailer_view"/>
-
+                <FrameLayout
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/framePreCall_view"/>
 
             </RelativeLayout>
 

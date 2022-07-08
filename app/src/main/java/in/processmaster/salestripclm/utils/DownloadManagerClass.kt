@@ -148,7 +148,7 @@ class DownloadManagerClass(
                 else folder = File(context?.getExternalFilesDir(null)?.absolutePath , "/"+selectedObj.brandName+"/"+selectedObj.downloadType)
 
                 var iny: FileChannel? = null
-                var out: FileChannel ? = null
+                var out: FileChannel? = null
                 try {
 
                     folder.mkdirs()
@@ -157,7 +157,7 @@ class DownloadManagerClass(
 
                     iny = FileInputStream(inputFile).getChannel()
                     out = FileOutputStream(folder.absoluteFile.toString()+"/"+title).getChannel()
-                    out.transferFrom(iny, 0, iny.size());
+                    out.transferFrom(iny, 0, iny.size())
                     out.close()
                     out = null
 
@@ -178,7 +178,7 @@ class DownloadManagerClass(
                 } catch (fnfe1: FileNotFoundException) {
                     Log.e("tagABCD", fnfe1.message.toString())
                 } catch (e: java.lang.Exception) {
-                    Log.e("tagABVRDF", e.message!!)
+                    Log.e("tagABVRDF", e.message.toString())
                 }
             }
             cutFile.await()
@@ -209,10 +209,10 @@ class DownloadManagerClass(
             var count: Int
 
             while (zis.nextEntry.also { ze = it } != null) {
-                filename = ze!!.name
+                filename = ze?.name.toString()
 
                 val fmd = File("${folder.absoluteFile}/$filename")
-                if (ze!!.isDirectory) {
+                if (ze?.isDirectory == true) {
                     fmd.mkdirs()
                     continue
                 }
@@ -238,7 +238,7 @@ class DownloadManagerClass(
         }
         catch (e: IOException)
         {
-            Log.e("zipException", e.message!!)
+            Log.e("zipException", e.message.toString())
         }
         finally
         {

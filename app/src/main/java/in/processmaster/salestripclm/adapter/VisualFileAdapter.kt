@@ -1,7 +1,6 @@
 package `in`.processmaster.salestripclm.adapter
 
 import `in`.processmaster.salestripclm.R
-import `in`.processmaster.salestripclm.fragments.PresentEDetailingFrag.Companion.doctor_et
 import `in`.processmaster.salestripclm.interfaceCode.ItemClickDisplayVisual
 import `in`.processmaster.salestripclm.models.DownloadFileModel
 import android.content.Context
@@ -73,19 +72,19 @@ class VisualFileAdapter(
         holder.parentCard.setOnClickListener()
         {
             //if doctor not selected
-            if(doctor_et?.text.toString()=="")
+          /*  if(doctor_et?.text.toString()=="")
             {
              Toast.makeText(context, "Select Doctor first", Toast.LENGTH_SHORT).show()
             }
 
             else
-            {
+            {*/
                 selectedPosition=position;
                 notifyDataSetChanged();
 
                 mCallback?.onClickDisplayVisual(modeldata?.eDetailingId!!,modeldata?.brandId,selectionType)
 
-            }
+         //   }
         }
 
     }

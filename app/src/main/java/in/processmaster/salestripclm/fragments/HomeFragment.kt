@@ -1,6 +1,7 @@
 package `in`.processmaster.salestripclm.fragments
 import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.HomePage
+import `in`.processmaster.salestripclm.activity.HomePage.Companion.homePageDataBase
 import `in`.processmaster.salestripclm.activity.SplashActivity
 import `in`.processmaster.salestripclm.adapter.CallDoctor_Adapter
 import `in`.processmaster.salestripclm.adapter.MeetingExpandableHeaderAdapter
@@ -83,7 +84,6 @@ class HomeFragment : Fragment(), OnChartGestureListener {
     var expandable_Rv: RecyclerView?= null
     var dailyDoctorCall_rv: RecyclerView?= null
     var dailyRetailer_rv: RecyclerView?= null
-    lateinit var db : DatabaseHandler
     var parent_ll: LinearLayout?=null
     var progressHomeFrag: ProgressBar?=null
     var noDocCall_tv: TextView?=null
@@ -114,7 +114,6 @@ class HomeFragment : Fragment(), OnChartGestureListener {
             expandable_Rv?.layoutManager = LinearLayoutManager(activity)
 
             sharePreferance = PreferenceClass(activity)
-            db= DatabaseHandler(activity)
 
             chart = root.findViewById(R.id.chart1)
             // charthalf = root.findViewById(R.id.charthalf)
@@ -161,9 +160,9 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         //Refresh fragment from home page
         (activity as HomePage?)?.setFragmentRefreshListener(object : HomePage.FragmentRefreshListener {
             override fun onRefresh() {
-                val responseDocCall=db.getApiDetail(5)
-                val dbListRetailer=db.getAllSaveSendRetailer("retailerFeedback")
-                val eDetailingArray=db.getAllSaveSend("feedback")
+                val responseDocCall=homePageDataBase?.getApiDetail(5)
+                val dbListRetailer=homePageDataBase?.getAllSaveSendRetailer("retailerFeedback")
+                val eDetailingArray=homePageDataBase?.getAllSaveSend("feedback")
                 doctorList.clear()
                 retailerList.clear()
                 if(!responseDocCall.equals(""))
@@ -175,8 +174,12 @@ class HomeFragment : Fragment(), OnChartGestureListener {
 
                         if(docCallModel.dcrDoctorlist?.size==0 && buttonId==R.id.doctorCall_btn) { noDocCall_tv?.visibility = View.VISIBLE}
 
-                          doctorList.addAll(eDetailingArray)
-                        retailerList.addAll(dbListRetailer)
+                        if (eDetailingArray != null) {
+                            doctorList.addAll(eDetailingArray)
+                        }
+                        if (dbListRetailer != null) {
+                            retailerList.addAll(dbListRetailer)
+                        }
 
                         val docAdapter= activity?.let { CallDoctor_Adapter(doctorList, it,"doc") }
                         val retailAdapter= activity?.let { CallDoctor_Adapter(retailerList, it,"ret") }
@@ -213,11 +216,11 @@ class HomeFragment : Fragment(), OnChartGestureListener {
             return
         }
 
-        val responseData=db.getApiDetail(2)
-        val responseGraph=db.getApiDetail(4)
-        val responseDocCall=db.getApiDetail(5)
-        val dbListRetailer=db.getAllSaveSendRetailer("retailerFeedback")
-        val eDetailingArray=db.getAllSaveSend("feedback")
+        val responseData=homePageDataBase?.getApiDetail(2)
+        val responseGraph=homePageDataBase?.getApiDetail(4)
+        val responseDocCall=homePageDataBase?.getApiDetail(5)
+        val dbListRetailer=homePageDataBase?.getAllSaveSendRetailer("retailerFeedback")
+        val eDetailingArray=homePageDataBase?.getAllSaveSend("feedback")
 
         doctorList.clear()
         retailerList.clear()
@@ -244,8 +247,12 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         {
             val  docCallModel= Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
 
-            doctorList.addAll(eDetailingArray)
-            retailerList.addAll(dbListRetailer)
+            if (eDetailingArray != null) {
+                doctorList.addAll(eDetailingArray)
+            }
+            if (dbListRetailer != null) {
+                retailerList.addAll(dbListRetailer)
+            }
 
 
             activity?.runOnUiThread {
@@ -268,10 +275,10 @@ class HomeFragment : Fragment(), OnChartGestureListener {
     }
 
 
-    fun updateTodaysCall()
+ /*   fun updateTodaysCall()
     {
-        db= DatabaseHandler(activity)
-        val responseDocCall=db.getApiDetail(5)
+        homePageDataBase= DatabaseHandler.getInstance(activity?.applicationContext)
+        val responseDocCall=homePageDataBase?.getApiDetail(5)
         val  docCallModel= Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
         val docAdapter= activity?.let { CallDoctor_Adapter(docCallModel.dcrDoctorlist, it, "ret") }
         activity?.runOnUiThread {
@@ -279,7 +286,7 @@ class HomeFragment : Fragment(), OnChartGestureListener {
             dailyDoctorCall_rv?.adapter=docAdapter
             todaysCall_tv?.setText("Today's call- "+docCallModel.dcrDoctorlist?.size)
         }
-    }
+    }*/
 
 
     fun createAlert(heading: String, buttonText: String, context: Activity)
@@ -600,7 +607,7 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         var selectedDate = dialogView.findViewById(R.id.selectedDate) as TextView
         var scheduledMeeting_rv = dialogView.findViewById(R.id.scheduledMeeting_rv) as RecyclerView
 
-        val responseData=db.getApiDetail(2)
+        val responseData=homePageDataBase?.getApiDetail(2)
         if(!responseData.equals(""))
         {
             var getScheduleModel= Gson().fromJson(responseData, GetScheduleModel::class.java)

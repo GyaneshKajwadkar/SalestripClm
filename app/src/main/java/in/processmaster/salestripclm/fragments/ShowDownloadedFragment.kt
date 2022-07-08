@@ -4,7 +4,6 @@ import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.adapter.DownloadedFolderAdapter
 import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.fragments.PresentEDetailingFrag.Companion.doctorIdDisplayVisual
-import `in`.processmaster.salestripclm.fragments.PresentEDetailingFrag.Companion.doctor_et
 import `in`.processmaster.salestripclm.models.DownloadFileModel
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import android.app.Activity
@@ -13,6 +12,7 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -44,11 +44,11 @@ class ShowDownloadedFragment : Fragment() {
     var selection_tv: TextView?=null
     var nestedScroll: NestedScrollView?=null
     var nodata_gif: ImageView?=null
-    var topSearchParent: CardView?=null
+ //   var topSearchParent: CardView?=null
     var adapterVideo : DownloadedFolderAdapter?=null
     var adapterImage : DownloadedFolderAdapter?=null
     var adapterWeb : DownloadedFolderAdapter?=null
-    var filterFavList_et : EditText?=null
+    //var filterFavList_et : EditText?=null
     var isCustomePresentation=false;
 
     private var db: DatabaseHandler? = null
@@ -69,22 +69,38 @@ class ShowDownloadedFragment : Fragment() {
         images_rv=views.findViewById(R.id.images_rv)
         html_rv=views.findViewById(R.id.html_rv)
         nodata_gif=views.findViewById(R.id.nodata_gif)
-        topSearchParent=views.findViewById(R.id.topSearchParent)
+       // topSearchParent=views.findViewById(R.id.topSearchParent)
 
         nestedScroll=views.findViewById(R.id.nestedScroll)
-        filterFavList_et=views.findViewById(R.id.filterFavList_et)
+      //  filterFavList_et=views.findViewById(R.id.filterFavList_et)
 
         selection_tv=views.findViewById(R.id.selection_tv)
 
         videoView_parent=views.findViewById(R.id.videoView_parent)
         images_parent=views.findViewById(R.id.images_parent)
         html_parent=views.findViewById(R.id.html_parent)
+
+        db = DatabaseHandler.getInstance(activity?.applicationContext)
+
+        video_rv?.layoutManager = GridLayoutManager(activity, 5)
+        video_rv?.itemAnimator = DefaultItemAnimator()
+
+        images_rv?.layoutManager = GridLayoutManager(activity, 5)
+        images_rv?.itemAnimator = DefaultItemAnimator()
+
+        html_rv?.layoutManager = GridLayoutManager(activity, 5)
+        html_rv?.itemAnimator = DefaultItemAnimator()
+
+        nodata_gif?.visibility=View.VISIBLE
+        selection_tv?.setText("Brand not selected")
+        selection_tv?.visibility=View.VISIBLE
+        nestedScroll?.visibility=View.INVISIBLE
+
         return views
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
+ /*   override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
         if (isAdded) {
             if(currentDate.isEmpty()&& currentDate.isEmpty())
             {
@@ -98,14 +114,15 @@ class ShowDownloadedFragment : Fragment() {
 
             val bundle = arguments
 
-            if(doctor_et?.text.toString().isEmpty())
-            {
-                nodata_gif?.visibility=View.VISIBLE
-                selection_tv?.setText("Doctor not selected")
-                selection_tv?.visibility=View.VISIBLE
-                nestedScroll?.visibility=View.INVISIBLE
-            }
-            else if(!doctor_et?.text.toString().isEmpty() && bundle==null)
+            *//*    if(doctor_et?.text.toString().isEmpty())
+                {
+                    nodata_gif?.visibility=View.VISIBLE
+                    selection_tv?.setText("Doctor not selected")
+                    selection_tv?.visibility=View.VISIBLE
+                    nestedScroll?.visibility=View.INVISIBLE
+                }
+                else*//*
+            if(*//*!doctor_et?.text.toString().isEmpty() && *//*bundle==null)
             {
                 nodata_gif?.visibility=View.VISIBLE
                 selection_tv?.setText("Brand not selected")
@@ -118,11 +135,10 @@ class ShowDownloadedFragment : Fragment() {
                 val coroutine= viewLifecycleOwner.lifecycleScope.launch{
                     var call= async {
                         var downloadList: ArrayList<DownloadFileModel> = ArrayList()
-                        db = DatabaseHandler(activity)
+                        db = DatabaseHandler.getInstance(activity?.applicationContext)
 
                         isCustomePresentation=  requireArguments().getBoolean("presentation")
                         var value = 0
-                        var brandID = 0
 
                         if(isCustomePresentation){
                             val presentationName=  requireArguments().getString("presentationName")
@@ -132,7 +148,6 @@ class ShowDownloadedFragment : Fragment() {
                         {
                             val selectionType = requireArguments().getInt("selectionType")
                             value = requireArguments().getInt("eDetailingID")
-                            brandID = requireArguments().getInt("brandId")
 
                             if(selectionType==1)
                             {
@@ -140,9 +155,9 @@ class ShowDownloadedFragment : Fragment() {
                             }
                             else
                             {
-                                downloadList= db?.getAllFavList() as ArrayList<DownloadFileModel>
-                                if(downloadList.size==0) activity?.runOnUiThread {  nodata_gif?.visibility=View.VISIBLE }
-                                else activity?.runOnUiThread { topSearchParent?.visibility=View.VISIBLE }
+                                *//*   downloadList= db?.getAllFavList() as ArrayList<DownloadFileModel>
+                                   if(downloadList.size==0) activity?.runOnUiThread {  nodata_gif?.visibility=View.VISIBLE }
+                                   else activity?.runOnUiThread { topSearchParent?.visibility=View.VISIBLE }*//*
                             }
                         }
 
@@ -151,17 +166,17 @@ class ShowDownloadedFragment : Fragment() {
                         {
                             if(valueDownload.downloadType.equals("VIDEO"))
                             {
-                                //   valueDownload.eDetailingId=value
+                                valueDownload.eDetailingId=value
                                 arraylistVideo.add(valueDownload)
                             }
                             else  if(valueDownload.downloadType.equals("IMAGE"))
                             {
-                                //  valueDownload.eDetailingId=value
+                                valueDownload.eDetailingId=value
                                 arraylistImages.add(valueDownload)
                             }
                             else
                             {
-                                // valueDownload.eDetailingId=value
+                                valueDownload.eDetailingId=value
                                 arraylistZip.add(valueDownload)
                             }
                         }
@@ -173,7 +188,6 @@ class ShowDownloadedFragment : Fragment() {
                         if(arraylistZip.size==0)activity?.runOnUiThread{ html_parent?.visibility=View.GONE}
                         var presentationName=""
                         if(isCustomePresentation) presentationName= requireArguments().getString("presentationName")!!
-
 
                         adapterVideo= activity?.let {
                             DownloadedFolderAdapter(presentationName,"VIDEO",arraylistVideo,
@@ -192,7 +206,6 @@ class ShowDownloadedFragment : Fragment() {
                         activity?.runOnUiThread {
                             nodata_gif?.visibility=View.GONE
                             selection_tv?.setText("Please wait...")
-
 
                             video_rv?.layoutManager = GridLayoutManager(activity, 5)
                             video_rv?.itemAnimator = DefaultItemAnimator()
@@ -223,27 +236,96 @@ class ShowDownloadedFragment : Fragment() {
                     call.await()
                 }
             }
-            filterFavList_et?.addTextChangedListener(filterTextWatcher)
-
-        }
-    }
-
-
-    //FilterUsingEdit
-    val filterTextWatcher: TextWatcher = object : TextWatcher {
-        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-
-            adapterVideo?.getFilter()?.filter(s.toString())
-            adapterImage?.getFilter()?.filter(s.toString())
-            adapterWeb?.getFilter()?.filter(s.toString())
         }
 
-        override fun afterTextChanged(s: Editable) {
-            // TODO Auto-generated method stub
+    }*/
+
+    fun updateOnClick(isCustomePresentation :Boolean, presentationName: String, eDetailingID: Int)
+    {
+        if (isAdded) {
+
+            if(currentDate.isEmpty()&& currentDate.isEmpty())
+            {
+                currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
+                currentDate = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(Date())
+            }
+
+            var arraylistVideo:ArrayList<DownloadFileModel> = ArrayList()
+            var arraylistImages:ArrayList<DownloadFileModel> = ArrayList()
+            var arraylistZip:ArrayList<DownloadFileModel> = ArrayList()
+
+            val coroutine= viewLifecycleOwner.lifecycleScope.launch{
+                    var call= async {
+                        var downloadList: ArrayList<DownloadFileModel> = ArrayList()
+
+                        if(isCustomePresentation){
+                            db?.getAllPresentationItem(presentationName)?.let { downloadList.addAll(it) }
+                        }
+                        else
+                        {
+                            downloadList= db?.getAllDownloadedData(eDetailingID) as ArrayList<DownloadFileModel>
+                        }
+
+                        for ((index, valueDownload) in downloadList?.withIndex()!!)
+                        {
+                            if(valueDownload.downloadType.equals("VIDEO"))
+                            {
+                                valueDownload.eDetailingId=eDetailingID
+                                arraylistVideo.add(valueDownload)
+                            }
+                            else  if(valueDownload.downloadType.equals("IMAGE"))
+                            {
+                                valueDownload.eDetailingId=eDetailingID
+                                arraylistImages.add(valueDownload)
+                            }
+                            else
+                            {
+                                valueDownload.eDetailingId=eDetailingID
+                                arraylistZip.add(valueDownload)
+                            }
+                        }
+
+                        adapterVideo= activity?.let {
+                            DownloadedFolderAdapter(presentationName,"VIDEO",arraylistVideo,
+                                it,doctorIdDisplayVisual,isCustomePresentation)
+                        }
+                        adapterImage= activity?.let {
+                            DownloadedFolderAdapter(presentationName,"IMAGE", arraylistImages,
+                                it, doctorIdDisplayVisual, isCustomePresentation)
+                        }
+                        adapterWeb= activity?.let {
+                            DownloadedFolderAdapter(presentationName,"ZIP", arraylistZip,
+                                it, doctorIdDisplayVisual, isCustomePresentation)
+                        }
+
+                    }
+                    call.await()
+                }
+                coroutine.invokeOnCompletion {
+                    if(arraylistVideo.size==0) activity?.runOnUiThread{ videoView_parent?.visibility=View.GONE}
+                    else activity?.runOnUiThread{ videoView_parent?.visibility=View.VISIBLE}
+
+                    if(arraylistImages.size==0) activity?.runOnUiThread{ images_parent?.visibility=View.GONE}
+                    else activity?.runOnUiThread{ images_parent?.visibility=View.VISIBLE}
+
+                    if(arraylistZip.size==0)activity?.runOnUiThread{ html_parent?.visibility=View.GONE}
+                    else activity?.runOnUiThread{ html_parent?.visibility=View.VISIBLE}
+
+                    activity?.runOnUiThread {
+                        nodata_gif?.visibility=View.GONE
+                        selection_tv?.setText("Please wait...")
+
+                        video_rv?.adapter = adapterVideo
+                        images_rv?.adapter = adapterImage
+                        html_rv?.adapter = adapterWeb
+
+                        nestedScroll?.visibility=View.VISIBLE
+                        selection_tv?.visibility=View.GONE
+                    }
+                }
+          //  }
         }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {}
-
 }

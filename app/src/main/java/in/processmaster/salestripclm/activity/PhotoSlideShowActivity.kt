@@ -388,11 +388,11 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
             var dowloadedAllList: ArrayList<DownloadFileModel> = ArrayList()
             if(intent.getBooleanExtra("isPresentation",false))
             {
-                 dowloadedAllList=dbBase.getAllPresentationItem(intent.getStringExtra("presentationName"))
+                 dowloadedAllList= dbBase?.getAllPresentationItem(intent.getStringExtra("presentationName")) as ArrayList<DownloadFileModel>
             }
             else
             {
-                 dowloadedAllList=dbBase.getAllDownloadedData(eDetailingId)
+                 dowloadedAllList= dbBase?.getAllDownloadedData(eDetailingId) as ArrayList<DownloadFileModel>
             }
 
 
@@ -497,22 +497,25 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
     {
         var  edetailingList = dbBase?.getAlleDetail() //fetch edetailing list from dbBase
         var  filteredList: ArrayList<DevisionModel.Data.EDetailing> = ArrayList()
-        for (itemParent in edetailingList )
-        {
-            if(itemParent.isSaved==1)
+        if (edetailingList != null) {
+            for (itemParent in edetailingList )
             {
-                var downloadedList = dbBase?.getAllDownloadedData(itemParent.geteDetailId())
-                var isImage=false
-                for(itemChild in downloadedList)
+                if(itemParent.isSaved==1)
                 {
-                    if(itemChild.downloadType.equals("IMAGE")) isImage=true
-                }
-                if(isImage)  filteredList.add(itemParent); continue
+                    var downloadedList = dbBase?.getAllDownloadedData(itemParent.geteDetailId())
+                    var isImage=false
+                    if (downloadedList != null) {
+                        for(itemChild in downloadedList) {
+                            if(itemChild.downloadType.equals("IMAGE")) isImage=true
+                        }
+                    }
+                    if(isImage)  filteredList.add(itemParent); continue
 
-              /*  if(downloadedList?.stream()?.anyMatch({ o -> o.downloadType.equals("IMAGE") }) == true)
-                {
-                    filteredList.add(itemParent)
-                }*/
+                    /*  if(downloadedList?.stream()?.anyMatch({ o -> o.downloadType.equals("IMAGE") }) == true)
+                    {
+                        filteredList.add(itemParent)
+                    }*/
+                }
             }
         }
         return filteredList
@@ -850,7 +853,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
         val runnable= Runnable {
             arrayImage.clear()
 
-            for (itemParent in dbBase?.getAllDownloadedData(passingInterface) )
+            for (itemParent in dbBase?.getAllDownloadedData(passingInterface)!!)
             {
                 if(itemParent.downloadType.equals("IMAGE")) arrayImage.add(itemParent)
             }
@@ -900,7 +903,7 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
 
         val isLike=dbBase?.getLike(model?.fileId.toString(),startDateTime)
 
-        if(isLike)
+        if(isLike == true)
         {
             fabLike?.setColorFilter(Color.WHITE)
             isList = true
@@ -936,11 +939,14 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
                     while (!this.isInterrupted) {
                         sleep(1000)
                         runOnUiThread {
-                            dbBaseTimer=dbBaseTimer+1
+                            dbBaseTimer= dbBaseTimer?.plus(1)
                             Log.e("timerSlider",dbBaseTimer.toString())
                             model?.fileId?.let {
-                                dbBase?.insertTime(dbBaseTimer,
-                                    it,startDateTime)
+                                dbBaseTimer?.let { it1 ->
+                                    dbBase?.insertTime(
+                                        it1,
+                                        it,startDateTime)
+                                }
                             }
                         }
                     }
@@ -1041,6 +1047,11 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
         super.onResume()
         createConnectivity(this)
         alertClass = AlertClass(this)
+        if(intent.getSerializableExtra("imageArray")!=null)
+        { setSlideViewTime()
+            slideBrandWiseInsert(startDateTime,brandId)
+        }
+
 
     }
 
@@ -1060,10 +1071,10 @@ class PhotoSlideShowActivity : BaseActivity(), View.OnClickListener , ItemClickD
                     while (!this.isInterrupted) {
                         sleep(1000)
                         runOnUiThread {
-                            dbBaseTimer=dbBaseTimer+1
+                            dbBaseTimer= dbBaseTimer?.plus(1)
 
                             Log.e("timerBrandWiseSlider",dbBaseTimer.toString())
-                            dbBase?.insertBrandTime(dbBaseTimer  ,startDateTime,brandID.toString())
+                            dbBaseTimer?.let { dbBase?.insertBrandTime(it,startDateTime,brandID.toString()) }
                         }
                     }
                 } catch (e: InterruptedException) {

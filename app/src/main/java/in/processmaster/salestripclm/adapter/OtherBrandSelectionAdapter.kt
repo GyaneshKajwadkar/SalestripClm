@@ -95,7 +95,7 @@ class OtherBrandSelectionAdapter(
                 intent.putExtra("isPresentation", isCustomePresentation)
                 intent.putExtra("presentationName", presentationName)
                 context.startActivity(intent)
-                var db= DatabaseHandler(context)
+                var db= DatabaseHandler.getInstance(context?.applicationContext)
                 db.insertStartTimeSlide(
                     ShowDownloadedFragment.currentDate + " " + ShowDownloadedFragment.currentTime,doctorId,model?.brandId,model.brandName,0, ShowDownloadedFragment.currentTime)
                 end_btn.performClick()
@@ -141,7 +141,7 @@ class OtherBrandSelectionAdapter(
             intent.putExtra("isPresentation", isCustomePresentation)
             intent.putExtra("presentationName", presentationName)
             context.startActivity(intent)
-            val db= DatabaseHandler(context)
+            val db= DatabaseHandler.getInstance(context?.applicationContext)
             db.insertStartTimeSlide(
                 ShowDownloadedFragment.currentDate + " " + ShowDownloadedFragment.currentTime,doctorId,model?.brandId,model.brandName,0, ShowDownloadedFragment.currentTime)
 

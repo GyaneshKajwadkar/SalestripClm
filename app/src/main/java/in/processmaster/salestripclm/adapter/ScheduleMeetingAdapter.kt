@@ -328,7 +328,7 @@ class ScheduleMeetingAdapter(
                     var model = response.body()
                     Log.e("abcdef",model.toString())
 
-                    DatabaseHandler(context)?.addAPIData(gson.toJson(model),2)
+                    DatabaseHandler.getInstance(context?.applicationContext)?.addAPIData(gson.toJson(model),2)
 
 
                     filteredData.removeAt(position)

@@ -53,7 +53,7 @@ open class BaseActivity : AppCompatActivity(){
 
     var alertDialog: AlertDialog? = null
     var sharePreferanceBase: PreferenceClass?= null
-    var dbBase= DatabaseHandler(this)
+    var dbBase: DatabaseHandler? = null
     var zoomSDKBase: ZoomSDK? = null
     val generalClass=GeneralClass(this)
     var alertClass=AlertClass(this)
@@ -66,6 +66,8 @@ open class BaseActivity : AppCompatActivity(){
         connectivityChangeReceiver= ConnectivityChangeReceiver()
         zoomSDKBase = ZoomSDK.getInstance()
         sharePreferanceBase = PreferenceClass(this)
+
+        dbBase= DatabaseHandler.getInstance(applicationContext)
     }
 
 
@@ -105,15 +107,15 @@ open class BaseActivity : AppCompatActivity(){
         if (alertDialogNetwork != null) { alertDialogNetwork?.dismiss() }
 
         //check if db have edetailing and send to network when internet enable
-        dbBase= DatabaseHandler(activity)
+        dbBase= DatabaseHandler.getInstance(activity)
         sharePreferanceBase = PreferenceClass(activity)
-        val eDetailingArray=dbBase.getAllSaveSend("feedback")
-        val retailerArray=dbBase.getAllSaveSend("retailerFeedback")
-        val pobArray=dbBase.getAllSaveSend("createOnlyPOB")
-        val sobArray=dbBase.getAllSaveSend("createOnlySOB")
+        val eDetailingArray=dbBase?.getAllSaveSend("feedback")
+        val retailerArray=dbBase?.getAllSaveSend("retailerFeedback")
+        val pobArray=dbBase?.getAllSaveSend("createOnlyPOB")
+        val sobArray=dbBase?.getAllSaveSend("createOnlySOB")
 
         var isLowNetwork=false
-        if( eDetailingArray.size!=0)
+        if( eDetailingArray?.size!=0)
         {
             Handler(Looper.getMainLooper()).postDelayed({
                 val coroutineScope= CoroutineScope(Dispatchers.IO+ generalClass.coroutineExceptionHandler).launch {
@@ -142,7 +144,7 @@ open class BaseActivity : AppCompatActivity(){
             },3000)
         }
 
-        if(retailerArray.size!=0)
+        if(retailerArray?.size!=0)
         {
             Handler(Looper.getMainLooper()).postDelayed({
                 val coroutineScope= CoroutineScope(Dispatchers.IO+ generalClass.coroutineExceptionHandler).launch {
@@ -167,14 +169,14 @@ open class BaseActivity : AppCompatActivity(){
             },4000)
         }
 
-        if(pobArray.size!=0)
+        if(pobArray?.size!=0)
         {
             Handler(Looper.getMainLooper()).postDelayed({
                 submitPOBAPI()
             },5000)
         }
 
-        if(sobArray.size!=0)
+        if(sobArray?.size!=0)
         {
             Handler(Looper.getMainLooper()).postDelayed({
                 submitSOBAPI()
@@ -380,9 +382,11 @@ open class BaseActivity : AppCompatActivity(){
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
                     val gson = Gson()
                     var model = response.body()
-                    withContext(Dispatchers.Default) {
-                        launch { dbBase?.addAPIData(gson.toJson(model), 2)  }
-                    }
+                   /* withContext(Dispatchers.Default) {
+                        launch { */
+                    dbBase?.addAPIData(gson.toJson(model), 2)
+                   /*     }
+                    }*/
                 }
 
                 else
@@ -399,7 +403,7 @@ open class BaseActivity : AppCompatActivity(){
                 APIClientKot().getUsersService(2, it
                 ).getZoomCredientailCoo("bearer " + loginModelHomePage.accessToken,loginModelHomePage.empId.toString())
             }
-        withContext(Dispatchers.Main) {
+      /*  withContext(Dispatchers.Main) {*/
             Log.e("getScheduleAPIII",response.toString())
             if (response?.isSuccessful == true)
             {
@@ -416,7 +420,8 @@ open class BaseActivity : AppCompatActivity(){
             else
             { Log.e("scheduleERROR", response?.errorBody().toString())
                 sharePreferanceBase?.setPrefBool("zoomCrediential", false)}
-        } }
+     //   }
+    }
 
     fun getCredientail_api(context: Activity) {
 
@@ -446,18 +451,20 @@ open class BaseActivity : AppCompatActivity(){
 
     suspend fun submitDCRCo()
     {
-        val eDetailingArray=dbBase.getAllSaveSend("feedback")
-        if(eDetailingArray.size==0)
+        val eDetailingArray=dbBase?.getAllSaveSend("feedback")
+        if(eDetailingArray?.size==0)
         { getDocCallAPI()
             return }
 
         val response =
             sharePreferanceBase?.getPref("secondaryUrl")?.let {
-                APIClientKot().getUsersService(2, it
-                ).submitEdetailingApiCoo("bearer " + loginModelHomePage.accessToken,eDetailingArray.get(0))
+                eDetailingArray?.let { it1 ->
+                    APIClientKot().getUsersService(2, it
+                    ).submitEdetailingApiCoo("bearer " + loginModelHomePage.accessToken, it1?.get(0))
+                }
             }
-        withContext(Dispatchers.IO) {
-            if (response?.isSuccessful == true)
+        // withContext(Dispatchers.IO) {
+        if (response?.isSuccessful == true)
             {
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
                     if(response.body()?.getErrorObj()?.errorMessage==null || !response.body()?.getErrorObj()?.errorMessage.toString().isEmpty())
@@ -466,34 +473,34 @@ open class BaseActivity : AppCompatActivity(){
                     }
                     else {
                         Log.e("getSubmitEdetailingData", response.body().toString())
-                        eDetailingArray.get(0).doctorId?.let { dbBase.deleteSaveSend(it) }
+                        eDetailingArray?.get(0)?.doctorId?.let { dbBase?.deleteSaveSend(it) }
                         submitDCRCo()
                     }
                 }
                 else Log.e("elsesubmitDCRCoAPI", response.code().toString())
             }
             else Log.e("submitDCRCoAPIERROR", response?.errorBody().toString())
-        }
+       // }
     }
 
     suspend fun submitDCRRetailer()
     {
 
-        val dcrRetailerList=dbBase.getAllSaveSendRetailer("retailerFeedback")
-        if(dcrRetailerList.size==0)
+        val dcrRetailerList=dbBase?.getAllSaveSendRetailer("retailerFeedback")
+        if(dcrRetailerList?.size==0)
         {
             getDocCallAPI()
             return
         }
         val sendRetailerDcr: ArrayList<DailyDocVisitModel.Data.DcrDoctor> = ArrayList()
-         sendRetailerDcr.add(dcrRetailerList.get(0))
+        dcrRetailerList?.let { sendRetailerDcr.add(it?.get(0)) }
 
         val response =
             sharePreferanceBase?.getPref("secondaryUrl")?.let {
                 APIClientKot().getUsersService(2, it
                 ).retailerSendApiCoo("bearer " + loginModelHomePage.accessToken,sendRetailerDcr)
             }
-        withContext(Dispatchers.Main) {
+      //  withContext(Dispatchers.Main) {
             if (response?.isSuccessful == true)
             {
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
@@ -503,14 +510,14 @@ open class BaseActivity : AppCompatActivity(){
                     }
                     else {
                            Log.e("getSubmitEdetailingData", response.body().toString())
-                        dcrRetailerList.get(0).retailerId?.let { dbBase.deleteSaveSend(it) }
+                        dcrRetailerList?.get(0)?.retailerId?.let { dbBase?.deleteSaveSend(it) }
                         submitDCRRetailer()
                     }
                 }
                 else Log.e("elsesubmitDCRCoAPI", response.code().toString())
             }
             else Log.e("submitDCRCoAPIERROR", response?.errorBody().toString())
-        }
+       // }
     }
 
      suspend fun getDocCallAPI()
@@ -526,16 +533,16 @@ open class BaseActivity : AppCompatActivity(){
             {
                 if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage?.isEmpty() == true) {
                     var model = response.body()
-                    withContext(Dispatchers.Main) {
-                        launch {
+                  /*  withContext(Dispatchers.Main) {
+                        launch {*/
                             if(model?.getData()?.dcrDoctorlist?.size==0)
                             {
-                                dbBase.deleteAllDoctorEdetailing()
+                                dbBase?.deleteAllDoctorEdetailing()
                             }
 
                             dbBase?.addAPIData(Gson().toJson(model?.getData()), 5)
-                        }
-                    }
+                    /*    }
+                    }*/
                 }
                 else Log.e("elsegetDocCallAPI", response.code().toString())
             }
@@ -545,21 +552,21 @@ open class BaseActivity : AppCompatActivity(){
 
     fun submitPOBAPI()
     {
-        val getPOBList=dbBase.getAllSavePOB("createOnlyPOB")
-        if(getPOBList.size==0)
+        val getPOBList=dbBase?.getAllSavePOB("createOnlyPOB")
+        if(getPOBList?.size==0)
         { return }
 
         apiInterface= APIClientKot().getClient(2, sharePreferanceBase?.getPref("secondaryUrl")).create(
             APIInterface::class.java)
 
         var call: Call<GenerateOTPModel>? = apiInterface?.submitPOB(
-            "bearer " + HomePage.loginModelHomePage.accessToken, getPOBList.get(0)
+            "bearer " + HomePage.loginModelHomePage.accessToken, getPOBList?.get(0)
         ) as? Call<GenerateOTPModel>
         call?.enqueue(object : Callback<GenerateOTPModel?> {
             override fun onResponse(call: Call<GenerateOTPModel?>?, response: Response<GenerateOTPModel?>) {
                 if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage?.isEmpty()==true) {
                   Log.e("offlinePOB","saveSuccessfully")
-                    getPOBList.get(0).randomNumber?.let { dbBase.deleteSaveSend(it) }
+                    getPOBList?.get(0)?.randomNumber?.let { dbBase?.deleteSaveSend(it) }
                     submitPOBAPI()
                 }
                 else{
@@ -574,21 +581,21 @@ open class BaseActivity : AppCompatActivity(){
 
     fun submitSOBAPI()
     {
-        val getSOBList=dbBase.getAllSaveSOB("createOnlySOB")
-        if(getSOBList.size==0)
+        val getSOBList=dbBase?.getAllSaveSOB("createOnlySOB")
+        if(getSOBList?.size==0)
         { return }
 
         apiInterface= APIClientKot().getClient(2, sharePreferanceBase?.getPref("secondaryUrl")).create(
             APIInterface::class.java)
 
         var call: Call<GenerateOTPModel>? = apiInterface?.submitSOB(
-            "bearer " + HomePage.loginModelHomePage.accessToken, getSOBList.get(0)
+            "bearer " + HomePage.loginModelHomePage.accessToken, getSOBList?.get(0)
         ) as? Call<GenerateOTPModel>
         call?.enqueue(object : Callback<GenerateOTPModel?> {
             override fun onResponse(call: Call<GenerateOTPModel?>?, response: Response<GenerateOTPModel?>) {
                 if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage?.isEmpty()==true) {
                     Log.e("offlineSOB","saveSuccessfully")
-                    getSOBList.get(0).randomNumber?.let { dbBase.deleteSaveSend(it) }
+                    getSOBList?.get(0)?.randomNumber?.let { dbBase?.deleteSaveSend(it) }
                     submitSOBAPI()
                 }
                 else{

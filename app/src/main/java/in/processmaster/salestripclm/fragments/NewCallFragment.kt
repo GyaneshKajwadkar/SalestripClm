@@ -1,6 +1,9 @@
 package `in`.processmaster.salestripclm.fragments
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.activity.HomePage
 import `in`.processmaster.salestripclm.activity.HomePage.Companion.apiInterface
+import `in`.processmaster.salestripclm.activity.HomePage.Companion.homePageAlertClass
+import `in`.processmaster.salestripclm.activity.HomePage.Companion.homePageSharePref
 import `in`.processmaster.salestripclm.activity.HomePage.Companion.loginModelHomePage
 import `in`.processmaster.salestripclm.activity.SplashActivity
 import `in`.processmaster.salestripclm.activity.SplashActivity.Companion.staticSyncData
@@ -52,7 +55,7 @@ import java.util.*
 
 
 class NewCallFragment : Fragment(),StringInterface {
-    lateinit var db : DatabaseHandler
+
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     var views:View?=null
     var adapter:BottomSheetDoctorAdapter =BottomSheetDoctorAdapter()
@@ -62,23 +65,14 @@ class NewCallFragment : Fragment(),StringInterface {
     var ristrictedRouteList: ArrayList<SyncModel.Data.Route> = ArrayList()
     var teamsList: ArrayList<SyncModel.Data.FieldStaffTeam> = ArrayList()
     var selectionType=0
-    var selectedDocID=0
-    var selectedDocName=""
-    var sharePreferance: PreferenceClass? = null
-    var generalClassObject:GeneralClass?=null
-    var routeIdGetDCR=""
-    var alertClass:AlertClass?=null
     var  docCallModel : DailyDocVisitModel.Data= DailyDocVisitModel.Data()
     var isSecondTime = false
     var doctorObject=SyncModel.Data.Doctor()
     var isRetailerAttached=false
+    var preCallObj= PreCallsFragment()
     companion object {
         var retailerObj= SyncModel.Data.Retailer()
         var instance: NewCallFragment? = null
-    }
-
-    val coroutineExceptionHandler = CoroutineExceptionHandler{_, throwable ->
-        throwable.printStackTrace()
     }
 
     override fun onCreateView(
@@ -90,7 +84,7 @@ class NewCallFragment : Fragment(),StringInterface {
         if (activity != null && isAdded)
         {
             initView()
-            instance = this;
+            instance = this
         }
         return views
     }
@@ -100,10 +94,6 @@ class NewCallFragment : Fragment(),StringInterface {
         bottomSheetBehavior = BottomSheetBehavior.from(views!!.bottomSheet)
 
         val strtext = arguments?.getString("retailerData")
-        db = DatabaseHandler(activity)
-        sharePreferance = PreferenceClass(activity)
-        alertClass = AlertClass(activity)
-        generalClassObject= activity?.let { GeneralClass(it) }
 
         if(strtext?.isEmpty()==false)
         {
@@ -129,14 +119,14 @@ class NewCallFragment : Fragment(),StringInterface {
 
                     routeList = routeList?.filter { s -> s.headQuaterName !=""} as java.util.ArrayList<SyncModel.Data.Route>
 
-                    val responseDocCall=db.getApiDetail(5)
+                   /* val responseDocCall=db.getApiDetail(5)
                     if(!responseDocCall.equals("")) {
                         docCallModel = Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
-                    }
+                    }*/
                     if(staticSyncData?.settingDCR?.isRestrictedParty==true)
                     {
-                        if(sharePreferance?.getPref("dcrObj")?.isEmpty() == false) {
-                            var dcrModel = Gson().fromJson(sharePreferance?.getPref("dcrObj"), GetDcrToday.Data.DcrData::class.java)
+                        if(HomePage.homePageSharePref?.getPref("dcrObj")?.isEmpty() == false) {
+                            var dcrModel = Gson().fromJson(HomePage.homePageSharePref?.getPref("dcrObj"), GetDcrToday.Data.DcrData::class.java)
 
                             var routeListPartList: ArrayList<SyncModel.Data.Route> = ArrayList()
                             val items: List<String>? = dcrModel?.routeId?.split(",")
@@ -170,9 +160,9 @@ class NewCallFragment : Fragment(),StringInterface {
                         views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
                     }
 
-                    if(sharePreferance?.getPref("otherActivitySelected").equals("1") && sharePreferance?.checkKeyExist("todayDate")==true && sharePreferance?.getPref("todayDate") == generalClassObject?.currentDateMMDDYY() )
+                    if(homePageSharePref?.getPref("otherActivitySelected").equals("1") && HomePage.homePageSharePref?.checkKeyExist("todayDate")==true && homePageSharePref?.getPref("todayDate") == HomePage.homePageGeneralClass?.currentDateMMDDYY() )
                     {
-                        if(generalClassObject?.isInternetAvailable()==false)
+                        if(HomePage.homePageGeneralClass?.isInternetAvailable()==false)
                         {
                             setOtherActivityView()
                         }
@@ -226,19 +216,6 @@ class NewCallFragment : Fragment(),StringInterface {
                             views?.selectTeam_tv?.setText("Select team")
                             views?.selectDoctorsCv?.setEnabled(false)
                         }
-                       /* Handler(Looper.getMainLooper()).postDelayed({
-                            if(!isChecked){
-                                if(isRetailerAttached==false) {
-                                    isRetailerAttached = true
-                                    activity?.runOnUiThread {
-                                        val transaction = activity?.supportFragmentManager?.beginTransaction()
-                                        transaction?.replace(R.id.frameRetailer_view, RetailerFillFragment(this@NewCallFragment))
-                                        transaction?.disallowAddToBackStack()
-                                        transaction?.commit()
-                                    }
-                                }
-                            }
-                        },50)*/
 
                     }
 
@@ -253,18 +230,21 @@ class NewCallFragment : Fragment(),StringInterface {
                                     openCloseModel()
                                 }
                             }
-
-
                         }
-                    /*  if(checkDCRusingShareP())
-                        { openCloseModel() }*/
                     })
 
                     views?.selectRoutesCv?.setOnClickListener({
                         selectionType=1
                         views?.bottomSheetTitle_tv?.setText("Select route")
                         if(!SplashActivity.staticSyncData?.settingDCR?.roleType.equals("MAN") ){
-                            if(generalClassObject?.isInternetAvailable() == true)
+
+                            activity.let {
+                                if( CheckDcrClass(it,"callFragment").checkDCR_UsingSP())
+                                {
+                                    openCloseModel()
+                                }
+                            }
+                         /*   if(generalClassObject?.isInternetAvailable() == true)
                             {
                                 callCoroutineApi()
                             }
@@ -276,7 +256,7 @@ class NewCallFragment : Fragment(),StringInterface {
                             else if( sharePreferance?.getPref("todayDate") != generalClassObject?.currentDateMMDDYY() || sharePreferance?.getPref("dcrId")=="0") {
                                 alertClass?.commonAlert("Alert!","DCR not submitted please connect to internet and fill DCR first.")
                             }
-                            else{ openCloseModel() }
+                            else{ openCloseModel() }*/
                         }
                         else{ openCloseModel() }
                     })
@@ -288,7 +268,7 @@ class NewCallFragment : Fragment(),StringInterface {
                             views?.bottomSheetTitle_tv?.setText("Select Doctor")
                             if(doctorListArray.size<=0)
                             {
-                                alertClass?.commonAlert("This route has no doctor","")
+                                HomePage.homePageAlertClass?.commonAlert("This route has no doctor","")
                                 return@setOnClickListener
                             }
                         }
@@ -296,7 +276,7 @@ class NewCallFragment : Fragment(),StringInterface {
                             views?.bottomSheetTitle_tv?.setText("Select Retailer")
                             if(retailerListArray.size<=0)
                             {
-                                alertClass?.commonAlert("This route has no Retailer","")
+                                HomePage.homePageAlertClass?.commonAlert("This route has no Retailer","")
                                 return@setOnClickListener
                             }
                         }
@@ -312,95 +292,37 @@ class NewCallFragment : Fragment(),StringInterface {
                     views?.close_selection_imv?.setOnClickListener({ bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)})
 
                     views?.doctorSearch_et?.addTextChangedListener(filterTextWatcher)
-
-                  /*  views?.startDetailing_btn?.setOnClickListener({
-
-                        val isAlreadyContain=docCallModel.dcrDoctorlist?.any{ s -> s.doctorId == selectedDocID }
-                        if(isAlreadyContain == true) {
-                            views?.parentButton?.visibility=View.GONE
-                            alertClass?.commonAlert("Alert!","This doctor DCR is already submitted")
-                            return@setOnClickListener
-                        }
-
-
-                         val intent = Intent(activity, OnlinePresentationActivity::class.java)
-                        intent.putExtra("doctorID", selectedDocID)
-                        intent.putExtra("doctorName", selectedDocName)
-                        intent.putExtra("skip", false)
-                        intent.putExtra("doctorObj", Gson().toJson(doctorObject))
-                        intent.putExtra("isPresentation", true)
-                        startActivityForResult(intent,3)
-
-                       })
-
-                    views?.skipDetailing_btn?.setOnClickListener({
-                        val intent = Intent(activity, SubmitE_DetailingActivity::class.java)
-                        intent.putExtra("doctorID", selectedDocID)
-                        intent.putExtra("doctorName", selectedDocName)
-                        intent.putExtra("skip", true)
-                        startActivityForResult(intent,3)
-                    })*/
                 }
-                alertClass?.hideAlert()
+                HomePage.homePageAlertClass?.hideAlert()
             }
         }
-
-
-
-    /*    else
-            views?.selectRoutesCv?.setEnabled(false)*/
-        //  views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#FA8072"))
-    //  checkDCRusingShareP(0)
+        callPreCallFrag()
     }
 
     fun getInstance(): NewCallFragment? {
         return instance
     }
 
-/*    fun checkDCRusingShareP():Boolean
-    {
-        if(generalClassObject?.isInternetAvailable() == true)
-        {
-            callCoroutineApi()
-            return false
-        }
-
-        else if(sharePreferance?.checkKeyExist("empIdSp")==false  ||
-            sharePreferance?.checkKeyExist("todayDate")==false  || sharePreferance?.checkKeyExist("dcrId")==false || sharePreferance?.getPref("empIdSp") != loginModelHomePage.empId.toString())
-        {
-            alertClass?.commonAlert("Alert!","DCR not submitted please connect to internet and fill DCR first.")
-            return false
-        }
-        else if( sharePreferance?.getPref("todayDate") != generalClassObject?.currentDateMMDDYY() || sharePreferance?.getPref("dcrId")=="0") {
-            alertClass?.commonAlert("Alert!","DCR not submitted please connect to internet and fill DCR first.")
-        return false
-        }
-        else{ return true }
-    }*/
-
-    fun callCoroutineApi() {
-        alertClass?.hideAlert()
-        alertClass?.showProgressAlert("")
+ /*   fun callCoroutineApi() {
+        homePageAlertClass?.hideAlert()
+        homePageAlertClass?.showProgressAlert("")
         try{
-            val coroutineScope = CoroutineScope(Dispatchers.IO + generalClassObject!!?.coroutineExceptionHandler).launch {
+            val coroutineScope = CoroutineScope(Dispatchers.IO + HomePage.homePageGeneralClass!!?.coroutineExceptionHandler).launch {
                 val api = async { checkCurrentDCR_API() }
                 api.await()
             }
-
             coroutineScope.invokeOnCompletion {
                 activity?.runOnUiThread(java.lang.Runnable {
-                    alertClass?.hideAlert()
+                    homePageAlertClass?.hideAlert()
                 })
             }
         }
         catch (e:Exception)
         {
-            alertClass?.hideAlert()
-            alertClass?.lowNetworkAlert()
+            homePageAlertClass?.hideAlert()
+            homePageAlertClass?.lowNetworkAlert()
         }
-
-
-    }
+    }*/
 
     fun openCloseModel()
     {
@@ -434,8 +356,7 @@ class NewCallFragment : Fragment(),StringInterface {
         }
     }
 
-
-     inner class BottomSheetDoctorAdapter() :
+    inner class BottomSheetDoctorAdapter() :
         RecyclerView.Adapter<BottomSheetDoctorAdapter.MyViewHolder>(),
         Filterable {
 
@@ -468,7 +389,6 @@ class NewCallFragment : Fragment(),StringInterface {
                 holder.headerDoctor_tv.setText(modeldata?.fullName)
                 holder.route_tv.setText("Head Quater Name- " + modeldata?.headQuaterName)
                 holder.speciality_tv.visibility=View.GONE
-
 
                 holder.parent_cv.setOnClickListener({
 
@@ -530,12 +450,11 @@ class NewCallFragment : Fragment(),StringInterface {
                     holder.speciality_tv.setText("Headquater- " + modeldata?.headQuaterName)
 
                     holder.parent_cv.setOnClickListener({
-                        alertClass?.showProgressAlert("")
+                        homePageAlertClass?.showProgressAlert("")
                         setRetailer(modeldata)
                     })
                 }
             }
-
         }
         override fun getItemCount(): Int
         {
@@ -546,7 +465,6 @@ class NewCallFragment : Fragment(),StringInterface {
             else
                 if(view?.docRetail_switch?.isChecked == true) return filteredDataDoctor?.size
                 else return filteredDataRetailer.size
-
         }
 
          //-------------------------------------filter list using text input from edit text
@@ -636,8 +554,7 @@ class NewCallFragment : Fragment(),StringInterface {
 
     fun removeDoneDcrFromList()
     {
-
-        val responseDocCall=db.getApiDetail(5)
+        val responseDocCall= HomePage.homePageDataBase?.getApiDetail(5)
         if(!responseDocCall.equals("")) {
 
             docCallModel = Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
@@ -669,18 +586,18 @@ class NewCallFragment : Fragment(),StringInterface {
         doctTempList.addAll(doctorListArray)
         rectTempList.addAll(retailerListArray)
 
-        val dcrRetailerList=db.getAllSaveSendRetailer("retailerFeedback")
-        val eDetailingArray=db.getAllSaveSend("feedback")
+        val dcrRetailerList=HomePage.homePageDataBase?.getAllSaveSendRetailer("retailerFeedback")
+        val eDetailingArray=HomePage.homePageDataBase?.getAllSaveSend("feedback")
         for ((index,data) in doctTempList.withIndex())
         {
-            val isAlreadyContain=eDetailingArray.any{ s -> s.doctorId == data.doctorId }
+            val isAlreadyContain=eDetailingArray?.any{ s -> s.doctorId == data.doctorId }
             if(isAlreadyContain==true) {
                 doctorListArray.remove(data)
             }
         }
         for ((index,data) in rectTempList.withIndex())
         {
-            val isAlreadyContain=dcrRetailerList.any{ s -> s.retailerId == data.retailerId }
+            val isAlreadyContain=dcrRetailerList?.any{ s -> s.retailerId == data.retailerId }
             if(isAlreadyContain == true) {
                 retailerListArray.remove(data)
             }
@@ -692,9 +609,8 @@ class NewCallFragment : Fragment(),StringInterface {
         val isAlreadyContain=docCallModel.dcrRetailerlist?.any{ s -> s.retailerId == retailerModel.retailerId }
         if(isAlreadyContain == true) {
             views?.selectDoctor_tv?.setText("Select Retailer")
-           // views?.parentButton?.visibility=View.GONE
-            alertClass?.commonAlert("Alert!","Dcr already done for this retailer")
-            alertClass?.hideAlert()
+            homePageAlertClass?.commonAlert("Alert!","Dcr already done for this retailer")
+            homePageAlertClass?.hideAlert()
             views?.noData_gif?.visibility=View.VISIBLE
             views?.retailer_parent?.visibility=View.GONE
             views?.frameRetailer_view?.visibility=View.GONE
@@ -707,12 +623,10 @@ class NewCallFragment : Fragment(),StringInterface {
 
         val coroutine= CoroutineScope(Dispatchers.IO).launch {
             val task= async {
-
-               val transaction = childFragmentManager.beginTransaction()
+                val transaction = childFragmentManager.beginTransaction()
                transaction?.replace(R.id.frameRetailer_view, RetailerFillFragment(this@NewCallFragment))
                transaction?.disallowAddToBackStack()
-               transaction?.commit()
-
+               transaction?.commitAllowingStateLoss()
             }
             task.await()
         }
@@ -738,17 +652,15 @@ class NewCallFragment : Fragment(),StringInterface {
                 views?.frameRetailer_view?.visibility=View.VISIBLE
                 views?.framePreCall_view?.visibility=View.GONE
                 Handler(Looper.getMainLooper()).postDelayed({
-                    alertClass?.hideAlert()
+                    homePageAlertClass?.hideAlert()
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)}, 2)
             }
-
         }
     }
 
 
     fun setDoctor(doctorDetailModel: SyncModel.Data.Doctor)
     {
-      //  views?.precall_parent?.visibility=View.GONE
         views?.doctorDetail_parent?.visibility=View.VISIBLE
         views?.doctorName_tv?.setText(doctorDetailModel.doctorName)
         views?.routeName_tv?.setText(doctorDetailModel.routeName)
@@ -757,8 +669,6 @@ class NewCallFragment : Fragment(),StringInterface {
         views?.city_tv?.setText(doctorDetailModel.cityName)
         views?.specility_tv?.setText(doctorDetailModel.specialityName)
         views?.qualifiction_tv?.setText(doctorDetailModel.qualificationName)
-        selectedDocID= doctorDetailModel.doctorId!!
-        selectedDocName= doctorDetailModel.doctorName.toString()
         doctorObject=doctorDetailModel;
 
         if(doctorDetailModel.mobileNo?.isEmpty() == true)
@@ -768,26 +678,12 @@ class NewCallFragment : Fragment(),StringInterface {
         if(doctorDetailModel.cityName?.isEmpty() == true)
             views?.cityParent?.visibility=View.GONE
 
+        views?.frameRetailer_view?.visibility=View.GONE
+        views?.framePreCall_view?.visibility=View.VISIBLE
+        views?.noInternet_tv?.visibility = View.GONE
+        views?.noData_gif?.visibility = View.GONE
 
-
-    /*    if(generalClassObject?.isInternetAvailable() == true) {*/
-
-                    views?.frameRetailer_view?.visibility=View.GONE
-                    views?.framePreCall_view?.visibility=View.VISIBLE
-                    views?.noInternet_tv?.visibility = View.GONE
-                    views?.noData_gif?.visibility = View.GONE
-
-                    val transaction = childFragmentManager.beginTransaction()
-                    transaction?.replace(R.id.framePreCall_view, PreCallsFragment(doctorDetailModel))
-                    transaction?.disallowAddToBackStack()
-                    transaction?.commit()
-
-
-
-         //   preCallAnalysisApi(doctorDetailModel)
-/*        }
-        else noInternet_tv.visibility=View.VISIBLE; *//*views?.parentButton?.visibility=View.VISIBLE*/
-
+        preCallObj.setViewPreCall(doctorDetailModel)
     }
 
     fun onSelection()
@@ -848,7 +744,6 @@ class NewCallFragment : Fragment(),StringInterface {
                 routeList.clear()
                 filterRouteUsingFieldStaff?.let { routeList.addAll(it) }
             }
-
         }
         else if(selectionType==1)
         {
@@ -859,50 +754,22 @@ class NewCallFragment : Fragment(),StringInterface {
                 val getRadius=jsonObj.getInt("SET011")
 
                 val startPoint = Location("locationA")
-               startPoint.setLatitude(getGpsTracker.latitude)
-               // startPoint.setLatitude(22.724177793056885)
+                startPoint.setLatitude(getGpsTracker.latitude)
                 startPoint.setLongitude(getGpsTracker.longitude)
-               // startPoint.setLongitude(75.90522484470453)
 
-
-               /* if(views?.docRetail_switch?.isChecked==true )
-                {*/
-                    val docFirstFilter= SplashActivity.staticSyncData?.doctorList?.filter { s -> s.routeId == id } as java.util.ArrayList<SyncModel.Data.Doctor>
+                val docFirstFilter= SplashActivity.staticSyncData?.doctorList?.filter { s -> s.routeId == id } as java.util.ArrayList<SyncModel.Data.Doctor>
 
                     for(fetch in docFirstFilter)
                     {
                         if(fetch.latitude==0.00 || fetch.longitude==0.00) { continue }
-
                         val endPoint = Location("locationB")
                         endPoint.latitude = fetch.latitude
                         endPoint.longitude = fetch.longitude
                         val distance = startPoint.distanceTo(endPoint).toInt()
-                       // doctorListArray.add(fetch)
                         if(distance <= getRadius){
                            doctorListArray.add(fetch)
                         }
                     }
-               // }
-              /*  else
-                {
-
-                    val retailFirstFilter= SplashActivity.staticSyncData?.retailerList?.filter { s -> s.routeId == id } as java.util.ArrayList<SyncModel.Data.Retailer>
-
-                    for(fetch in retailFirstFilter)
-                    {
-
-                        if(fetch.latitude==0.00 || fetch.longitude==0.00) { continue }
-
-                        val endPoint = Location("locationB")
-                        endPoint.latitude = fetch.latitude
-                        endPoint.longitude = fetch.longitude
-                        val distance = startPoint.distanceTo(endPoint).toInt()
-                      //  retailerListArray.add(fetch)
-                        if(distance <= getRadius){
-                           retailerListArray.add(fetch)
-                        }
-                    }
-                }*/
             }
             else if(staticSyncData?.settingDCR?.isRetailerFencingRequired == true && views?.docRetail_switch?.isChecked==false){
                 val retailFirstFilter= SplashActivity.staticSyncData?.retailerList?.filter { s -> s.routeId == id } as java.util.ArrayList<SyncModel.Data.Retailer>
@@ -913,19 +780,14 @@ class NewCallFragment : Fragment(),StringInterface {
 
                 val startPoint = Location("locationA")
                 startPoint.setLatitude(getGpsTracker.latitude)
-                // startPoint.setLatitude(22.724177793056885)
                 startPoint.setLongitude(getGpsTracker.longitude)
-                // startPoint.setLongitude(75.90522484470453)
                 for(fetch in retailFirstFilter)
                 {
-
                     if(fetch.latitude==0.00 || fetch.longitude==0.00) { continue }
-
                     val endPoint = Location("locationB")
                     endPoint.latitude = fetch.latitude
                     endPoint.longitude = fetch.longitude
                     val distance = startPoint.distanceTo(endPoint).toInt()
-                    //  retailerListArray.add(fetch)
                     if(distance <= getRadius){
                         retailerListArray.add(fetch)
                     }
@@ -948,194 +810,12 @@ class NewCallFragment : Fragment(),StringInterface {
 
     }
 
-   /* private fun preCallAnalysisApi(doctorDetailModel: SyncModel.Data.Doctor) {
+    /*suspend fun checkCurrentDCR_API() {
 
-        views?.noData_gif?.visibility=View.GONE
-        views?.analysisProgress?.visibility=View.VISIBLE
-
-        var profileData = sharePreferance?.getPref("profileData")           //get profile data from share preferance
-        var loginModel = Gson().fromJson(profileData, LoginModel::class.java)
-
-        //call submit visual ads api interfae post method
-        var call: Call<PreCallModel>? = apiInterface?.priCallAnalysisApi("bearer " + loginModel?.accessToken,selectedDocID) as? Call<PreCallModel>
-        call?.enqueue(object : Callback<PreCallModel?> {
-            override fun onResponse(call: Call<PreCallModel?>?, response: Response<PreCallModel?>) {
-                Log.e("preCallAnalysisApi", response.code().toString() + "")
-                if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage?.isEmpty() == true) {
-                    val analysisModel=response.body()?.getData()?.lastVisitSummary
-                    views?.precall_parent?.visibility=View.VISIBLE
-                    views?.parentButton?.visibility=View.VISIBLE
-
-                    //remark_ll
-                    if(analysisModel?.visitPurpose?.let {
-                            generalClassObject?.checkStringNullEmpty(it) } == true)
-                    { views?.visitPurpose_tr?.visibility=View.GONE }
-                    else{ views?.visitPurpose_tv?.setText(analysisModel?.visitPurpose) }
-
-                    if(analysisModel?.workWithName?.let { generalClassObject?.checkStringNullEmpty(it) } == true)
-                    { views?.workingWith_tr?.visibility=View.GONE }
-                    else{ views?.workingWith_tv?.setText(analysisModel?.workWithName) }
-
-                    if(analysisModel?.strDcrDate?.let { generalClassObject?.checkStringNullEmpty(it) } == true)
-                    { views?.lastVisit_tr?.visibility=View.GONE }
-                    else{ views?.lastVisitDate_tv?.setText(analysisModel?.strDcrDate) }
-
-                    if(analysisModel?.remarks?.let { generalClassObject?.checkStringNullEmpty(it) } == true)
-                    { views?.remark_ll?.visibility=View.GONE }
-                    else{ views?.remark_tv?.setText(analysisModel?.remarks) }
-
-                    if(analysisModel?.strReportedTime?.let { generalClassObject?.checkStringNullEmpty(it) } == true)
-                    { views?.reportedTime_tr?.visibility=View.GONE }
-                    else{ views?.reportedTime_tv?.setText(analysisModel?.strReportedTime) }
-
-
-                    views?.brandList_rv?.layoutManager=LinearLayoutManager(activity)
-                    views?.sampleGiven_rv?.layoutManager=LinearLayoutManager(activity)
-                    views?.giftGiven_rv?.layoutManager=LinearLayoutManager(activity)
-
-                    var mainList= ArrayList<String>()
-                    var subList= ArrayList<Int>()
-
-                    if( analysisModel?.productList!=null && analysisModel?.productList?.size!=0)
-                    {
-                        var i: Int = analysisModel?.productList?.size?.minus(1)!!
-                        for( data in analysisModel?.productList!!)
-                        {
-                            data.productName?.let { mainList.add(it) }
-                            if (i-- == 0) {
-                                if(mainList.size==0)view?.noDataBrand?.visibility=View.VISIBLE
-                                else view?.noDataBrand?.visibility=View.GONE
-                            }
-                        }
-                        var adapterProduct=SimpleListAdapter(mainList,subList)
-                        views?.brandList_rv?.adapter=adapterProduct
-                    }
-                    else
-                    {
-                        view?.noDataBrand?.visibility = View.VISIBLE
-                        views?.brandList_rv?.adapter=SimpleListAdapter(mainList,subList)
-                    }
-
-                    mainList=ArrayList<String>()
-                    subList= ArrayList<Int>()
-
-                    if( analysisModel?.sampleList!=null && analysisModel?.sampleList?.size!=0)
-                    {
-                        var i: Int = analysisModel?.sampleList?.size?.minus(1)!!
-                        for( data in analysisModel?.sampleList!!) {
-                            mainList.add(data.productName.toString())
-                            data.qty?.let { subList.add(it) }
-                            if (i-- == 0) {
-                                if(mainList.size==0)view?.noDataSample?.visibility=View.VISIBLE
-                                else view?.noDataSample?.visibility=View.GONE
-                            }
-                        }
-
-                        var adapterSampleGiven=SimpleListAdapter(mainList,subList)
-                        views?.sampleGiven_rv?.adapter=adapterSampleGiven
-
-                        val isAlreadyContain=docCallModel.dcrDoctorlist?.any{ s -> s.doctorId == doctorDetailModel.doctorId }
-                        if(isAlreadyContain == true) {
-                            views?.parentButton?.visibility=View.GONE
-                            alertClass?.commonAlert("Alert!","Doctor e-detailing already done for today")
-                        }
-
-                    }
-                    else
-                    {
-                        view?.noDataSample?.visibility = View.VISIBLE
-                        views?.sampleGiven_rv?.adapter=SimpleListAdapter(mainList,subList)
-                    }
-
-                    mainList=ArrayList<String>()
-                    subList= ArrayList<Int>()
-
-                    if( analysisModel?.giftList!=null && analysisModel?.giftList?.size!=0)
-                    {
-                         mainList=ArrayList<String>()
-                         subList= ArrayList<Int>()
-                        var i: Int = analysisModel?.giftList?.size?.minus(1)!!
-                        for( data in analysisModel?.giftList!!)
-                        {
-                            mainList.add(data.productName.toString())
-                            data.qty?.let { subList.add(it) }
-                            if (i-- == 0) {
-                                if(mainList.size==0)view?.noDataGift?.visibility=View.VISIBLE
-                                else  view?.noDataGift?.visibility=View.GONE
-                            }
-                        }
-                        var adapterGift=SimpleListAdapter(mainList,subList)
-                        views?.giftGiven_rv?.adapter=adapterGift
-                    }
-                    else {
-                        view?.noDataGift?.visibility = View.VISIBLE
-                        views?.giftGiven_rv?.adapter=SimpleListAdapter(mainList,subList)
-                    }
-
-                    views?.total_tv?.setText("Total: "+analysisModel?.lastPOBDetails?.totalPOB)
-
-
-                    if(analysisModel?.lastPOBDetails?.remark?.let { generalClassObject?.checkStringNullEmpty(it) } == true)
-                    { views?.remarkPOB_tv?.visibility=View.GONE }
-                    else{ views?.remarkPOB_tv?.setText("Remark: "+analysisModel?.lastPOBDetails?.remark) }
-
-                    if(analysisModel?.lastPOBDetails?.strPobDate?.let { generalClassObject?.checkStringNullEmpty(it) } == true)
-                    { views?.datePob_tv?.visibility=View.GONE }
-                    else{ views?.datePob_tv?.setText("Date: "+analysisModel?.lastPOBDetails?.strPobDate) }
-
-                        if(analysisModel?.lastRCPADetails?.size!=0)
-                        {
-                            views?.lastRcpaDetail_rv?.layoutManager=LinearLayoutManager(activity)
-                            val adapter=LastRCPA_Adapter(analysisModel?.lastRCPADetails)
-                            view?.lastRcpaDetail_rv?.adapter=adapter
-                        }
-                    else{ views?.lastRcpaHeader_tv?.visibility=View.GONE}
-
-                   // viewDetail_lRcpaDetail
-                   // viewDetail_lpobDetail
-
-                *//*    if(generalClassObject?.checkStringNullEmpty(analysisModel?.lastPOBDetails!!.strPobDate!!)!!)
-                    { views!!.datePob_tv.setText("Date: --") }
-                    else{
-                        if(generalClassObject!!.checkDateValidation(analysisModel?.lastPOBDetails?.strPobDate!!))
-                        { views!!.datePob_tv.setText("Date: "+analysisModel?.lastPOBDetails?.strPobDate) }
-                        else{ views!!.datePob_tv.setText("Date: ----")} }*//*
-
-
-
-
-            //        views!!.demoSales_tv.setText("Sales: "+analysisModel?.docLastRCPADetail?.ownSales)
-            //        views!!.dateRCPA_tv.setText("Date: "+analysisModel?.docLastRCPADetail?.strRCPADate)
-
-                    *//*if(generalClassObject?.checkStringNullEmpty(analysisModel?.docLastRCPADetail!!.strRCPADate!!)!!)
-                    { views?.dateRCPA_tv?.setText("Date: --") }
-                    else{ views?.dateRCPA_tv?.setText("Date: "+analysisModel?.docLastRCPADetail?.strRCPADate) }
-
-                    if(generalClassObject?.checkStringNullEmpty(analysisModel?.docLastRCPADetail!!.ownSales!!)!!)
-                    { views!!.demoSales_tv.setText("Sales: --") }
-                    else{ views!!.demoSales_tv.setText("Sales: "+analysisModel?.docLastRCPADetail?.ownSales)}
-*//*
-                }
-                else views?.noData_gif?.visibility=View.VISIBLE
-
-                views?.analysisProgress?.visibility=View.GONE
-            }
-
-            override fun onFailure(call: Call<PreCallModel?>, t: Throwable?) {
-                views?.analysisProgress?.visibility=View.GONE
-                views?.noData_gif?.visibility=View.VISIBLE
-                activity?.let { GeneralClass(it).checkInternet() } // check internet connection
-                call.cancel()
-            }
-        })
-    }*/
-
-    suspend fun checkCurrentDCR_API() {
-
-        val response = APIClientKot().getUsersService(2, sharePreferance?.getPref("secondaryUrl")!!).checkDCR_API(
+        val response = APIClientKot().getUsersService(2, HomePage.homePageSharePref?.getPref("secondaryUrl")!!).checkDCR_API(
             "bearer " + loginModelHomePage.accessToken,
             loginModelHomePage.empId,
-            generalClassObject?.currentDateMMDDYY()
+            HomePage.homePageGeneralClass?.currentDateMMDDYY()
         )
         withContext(Dispatchers.Main) {
 
@@ -1150,45 +830,45 @@ class NewCallFragment : Fragment(),StringInterface {
 
                         if(staticSyncData?.settingDCR?.isCallPlanMandatoryForDCR==true && response.body()?.data?.isCPExiest == false)
                         {
-                            alertClass?.commonAlert("Alert!","Please submit you day plan first")
+                            homePageAlertClass?.commonAlert("Alert!","Please submit you day plan first")
                             return@withContext
                         }
 
                         if (dcrData?.rtpApproveStatus?.lowercase() != "a") {
-                            alertClass?.commonAlert("Alert!","Tour plan not approved")
+                            homePageAlertClass?.commonAlert("Alert!","Tour plan not approved")
                             return@withContext
                         }
 
                         if (dcrData?.dataSaveType?.lowercase() == "s") {
-                            alertClass?.commonAlert("Alert!","The DCR is submitted it cannot be unlocked please connect with your admin")
+                            homePageAlertClass?.commonAlert("Alert!","The DCR is submitted it cannot be unlocked please connect with your admin")
                             return@withContext
                         }
 
                         if (dcrData?.routeId.toString()=="" || dcrData?.routeId==null || dcrData?.routeId=="0") {
-                            alertClass?.commonAlert("Alert!", "Please submit tour program first")
-                            alertClass?.hideAlert()
+                            homePageAlertClass?.commonAlert("Alert!", "Please submit tour program first")
+                            homePageAlertClass?.hideAlert()
                             return@withContext
                         }
 
                         routeIdGetDCR = dcrData?.routeId.toString()
                         dcrData?.dataSaveType="D"
-                        sharePreferance?.setPref("dcrObj", Gson().toJson(dcrData))
+                        HomePage.homePageSharePref?.setPref("dcrObj", Gson().toJson(dcrData))
 
                         if (dcrData?.dcrId == 0) {
                            // createDCRAlert(dcrData?.routeId.toString())
-                               alertClass?.createDCRAlert(dcrData?.routeId.toString(),dcrData?.routeName.toString())
-                            sharePreferance?.setPref("dcrId", dcrData?.dcrId.toString())
+                            homePageAlertClass?.createDCRAlert(dcrData?.routeId.toString(),dcrData?.routeName.toString())
+                            HomePage.homePageSharePref?.setPref("dcrId", dcrData?.dcrId.toString())
                         } else {
-                            sharePreferance?.setPref("todayDate", generalClassObject?.currentDateMMDDYY())
-                            sharePreferance?.setPref("dcrId", dcrData?.dcrId.toString())
-                            sharePreferance?.setPref("empIdSp", loginModelHomePage.empId.toString())
+                            homePageSharePref?.setPref("todayDate", HomePage.homePageGeneralClass?.currentDateMMDDYY())
+                            homePageSharePref?.setPref("dcrId", dcrData?.dcrId.toString())
+                            homePageSharePref?.setPref("empIdSp", loginModelHomePage.empId.toString())
 
                             views?.bottomSheetTitle_tv?.setText(if(selectionType==1)"Select route" else "Select team")
 
                             if(dcrData?.otherDCR!=0)
                             {
                                 setOtherActivityView()
-                                sharePreferance?.setPref("otherActivitySelected","1")
+                                homePageSharePref?.setPref("otherActivitySelected","1")
                                 return@withContext
                             }
                             openCloseModel()
@@ -1197,14 +877,10 @@ class NewCallFragment : Fragment(),StringInterface {
                         activity?.let { GeneralClass(it).checkInternet() }
                     }
                 }
-
             }
-
         }
 
-
-
-       /* var returnType=false;
+       *//* var returnType=false;
         alertClass?.showProgressAlert("")
 
         var call: Call<JsonObject> = apiInterface?.checkDCR_API("bearer " + loginModelHomePage.accessToken, loginModelHomePage.empId,generalClassObject!!.currentDateMMDDYY()) as Call<JsonObject>
@@ -1249,72 +925,17 @@ class NewCallFragment : Fragment(),StringInterface {
                 call.cancel()
                 returnType=false
             }
-        })*/
-
-    }
-
-    fun saveDCR_API(dcrObject: CommonModel.SaveDcrModel, alertDialog: AlertDialog, checked: Boolean) {
-        alertClass?.showProgressAlert("")
-        var call: Call<JsonObject>? = apiInterface?.saveDCS("bearer " + loginModelHomePage.accessToken,dcrObject) as? Call<JsonObject>
-        call?.enqueue(object : Callback<JsonObject?> {
-            override fun onResponse(call: Call<JsonObject?>?, response: Response<JsonObject?>) {
-                alertClass?.hideAlert()
-                    Log.e("gsuifsdguifdgsf",Gson().toJson(response.body()))
-                if (response.code() == 200 && !response.body().toString().isEmpty()) {
-                    val jsonObjError:JsonObject = response.body()?.get("errorObj") as JsonObject
-                if(!jsonObjError.get("errorMessage").asString.isEmpty())
-                    {
-                    alertClass?.commonAlert("",jsonObjError.get("errorMessage").asString)
-                    }
-                    else {
-                    val jsonObjData:JsonObject = response.body()?.get("data") as JsonObject
-
-                    if(!checked)
-                    {
-                        alertClass?.commonAlert("",jsonObjData.get("message").asString + "And kindly moved to Salestrip to submit DCR")
-
-                    }
-                    else
-                    {
-                        alertClass?.commonAlert("",jsonObjData.get("message").asString)
-                    }
-                    sharePreferance?.setPref("todayDate",generalClassObject?.currentDateMMDDYY())
-                    sharePreferance?.setPref("dcrId",jsonObjData.get("dcrId").asString)
-
-                    if(!checked) sharePreferance?.setPref("otherActivitySelected","1")
-
-                 /*  if(generalClassObject?.isInternetAvailable() == true && checked)
-                   {
-                       CoroutineScope(Dispatchers.IO).launch {
-                           val api = async { checkCurrentDCR_API() }
-                           api.await()
-                       }
-                   }
-*/
-                    alertDialog.cancel()
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call<JsonObject?>, t: Throwable?) {
-                generalClassObject?.checkInternet()
-                alertClass?.hideAlert()
-                alertDialog.cancel()// check internet connection
-                call.cancel()
-            }
-        })
-    }
+        })*//*
+    }*/
 
     fun setOtherActivityView()
     {
-        alertClass?.commonAlert("Alert!","You have not planned field working today. Kindly save it from Salestrip app")
-
+        homePageAlertClass?.commonAlert("Alert!","You have not planned field working today. Kindly save it from Salestrip app")
         views?.selectRoutesCv?.setEnabled(false)
         views?.selectTeamsCv?.setEnabled(false)
         views?.selectTeam_tv?.setBackgroundColor(Color.parseColor("#A9A9A9"))
         views?.selectRoute_tv?.setBackgroundColor(Color.parseColor("#A9A9A9"))
     }
-
 
     override fun onResume() {
         super.onResume()
@@ -1328,10 +949,10 @@ class NewCallFragment : Fragment(),StringInterface {
           // views?.parentButton?.visibility=View.GONE
             views?.noData_gif?.visibility=View.VISIBLE
             views?.framePreCall_view?.visibility=View.GONE
-            val responseDocCall=db.getApiDetail(5)
+            /*val responseDocCall=db.getApiDetail(5)
             if(!responseDocCall.equals("")) {
                 docCallModel = Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
-            }
+            }*/
         }
         else isSecondTime=true
 
@@ -1377,7 +998,7 @@ class NewCallFragment : Fragment(),StringInterface {
             val transaction = childFragmentManager.beginTransaction()
             transaction?.replace(R.id.frameRetailer_view, retailerFragment)
             transaction?.disallowAddToBackStack()
-            transaction?.commit()
+            transaction?.commitAllowingStateLoss()
 
             Handler(Looper.getMainLooper()).postDelayed({
                 activity?.runOnUiThread {
@@ -1401,6 +1022,14 @@ class NewCallFragment : Fragment(),StringInterface {
         views?.framePreCall_view?.visibility=View.GONE
         views?.noData_gif?.visibility=View.VISIBLE
         views?.retailer_parent?.visibility=View.GONE
+    }
+
+    fun callPreCallFrag()
+    {
+        val transaction = childFragmentManager.beginTransaction()
+        transaction?.replace(R.id.framePreCall_view, preCallObj)
+        transaction?.disallowAddToBackStack()
+        transaction?.commitAllowingStateLoss()
     }
 
 }

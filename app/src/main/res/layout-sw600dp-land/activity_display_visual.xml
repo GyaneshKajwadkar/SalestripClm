@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <RelativeLayout
+       <!-- <RelativeLayout
             android:id="@+id/fragmentToolbar_rl"
             android:padding="4dp"
             android:layout_width="match_parent"
@@ -128,7 +128,7 @@
                     </LinearLayout>
                 </RelativeLayout>
             </LinearLayout>
-        </RelativeLayout>
+        </RelativeLayout>-->
 
 
         <LinearLayout
@@ -279,15 +279,17 @@
             </RelativeLayout>
         </LinearLayout>
 
-        <FrameLayout
+    <!--    <FrameLayout
             android:padding="10dp"
             android:layout_width= "match_parent"
             android:layout_height="match_parent"
             android:visibility="gone"
-            android:id="@+id/favBrand_frame"/>
+            android:id="@+id/favBrand_frame"/>-->
 
     </LinearLayout>
 
+<!--
     <include layout="@layout/bottom_sheet_visualads" />
+-->
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

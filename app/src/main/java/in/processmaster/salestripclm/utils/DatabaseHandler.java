@@ -28,6 +28,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 2;
     private static final String DATABASE_NAME = "SalesTrip_CLM_db";
     private static final String KEY_ID = "id";
+    private static DatabaseHandler sInstance;
+
 
     //=========================================hold sync api data==============================================
     private static final String TABLE_SYNC_API = "syncDataTable";
@@ -109,12 +111,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String PRESENTATION_NAME = "presentaion_name";
     private static final String EDETAILING_ITEM = "edetailing_item";
 
+    private DatabaseHandler(Context applicationContext) {
+        super(applicationContext, DATABASE_NAME, null, DATABASE_VERSION);
+    }
 
 
-    public DatabaseHandler(Context context) {
+
+ /*   public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context = context;
-    }
+    }*/
 
     // Creating Tables
     @Override
@@ -504,14 +510,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         //db.close();
     }
 
-    public void updateFavourite(String idModel,int isFavInt)
+   /* public void updateFavourite(String idModel,int isFavInt)
     {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues initialValues = new ContentValues();
         initialValues.put(ISFAV, isFavInt);
         db.update(TABLE_EDETAILING, initialValues, "id=?", new String[] {String.valueOf(idModel)});
         //db.close();
-    }
+    }*/
 
     //insert file path using id
     public void insertFilePath(int isDownloaded,String filePath,String idModel) {
@@ -605,7 +611,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
-    //getFav edetailing
+   /* //getFav edetailing
     @SuppressLint("Range")
     public  ArrayList<DevisionModel.Data.EDetailing> getAllFavBrands()
     {
@@ -635,7 +641,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         cursor.close();
         //db.close();
         return downloadFileList;
-    }
+    }*/
 
     public void deleteEdetailingData(String id)
     {
@@ -687,11 +693,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         Cursor cursor = sqldb.rawQuery(Query, null);
         if(cursor.getCount() <= 0){
             cursor.close();
-            //sqlb.close();
             return false;
         }
         cursor.close();
-       // sqldb.close();
         return true;
     }
 
@@ -1427,4 +1431,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         cursor.close();
         return itemList;
     }
+
+    public static synchronized DatabaseHandler getInstance(Context context) {
+        if (sInstance == null) { sInstance = new DatabaseHandler(context); }
+        return sInstance;
+    }
+
+
 }

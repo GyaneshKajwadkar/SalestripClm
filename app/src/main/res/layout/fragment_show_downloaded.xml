@@ -24,7 +24,7 @@
         android:textColor="@color/zm_red"
         android:visibility="gone"/>
 
-    <androidx.cardview.widget.CardView
+  <!--  <androidx.cardview.widget.CardView
         android:visibility="gone"
         android:id="@+id/topSearchParent"
         android:layout_margin="2dp"
@@ -51,11 +51,10 @@
             android:layout_width="wrap_content"
             android:layout_height="40dp"/>
 
-    </androidx.cardview.widget.CardView>
+    </androidx.cardview.widget.CardView>-->
 
 
     <androidx.core.widget.NestedScrollView
-        android:layout_below="@+id/topSearchParent"
         android:id="@+id/nestedScroll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -84,7 +83,7 @@
                         android:textColor="@color/purple_200"
                         android:text="Videos"/>
 
-                    <LinearLayout
+                 <!--   <LinearLayout
                         android:visibility="gone"
                         android:orientation="horizontal"
                         android:layout_alignParentRight="true"
@@ -106,7 +105,7 @@
                             android:textColor="@color/black"
                             android:text="Slide show"/>
 
-                    </LinearLayout>
+                    </LinearLayout>-->
 
                 </RelativeLayout>
 
@@ -146,7 +145,7 @@
                         android:textColor="@color/purple_200"
                         android:text="Images"/>
 
-                    <LinearLayout
+                    <!--<LinearLayout
                         android:visibility="gone"
                         android:orientation="horizontal"
                         android:layout_alignParentRight="true"
@@ -168,7 +167,7 @@
                             android:textColor="@color/black"
                             android:text="Slide show"/>
 
-                    </LinearLayout>
+                    </LinearLayout>-->
 
                 </RelativeLayout>
                 <View

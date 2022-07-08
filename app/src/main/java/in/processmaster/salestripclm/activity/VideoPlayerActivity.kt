@@ -123,7 +123,6 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
     private fun initPlayer() {
         mPlayer = SimpleExoPlayer.Builder(this).build()
         playerView.player = mPlayer
@@ -340,7 +339,6 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
     }
 
 
-    @RequiresApi(Build.VERSION_CODES.N)
     override fun onResume() {
         super.onResume()
         alertClass = AlertClass(this)
@@ -348,9 +346,8 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
 
         createConnectivity(this)
 
-        if (Util.SDK_INT < 24 || mPlayer == null) {
+        if ( mPlayer == null) {
             initPlayer()
-
         }
     }
 
@@ -576,7 +573,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
         mPlayer?.stop()
         arrayVideo.clear()
 
-        for (itemParent in dbBase.getAllDownloadedData(passingInterface) )
+        for (itemParent in dbBase!!?.getAllDownloadedData(passingInterface) )
         {
 
             if(itemParent.downloadType.equals("VIDEO"))
@@ -637,9 +634,9 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
                         runOnUiThread {
                             if(mPlayer?.isPlaying == true)
                             {
-                                dbBaseTimer=dbBaseTimer+1
+                                dbBaseTimer= dbBaseTimer?.plus(1)
                                 Log.e("timerBrandWiseSlider",dbBaseTimer.toString())
-                                dbBase?.insertBrandTime(dbBaseTimer  ,startDateTime,brandID.toString())
+                                dbBaseTimer?.let { dbBase?.insertBrandTime(it,startDateTime,brandID.toString()) }
                             }
                         }
                     }
@@ -651,28 +648,30 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
     }
 
 
-    @RequiresApi(Build.VERSION_CODES.N)
     fun getAllEdetailingProduct() : java.util.ArrayList<DevisionModel.Data.EDetailing>
     {
-        var  edetailingList = dbBase.getAlleDetail() //fetch edetailing list from db
+        var  edetailingList = dbBase?.getAlleDetail() //fetch edetailing list from db
         var  filteredList: ArrayList<DevisionModel.Data.EDetailing> = ArrayList()
-        for (itemParent in edetailingList )
-        {
-            if(itemParent.isSaved==1)
+        if (edetailingList != null) {
+            for (itemParent in edetailingList )
             {
-                var downloadedList = dbBase.getAllDownloadedData(itemParent.geteDetailId())
-
-                var isAvailable=false
-                for(itemChild in downloadedList)
+                if(itemParent.isSaved==1)
                 {
-                    if(itemChild.downloadType.equals("VIDEO")) isAvailable=true
+                    var downloadedList = dbBase?.getAllDownloadedData(itemParent.geteDetailId())
+
+                    var isAvailable=false
+                    if (downloadedList != null) {
+                        for(itemChild in downloadedList) {
+                            if(itemChild.downloadType.equals("VIDEO")) isAvailable=true
+                        }
+                    }
+                    if(isAvailable)  filteredList.add(itemParent); continue
+
+                    /*  if(downloadedList.stream().anyMatch({ o -> o.downloadType.equals("VIDEO") }))
+                    {
+                        filteredList.add(itemParent)
+                    }*/
                 }
-                if(isAvailable)  filteredList.add(itemParent); continue
-
-              /*  if(downloadedList.stream().anyMatch({ o -> o.downloadType.equals("VIDEO") }))
-                {
-                    filteredList.add(itemParent)
-                }*/
             }
         }
         return filteredList
@@ -685,7 +684,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
 
         val isLike=dbBase?.getLike(videoModel?.fileId.toString(),startDateTime)
 
-        if(isLike)
+        if(isLike == true)
         {
             fabLike?.setColorFilter(Color.WHITE)
             isList = true
@@ -725,11 +724,14 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
 
                             if(mPlayer?.isPlaying == true)
                             {
-                                dbTimer=dbTimer+1
+                                dbTimer= dbTimer?.plus(1)
                                 Log.e("timerSlider",dbTimer.toString())
                                 videoModel?.fileId?.let {
-                                    dbBase?.insertTime(dbTimer,
-                                        it,startDateTime)
+                                    dbTimer?.let { it1 ->
+                                        dbBase?.insertTime(
+                                            it1,
+                                            it,startDateTime)
+                                    }
                                 }
                             }
 
@@ -798,11 +800,11 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
             var dowloadedAllList: ArrayList<DownloadFileModel> = ArrayList()
             if(intent.getBooleanExtra("isPresentation",false))
             {
-                dowloadedAllList=dbBase.getAllPresentationItem(intent.getStringExtra("presentationName"))
+                dowloadedAllList= dbBase?.getAllPresentationItem(intent.getStringExtra("presentationName")) as ArrayList<DownloadFileModel>
             }
             else
             {
-                dowloadedAllList=dbBase.getAllDownloadedData(eDetailingId)
+                dowloadedAllList= dbBase?.getAllDownloadedData(eDetailingId) as ArrayList<DownloadFileModel>
             }
 
             for(item in dowloadedAllList)

@@ -113,7 +113,12 @@ class CommonModel {
         class Data {
             @SerializedName("employeeSampleBalanceList")
             @Expose
-            var employeeSampleBalanceList: List<EmployeeSampleBalance>? = null
+            var employeeSampleBalanceList: ArrayList<EmployeeSampleBalance>? = null
+                get() = field
+                set(value) {
+                    if(value==null || value.isEmpty())field = ArrayList<EmployeeSampleBalance>()
+                    else field = value
+                }
 
             class EmployeeSampleBalance {
                 @SerializedName("productId")
@@ -124,9 +129,9 @@ class CommonModel {
                 @Expose
                 var actualBalanceQty: Int? = null
 
-                @SerializedName("newBalanceQty")
+         /*       @SerializedName("newBalanceQty")
                 @Expose
-                var newBalanceQty: Int? = null
+                var newBalanceQty: Int? = null*/
 
                 @SerializedName("productName")
                 @Expose

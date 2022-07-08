@@ -48,7 +48,7 @@ class DownloadedActivtiy : BaseActivity() {
 
     var adapter : DownloadAdapter?=null
 
-    var db = DatabaseHandler(this)
+    var db = DatabaseHandler.getInstance(this)
 
    // var arrayList: ArrayList<DownloadEdetail_model.Data.EDetailingImages> = ArrayList()
     var arrayListD: ArrayList<DownloadFileModel> = ArrayList()

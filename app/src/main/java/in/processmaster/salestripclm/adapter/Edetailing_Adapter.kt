@@ -10,6 +10,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -53,7 +54,7 @@ class Edetailing_Adapter(
     override fun onBindViewHolder(holder: MyViewHolder, position: Int)
     {
         val modeldata = filteredData?.get(position)
-
+        Log.e("fdgdgdgdgdgdf","dfsdfsdfsdfgegdf")
         if(modeldata?.isSaved==1)
         {
             holder.download_rl?.visibility = View.GONE
@@ -73,12 +74,8 @@ class Edetailing_Adapter(
                        holder.isPending_iv.setImageResource(R.drawable.ic_download)
                    }
                }
-
            }
             Thread(runnable).start()
-
-
-
         }
 
       holder.header_tv.text = modeldata?.brandName

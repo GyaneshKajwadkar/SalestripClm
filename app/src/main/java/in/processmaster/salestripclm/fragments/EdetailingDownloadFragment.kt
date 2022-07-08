@@ -59,7 +59,7 @@ class EdetailingDownloadFragment : Fragment() {
         filter_et=view.findViewById(R.id.filter_et)as EditText
         syncData_ll=view.findViewById(R.id.syncData_ll)as LinearLayout
         sharePreferance = PreferenceClass(activity)
-        db = DatabaseHandler(activity)
+        db = DatabaseHandler.getInstance(activity?.applicationContext)
         alertClass= activity?.let { AlertClass(it) }
         viewPager = view.findViewById<View>(R.id.viewpager) as ViewPager
         tabs = view.findViewById<View>(R.id.result_tabs) as TabLayout

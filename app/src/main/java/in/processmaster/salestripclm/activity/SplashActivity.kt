@@ -6,6 +6,7 @@ import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.models.SyncModel
 import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import `in`.processmaster.salestripclm.networkUtils.APIInterface
+import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.content.Intent
 import android.os.Bundle
@@ -48,12 +49,12 @@ class SplashActivity : BaseActivity()
                 val token: String = task.getResult().toString()
                 Log.e("TOKEN",token)
             })*/
-
+        dbBase= DatabaseHandler.getInstance(applicationContext)
 
         if(sharePreferance?.getPrefBool("isLogin") == true)
         {
 //         //if no internet connection and database have sync data then open directly home page
-            if(!generalClass.isInternetAvailable() && dbBase.getDatasCount() > 0)
+            if(!generalClass.isInternetAvailable() && dbBase?.getDatasCount()!! > 0)
             {
                 generalClass.enableSimpleProgress(progressBar!!)
                 val coroutineScope= CoroutineScope(Dispatchers.IO).launch {
@@ -98,6 +99,7 @@ class SplashActivity : BaseActivity()
                 finish()
             }, 2000)
         }
+
 
     }
     suspend fun callingSyncAPI()

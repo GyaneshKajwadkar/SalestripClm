@@ -58,7 +58,7 @@ class OnlinePresentationActivity : BaseActivity(), View.OnClickListener, Lifecyc
             ProcessLifecycleOwner.get().getLifecycle().addObserver(this)
         }
 
-        dbBase.deleteApiData(7)
+        dbBase?.deleteApiData(7)
         val fragment = PresentEDetailingFrag()
         openFragment(fragment)
 

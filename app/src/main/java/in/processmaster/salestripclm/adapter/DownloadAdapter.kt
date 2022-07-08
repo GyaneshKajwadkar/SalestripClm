@@ -131,7 +131,7 @@ class DownloadAdapter constructor() :
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int)
     {
-        var db = DatabaseHandler(context!!)
+        var db = DatabaseHandler.getInstance(context!!)
         if(downloadedType.equals("VIDEO"))
         {
             val videoView: ViewHoldersVideo = holder as ViewHoldersVideo
@@ -334,7 +334,7 @@ class DownloadAdapter constructor() :
                     favAlertImage(videoView,imagemodel,db)
 
                 }
-                checkIsItemIsFav(db)
+             //   checkIsItemIsFav(db)
             })
 
         }
@@ -463,7 +463,7 @@ class DownloadAdapter constructor() :
                 {
                     favAlertHTML(videoView,zipmodel,db)
                 }
-                checkIsItemIsFav(db)
+              //  checkIsItemIsFav(db)
             })
         }
 
@@ -610,7 +610,7 @@ class DownloadAdapter constructor() :
                     output.flush()
                     output.close()
 
-                    var db = DatabaseHandler(context!!)
+                    var db = DatabaseHandler.getInstance(context!!)
 
                     var fileModel= DownloadFileModel()
                     fileModel.fileName=extension.replace("/","")
@@ -710,7 +710,7 @@ class DownloadAdapter constructor() :
                     })
                     output.write(buffer, 0, read)
                 }
-                var db = DatabaseHandler(context!!)
+                var db = DatabaseHandler.getInstance(context!!)
 
                 var fileModel= DownloadFileModel()
                 fileModel.fileName=extension.replace("/","")
@@ -947,7 +947,7 @@ class DownloadAdapter constructor() :
                     fileModel.brandId=parentId
                     fileModel.brandName=brandName
 
-                    var db = DatabaseHandler(context!!)
+                    var db = DatabaseHandler.getInstance(context?.applicationContext)
 
                     var downloadedModel=db.getSingleDownloadedData(zipmodel.fileId!!)
 
@@ -979,7 +979,7 @@ class DownloadAdapter constructor() :
 
     }
 
-    //Check is brand have fav items
+    /*//Check is brand have fav items
     private fun checkIsItemIsFav(db: DatabaseHandler)
     {
         var eDeatilingList = db.getAllDownloadedData(eDetailingId.toInt())
@@ -1004,7 +1004,7 @@ class DownloadAdapter constructor() :
             }
         }
 
-    }
+    }*/
 
 
     //alert dialog for video views

@@ -30,7 +30,7 @@ class AllDataSharingActivity : BaseActivity()
     }
     fun initView()
     {
-        dbBase= DatabaseHandler(this)
+        dbBase= DatabaseHandler.getInstance(this)
 
         dataSelectorback_iv.setOnClickListener({ onBackPressed() })
 

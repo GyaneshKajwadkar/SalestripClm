@@ -176,7 +176,7 @@ public class JoinMeetingActivity extends BaseActivity implements MeetingServiceL
     public void setScheduleAdapter( )
     {
 
-        String responseData= new DatabaseHandler(this).getApiDetail(2);
+     /*   String responseData= new DatabaseHandler.getInstance(this).getApiDetail(2);
 
         if(!responseData.equals(""))
         {
@@ -200,7 +200,7 @@ public class JoinMeetingActivity extends BaseActivity implements MeetingServiceL
             sheduled_rv.setAdapter(adapterRecycler);
             adapterRecycler.notifyDataSetChanged();
             scheduledProgess.setVisibility(View.GONE);
-        }
+        }*/
     }
 
 

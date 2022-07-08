@@ -111,7 +111,7 @@ class MeetingActivity : BaseActivity(), MeetingServiceListener, View.OnClickList
         }
         catch (e:Exception){return}
 
-        val responseData: String = dbBase.getApiDetail(2)
+        val responseData: String = dbBase!!?.getApiDetail(2)
         if (responseData != "") {
             val getScheduleModel: GetScheduleModel = Gson().fromJson<GetScheduleModel>(
                 responseData,

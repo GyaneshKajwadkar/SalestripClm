@@ -14,9 +14,6 @@ import `in`.processmaster.salestripclm.models.*
 import `in`.processmaster.salestripclm.networkUtils.GPSTracker
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.annotation.SuppressLint
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.InsetDrawable
 import android.location.Location
 import android.os.Bundle
 import android.os.Handler
@@ -27,20 +24,19 @@ import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.annotation.NonNull
-import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.forEach
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.button.MaterialButtonToggleGroup.OnButtonCheckedListener
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_submit_edetailing.*
 import kotlinx.android.synthetic.main.checkbox_bottom_sheet.*
 import kotlinx.android.synthetic.main.checkbox_bottom_sheet.noDataCheckAdapter_tv
 import kotlinx.android.synthetic.main.common_toolbar.*
+import kotlinx.android.synthetic.main.multiselection_buttons.*
+import kotlinx.android.synthetic.main.multiselection_buttons.pobParent
 import kotlinx.android.synthetic.main.pob_product_bottom_sheet.*
 import kotlinx.android.synthetic.main.pob_view.*
 import kotlinx.coroutines.Runnable
@@ -53,7 +49,6 @@ import retrofit2.Response
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.Executors
 import kotlin.collections.ArrayList
 
 class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProductTransfer,
@@ -75,13 +70,13 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
     var passingSchemeList:ArrayList<SyncModel.Data.Scheme> = ArrayList()
     var selectedStockist=IdNameBoll_model()
     var commonSlectionAdapter=CheckboxSpinnerAdapter(ArrayList(),this)
-  //  var sendEDetailingArray:ArrayList<Send_EDetailingModel.PobObj.PobDetailList> = ArrayList()
 
     //pob initilize------
     var mainProductList:ArrayList<SyncModel.Data.Product> = ArrayList()
     var selectedProductList:ArrayList<SyncModel.Data.Product> = ArrayList()
     var unSelectedProductList:ArrayList<SyncModel.Data.Product> = ArrayList()
     var checkIsDcrSave=false
+    var pobClassObj= PobCommonClass(this)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,8 +84,8 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         setContentView(R.layout.activity_submit_edetailing)
 
         alertClass.showProgressAlert("")
-        val executor = Executors.newFixedThreadPool(3)
-        val handler = Handler(Looper.getMainLooper())
+
+        pobClassObj= PobCommonClass(this)
 
         val runnable = java.lang.Runnable {
             if(!PreferenceClass(this).getPref("dcrId").isEmpty())
@@ -100,22 +95,16 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
             if(intent.getIntExtra("doctorID",0)!=0) doctorIdDisplayVisual= intent.getIntExtra("doctorID",0)
 
-            val quantityModel=Gson().fromJson(dbBase.getApiDetail(3),CommonModel.QuantityModel.Data::class.java)
+            val quantityModel=Gson().fromJson(dbBase?.getApiDetail(3),CommonModel.QuantityModel.Data::class.java)
 
             var listSample = quantityModel.employeeSampleBalanceList?.filter { s -> s.productType == "Sample"}
-            var listStokist = staticSyncData?.retailerList?.filter { s -> s.type == "STOCKIST" }
             var Gift = quantityModel.employeeSampleBalanceList?.filter { s -> s.productType == "Gift"}
             var listGift = Gift?.filter { s -> s.actualBalanceQty != 0}
 
-            if (listStokist != null) {
-                for(stockist in listStokist) {
-                    val data =IdNameBoll_model()
-                    data.id= stockist.retailerId.toString()
-                    data.city= stockist.cityName.toString()
-                    data.name= stockist.shopName.toString()
-                    stokistArray.add(data)
-                }
-            }
+            stokistArray.addAll(pobClassObj.getStockist())
+            mainProductList.addAll(pobClassObj.getProductList())
+            unSelectedProductList.addAll(pobClassObj.getProductList())
+            passingSchemeList.addAll(pobClassObj.getSchemeList())
 
             for(workWith in staticSyncData?.workingWithList!!)
             {
@@ -150,21 +139,18 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
           //  mainProductList.addAll(data.productList.filter { s -> (s.productType==1) } as ArrayList<SyncModel.Data.Product>)
           //  unSelectedProductList=ArrayList(mainProductList)
 
-            mainProductList.addAll(PobCommonClass(this).getProductList())
-            unSelectedProductList.addAll(PobCommonClass(this).getProductList())
-
 
             val getSchemeList=staticSyncData?.schemeList
             val filterByTypeSchemeList= getSchemeList?.filter { data -> (data?.schemeFor=="S" || data?.schemeFor=="H") }
 
             val getDocDetail: SyncModel.Data.Doctor? = staticSyncData?.doctorList?.find { it.doctorId == doctorIdDisplayVisual }
 
-            getSchemeList?.clear()
+            //getSchemeList?.clear()
             filterByTypeSchemeList?.sortedBy { it.schemeFor }?.let { getSchemeList?.addAll(it) }
 
-            getSchemeList?.let { passingSchemeList.addAll(it)}
+           // getSchemeList?.let { passingSchemeList.addAll(it)}
 
-            getSchemeList?.forEachIndexed { indexH, hElement ->
+           /* getSchemeList?.forEachIndexed { indexH, hElement ->
 
                 val separated: Array<String>? = hElement.schemeForId?.split(",")?.toTypedArray()
                 val event: String? = separated?.find { it ==getDocDetail?.fieldStaffId?.toString() }
@@ -183,7 +169,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                         }
                     }
                 }
-            }
+            }*/
 
             val adapterVisit: ArrayAdapter<SyncModel.Data.WorkType> = ArrayAdapter<SyncModel.Data.WorkType>(this,
                 R.layout.spinner_txt, CommonListGetClass().getWorkTypeForSpinner())
@@ -192,13 +178,13 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             {
                 if(intent.getBooleanExtra("skip",false))
                 {
-                    dbBase.deleteAllVisualAds()
-                    dbBase.deleteAllChildVisual()
+                    dbBase?.deleteAllVisualAds()
+                    dbBase?.deleteAllChildVisual()
                 }
                 else
                 { }
 
-                visualSendModel = dbBase.getAllSubmitVisual()
+                visualSendModel = dbBase?.getAllSubmitVisual() as ArrayList<VisualAdsModel_Send>
                 runOnUiThread(){
                     if(visualSendModel.size==0)nodata_gif.visibility=View.VISIBLE
                 }
@@ -219,6 +205,8 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 {
                     submitDetailing_btn.visibility=View.INVISIBLE
                 }
+
+                setMultipleSelectionButton()
 
                 Handler(Looper.getMainLooper()).postDelayed({
                     alertClass.hideAlert() }, 10)
@@ -265,7 +253,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             override fun onSlide(bottomSheet: View, slideOffset: Float) {}
         })
 
-        toggleButton.forEach { button ->
+ /*       toggleButton.forEach { button ->
             button.setOnClickListener { (button as MaterialButton).isChecked = true }
         }
 
@@ -299,7 +287,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 hideAllSelection()
                 pobParentSubmitEdetailing.visibility=View.VISIBLE
             }
-        })
+        })*/
 
         selectBtn.setOnClickListener({
             if(selectBtn.text.equals("Select Working with")){ openCloseModel(1)}
@@ -331,7 +319,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
             var saveModel=getSaveData(false)
 
-            val quantityModel=Gson().fromJson(dbBase.getApiDetail(3),CommonModel.QuantityModel.Data::class.java)
+            val quantityModel=Gson().fromJson(dbBase?.getApiDetail(3),CommonModel.QuantityModel.Data::class.java)
             var quantityArray=quantityModel.employeeSampleBalanceList as ArrayList<CommonModel.QuantityModel.Data.EmployeeSampleBalance>
 
             for((index, model) in quantityArray?.withIndex())
@@ -431,10 +419,10 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                 {
                     if(edetailingEditModel.saveInDb==true)
                     {
-                        dbBase.insertOrUpdateSaveAPI(doctorIdDisplayVisual, Gson().toJson(saveModel),"feedback")
+                        dbBase?.insertOrUpdateSaveAPI(doctorIdDisplayVisual, Gson().toJson(saveModel),"feedback")
                         val commonModel=CommonModel.QuantityModel.Data()
                         commonModel.employeeSampleBalanceList=quantityArray
-                        dbBase.addAPIData(Gson().toJson(commonModel),3)
+                        dbBase?.addAPIData(Gson().toJson(commonModel),3)
                         callRunnableAlert("Data save successfully")
                     }
                     else{ submitDcr(saveModel,quantityArray) }
@@ -445,10 +433,10 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             else
             {
                 if(!GeneralClass(this).isInternetAvailable())
-                {   dbBase.insertOrUpdateSaveAPI(doctorIdDisplayVisual, Gson().toJson(saveModel),"feedback")
+                {   dbBase?.insertOrUpdateSaveAPI(doctorIdDisplayVisual, Gson().toJson(saveModel),"feedback")
                     val commonModel=CommonModel.QuantityModel.Data()
                     commonModel.employeeSampleBalanceList=quantityArray
-                    dbBase.addAPIData(Gson().toJson(commonModel),3)
+                    dbBase?.addAPIData(Gson().toJson(commonModel),3)
 
                     callRunnableAlert("Data save successfully")
                 }
@@ -459,7 +447,9 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
         pobProduct_btn.setOnClickListener({
         //    closeBottomSheet()
-            callPobSelectAlert()
+          //  callPobSelectAlert()
+            pobClassObj.callPobSelectAlert(filterTextPobWatcher,mainProductList,unSelectedProductList,passingSchemeList,this)
+
         })
 
         closePob_iv.setOnClickListener({closeBottomSheet()})
@@ -808,7 +798,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
     fun hideAllSelection()
     {   commonSearch_et.setText("")
-        pobParentSubmitEdetailing.visibility=View.GONE
+        pobParent.visibility=View.GONE
         sample_rv.visibility=View.GONE
         gift_rv.visibility=View.GONE
         workingWithRv.visibility=View.GONE
@@ -1017,10 +1007,10 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                         alertClass?.commonAlert("",response.body()?.getErrorObj()?.errorMessage.toString())
                     }
                     else {
-                        val responseDocCall=dbBase.getApiDetail(5)
+                        val responseDocCall=dbBase?.getApiDetail(5)
 
                         var  docCallModel= Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
-                        if(responseDocCall.isEmpty()){
+                        if(responseDocCall?.isEmpty() == true){
                             docCallModel= DailyDocVisitModel.Data()
                         }
 
@@ -1034,8 +1024,8 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
                         val commonModel=CommonModel.QuantityModel.Data()
                         commonModel.employeeSampleBalanceList=quantityArray
-                        dbBase.addAPIData(Gson().toJson(commonModel),3)
-                        dbBase.deleteApiData(7)
+                        dbBase?.addAPIData(Gson().toJson(commonModel),3)
+                        dbBase?.deleteApiData(7)
 
                     } } }
 
@@ -1048,9 +1038,9 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
     fun callRunnableAlert(message:String)
     {
-        if(!intent.getBooleanExtra("skip",false)) dbBase.insertdoctorData(doctorIdDisplayVisual,generalClass.getCurrentDate())
-        dbBase.deleteAllVisualAds()
-        dbBase.deleteAllChildVisual()
+        if(!intent.getBooleanExtra("skip",false)) dbBase?.insertdoctorData(doctorIdDisplayVisual,generalClass.getCurrentDate())
+        dbBase?.deleteAllVisualAds()
+        dbBase?.deleteAllChildVisual()
 
         val r: Runnable = object : Runnable {
             override fun run() {
@@ -1287,20 +1277,17 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
     fun setPobAdapter()
     {
         runOnUiThread{
-         /*   pobProductSelectAdapter=PobProductAdapter(unSelectedProductList, passingSchemeList,this)
-            pobProduct_rv.adapter= pobProductSelectAdapter*/
-
             selectedPobAdapter=SelectedPobAdapter(selectedProductList,this,this,this,checkIsDcrSave)
             selectedPob_rv.adapter= selectedPobAdapter
 
-            calculateTotalProduct()
+            pobClassObj.calculateTotalProduct(selectedProductList,totalProductPrice_tv)
         }
     }
 
     fun updateSpecificElement(returnModel: SyncModel.Data.Product?, position: Int)
     {
         returnModel?.let { selectedProductList.set(position, it) }
-        calculateTotalProduct()
+        pobClassObj.calculateTotalProduct(selectedProductList,totalProductPrice_tv)
     }
 
     fun calculateTotalProduct()
@@ -1465,7 +1452,9 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
                         if(visualSendModel.size!=0)nodata_gif.visibility=View.GONE
 
                         setPobAdapter()
-                        calculateTotalProduct()
+                        pobClassObj.calculateTotalProduct(selectedProductList,totalProductPrice_tv)
+
+                      //  calculateTotalProduct()
                     })
                 }
             }
@@ -1690,89 +1679,10 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         }
     }
 
-    fun callPobSelectAlert()
-    {
-        val dialogBuilder = AlertDialog.Builder(this, R.style.my_dialog)
-        val inflater = this.layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.pobcreatealert, null)
-
-        dialogBuilder.setView(dialogView)
-
-        val alertDialog: AlertDialog = dialogBuilder.create()
-       // alertDialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        val back = ColorDrawable(Color.TRANSPARENT)
-        val inset = InsetDrawable(back, 25)
-        alertDialog.getWindow()?.setBackgroundDrawable(inset)
-
-        val wmlp: WindowManager.LayoutParams? = alertDialog.getWindow()?.getAttributes()
-
-        wmlp?.gravity = Gravity.TOP or Gravity.RIGHT
-
-
-        val closePob_iv = dialogView.findViewById<View>(R.id.closePob_iv) as ImageView
-        val okPob_iv = dialogView.findViewById<View>(R.id.okPob_iv) as TextView
-        val filterRv = dialogView.findViewById<View>(R.id.filterRv) as RecyclerView
-        val pobProduct_rv = dialogView.findViewById<View>(R.id.pobProduct_rv) as RecyclerView
-            pobProduct_rv.layoutManager=LinearLayoutManager(this)
-            filterRv.setLayoutManager(LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false))
-
-        val productSearch_et = dialogView.findViewById<View>(R.id.productSearch_et) as EditText
-            productSearch_et?.addTextChangedListener(filterTextPobWatcher)
-
-        var categoryList:ArrayList<String> =ArrayList<String>()
-
-        for(categoryName in mainProductList)
-        {
-            categoryName.categoryName?.let { categoryList.add(it) }
-        }
-
-        val uniqueValues: HashSet<String> = HashSet(categoryList)
-        val categoryListFiltered :ArrayList<CommonModel.FilterModel> =ArrayList<CommonModel.FilterModel>()
-
-        for(categoryName in uniqueValues)
-        {
-            val filterModel=CommonModel.FilterModel()
-            filterModel.categoryName= categoryName.toString()
-            categoryListFiltered.add(filterModel)
-        }
-
-
-        val pobProductSelectAdapter=PobProductAdapter(unSelectedProductList, passingSchemeList,this,1,productSearch_et)
-        pobProduct_rv.adapter= pobProductSelectAdapter
-
-        val filterAdapter= ButtonFilterAdapter(categoryListFiltered, pobProductSelectAdapter)
-        filterRv.adapter=filterAdapter
-
-        productSearch_et.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                pobProductSelectAdapter?.getFilter()?.filter(s.toString())
-            }
-            override fun afterTextChanged(editable: Editable) {}
-        })
-
-        okPob_iv.setOnClickListener{
-            runOnUiThread{
-                generalClass.hideKeyboard(this,it)
-            }
-            pobProductSelectAdapter.setSelction()
-            alertDialog.dismiss()
-        }
-
-        closePob_iv.setOnClickListener{
-
-            alertDialog.dismiss()
-        }
-        alertDialog.show()
-
-    }
-
     override fun onClickButtonProduct(productModel: SyncModel.Data.Product, positon: Int) {
 
-
-            for ((index,data) in unSelectedProductList?.withIndex()!!)
+        for ((index,data) in unSelectedProductList?.withIndex()!!)
             {
-
                 if(productModel?.productId==data.productId)
                 {
                     productModel.notApi=SyncModel.Data.Product.NotApiData()
@@ -1795,6 +1705,66 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
     override fun onResume() {
         super.onResume()
         alertClass = AlertClass(this)
+    }
+
+    fun setMultipleSelectionButton()
+    {
+
+        workingWith_mb.setOnClickListener({
+            hideAllSelection()
+            setToDefaultAll()
+            workingWith_mb.setBackgroundTintList(this.let { it1 -> ContextCompat.getColorStateList(it1, R.color.appColor) })
+            workingWith_mb.setTextColor(this.let { it1 -> ContextCompat.getColorStateList(it1, R.color.white) })
+            selectBtn?.setText("Select Working with")
+            selectHeader_tv?.setText("Select Working with")
+            workingWithRv?.visibility = View.VISIBLE
+            selectBtn?.visibility = View.VISIBLE
+        })
+
+        rcpaOrSamples_mb.setOnClickListener({
+            hideAllSelection()
+            setToDefaultAll()
+            rcpaOrSamples_mb.setBackgroundTintList(this?.let { it1 -> ContextCompat.getColorStateList(it1, R.color.appColor) })
+            rcpaOrSamples_mb.setTextColor(this?.let { it1 -> ContextCompat.getColorStateList(it1, R.color.white) })
+            selectBtn.setText("Select Samples")
+            sample_rv.visibility=View.VISIBLE
+            if(checkIsDcrSave)selectBtn.visibility=View.GONE
+            else selectBtn.visibility=View.VISIBLE
+        })
+
+       gifts_mb.setOnClickListener({
+            hideAllSelection()
+            setToDefaultAll()
+            gifts_mb.setBackgroundTintList(this?.let { it1 -> ContextCompat.getColorStateList(it1, R.color.appColor) })
+            gifts_mb.setTextColor(this?.let { it1 -> ContextCompat.getColorStateList(it1, R.color.white) })
+            selectBtn.setText("Select Gifts")
+            selectHeader_tv.setText("Select Gifts")
+            gift_rv.visibility = View.VISIBLE
+            selectBtn.visibility = View.VISIBLE
+        })
+
+        pob_mb.setOnClickListener({
+            hideAllSelection()
+            setToDefaultAll()
+           pob_mb.setBackgroundTintList(this?.let { it1 -> ContextCompat.getColorStateList(it1, R.color.appColor) })
+           pob_mb.setTextColor(this?.let { it1 -> ContextCompat.getColorStateList(it1, R.color.white) })
+           pobParent.visibility = View.VISIBLE
+
+        })
+
+    }
+
+    fun setToDefaultAll()
+    {
+        rcpaOrSamples_mb.setBackgroundTintList(this?.let { ContextCompat.getColorStateList(it, R.color.gray) })
+        gifts_mb.setBackgroundTintList(this?.let { ContextCompat.getColorStateList(it, R.color.gray) })
+        pob_mb.setBackgroundTintList(this?.let { ContextCompat.getColorStateList(it, R.color.gray) })
+        workingWith_mb.setBackgroundTintList(this?.let { ContextCompat.getColorStateList(it, R.color.gray) })
+
+        rcpaOrSamples_mb.setTextColor(this?.let { ContextCompat.getColorStateList(it, R.color.black) })
+        gifts_mb.setTextColor(this?.let { ContextCompat.getColorStateList(it, R.color.black) })
+        pob_mb.setTextColor(this?.let { ContextCompat.getColorStateList(it, R.color.black) })
+        workingWith_mb.setTextColor(this?.let { ContextCompat.getColorStateList(it, R.color.black) })
 
     }
 

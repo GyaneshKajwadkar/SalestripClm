@@ -49,7 +49,6 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
     private var gs: GestureDetector? = null
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var bottomSheetWeb: ConstraintLayout
-    var db = DatabaseHandler(this)
     var brandId=0
     var empId=0
     var startDateTime=""
@@ -131,7 +130,7 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
         if(intent.getSerializableExtra("webArray")!=null)
         {
 
-            db = DatabaseHandler(this)
+            dbBase = DatabaseHandler.getInstance(this.applicationContext)
 
             arrayweb = intent.getSerializableExtra("webArray") as ArrayList<DownloadFileModel>
             modelweb = intent.getSerializableExtra("model") as DownloadFileModel
@@ -207,7 +206,7 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
             doctorId = intent.getIntExtra("doctorId", 0)
             //  val file = File(webUrlPath)
 
-            db?.insertFileID(modelweb!!.fileId,startDateTime,brandId)
+            dbBase?.insertFileID(modelweb!!.fileId,startDateTime,brandId)
             showWeb_mb.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.appColor))
 
             setSlideViewTime()
@@ -223,7 +222,7 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
                         )
 
 
-                        db?.updateendData(currentDate + " " + currentTime,startDateTime)
+                dbBase?.updateendData(currentDate + " " + currentTime,startDateTime)
                         onBackPressed()
                         finish()
             })
@@ -323,12 +322,12 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
 
         fabLike?.setOnClickListener({
             if (isList) {
-                db?.insertlike(0, modelweb!!.fileId,startDateTime)
+                dbBase?.insertlike(0, modelweb!!.fileId,startDateTime)
                 fabLike?.setColorFilter(Color.BLACK)
                 isList = false
             }
             else {
-                db?.insertlike(1, modelweb!!.fileId,startDateTime)
+                dbBase?.insertlike(1, modelweb!!.fileId,startDateTime)
                 fabLike?.setColorFilter(Color.WHITE)
                 isList = true
             }
@@ -400,11 +399,11 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
             var dowloadedAllList: ArrayList<DownloadFileModel> = ArrayList()
             if(intent.getBooleanExtra("isPresentation",false))
             {
-                dowloadedAllList=dbBase.getAllPresentationItem(intent.getStringExtra("presentationName"))
+                dowloadedAllList= dbBase?.getAllPresentationItem(intent.getStringExtra("presentationName")) as ArrayList<DownloadFileModel>
             }
             else
             {
-                dowloadedAllList=dbBase.getAllDownloadedData(eDetailingId)
+                dowloadedAllList= dbBase?.getAllDownloadedData(eDetailingId) as ArrayList<DownloadFileModel>
             }
 
 
@@ -669,7 +668,7 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
         val post_btn = dialogView.findViewById(R.id.post_btn) as Button
         val comment_et = dialogView.findViewById(R.id.comment_et) as EditText
 
-        val storecomment= db?.getComment(modelweb!!.fileId.toString(),startDateTime)
+        val storecomment= dbBase?.getComment(modelweb!!.fileId.toString(),startDateTime)
         comment_et.setText(storecomment)
 
         cancel_btn.setOnClickListener({
@@ -689,7 +688,7 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
                 return@setOnClickListener
             }
 
-            db?.insertComment(comment_et.text.toString(), modelweb!!.fileId,startDateTime)
+            dbBase?.insertComment(comment_et.text.toString(), modelweb!!.fileId,startDateTime)
             fabComment?.setColorFilter(Color.WHITE)
             val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(dialogView.getWindowToken(), 0)
@@ -704,25 +703,28 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
 
     fun getAllEdetailingProduct() : java.util.ArrayList<DevisionModel.Data.EDetailing>
     {
-        var  edetailingList = db.getAlleDetail() //fetch edetailing list from db
+        var  edetailingList = dbBase?.getAlleDetail() //fetch edetailing list from db
         var  filteredList: ArrayList<DevisionModel.Data.EDetailing> = ArrayList()
-        for (itemParent in edetailingList )
-        {
-            if(itemParent.isSaved==1)
+        if (edetailingList != null) {
+            for (itemParent in edetailingList )
             {
-                var downloadedList = db.getAllDownloadedData(itemParent.geteDetailId()!!)
-                var isAvailable=false
-                for(itemChild in downloadedList)
+                if(itemParent.isSaved==1)
                 {
-                    if(itemChild.downloadType.equals("ZIP")) isAvailable=true
+                    var downloadedList = dbBase?.getAllDownloadedData(itemParent.geteDetailId()!!)
+                    var isAvailable=false
+                    if (downloadedList != null) {
+                        for(itemChild in downloadedList) {
+                            if(itemChild.downloadType.equals("ZIP")) isAvailable=true
+                        }
+                    }
+                    if(isAvailable)  filteredList.add(itemParent); continue
+
+
+                    /*  if(downloadedList.stream().anyMatch({ o -> o.downloadType.equals("ZIP") }))
+                    {
+                        filteredList.add(itemParent)
+                    }*/
                 }
-                if(isAvailable)  filteredList.add(itemParent); continue
-
-
-              /*  if(downloadedList.stream().anyMatch({ o -> o.downloadType.equals("ZIP") }))
-                {
-                    filteredList.add(itemParent)
-                }*/
             }
         }
         return filteredList
@@ -732,7 +734,7 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
     {
         arrayweb.clear()
 
-        for (itemParent in db.getAllDownloadedData(passingInterface) )
+        for (itemParent in dbBase?.getAllDownloadedData(passingInterface)!!)
         {
 
             if(itemParent.downloadType.equals("ZIP"))
@@ -775,10 +777,10 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
     fun likeCommentColor()
     {
 
-        db?.insertFileID(modelweb!!.fileId, startDateTime,brandId)
+        dbBase?.insertFileID(modelweb!!.fileId, startDateTime,brandId)
 
-        val isLike=db?.getLike(modelweb!!.fileId.toString(),startDateTime)
-        val storecomment= db?.getComment(modelweb!!.fileId.toString(),startDateTime)
+        val isLike=dbBase?.getLike(modelweb!!.fileId.toString(),startDateTime)
+        val storecomment= dbBase?.getComment(modelweb!!.fileId.toString(),startDateTime)
 
         if(storecomment!=null)
         {
@@ -809,7 +811,7 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
     fun setSlideViewTime()
     {
         thread?.interrupt()
-        var dbTimer=db?.getTime(modelweb!!.fileId.toString(),startDateTime)
+        var dbTimer=dbBase?.getTime(modelweb!!.fileId.toString(),startDateTime)
 
         thread = object : Thread() {
             override fun run() {
@@ -819,7 +821,7 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
                         runOnUiThread {
                             dbTimer=dbTimer!!+1
                             Log.e("timerSlider",dbTimer.toString())
-                            db?.insertTime(dbTimer!!, modelweb!!.fileId ,startDateTime)
+                            dbBase?.insertTime(dbTimer!!, modelweb!!.fileId ,startDateTime)
                         }
                     }
                 } catch (e: InterruptedException) {
@@ -839,6 +841,10 @@ class WebViewActivity : BaseActivity(), StoreVisualInterface , ItemClickDisplayV
         super.onResume()
         createConnectivity(this)
         alertClass = AlertClass(this)
+        if(intent.getSerializableExtra("webArray")!=null)
+        { setSlideViewTime()
+            slideBrandWiseInsert(startDateTime,brandId)
+        }
     }
 
     override fun onPause() {

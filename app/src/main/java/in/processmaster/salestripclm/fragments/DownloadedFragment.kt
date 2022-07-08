@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -27,7 +28,7 @@ class DownloadedFragment : Fragment() {
 
     var recyclerView: RecyclerView?=null
     var sharePreferance: PreferenceClass?= null
-    var nodata_gif: GifImageView?= null
+    var nodata_gif: ImageView?= null
     lateinit var db : DatabaseHandler
     var nodownload_tv: TextView?= null
     var isFirstTimeOpen=true
@@ -46,17 +47,16 @@ class DownloadedFragment : Fragment() {
 
         recyclerView=views.findViewById(R.id.recyclerView)as RecyclerView
         nodownload_tv=views.findViewById(R.id.nodownload_tv)as TextView
-        nodata_gif=views.findViewById(R.id.nodata_gif)as GifImageView
+        nodata_gif=views.findViewById(R.id.nodata_gif)as ImageView
         return views
-
         }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
-        Log.e("oinScshdfuiosdudf","sdfsuiodfyhiosdfhsduifh")
 
         val coroutine= viewLifecycleOwner.lifecycleScope.launch {
+
             sharePreferance = PreferenceClass(activity)
-            db = DatabaseHandler(activity)
+            db = DatabaseHandler.getInstance(activity?.applicationContext)
             getAlleDetailListDb= db.getSelectedeDetail(true)
         }
         coroutine.invokeOnCompletion {
@@ -93,7 +93,6 @@ class DownloadedFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-
         if (!isAdded) return
 
         if(!isFirstTimeOpen)
@@ -108,40 +107,44 @@ class DownloadedFragment : Fragment() {
                     val coroutine= viewLifecycleOwner.lifecycleScope.launch{
                         val notify= async {
                             var   getAlleDetail= db.getSelectedeDetail(true)
-                            if(getAlleDetail.size!=getAlleDetailListDb.size)
-                            {
+
                                 getAlleDetailListDb.clear()
                                 getAlleDetailListDb.addAll(getAlleDetail)
 
-                                activity?.runOnUiThread(Runnable {
-                                    // adapter?.notifyDataSetChanged()
-                                    adapter =  Edetailing_Adapter(
+                          /*      activity?.runOnUiThread(Runnable {
+                                   adapter =  Edetailing_Adapter(
                                         getAlleDetailListDb, sharePreferance, activity, db
                                     )
                                     recyclerView?.adapter = adapter
+                                    adapter?.notifyDataSetChanged()
+
                                     if(getAlleDetail.size!=0)
                                     {   nodata_gif?.visibility=View.GONE
                                         recyclerView?.visibility=View.VISIBLE
                                     }
-                                })
-                            }
+                                })*/
+
                         }
                         notify.await()
                     }
                     coroutine.invokeOnCompletion {
                         activity?.runOnUiThread(Runnable {
                             progressView.visibility=View.GONE
+                            nodata_gif?.visibility=View.GONE
                             recyclerView?.visibility=View.VISIBLE
+                            val layoutManager = LinearLayoutManager(activity)
+                            recyclerView?.layoutManager = layoutManager
+                            adapter =  Edetailing_Adapter(
+                                getAlleDetailListDb, sharePreferance, activity, db
+                            )
+                            recyclerView?.adapter = adapter
+                            adapter?.notifyDataSetChanged()
                         }) }
-
-                }, 0)
-
+                }, 300)
         }
     }
 
     fun editTextFilter(string: String)
-    {
-        adapter?.getFilter()?.filter(string);
-    }
+    { adapter?.getFilter()?.filter(string) }
 
 }

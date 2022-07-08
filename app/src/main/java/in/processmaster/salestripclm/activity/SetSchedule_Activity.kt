@@ -197,7 +197,7 @@ class SetSchedule_Activity : BaseActivity() ,SelectorInterface,IntegerInterface
     fun setScheduleAdapter()
     {
 
-        val responseData=dbBase.getApiDetail(2)
+        val responseData=dbBase?.getApiDetail(2)
 
         if(!responseData.equals(""))
         {

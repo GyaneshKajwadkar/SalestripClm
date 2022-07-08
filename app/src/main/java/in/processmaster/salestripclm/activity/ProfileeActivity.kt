@@ -472,7 +472,7 @@ class ProfileeActivity : BaseActivity() {
 
     fun setLayout()
     {
-        val responseData=dbBase.getApiDetail(6)
+        val responseData=dbBase?.getApiDetail(6)
         if(!responseData.equals("")) {
             var parentObject: ProfileModel.Data = Gson().fromJson(responseData, ProfileModel.Data::class.java)
             var getObject=parentObject.users?.get(0)

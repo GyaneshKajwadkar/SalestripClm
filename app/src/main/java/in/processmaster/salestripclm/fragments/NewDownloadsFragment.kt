@@ -44,7 +44,7 @@ class NewDownloadsFragment : Fragment() {
         if(isAdded)
         {
             sharePreferance = PreferenceClass(activity)
-            db = DatabaseHandler(activity)
+            db = DatabaseHandler.getInstance(activity?.applicationContext)
 
             Handler(Looper.getMainLooper()).postDelayed({
 
