@@ -3,7 +3,6 @@ import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.adapter.Edetailing_Adapter
 import `in`.processmaster.salestripclm.models.DevisionModel
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
-import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -18,8 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 class NewDownloadsFragment : Fragment() {
 
     var recyclerView: RecyclerView?=null
-    var sharePreferance: PreferenceClass?= null
-    lateinit var db : DatabaseHandler
+    lateinit var dbNewDownloadFrag : DatabaseHandler
     var nodownload_tv: TextView?= null
     var getAlleDetailListDb: ArrayList<DevisionModel.Data.EDetailing> = ArrayList()
     var isFirstTimeOpen=true
@@ -43,18 +41,17 @@ class NewDownloadsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         if(isAdded)
         {
-            sharePreferance = PreferenceClass(activity)
-            db = DatabaseHandler.getInstance(activity?.applicationContext)
+            dbNewDownloadFrag = DatabaseHandler.getInstance(activity?.applicationContext)
 
             Handler(Looper.getMainLooper()).postDelayed({
 
-                getAlleDetailListDb= db.getSelectedeDetail(false)
+                getAlleDetailListDb= dbNewDownloadFrag.getSelectedeDetail(false)
 
                 if(getAlleDetailListDb.size==0)nodownload_tv?.visibility=View.VISIBLE
 
 
                 adapter =  Edetailing_Adapter(
-                    getAlleDetailListDb, sharePreferance, activity, db)
+                    getAlleDetailListDb, activity, dbNewDownloadFrag)
 
                 val layoutManager = LinearLayoutManager(activity)
                 recyclerView?.layoutManager = layoutManager
@@ -75,7 +72,7 @@ class NewDownloadsFragment : Fragment() {
         super.onResume()
 
         if(isAdded){
-       var geteDetail= db.getSelectedeDetail(false)
+       var geteDetail= dbNewDownloadFrag.getSelectedeDetail(false)
         if(geteDetail.size!=getAlleDetailListDb.size && !isFirstTimeOpen)
         {
             getAlleDetailListDb.clear()
@@ -83,7 +80,7 @@ class NewDownloadsFragment : Fragment() {
             if(getAlleDetailListDb.size==0)nodownload_tv?.visibility=View.VISIBLE
 
             adapter =  Edetailing_Adapter(
-                getAlleDetailListDb, sharePreferance, activity, db
+                getAlleDetailListDb, activity, dbNewDownloadFrag
             )
             recyclerView?.adapter = adapter
             //adapter?.notifyDataSetChanged()

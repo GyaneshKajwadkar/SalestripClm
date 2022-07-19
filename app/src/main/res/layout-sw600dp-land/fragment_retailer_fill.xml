@@ -83,10 +83,7 @@
                     <EditText
                         android:layout_margin="1dp"
                         style="@style/editTextWithRound"
-                        android:background="@drawable/round_shape_edit"
                         android:id="@+id/remark_Et"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
                         android:lines="3" />
                 </LinearLayout>
             </LinearLayout>
@@ -111,6 +108,7 @@
         android:layout_height="match_parent"
         android:layout_alignParentBottom="true"
         android:elevation="3dp">
+
         <include layout="@layout/checkbox_bottom_sheet" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

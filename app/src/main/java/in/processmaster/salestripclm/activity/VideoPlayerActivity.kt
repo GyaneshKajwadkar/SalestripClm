@@ -160,9 +160,7 @@ class VideoPlayerActivity : BaseActivity() , ItemClickDisplayVisual, PlayerContr
                 setHorizontalAdapter(arrayVideo)
 
                 mPlayer?.addListener(object : Player.EventListener {
-                    override fun onPlayerStateChanged(playWhenReady: Boolean,playbackState: Int) {
-
-                    }
+                    override fun onPlayerStateChanged(playWhenReady: Boolean,playbackState: Int) {}
 
                     override fun onPositionDiscontinuity(reason: Int) {
                         adapterVisualFile.notifyDataSetChanged()

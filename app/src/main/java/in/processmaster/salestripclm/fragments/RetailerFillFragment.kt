@@ -118,7 +118,7 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
         adapter3=AddedRcpa_Adapter(3,saveRcpaDetailList3)
 
         vParent.visitPurpose_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if(position!=0)
                     selectedPurposeID = CommonListGetClass().getWorkTypeForSpinner()[position].workId!!
             }
@@ -415,6 +415,12 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
             }
 
             saveModel.reportedTime=homePageGeneralClass?.getCurrentDateTimeApiForamt()
+
+            if(homePageGeneralClass?.checkCurrentDateIsValid() == false)
+            {
+                homePageAlertClass?.commonAlert("Date error","Device date is not correct. Please set it to current date")
+                return@setOnClickListener
+            }
 
             if(activity?.let { it1 -> GeneralClass(it1).isInternetAvailable() }==false)
             {

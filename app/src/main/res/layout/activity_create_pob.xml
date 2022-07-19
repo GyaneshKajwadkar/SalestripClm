@@ -7,15 +7,12 @@
     android:orientation="vertical"
     tools:context=".activity.CreatePobActivity">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
 
         <include layout="@layout/common_toolbar"/>
 
 
         <LinearLayout
+            android:layout_below="@+id/toolbarHeader_rl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -60,21 +57,14 @@
                                 android:orientation="vertical">
 
                                 <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
+                                    style="@style/editTextHeader_text"
                                     android:text="POB number"
-                                    android:id="@+id/pobNumber_tv"
-                                    android:textColor="@color/appColor" />
+                                    android:id="@+id/pobNumber_tv" />
 
                                 <EditText
                                     android:id="@+id/pobNumber_et"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:background="@drawable/edittext_capsul"
-                                    android:cursorVisible="false"
-                                    android:focusable="false"
-                                    android:focusableInTouchMode="false"
-                                    android:padding="7dp" />
+                                    style="@style/capsul_editText_inputRestrict"
+                                    />
                             </LinearLayout>
 
                             <LinearLayout
@@ -97,24 +87,17 @@
                                         android:src="@drawable/ic_calendar" />
 
                                     <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
+                                        style="@style/editTextHeader_text"
                                         android:text="Select Date"
-                                        android:textColor="@color/appColor" />
+                                     />
 
                                 </LinearLayout>
 
 
                                 <EditText
                                     android:id="@+id/selectDate_et"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginRight="5dp"
-                                    android:background="@drawable/edittext_capsul"
-                                    android:cursorVisible="false"
-                                    android:focusable="false"
-                                    android:focusableInTouchMode="false"
-                                    android:padding="7dp" />
+                                    style="@style/capsul_editText_inputRestrict"
+                                    />
 
                             </LinearLayout>
 
@@ -135,20 +118,14 @@
                                 android:orientation="vertical">
 
                                 <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
+                                    style="@style/editTextHeader_text"
                                     android:text="Select team"
-                                    android:textColor="@color/appColor" />
+                                   />
 
                                 <EditText
                                     android:id="@+id/selectTeam_et"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:background="@drawable/edittext_capsul"
-                                    android:cursorVisible="false"
-                                    android:focusable="false"
-                                    android:focusableInTouchMode="false"
-                                    android:padding="7dp" />
+                                    style="@style/capsul_editText_inputRestrict"
+                                    />
 
                             </LinearLayout>
 
@@ -190,19 +167,13 @@
                                 </LinearLayout>
 
                                 <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Party"
-                                    android:textColor="@color/appColor" />
+                                    style="@style/editTextHeader_text"
+                                    android:text="Party" />
 
                                 <EditText
                                     android:id="@+id/selectParty_et"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:background="@drawable/edittext_capsul"
-                                    android:cursorVisible="false"
-                                    android:focusable="false"
-                                    android:padding="7dp" />
+                                    style="@style/capsul_editText_inputRestrict"
+                                    />
 
                             </LinearLayout>
 
@@ -277,24 +248,16 @@
                                 android:src="@drawable/ic_calendar"
                                 />
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
                                 android:text="Start Date"
-                                android:textColor="@color/appColor" />
+                                style="@style/editTextHeader_text"
+                                />
 
                         </LinearLayout>
 
                         <EditText
                             android:id="@+id/startDatePOB_et"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginRight="5dp"
-                            android:layout_toLeftOf="@+id/calanderImvv"
-                            android:background="@drawable/edittext_capsul"
-                            android:cursorVisible="false"
-                            android:focusable="false"
-                            android:focusableInTouchMode="false"
-                            android:padding="7dp" />
+                            style="@style/capsul_editText_inputRestrict"
+                            />
 
                     </LinearLayout>
 
@@ -319,24 +282,15 @@
                                 android:src="@drawable/ic_calendar" />
 
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
                                 android:text="End Date"
-                                android:textColor="@color/appColor" />
+                                style="@style/editTextHeader_text" />
 
                         </LinearLayout>
 
                         <EditText
                             android:id="@+id/endDatePOB_et"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginRight="5dp"
-                            android:layout_toLeftOf="@+id/calanderImvv"
-                            android:background="@drawable/edittext_capsul"
-                            android:cursorVisible="false"
-                            android:focusable="false"
-                            android:focusableInTouchMode="false"
-                            android:padding="7dp" />
+                            style="@style/capsul_editText_inputRestrict"
+                            />
 
                     </LinearLayout>
 
@@ -384,10 +338,8 @@
                     android:layout_height="wrap_content"/>
 
             </LinearLayout>
-
         </LinearLayout>
 
-    </LinearLayout>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
@@ -399,8 +351,6 @@
 
         <include layout="@layout/checkbox_bottom_sheet" />
 
-
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
 
 </RelativeLayout>

@@ -27,9 +27,8 @@ import java.lang.Runnable
 class DownloadedFragment : Fragment() {
 
     var recyclerView: RecyclerView?=null
-    var sharePreferance: PreferenceClass?= null
     var nodata_gif: ImageView?= null
-    lateinit var db : DatabaseHandler
+    lateinit var dbDownloadFrag : DatabaseHandler
     var nodownload_tv: TextView?= null
     var isFirstTimeOpen=true
     var getAlleDetailListDb: ArrayList<DevisionModel.Data.EDetailing> = ArrayList()
@@ -55,9 +54,8 @@ class DownloadedFragment : Fragment() {
 
         val coroutine= viewLifecycleOwner.lifecycleScope.launch {
 
-            sharePreferance = PreferenceClass(activity)
-            db = DatabaseHandler.getInstance(activity?.applicationContext)
-            getAlleDetailListDb= db.getSelectedeDetail(true)
+            dbDownloadFrag = DatabaseHandler.getInstance(activity?.applicationContext)
+            getAlleDetailListDb= dbDownloadFrag.getSelectedeDetail(true)
         }
         coroutine.invokeOnCompletion {
             activity?.runOnUiThread {
@@ -80,7 +78,7 @@ class DownloadedFragment : Fragment() {
                 isFirstTimeOpen=false
 
                 adapter =  Edetailing_Adapter(
-                    getAlleDetailListDb, sharePreferance, activity, db
+                    getAlleDetailListDb, activity, dbDownloadFrag
                 )
                 val layoutManager = LinearLayoutManager(activity)
                 recyclerView?.layoutManager = layoutManager
@@ -106,7 +104,7 @@ class DownloadedFragment : Fragment() {
                 .postDelayed({
                     val coroutine= viewLifecycleOwner.lifecycleScope.launch{
                         val notify= async {
-                            var   getAlleDetail= db.getSelectedeDetail(true)
+                            var   getAlleDetail= dbDownloadFrag.getSelectedeDetail(true)
 
                                 getAlleDetailListDb.clear()
                                 getAlleDetailListDb.addAll(getAlleDetail)
@@ -135,10 +133,10 @@ class DownloadedFragment : Fragment() {
                             val layoutManager = LinearLayoutManager(activity)
                             recyclerView?.layoutManager = layoutManager
                             adapter =  Edetailing_Adapter(
-                                getAlleDetailListDb, sharePreferance, activity, db
+                                getAlleDetailListDb, activity, dbDownloadFrag
                             )
                             recyclerView?.adapter = adapter
-                            adapter?.notifyDataSetChanged()
+                          //  adapter?.notifyDataSetChanged()
                         }) }
                 }, 300)
         }

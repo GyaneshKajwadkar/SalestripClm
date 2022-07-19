@@ -27,7 +27,6 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.CompoundButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -67,7 +66,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     var retailerString=""
     var firstCall=false
     private var isAutoDownload = false
-
+    var secondaryUrl=""
 
     companion object {
         var loginModelHomePage= LoginModel()
@@ -89,8 +88,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         homePageSharePref = PreferenceClass(this)
         homePageDataBase = DatabaseHandler.getInstance(applicationContext)
 
-        val sharePreferance = PreferenceClass(this)
-        var profileData = sharePreferance.getPref("profileData")
+        var profileData = homePageSharePref?.getPref("profileData")
 
          loginModelHomePage = Gson().fromJson(profileData, LoginModel::class.java)
         val jsonObj= JSONObject(loginModelHomePage?.configurationSetting)
@@ -105,20 +103,20 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         catch (e:Exception){}
 
 
-        apiInterface = APIClientKot().getClient(2, sharePreferance?.getPref("secondaryUrl")).create(
+        apiInterface = APIClientKot().getClient(2, homePageSharePref?.getPref("secondaryUrl")).create(
             APIInterface::class.java)
+        secondaryUrl= homePageSharePref?.getPref("secondaryUrl").toString()
 
 
         if(generalClass.isInternetAvailable()) {
             callingMultipleAPI()
-
         }
         else {
             initView()
             bottomNavigation?.selectedItemId= R.id.landingPage
         }
 
-      isAutoDownload= sharePreferanceBase?.getPrefBool("isAutoDownload") == true
+      isAutoDownload= homePageSharePref?.getPrefBool("isAutoDownload") == true
 
         val menuItem = nav_view.menu.findItem(R.id.nav_autoDownload)
         val switch_id = menuItem.actionView.findViewById<SwitchCompat>(R.id.switch_id)
@@ -126,7 +124,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         switch_id.setOnClickListener(View.OnClickListener {
             if(isAutoDownload){isAutoDownload=false}
             else {isAutoDownload=true}
-            sharePreferanceBase?.setPrefBool("isAutoDownload", isAutoDownload)
+            homePageSharePref?.setPrefBool("isAutoDownload", isAutoDownload)
         })
     }
 
@@ -140,35 +138,14 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
         try
         {
-            val pInfo: PackageInfo = getPackageManager().getPackageInfo(this.getPackageName(), 0)
+            val pInfo: PackageInfo = getPackageManager().getPackageInfo(getPackageName(), 0)
             val version = pInfo.versionName
             appVersion_tv?.setText("v.${version}")
         }
         catch (e: PackageManager.NameNotFoundException)
         { e.printStackTrace() }
 
-        //Logout
-        menu_iv?.setOnClickListener({
 
-            val menuBuilder = MenuBuilder(this)
-            val inflater = MenuInflater(this)
-            inflater.inflate(R.menu.menu_main, menuBuilder)
-            val optionsMenu = MenuPopupHelper(this, menuBuilder, menu_iv)
-            optionsMenu.setForceShowIcon(true)
-
-            // Set Item Click Listener
-            menuBuilder.setCallback(object : MenuBuilder.Callback {
-
-                override fun onMenuItemSelected(menu: MenuBuilder, item: MenuItem): Boolean {
-                    when (item.itemId) {
-                        R.id.logout_menu -> {
-                            logoutAppAlert() } }
-                    return true }
-                override fun onMenuModeChange(menu: MenuBuilder) {}
-            })
-            // Display the menu
-            optionsMenu.show()
-        })
         menu_img?.setOnClickListener({ drawer_layout.openDrawer(Gravity.LEFT) })
 
         val headerView: View = nav_view?.inflateHeaderView(R.layout.nav_header_main)!!
@@ -185,6 +162,12 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
     //set bottom navigation
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
+
+        if(homePageGeneralClass?.checkCurrentDateIsValid() == false)
+        {
+            alertClass?.commonAlert("Date error","Device date is not correct. Please set it to current date")
+            return@OnNavigationItemSelectedListener true
+        }
 
         if(staticSyncData?.configurationSetting==null)
         {
@@ -253,7 +236,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     //open fragment method
     private fun openFragment(fragment: Fragment)
     {
-
         val transaction = supportFragmentManager.beginTransaction()
         if(!retailerString.isEmpty())
         {
@@ -263,7 +245,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         }
         transaction.replace(R.id.container, fragment)
         transaction.commitAllowingStateLoss()
-       // transaction.commit()
+        // transaction.commit()
         retailerString=""
     }
 
@@ -300,7 +282,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
             stopDownload=true
 
-            sharePreferanceBase?.setPrefBool("isLogin", false)
+            homePageSharePref?.setPrefBool("isLogin", false)
 
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
@@ -368,9 +350,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                 }
 
                 R.id.nav_logout ->
-                {
-                    logoutAppAlert()
-                }
+                { logoutAppAlert() }
 
                 R.id.nav_createpob -> {
                     var intent = Intent(this, CreatePobActivity::class.java)
@@ -383,7 +363,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                     intent.putExtra("action","stock")
                     startActivity(intent)
                 }
-
             }
 
          drawer_layout?.closeDrawers()
@@ -394,40 +373,12 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     override fun onResume()
     {
         super.onResume()
-
         alertClass = AlertClass(this)
 
         createConnectivity(this)
-
-        if(nav_view!=null)
-        {
-            nav_view?.getMenu()?.getItem(0)?.setChecked(true)
-        }
-
-        val c = Calendar.getInstance().time
-        val df = SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault())
-        val formattedDate: String = df.format(c)
-
-      /*  if(sharePreferanceBase?.getPref("SyncDate")==null || sharePreferanceBase?.getPref("SyncDate").toString().isEmpty())
-        {
-            sharePreferanceBase?.setPref("SyncDate", formattedDate)
-        }
-        else
-        {
-            if(sharePreferanceBase?.getPref("SyncDate").toString().equals(formattedDate))
-            { }
-            else
-            {
-                sharePreferanceBase?.setPref("SyncDate", formattedDate)
-                if(generalClass.isInternetAvailable()) callingMultipleAPI()
-                else {
-                  //  if (dbBase?.getApiDetail(1) != "") staticSyncData = Gson().fromJson(dbBase?.getApiDetail(1), SyncModel::class.java)
-                }
-            }
-
-        }*/
-
         setImages()
+
+        if(nav_view!=null) nav_view?.getMenu()?.getItem(0)?.setChecked(true)
 
     }
 
@@ -461,10 +412,11 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                 val sync= async { callingSyncAPI() }
                 val deleteItem= async {  dbBase?.deleteAll() }
                 val divisionApi =async { callingDivisionAPI() }
-                val credientialApi= async { getSheduleMeetingAPI() }
                 val quantityApi= async { getQuantityAPI() }
                 val doctorGraphApi= async { getDoctorGraphAPI() }
                 val getDocCall= async { getDocCallAPI() }
+
+                //  val scheduleApi= async { getSheduleMeetingAPI() }
               /*  val initilizeZoom= async {
                     val jsonObj= JSONObject(loginModelHomePage?.configurationSetting)
                     val checkZoom=jsonObj.getInt("SET059")
@@ -478,11 +430,10 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                     }
 
                 }*/
-
                 deleteItem.await()
                 sync.await()
                 divisionApi.await()
-                credientialApi.await()
+               // scheduleApi.await()
                 quantityApi.await()
               //  initilizeZoom.await()
                 doctorGraphApi.await()
@@ -493,7 +444,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                 alertClass.hideAlert()
                 alertClass.commonAlert("OOps!","Something went wrong please try again later.")
             }
-
 
         }
         coroutineScope.invokeOnCompletion {
@@ -525,7 +475,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         offlineCoroutine.invokeOnCompletion {
             submitPOBAPI()
         }
-
     }
 
     fun setImages()
@@ -544,22 +493,18 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     {
         val jsonObject = JSONObject(loginModelHomePage.getEmployeeObj().toString())
 
-        val response =
-            sharePreferanceBase?.getPref("secondaryUrl")?.let {
-                APIClientKot().getUsersService(2, it
+        val response = APIClientKot().getUsersService(2, secondaryUrl
                 ).detailingApiCoo( "bearer " + loginModelHomePage.accessToken, jsonObject.getString(
                     "Division"
                 ))
-            }
+
         if (response?.isSuccessful == true) {
             if (response?.code() == 200 && !response.body().toString().isEmpty()) {
 
                      if(response.body()?.getData()?.geteDetailingList()==null)
                     {  }
                     else{
-                        /* withContext(Dispatchers.Default){
-                             launch {*/
-                                 for ((index, value) in response.body()?.getData()?.geteDetailingList()?.withIndex()!!) {
+                        for ((index, value) in response.body()?.getData()?.geteDetailingList()?.withIndex()!!) {
                                      //store edetailing data to db
                                      val gson = Gson()
                                      dbBase?.insertOrUpdateEDetail(
@@ -605,101 +550,17 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                                          }!!
                                      objDownloadManager.startDownloading()
                                  }
-
-
-                            /* } }*/
                     }
-
-
             }
         }
-
-
-        /*
-        withContext(Dispatchers.Main) {
-            if (response?.isSuccessful == true)
-            {
-                if (response?.code() == 200 && !response.body().toString().isEmpty())
-                {
-                    if(response.body()?.getData()?.geteDetailingList()==null)
-                    {  }
-                    else{
-
-                        for ((index, value) in response.body()?.getData()?.geteDetailingList()?.withIndex()!!) {
-                                //store edetailing data to db
-                                val gson = Gson()
-                                dbBase.insertOrUpdateEDetail(
-                                    value.geteDetailId().toString(),
-                                    gson.toJson(value)
-                                )
-                            }
-                            // clear database
-                            for (dbList in dbBase.getAlleDetail()) {
-                                var isSet = false
-                                for (mainList in response.body()?.getData()?.geteDetailingList()!!) {
-                                    if (mainList.geteDetailId() == dbList.geteDetailId()) {
-                                        isSet = true
-                                    }
-                                }
-
-                                //this clear database and files from device which is not in used
-                                if (!isSet) {
-                                    dbBase.deleteEdetailingData(dbList.geteDetailId().toString())
-
-                                    var downloadModelArrayList =
-                                        dbBase.getAllDownloadedData(dbList.geteDetailId())
-
-                                    //Delete files from folder before erase db
-                                    for (item in downloadModelArrayList) {
-                                        val someDir = File(item.fileDirectoryPath)
-                                        someDir.deleteRecursively()
-                                    }
-                                    dbBase.deleteEdetailDownloada(dbList.geteDetailId().toString())
-                                }
-                            }
-
-                            //get all remaining download file
-                            val list= dbBase.getAlleDetail().filter { s-> s.isSaved==0} as ArrayList<DevisionModel.Data.EDetailing>
-                            if(list.size!=0 && generalClass.isInternetAvailable())
-                            {
-                                objDownloadManager= DownloadManagerClass(this@HomePage,dbBase,list)
-                                objDownloadManager.startDownloading()
-                            }
-
-
-
-                    }
-                }
-
-                // if token expire go to login page again
-                else
-                {
-                    Log.e("responseCode", "error")
-                    sharePreferanceBase?.setPrefBool("isLogin", false)
-                    val intent = Intent(this@HomePage, LoginActivity::class.java)
-                    startActivity(intent)
-                    finish()
-                }
-            }
-            else
-            {
-                generalClass.checkInternet()
-            }
-        }*/
     }
 
     suspend fun callingSyncAPI()
     {
-        val response =
-            sharePreferanceBase?.getPref("secondaryUrl")?.let {
-                APIClientKot().getUsersService(2, it
+        val response = APIClientKot().getUsersService(2, secondaryUrl
                 ).syncApiCoo("bearer " + loginModelHomePage.accessToken)
-            }
-
-
         if (response?.isSuccessful == true)
         {
-            //  alertClass.commonAlert("",Gson().toJson(response.body()))
             if (response?.code() == 200 && !response.body().toString().isEmpty())
             {
                 staticSyncData=response.body()?.data
@@ -711,9 +572,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                     }
                 }
 
-              //  runBlocking {
-                    withContext(Dispatchers.Default){
-
+                withContext(Dispatchers.IO){
                         launch { dbBase?.addSYNCAPIData(gson.toJson(apiModel?.settingDCR),
                             gson.toJson(apiModel?.workTypeList),"",
                             "",gson.toJson(apiModel?.workingWithList),gson.toJson(apiModel?.fieldStaffTeamList),""
@@ -724,14 +583,12 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                         launch {  dbBase?.addProduct(apiModel?.productList)  }
 
                     }
-               // }
             }
-
             // if token expire go to login page again
             else
             {
                 Log.e("responseCode", "error")
-                sharePreferanceBase?.setPrefBool("isLogin", false)
+                homePageSharePref?.setPrefBool("isLogin", false)
                 val intent = Intent(this@HomePage, LoginActivity::class.java)
                 startActivity(intent)
                 finish()
@@ -741,82 +598,24 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         {   Log.e("responseERROR", response?.errorBody().toString())
             generalClass.checkInternet()
         }
-
-
-       /* withContext(Dispatchers.Main) {
-            if (response?.isSuccessful == true)
-            {
-              //  alertClass.commonAlert("",Gson().toJson(response.body()))
-            if (response?.code() == 200 && !response.body().toString().isEmpty())
-            {
-                   // dbBase?.addAPIData(Gson().toJson(response.body()),1)
-
-
-                       staticSyncData=response.body()?.data
-                        val apiModel=response.body()?.data
-                        val gson=Gson()
-              CoroutineScope(Dispatchers.Unconfined).launch {
-                    val asyn=async {
-                        dbBase?.deleteAll_SYNCAPI()
-
-                        dbBase?.addSYNCAPIData(gson.toJson(apiModel?.settingDCR),
-                            gson.toJson(apiModel?.workTypeList),"",
-                            "",gson.toJson(apiModel?.workingWithList),gson.toJson(apiModel?.fieldStaffTeamList),""
-                            ,apiModel?.configurationSetting, gson.toJson(apiModel?.schemeList),
-                            "",0, gson.toJson(apiModel?.doctorList))
-                        dbBase?.addRoutes(apiModel?.routeList)
-                        dbBase?.addRetailer(apiModel?.retailerList)
-                        dbBase?.addProduct(apiModel?.productList) }
-                    asyn.await()
-                }
-
-
-            }
-
-                // if token expire go to login page again
-                else
-                {
-                    Log.e("responseCode", "error")
-                    sharePreferanceBase?.setPrefBool("isLogin", false)
-                    val intent = Intent(this@HomePage, LoginActivity::class.java)
-                    startActivity(intent)
-                    finish()
-                }
-            }
-            else
-            {   Log.e("responseERROR", response?.errorBody().toString())
-                generalClass.checkInternet()
-            }
-        }*/
     }
 
     suspend fun getQuantityAPI()
     {
-        val response =
-            sharePreferanceBase?.getPref("secondaryUrl")?.let {
-                APIClientKot().getUsersService(2, it
+        val response = APIClientKot().getUsersService(2, secondaryUrl
                 ).getQuantiyApiCoo("bearer " + loginModelHomePage.accessToken)
-            }
 
-            Log.e("quantitiveAPI",response.toString())
+        Log.e("quantitiveAPI",response.toString())
             if (response?.isSuccessful == true)
             {
                 if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage?.isEmpty() == true) {
                     val gson = Gson()
                     var model = response.body()
-                 /*   withContext(Dispatchers.Default) {
-                        launch {*/
-                            dbBase?.addAPIData(gson.toJson(model?.getData()), 3)
-                    /*    }
-                    }*/
-
+                    dbBase?.addAPIData(gson.toJson(model?.getData()), 3)
                 }
                 else Log.e("elsequantitiveAPI", response.code().toString())
             }
             else Log.e("quantitiveAPIERROR", response?.errorBody().toString())
-
-
-
     }
 
     //exit app alert
@@ -865,22 +664,15 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         val c:Date=cal.time
         val df = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
 
-        val response =
-            sharePreferanceBase?.getPref("secondaryUrl")?.let {
-                APIClientKot().getUsersService(2, it
+        val response = APIClientKot().getUsersService(2, secondaryUrl
                 ).visitDoctorGraphApi("bearer " + loginModelHomePage.accessToken,df.format(c),generalClass.currentDateMMDDYY())
-            }
 
-            Log.e("getDoctorGraphAPI", response?.body().toString())
+        Log.e("getDoctorGraphAPI", response?.body().toString())
             if (response?.isSuccessful == true)
             {
                 if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage?.isEmpty() == true) {
                     var model = response.body()
-                   /* withContext(Dispatchers.Main) {
-                        launch {*/
                     dbBase?.addAPIData(Gson().toJson(model?.getData()), 4)
-                     /*   }
-                    }*/
                 }
                 else Log.e("elseDoctorGraphAPI", response.code().toString())
             }
@@ -890,14 +682,11 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
     suspend fun profileApi()
     {
-        val response =
-            sharePreferanceBase?.getPref("secondaryUrl")?.let {
-                APIClientKot().getUsersService(2, it
+        val response = APIClientKot().getUsersService(2, secondaryUrl
                 ).getProfileData("bearer " + loginModelHomePage.accessToken,
                     loginModelHomePage.empId.toString())
-            }
 
-            Log.e("getProfileAPI", response?.body().toString())
+        Log.e("getProfileAPI", response?.body().toString())
             if (response?.isSuccessful == true)
             {
                 if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage?.isEmpty() == true) {
@@ -909,7 +698,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                 else Log.e("elseProfileAPI", response.code().toString())
             }
             else Log.e("getProfileAPIERROR", response?.errorBody().toString())
-
     }
 
     fun getFragmentRefreshListener(): FragmentRefreshListener? {
@@ -924,245 +712,9 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         fun onRefresh()
     }
 
-    fun checkDCRusingShareP(onMenuItemClickListener: MenuItem)
-    {
-        if(generalClass?.isInternetAvailable() == true)
-        {
-            runOnUiThread(java.lang.Runnable { alertClass?.showProgressAlert("") })
-            try{
-                val coroutineScope = CoroutineScope(Dispatchers.IO + generalClass.coroutineExceptionHandler).launch {
-
-                   try {
-                       val api = async { checkCurrentDCR_API(onMenuItemClickListener) }
-                       api.await()
-                   }
-                   catch (e:Exception)
-                   {
-                       runOnUiThread { alertClass?.hideAlert()
-                       alertClass?.networkAlert()
-                       }
-                   }
-                }
-
-                coroutineScope.invokeOnCompletion {
-                    coroutineScope.cancel()
-                    runOnUiThread(java.lang.Runnable {
-                        alertClass?.hideAlert() })
-                }
-            }
-            catch (e:Exception)
-            {
-                runOnUiThread { alertClass.networkAlert()
-                alertClass.hideAlert()}
-
-            }
-
-            //return false
-        }
-
-        else if(sharePreferanceBase?.checkKeyExist("empIdSp")==false  ||
-            sharePreferanceBase?.checkKeyExist("todayDate")==false  || sharePreferanceBase?.checkKeyExist("dcrId")==false || sharePreferanceBase?.getPref("empIdSp") != loginModelHomePage.empId.toString())
-        {
-            alertClass?.commonAlert("Alert!","DCR not submitted please connect to internet and fill DCR first.")
-            onMenuItemClickListener.setCheckable(false)
-            onMenuItemClickListener.setChecked(false)
-        }
-        else if( sharePreferanceBase?.getPref("todayDate") != generalClass?.currentDateMMDDYY() || sharePreferanceBase?.getPref("dcrId")=="0") {
-            alertClass?.commonAlert("Alert!","DCR not submitted please connect to internet and fill DCR first.")
-            onMenuItemClickListener.setCheckable(false)
-            onMenuItemClickListener.setChecked(false)
-        }
-        else{
-            toolbarTv?.setText("Create Calls")
-            val fragment = NewCallFragment()
-            openFragment(fragment)
-            openFragmentStr = "CallsFragment"
-            onMenuItemClickListener.setCheckable(true)
-            onMenuItemClickListener.setChecked(true)}
-    }
-
-/*    fun callCoroutineApi() :Boolean {
-        var callCoroutineReturn=false
-
-        alertClass?.showProgressAlert("")
-        val coroutineScope = CoroutineScope(Dispatchers.IO).launch {
-            val api = async { checkCurrentDCR_API(onMenuItemClickListener) }
-            callCoroutineReturn= api.await()
-        }
-
-        coroutineScope.invokeOnCompletion {
-            runOnUiThread(java.lang.Runnable {
-                alertClass?.hideAlert() })
-        }
-        return callCoroutineReturn
-    }*/
-
-
-    suspend fun checkCurrentDCR_API(onMenuItemClickListener: MenuItem) {
-
-        val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!).checkDCR_API(
-            "bearer " + loginModelHomePage.accessToken,
-            loginModelHomePage.empId,
-            generalClass?.currentDateMMDDYY()
-        )
-
-            if (response?.isSuccessful==true) {
-
-                if (response.code() == 200 && !response.body().toString().isEmpty()) {
-
-                    if (response.body()?.errorObj?.errorMessage?.isEmpty() == true) {
-
-                        val dcrData=response.body()?.data?.dcrData
-
-                        if(staticSyncData?.settingDCR?.isCallPlanMandatoryForDCR==true && response.body()?.data?.isCPExiest == false)
-                        {
-                            runOnUiThread(java.lang.Runnable {
-                                alertClass?.commonAlert("Alert!","Please submit your day plan first")
-
-                            })
-                            return
-                        }
-                        if (dcrData?.rtpApproveStatus?.lowercase() != "a") {
-
-                            alertClass?.commonAlert("Alert!","Tour plan not approved")
-                            return
-                        }
-
-                        if (dcrData?.dataSaveType?.lowercase() == "s") {
-
-                            runOnUiThread(java.lang.Runnable {
-                                alertClass?.commonAlert("Alert!","The DCR is submitted it cannot be unlocked please connect with your admin")
-                                onMenuItemClickListener.setCheckable(false)
-                                onMenuItemClickListener.setChecked(false)
-                            })
-
-                            return
-                        }
-
-
-                        if (dcrData?.routeId.toString()=="" || dcrData?.routeId==null || dcrData?.routeId=="0") {
-                            runOnUiThread {
-                                alertClass?.commonAlert("Alert!", "Please submit tour program first")
-                                alertClass?.hideAlert()
-                                onMenuItemClickListener.setCheckable(false)
-                                onMenuItemClickListener.setChecked(false)
-                            }
-
-                            return
-                        }
-
-                        dcrData?.dataSaveType="D"
-                        sharePreferanceBase?.setPref("dcrObj", Gson().toJson(dcrData))
-
-                        if (dcrData?.dcrId == 0) {
-
-                            runOnUiThread {
-                                alertClass.createDCRAlert(
-                                    dcrData?.routeId.toString(),
-                                    dcrData?.routeName.toString()
-                                )
-                                onMenuItemClickListener.setCheckable(false)
-                                onMenuItemClickListener.setChecked(false)
-                            }
-
-                            sharePreferanceBase?.setPref("dcrId", dcrData?.dcrId.toString())
-
-                        } else {
-                            sharePreferanceBase?.setPref("todayDate", generalClass?.currentDateMMDDYY())
-                            sharePreferanceBase?.setPref("dcrId", dcrData?.dcrId.toString())
-                            sharePreferanceBase?.setPref("empIdSp", loginModelHomePage.empId.toString())
-
-                            if(dcrData?.otherDCR!=0)
-                            {
-                               // setOtherActivityView()
-                                runOnUiThread {
-                                    alertClass?.commonAlert("Alert!","You have not planned field working today. Kindly save it from Salestrip app")
-                                    onMenuItemClickListener.setCheckable(false)
-                                    onMenuItemClickListener.setChecked(false)
-                                }
-                                sharePreferanceBase?.setPref("otherActivitySelected","1")
-
-                                return
-                            }
-                           // if(!setDcrCheck) {
-                           //     setDcrCheck=true
-                           //     bottomNavigation?.selectedItemId = R.id.callPage
-                           // }
-                            runOnUiThread {
-                                toolbarTv?.setText("Create Calls")
-                                val fragment = NewCallFragment()
-                                openFragment(fragment)
-                                openFragmentStr = "CallsFragment"
-                                onMenuItemClickListener.setCheckable(true)
-                                onMenuItemClickListener.setChecked(true)
-                            }
-                        }
-                    } else {
-                        GeneralClass(this@HomePage).checkInternet()
-                        runOnUiThread {
-                            onMenuItemClickListener.setCheckable(false)
-                            onMenuItemClickListener.setChecked(false) }
-
-                     }
-                }
-            }
-
-
-    }
-
-    fun saveDCR_API(dcrObject: CommonModel.SaveDcrModel, alertDialog: AlertDialog, checked: Boolean) {
-        alertClass?.showProgressAlert("")
-        var call: Call<JsonObject> = apiInterface?.saveDCS("bearer " + loginModelHomePage.accessToken,dcrObject) as Call<JsonObject>
-        call.enqueue(object : Callback<JsonObject?> {
-            override fun onResponse(call: Call<JsonObject?>?, response: Response<JsonObject?>) {
-                alertClass?.hideAlert()
-                if (response.code() == 200 && !response.body().toString().isEmpty()) {
-                    val jsonObjError: JsonObject = response.body()?.get("errorObj") as JsonObject
-                    if(!jsonObjError.get("errorMessage").asString.isEmpty())
-                    {
-                        alertClass?.commonAlert("",jsonObjError.get("errorMessage").asString)
-                    }
-                    else {
-                        val jsonObjData: JsonObject = response.body()?.get("data") as JsonObject
-
-                        if(!checked)
-                        {
-                            alertClass?.commonAlert("",jsonObjData.get("message").asString + "And kindly moved to Salestrip to submit DCR")
-                        }
-                        else
-                        {
-                            alertClass?.commonAlert("",jsonObjData.get("message").asString)
-                        }
-
-                        if(!checked) sharePreferanceBase?.setPref("otherActivitySelected","1")
-
-                       /* if(generalClass?.isInternetAvailable() == true && checked)
-                        {
-                            CoroutineScope(Dispatchers.IO).launch {
-                                val api = async { checkCurrentDCR_API() }
-                                api.await()
-                            }
-                        }*/
-
-                        alertDialog.cancel()
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call<JsonObject?>, t: Throwable?) {
-                generalClass?.checkInternet()
-                alertClass?.hideAlert()
-                alertDialog.cancel()// check internet connection
-                call.cancel()
-            }
-        })
-    }
-
-
     fun selectRetailerForEdit(toJson: String) {
         retailerString=toJson
         bottomNavigation?.selectedItemId= R.id.callPage
-
     }
 
     fun backToHome()
@@ -1177,6 +729,5 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         openFragment(fragment)
         openFragmentStr = "CallsFragment"
     }
-
 
 }

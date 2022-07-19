@@ -58,6 +58,10 @@ class LoginModel {
     @Expose
     var empName: String? = null
 
+    @SerializedName("currentDate")
+    @Expose
+    var currentDate: String? = null
+
     /*@SerializedName("compName")
     @Expose
      var compName: String? = null
@@ -87,10 +91,6 @@ class LoginModel {
     @SerializedName("isCheckIn")
     @Expose
      var isCheckIn: Boolean? = null
-
-    @SerializedName("currentDate")
-    @Expose
-     var currentDate: String? = null
 
     @SerializedName("isMpin")
     @Expose

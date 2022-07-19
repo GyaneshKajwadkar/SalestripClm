@@ -218,9 +218,14 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         doctorName_tv.setText(intent.getStringExtra("doctorName"))
 
         visitPurpose_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if(position!=0)
-                    selectedPurposeID = CommonListGetClass().getWorkTypeForSpinner()[position].workId!!
+                    CommonListGetClass().getWorkTypeForSpinner()[position].workId.let {
+                        if (it != null) {
+                            selectedPurposeID=it
+                        }
+                    }
+                  //  selectedPurposeID = CommonListGetClass().getWorkTypeForSpinner()[position].workId
             }
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
@@ -389,7 +394,6 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
 
             if(selectedStockist.id!=null && selectedStockist.id!="" && filterSelectecd.size!=0)  saveModel.pobObject?.stockistId=selectedStockist.id.toInt()
 
-
             }
 
             val dcrDetail= Gson().fromJson(sharePreferanceBase?.getPref("dcrObj"),GetDcrToday.Data.DcrData::class.java)
@@ -411,6 +415,12 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             }
 
             saveModel.reportedTime=generalClass.getCurrentDateTimeApiForamt()
+
+            if(generalClass?.checkCurrentDateIsValid() == false)
+            {
+                alertClass?.commonAlert("Date error","Device date is not correct. Please set it to current date")
+                return@setOnClickListener
+            }
 
             if(intent.getStringExtra("apiDataDcr")?.isEmpty() == false)
             {
@@ -760,7 +770,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         }*/
 
 
-/*
+    /*
         Handler(Looper.getMainLooper()).postDelayed({
 
 
@@ -1732,7 +1742,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             else selectBtn.visibility=View.VISIBLE
         })
 
-       gifts_mb.setOnClickListener({
+        gifts_mb.setOnClickListener({
             hideAllSelection()
             setToDefaultAll()
             gifts_mb.setBackgroundTintList(this?.let { it1 -> ContextCompat.getColorStateList(it1, R.color.appColor) })

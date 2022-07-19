@@ -1,5 +1,7 @@
 package `in`.processmaster.salestripclm.common_classes
 
+import `in`.processmaster.salestripclm.activity.HomePage
+import `in`.processmaster.salestripclm.models.LoginModel
 import android.app.Activity
 import android.content.Context
 import android.graphics.Color
@@ -157,5 +159,29 @@ class GeneralClass(val activity: Activity) {
     val coroutineExceptionHandler = CoroutineExceptionHandler{_, throwable ->
         throwable.printStackTrace()
     }
+
+    fun checkCurrentDateIsValid(loginModelHomePage:LoginModel=LoginModel(), from :String= "" ):Boolean {
+        try
+        {
+            var format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+
+            var apiDateString=Date()
+            if(from.equals("splash")) apiDateString = format.parse(loginModelHomePage.currentDate)
+                else apiDateString = format.parse(HomePage.loginModelHomePage.currentDate)
+
+            format = SimpleDateFormat("dd/MM/yyyy")
+            val apiDate= format.format(apiDateString)
+            val deviceDate = format.format(Calendar.getInstance().time)
+            Log.e("getAPIDate",apiDate.toString())
+            Log.e("getcurrentDate", deviceDate.toString())
+
+            if(apiDate.equals(deviceDate)) return true
+            else return false
+        }
+        catch (e: Exception) {
+            return true
+        }
+    }
+
 
 }

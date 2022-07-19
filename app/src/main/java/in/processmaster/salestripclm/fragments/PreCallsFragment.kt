@@ -85,8 +85,15 @@ class PreCallsFragment() : Fragment() {
 
          viewParent?.startDetailing_btn?.setOnClickListener({
 
+             if(homePageGeneralClass?.checkCurrentDateIsValid() == false)
+             {
+                 homePageAlertClass?.commonAlert("Date error","Device date is not correct. Please set it to current date")
+                 return@setOnClickListener
+             }
+
              val responseDocCall=homePageDataBase?.getApiDetail(5)
-             if(!responseDocCall.equals("")) {
+             if(!responseDocCall.equals(""))
+             {
                  docCallModel = Gson().fromJson(responseDocCall, DailyDocVisitModel.Data::class.java)
              }
 

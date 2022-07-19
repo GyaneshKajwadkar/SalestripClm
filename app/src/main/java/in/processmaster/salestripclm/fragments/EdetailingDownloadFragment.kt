@@ -26,7 +26,6 @@ import kotlinx.coroutines.launch
 
 class EdetailingDownloadFragment : Fragment() {
 
-    var sharePreferance: PreferenceClass?= null
     var position:Int=0
     var viewPager: ViewPager?=null
     var tabs: TabLayout? = null
@@ -38,7 +37,6 @@ class EdetailingDownloadFragment : Fragment() {
         var filter_et : EditText?=null
     }
 
-    lateinit var db : DatabaseHandler
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,8 +47,10 @@ class EdetailingDownloadFragment : Fragment() {
         if (isAdded) { initView(views)  }
 
         Handler(Looper.getMainLooper()).postDelayed({
-            if (isAdded)  calladapter()
-        }, 100)
+            if (isAdded) {
+                calladapter()
+            }
+        }, 50)
 
         return views }
 
@@ -58,13 +58,11 @@ class EdetailingDownloadFragment : Fragment() {
     {
         filter_et=view.findViewById(R.id.filter_et)as EditText
         syncData_ll=view.findViewById(R.id.syncData_ll)as LinearLayout
-        sharePreferance = PreferenceClass(activity)
-        db = DatabaseHandler.getInstance(activity?.applicationContext)
         alertClass= activity?.let { AlertClass(it) }
         viewPager = view.findViewById<View>(R.id.viewpager) as ViewPager
         tabs = view.findViewById<View>(R.id.result_tabs) as TabLayout
 
-        filter_et!!.addTextChangedListener(filterTextWatcher)
+        filter_et?.addTextChangedListener(filterTextWatcher)
 
         alertClass?.showProgressAlert("")
     }

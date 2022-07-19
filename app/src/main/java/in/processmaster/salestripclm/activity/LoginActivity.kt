@@ -13,6 +13,7 @@ import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
@@ -138,6 +139,7 @@ class LoginActivity : BaseActivity() {
                     var loginModel = response.body()
                     sendDeviceDetail_api(loginModel)
 
+
                     val jsonObj= JSONObject(loginModel?.configurationSetting)
                     val jsonObjEmp= JSONObject(loginModel?.getEmployeeObj())
 
@@ -193,8 +195,21 @@ class LoginActivity : BaseActivity() {
         deviceDetailModel.manufacturer= android.os.Build.MANUFACTURER
         deviceDetailModel.model= android.os.Build.MODEL
         deviceDetailModel.osVersion=Build.VERSION.SDK_INT
-        deviceDetailModel.mobileAppVersion= BuildConfig.VERSION_NAME
+
+        try
+        {
+            val pInfo: PackageInfo = getPackageManager().getPackageInfo(getPackageName(), 0)
+            val version = pInfo.versionName
+            deviceDetailModel.mobileAppVersion= version
+        }
+        catch (e: Exception)
+        {
+            deviceDetailModel.mobileAppVersion= BuildConfig.VERSION_NAME
+        }
+
         if(loginModel?.empId!=null) deviceDetailModel.userId= loginModel?.empId!!
+
+        Log.e("sendDeviceDetail_api",Gson().toJson(deviceDetailModel))
 
         apiInterface= APIClientKot().getClient(2, sharePreferance?.getPref("secondaryUrl")).create(APIInterface::class.java)
 
@@ -277,7 +292,7 @@ class LoginActivity : BaseActivity() {
                         if(verionLower!= null &&  versionHigher!=null && version!=null)
                         {
                             if( version < verionLower ||version > versionHigher ) {
-                            //    needUpdateAlert()
+                                needUpdateAlert()
                             }
                         }
 

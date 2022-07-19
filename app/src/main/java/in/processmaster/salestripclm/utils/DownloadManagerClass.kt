@@ -79,8 +79,10 @@ class DownloadManagerClass(
         }
         if(allProductList.size!=0 && getNumber<allProductList.size)
         {
-            selectedObj= allProductList.get(getNumber)
+
             if(context.stopDownload==true)return
+
+            selectedObj= allProductList.get(getNumber)
             downloadFile(selectedObj.filePath,selectedObj.fileName,selectedObj.downloadType)
         }
     }
@@ -90,7 +92,6 @@ class DownloadManagerClass(
         val request = DownloadManager.Request(Uri.parse(url))
             .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
             .setTitle(name)
-            .setDescription("desc")
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
             .setAllowedOverMetered(true)
             .setAllowedOverRoaming(false)
@@ -254,11 +255,7 @@ class DownloadManagerClass(
                 dataBase.insertFilePath(1,  gson.toJson(selectedObj), selectedObj.eDetailingId.toString())
 
                 File(path).delete()
-
-            }
-            else{
-
-            }}}
+            } }}
 
 
     fun downloadProgressAlert()

@@ -1,116 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
     android:focusableInTouchMode="true"
+    android:orientation="vertical"
     android:descendantFocusability="beforeDescendants"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
-    <LinearLayout
+
+    <RelativeLayout
+        android:background="@color/appDarkColor"
+        android:id="@+id/toolbarParent"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:padding="10dp">
 
-        <RelativeLayout
-            android:background="@color/appDarkColor"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <RelativeLayout
-                android:id="@+id/toolbarParent"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10dp">
-
-                <ImageView
-                    android:id="@+id/closePob_iv"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:padding="7dp"
-                    android:src="@drawable/ic_close"
-                    app:tint="@color/white" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Save"
-                    android:id="@+id/okPob_iv"
-                    android:layout_alignParentEnd="true"
-                    android:textStyle="bold"
-                    android:textColor="@color/white"
-                    android:padding="5dp"
-                    android:textSize="16sp"/>
-
-
-                <ImageButton
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
-                    android:visibility="gone"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/zm_ic_tick"
-                    app:tint="@color/white" />
-
-
-                <TextView
-                    android:id="@+id/selectHeader_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:layout_marginTop="2dp"
-                    android:text="Products"
-                    android:textColor="@color/white"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-            </RelativeLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/toolbarParent"
-                android:background="@color/appDarkColor"
-                android:orientation="horizontal"
-                android:weightSum="3"
-                tools:ignore="MissingConstraints">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.5"></LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:orientation="vertical"
-                    android:padding="5dp"
-                    tools:ignore="MissingConstraints">
-
-                    <EditText
-                        android:inputType="text"
-                        android:id="@+id/productSearch_et"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:layout_marginTop="5dp"
-                        android:background="@drawable/edittext_capsul"
-                        android:drawableRight="@android:drawable/ic_menu_search"
-                        android:drawableTint="@color/appColor"
-                        android:paddingRight="5dp"
-                        android:paddingLeft="5dp" />
-
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.5"></LinearLayout>
-
-            </LinearLayout>
-        </RelativeLayout>
+        <ImageView
+            android:id="@+id/closePob_iv"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:padding="7dp"
+            android:src="@drawable/ic_close"
+            app:tint="@color/white" />
 
         <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save"
+            android:id="@+id/okPob_iv"
+            android:layout_alignParentEnd="true"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:padding="5dp"
+            android:textSize="16sp"/>
+
+
+        <ImageButton
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:visibility="gone"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/zm_ic_tick"
+            app:tint="@color/white" />
+
+
+        <TextView
+            android:id="@+id/selectHeader_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="2dp"
+            android:text="Products"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/toolbarParent"
+        android:background="@color/appDarkColor"
+        android:orientation="horizontal"
+        android:weightSum="3"
+        tools:ignore="MissingConstraints">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"></LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:orientation="vertical"
+            android:padding="5dp"
+            tools:ignore="MissingConstraints">
+
+            <EditText
+                android:inputType="text"
+                android:id="@+id/productSearch_et"
+                android:layout_width="match_parent"
+                android:drawableRight="@android:drawable/ic_menu_search"
+                android:drawableTint="@color/appColor"
+                style="@style/capsul_editText_simple" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"></LinearLayout>
+
+    </LinearLayout>
+
+    <TextView
             android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -172,6 +160,4 @@
             </LinearLayout>
 
         </LinearLayout>
-
-    </LinearLayout>
-</RelativeLayout>
+</LinearLayout>

@@ -3,6 +3,7 @@ import `in`.processmaster.salestripclm.R
 import `in`.processmaster.salestripclm.activity.HomePage
 import `in`.processmaster.salestripclm.activity.HomePage.Companion.apiInterface
 import `in`.processmaster.salestripclm.activity.HomePage.Companion.homePageAlertClass
+import `in`.processmaster.salestripclm.activity.HomePage.Companion.homePageGeneralClass
 import `in`.processmaster.salestripclm.activity.HomePage.Companion.homePageSharePref
 import `in`.processmaster.salestripclm.activity.HomePage.Companion.loginModelHomePage
 import `in`.processmaster.salestripclm.activity.SplashActivity
@@ -220,6 +221,13 @@ class NewCallFragment : Fragment(),StringInterface {
                     }
 
                     views?.selectTeamsCv?.setOnClickListener({
+
+                        if(homePageGeneralClass?.checkCurrentDateIsValid() == false)
+                        {
+                            homePageAlertClass?.commonAlert("Date error","Device date is not correct. Please set it to current date")
+                            return@setOnClickListener
+                        }
+
                         selectionType=0
                         views?.bottomSheetTitle_tv?.setText("Select Team")
                         if(isAdded)
@@ -234,6 +242,12 @@ class NewCallFragment : Fragment(),StringInterface {
                     })
 
                     views?.selectRoutesCv?.setOnClickListener({
+                        if(homePageGeneralClass?.checkCurrentDateIsValid() == false)
+                        {
+                            homePageAlertClass?.commonAlert("Date error","Device date is not correct. Please set it to current date")
+                            return@setOnClickListener
+                        }
+
                         selectionType=1
                         views?.bottomSheetTitle_tv?.setText("Select route")
                         if(!SplashActivity.staticSyncData?.settingDCR?.roleType.equals("MAN") ){

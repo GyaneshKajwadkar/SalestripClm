@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/pobParent"
+    android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
-        android:id="@+id/pobParent"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -22,21 +18,17 @@
                 android:layout_weight="1.3">
                 <TextView
                     android:id="@+id/remarkHeader"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:layout_above="@+id/remark_cv"
                     android:layout_marginLeft="10dp"
                     android:layout_marginTop="5dp"
                     android:text="POB Remark"
-                    android:textColor="@color/appColor" />
+                    style="@style/editTextHeader_text"
+                    />
 
                 <EditText
                     android:maxLength="400"
                     android:id="@+id/remarkPOB_Et"
                     style="@style/editTextWithRound"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/round_shape_edit"
                     android:lines="3" />
             </LinearLayout>
 
@@ -76,8 +68,7 @@
 
         </LinearLayout>
 
-
-        <RelativeLayout
+    <RelativeLayout
             android:layout_marginRight="10dp"
             android:layout_marginLeft="10dp"
             android:layout_width="match_parent"
@@ -104,18 +95,14 @@
 
         </RelativeLayout>
 
-
-        <View
+    <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/gray"/>
 
-        <androidx.recyclerview.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/selectedPob_rv"/>
 
-
-    </LinearLayout>
-
-</RelativeLayout>
+</LinearLayout>

@@ -24,7 +24,6 @@ import java.io.*
 
 class Edetailing_Adapter(
     var edetailidList: ArrayList<DevisionModel.Data.EDetailing>?,
-    private var sharePreferance: PreferenceClass?,
     var context: Activity?,
     var db: DatabaseHandler
 ) : RecyclerView.Adapter<Edetailing_Adapter.MyViewHolder>(), Filterable
@@ -54,7 +53,6 @@ class Edetailing_Adapter(
     override fun onBindViewHolder(holder: MyViewHolder, position: Int)
     {
         val modeldata = filteredData?.get(position)
-        Log.e("fdgdgdgdgdgdf","dfsdfsdfsdfgegdf")
         if(modeldata?.isSaved==1)
         {
             holder.download_rl?.visibility = View.GONE

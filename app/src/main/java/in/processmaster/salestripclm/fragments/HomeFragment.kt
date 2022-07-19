@@ -81,7 +81,7 @@ class HomeFragment : Fragment(), OnChartGestureListener {
     val myCalendar = Calendar.getInstance()
     var selectDate_tv : TextView? =null
     var todaysCall_tv : TextView? =null
-    var expandable_Rv: RecyclerView?= null
+ //   var expandable_Rv: RecyclerView?= null
     var dailyDoctorCall_rv: RecyclerView?= null
     var dailyRetailer_rv: RecyclerView?= null
     var parent_ll: LinearLayout?=null
@@ -103,7 +103,7 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         if (activity != null && isAdded) {
             parent_ll        = root.findViewById<View>(R.id.parent_ll) as LinearLayout
             progressHomeFrag = root.findViewById<View>(R.id.progressHomeFrag) as ProgressBar
-            expandable_Rv    = root.findViewById<View>(R.id.expandable_Rv) as RecyclerView
+           // expandable_Rv    = root.findViewById<View>(R.id.expandable_Rv) as RecyclerView
             dailyDoctorCall_rv = root.findViewById<View>(R.id.dailyDoctorCall_rv) as RecyclerView
             dailyRetailer_rv = root.findViewById<View>(R.id.dailyRetailer_rv) as RecyclerView
             noDocCall_tv = root.findViewById<View>(R.id.noDocCall_tv) as TextView
@@ -111,7 +111,7 @@ class HomeFragment : Fragment(), OnChartGestureListener {
             toggleButton = root.findViewById<View>(R.id.toggleButton) as MaterialButtonToggleGroup
             dailyDoctorCall_rv?.layoutManager=LinearLayoutManager(activity)
             dailyRetailer_rv?.layoutManager=LinearLayoutManager(activity)
-            expandable_Rv?.layoutManager = LinearLayoutManager(activity)
+           // expandable_Rv?.layoutManager = LinearLayoutManager(activity)
 
             sharePreferance = PreferenceClass(activity)
 
@@ -216,7 +216,7 @@ class HomeFragment : Fragment(), OnChartGestureListener {
             return
         }
 
-        val responseData=homePageDataBase?.getApiDetail(2)
+     //   val responseData=homePageDataBase?.getApiDetail(2)
         val responseGraph=homePageDataBase?.getApiDetail(4)
         val responseDocCall=homePageDataBase?.getApiDetail(5)
         val dbListRetailer=homePageDataBase?.getAllSaveSendRetailer("retailerFeedback")
@@ -225,7 +225,7 @@ class HomeFragment : Fragment(), OnChartGestureListener {
         doctorList.clear()
         retailerList.clear()
 
-        if(!responseData.equals(""))
+     /*   if(!responseData.equals(""))
         {
            val  getScheduleModel= Gson().fromJson(responseData, GetScheduleModel::class.java)
             var arrayListString : ArrayList<String> = ArrayList()
@@ -235,7 +235,7 @@ class HomeFragment : Fragment(), OnChartGestureListener {
             arrayListString.add("Next week meetings")
             val adapter = activity?.let { MeetingExpandableHeaderAdapter(it,arrayListString,getScheduleModel) }
             activity?.runOnUiThread {  expandable_Rv?.adapter = adapter }
-        }
+        }*/
         if(!responseGraph.equals(""))
         {
             var doctorGraphModel=DoctorGraphModel.Data()

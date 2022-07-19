@@ -12,6 +12,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.ProgressBar
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
@@ -83,7 +84,18 @@ class SplashActivity : BaseActivity()
                     }
                     catch (e:Exception)
                     {
-                        alertClass.lowNetworkAlert()
+                        try{
+                            var profileData = sharePreferance?.getPref("profileData")
+                            val loginModelHomePage = Gson().fromJson(profileData, LoginModel::class.java)
+
+                            if(generalClass.checkCurrentDateIsValid(loginModelHomePage,"splash") == false)
+                            {
+                                alertClass?.commonAlert("Date error","Device date is not correct. Please set it to current date")
+                            }
+                            else  alertClass.lowNetworkAlert()
+
+                        }
+                        catch (e: Exception){}
                     }
                     }
                 scope.invokeOnCompletion {
@@ -100,7 +112,6 @@ class SplashActivity : BaseActivity()
             }, 2000)
         }
 
-
     }
     suspend fun callingSyncAPI()
     {
@@ -111,7 +122,7 @@ class SplashActivity : BaseActivity()
         ).syncApiCoo("bearer " + loginModel?.accessToken)
 
 
-        withContext(Dispatchers.Main) {
+        withContext(Dispatchers.IO) {
             var intent=Intent()
                 if (response?.code() == 200 && !response.body().toString().isEmpty())
                 {

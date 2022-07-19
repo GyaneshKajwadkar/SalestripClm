@@ -253,8 +253,6 @@ class SyncModel {
             @Expose
             var doctorName: String? = ""
 
-
-
             @SerializedName("stateId")
             @Expose
             var stateId: Int? = 0
@@ -262,8 +260,6 @@ class SyncModel {
             @SerializedName("stateName")
             @Expose
             var stateName: String? = ""
-
-
 
             @SerializedName("routeName")
             @Expose
@@ -555,11 +551,11 @@ class SyncModel {
             @Expose
             var headQuaterName: String? = ""
 
-            @SerializedName("headQuaterId")
+          /*  @SerializedName("headQuaterId")
             @Expose
             var headQuaterId: String? = ""
 
-        /*    @SerializedName("hierachyId")
+           @SerializedName("hierachyId")
             @Expose
             var hierachyId: Int? = 0
 
@@ -1422,13 +1418,13 @@ class SyncModel {
             @Expose
             var productType: Int? = 0
 
-            @SerializedName("empId")
+        /*    @SerializedName("empId")
             @Expose
-            var empId: Int? = 0
+            var empId: Int? = 0*/
 
-            @SerializedName("mode")
+      /*      @SerializedName("mode")
             @Expose
-            var mode: Int? = 0
+            var mode: Int? = 0*/
 
             @SerializedName("packingTypeName")
             @Expose
@@ -1442,33 +1438,33 @@ class SyncModel {
             @Expose
             var price: Double = 0.0
 
-            @SerializedName("status")
+       /*     @SerializedName("status")
             @Expose
-            var status: String? = ""
+            var status: String? = ""*/
 
-            @SerializedName("brandId")
+         /*   @SerializedName("brandId")
             @Expose
-            var brandId: Int? = 0
+            var brandId: Int? = 0*/
 
-            @SerializedName("isError")
+        /*    @SerializedName("isError")
             @Expose
-            var isError: Boolean? = false
+            var isError: Boolean? = false*/
 
-            @SerializedName("errorMessage")
+      /*      @SerializedName("errorMessage")
             @Expose
-            var errorMessage: String? = ""
+            var errorMessage: String? = ""*/
 
-            @SerializedName("brandName")
+          /*  @SerializedName("brandName")
             @Expose
-            var brandName: String? = ""
+            var brandName: String? = ""*/
 
             @SerializedName("categoryName")
             @Expose
             var categoryName: String? = ""
 
-               var isAdded=false
+           /*    var isAdded=false
                    get() = field
-                   set(value) { field = value }
+                   set(value) { field = value }*/
          /*   @SerializedName("prodCode")
             @Expose
             var prodCode: String? = ""
@@ -1702,21 +1698,21 @@ class SyncModel {
             @Expose
             var emailId: String? = ""
 
-            @SerializedName("empId")
+          /*  @SerializedName("empId")
             @Expose
-            var empId: Int? = 0
+            var empId: Int? = 0*/
 
-            @SerializedName("mode")
+        /*    @SerializedName("mode")
             @Expose
-            var mode: Int? = 0
+            var mode: Int? = 0*/
 
             @SerializedName("cityName")
             @Expose
             var cityName: String? = ""
 
-            @SerializedName("stateName")
+          /*  @SerializedName("stateName")
             @Expose
-            var stateName: String? = ""
+            var stateName: String? = ""*/
 
             @SerializedName("headQuaterName")
             @Expose
@@ -1726,21 +1722,21 @@ class SyncModel {
             @Expose
             var routeName: String? = ""
 
-            @SerializedName("status")
+      /*      @SerializedName("status")
             @Expose
-            var status: String? = ""
+            var status: String? = ""*/
 
-            @SerializedName("createdDate")
+       /*     @SerializedName("createdDate")
             @Expose
-            var createdDate: String? = ""
+            var createdDate: String? = ""*/
 
             @SerializedName("type")
             @Expose
             var type: String? = ""
 
-            @SerializedName("stateId")
+/*            @SerializedName("stateId")
             @Expose
-            var stateId: Int? = 0
+            var stateId: Int? = 0*/
 
          /*   @SerializedName("isError")
             @Expose
@@ -1750,13 +1746,13 @@ class SyncModel {
             @Expose
             var errorMessage: String? = ""*/
 
-            @SerializedName("code")
+         /*   @SerializedName("code")
             @Expose
-            var code: String? = ""
+            var code: String? = ""*/
 
-            @SerializedName("division")
+        /*    @SerializedName("division")
             @Expose
-            var division: String? = ""
+            var division: String? = ""*/
 
             @SerializedName("routeId")
             @Expose
@@ -1776,9 +1772,9 @@ class SyncModel {
             @Expose
             var contactPerson: String? = ""
 
-            @SerializedName("employeeName")
+         /*   @SerializedName("employeeName")
             @Expose
-            var employeeName: String? = ""
+            var employeeName: String? = ""*/
 
             @SerializedName("mobileNo")
             @Expose
@@ -2263,13 +2259,13 @@ class SyncModel {
             @Expose
             var productId: Int? = 0
 
-            @SerializedName("mode")
+       /*     @SerializedName("mode")
             @Expose
-            var mode: Int? = 0
+            var mode: Int? = 0*/
 
-            @SerializedName("productName")
+    /*        @SerializedName("productName")
             @Expose
-            var productName: String? = ""
+            var productName: String? = ""*/
 
     /*        @SerializedName("schemeDate")
             @Expose
@@ -2328,13 +2324,13 @@ class SyncModel {
                      @Expose
                      var sequentialDCR: Boolean? = false*/
 
-            @SerializedName("mode")
+ /*           @SerializedName("mode")
             @Expose
             var mode: Int? = 0
 
             @SerializedName("empId")
             @Expose
-            var empId: Int? = 0
+            var empId: Int? = 0*/
 
             @SerializedName("isDoctorFencingRequired")
             @Expose
@@ -2372,9 +2368,9 @@ class SyncModel {
               @Expose
               var isDCRApproval: Boolean? = false*/
 
-            @SerializedName("isGeoLocationRequired")
+        /*    @SerializedName("isGeoLocationRequired")
             @Expose
-            var isGeoLocationRequired: Boolean? = false
+            var isGeoLocationRequired: Boolean? = false*/
 
             @SerializedName("isRCPAMandatoryForChemistReport")
             @Expose
@@ -2453,11 +2449,7 @@ class SyncModel {
              @Expose
              var isSelfieAttendanceRequired: Boolean? = false
 
-
-
-
-
-             @SerializedName("minInclinicEffectivenessCall")
+              @SerializedName("minInclinicEffectivenessCall")
              @Expose
              var minInclinicEffectivenessCall: Int? = 0
 
@@ -2565,15 +2557,15 @@ class SyncModel {
             @Expose
             var empId: Int? = 0
 
-            @SerializedName("userName")
+          /*  @SerializedName("userName")
             @Expose
-            var userName: String? = ""
+            var userName: String? = ""*/
 
-            @SerializedName("password")
+        /*    @SerializedName("password")
             @Expose
-            var password: String? = ""
+            var password: String? = ""*/
 
-            @SerializedName("emailId")
+        /*    @SerializedName("emailId")
             @Expose
             var emailId: String? = ""
 
@@ -2583,23 +2575,23 @@ class SyncModel {
 
             @SerializedName("stateName")
             @Expose
-            var stateName: String? = ""
-
+            var stateName: String? = ""*/
+/*
             @SerializedName("division")
             @Expose
             var division: String? = ""
 
             @SerializedName("headQuaterName")
             @Expose
-            var headQuaterName: String? = ""
+            var headQuaterName: String? = ""*/
 
-            @SerializedName("mode")
+        /*    @SerializedName("mode")
             @Expose
             var mode: Int? = 0
 
             @SerializedName("absolutePath")
             @Expose
-            var absolutePath: String? = ""
+            var absolutePath: String? = ""*/
 
             @SerializedName("fullName")
             @Expose
@@ -2613,7 +2605,7 @@ class SyncModel {
             @Expose
             var hierachyType: String? = ""
 
-            @SerializedName("divisionName")
+       /*     @SerializedName("divisionName")
             @Expose
             var divisionName: String? = ""
 
@@ -2623,7 +2615,7 @@ class SyncModel {
 
             @SerializedName("errorMessage")
             @Expose
-            var errorMessage: String? = ""
+            var errorMessage: String? = ""*/
 
         /*    @SerializedName("firstName")
             @Expose

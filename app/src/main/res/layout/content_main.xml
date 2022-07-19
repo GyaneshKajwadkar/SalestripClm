@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:background="@color/appColor">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_marginLeft="10dp"
             android:gravity="center"
             android:orientation="vertical"
@@ -33,14 +33,15 @@
                 app:tint="@color/white" />
 
             <TextView
+                android:layout_below="@+id/menu_img"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
                 android:textSize="10sp"
                 android:id="@+id/appVersion_tv"
-                android:layout_centerVertical="true" />
+                android:layout_centerHorizontal="true"/>
 
-        </LinearLayout>
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/toolbarTv"
@@ -53,8 +54,8 @@
             android:textStyle="bold"/>
 
         <RelativeLayout
+            android:layout_alignParentRight="true"
             android:layout_marginRight="10dp"
-            android:layout_toLeftOf="@+id/notification_iv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
@@ -79,56 +80,28 @@
         </RelativeLayout>
 
 
-        <ImageView
-            android:visibility="gone"
-            android:id="@+id/notification_iv"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="5dp"
-            android:layout_toLeftOf="@+id/menu_iv"
-            android:padding="5dp"
-            android:src="@drawable/ic_bell"
-            app:tint="@color/white" />
-
-        <ImageView
-            android:visibility="invisible"
-            android:padding="5dp"
-            android:id="@+id/menu_iv"
-            android:layout_centerVertical="true"
-            android:layout_alignParentEnd="true"
-            android:layout_width="10dp"
-            android:layout_height="10dp"
-            android:src="@drawable/ic_menu_dot"
-            app:tint="@color/white" />
 
     </RelativeLayout>
 
-    <RelativeLayout
+
+    <FrameLayout
         android:layout_below="@+id/profileHolder"
+        android:id="@+id/container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:layout_above="@+id/navigationView"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-        <FrameLayout
-            android:id="@+id/container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@+id/navigationView"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/navigationView"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_width="wrap_content"
-            android:layout_height="60dp"
-            android:background="@drawable/nav_background_curved"
-            app:itemBackground="@drawable/bottom_navback"
-            app:itemIconTint="@color/white"
-            app:itemTextColor="@color/white"
-            app:menu="@menu/navigation"/>
-
-    </RelativeLayout>
-
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/navigationView"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/nav_background_curved"
+        app:itemBackground="@drawable/bottom_navback"
+        app:itemIconTint="@color/white"
+        app:itemTextColor="@color/white"
+        app:menu="@menu/navigation" />
 
 </RelativeLayout>

@@ -517,8 +517,8 @@ class DownloadAdapter constructor() :
         dialogBuilder.setView(dialogView)
 
         alertDialog= dialogBuilder.create()
-        alertDialog!!.setCanceledOnTouchOutside(false)
-        alertDialog!!.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+        alertDialog?.setCanceledOnTouchOutside(false)
+        alertDialog?.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
 
         progressBarAlert =
             dialogView.findViewById<View>(R.id.valueProgressBar) as ProgressBar
@@ -546,7 +546,7 @@ class DownloadAdapter constructor() :
         return false
     }
 
-    fun downloadUrl(
+/*    fun downloadUrl(
         urlMain: String,
         position: Int,
         category: String,
@@ -641,7 +641,6 @@ class DownloadAdapter constructor() :
                         alertDialog?.dismiss()
                         notifyItemChanged(position)
                     })
-//895533366810
                 } else {
                     Log.e("notSuccessfull","hsidhfidsh")
                     alertDialog?.dismiss()
@@ -651,7 +650,7 @@ class DownloadAdapter constructor() :
                 Log.e("Error:single ",Log.getStackTraceString(e)    )
                 alertDialog?.dismiss()
             }})
-    }
+    }*/
 
     fun saveFile(
         body: ResponseBody,
@@ -682,6 +681,9 @@ class DownloadAdapter constructor() :
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
             Log.e("firstCatch",e.message.toString())
+            context?.alertClass?.commonAlert("Download error","Unable to download this file")
+            alertDialog?.dismiss()
+
         }
 
         var success = true
@@ -760,6 +762,8 @@ class DownloadAdapter constructor() :
             return folder.getAbsolutePath() + "extension"
         }catch (e:Exception){
             Log.e("saveFile",e.toString())
+            context?.alertClass?.commonAlert("Download error","Unable to download this file")
+            alertDialog?.dismiss()
         }
         finally {
             input?.close()

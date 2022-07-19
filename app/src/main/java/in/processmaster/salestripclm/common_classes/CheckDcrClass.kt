@@ -181,7 +181,7 @@ class CheckDcrClass(val activity: Activity?, val callingName : String, val addit
                                 intent.putExtra("apiDataDcr", additionalData)
                                 activity?.startActivity(intent)
                             }
-
+                            sharePreferanceBase?.setPref("otherActivitySelected","0")
                         }
 
                     }

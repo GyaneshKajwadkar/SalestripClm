@@ -231,7 +231,6 @@ class DownloadedActivtiy : BaseActivity() {
     {
         this.runOnUiThread(Runnable {
             downloadItem_tv?.setText("${index + 1} / ${downloadList.size}")
-
         })
 
         var modelObject = downloadList.get(index)
@@ -245,13 +244,13 @@ class DownloadedActivtiy : BaseActivity() {
         val dialogBuilder = AlertDialog.Builder(this)
         val inflater = this.layoutInflater
         val dialogView: View = inflater.inflate(R.layout.downloadallprogress_alert, null)
-        dialogBuilder.setCancelable(false);
+        dialogBuilder.setCancelable(false)
 
         dialogBuilder.setView(dialogView)
 
         alertDialog= dialogBuilder.create()
         alertDialog?.setCanceledOnTouchOutside(false)
-        alertDialog?.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+        alertDialog?.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         progressBarAlert =
             dialogView.findViewById<View>(R.id.valueProgressBar) as ProgressBar
@@ -546,6 +545,10 @@ class DownloadedActivtiy : BaseActivity() {
 
                 })
             }
+            else{
+                alertClass?.commonAlert("Download error","Unable to download this file")
+                alertDialog?.dismiss()
+            }
         }
 
     }
@@ -659,6 +662,8 @@ class DownloadedActivtiy : BaseActivity() {
          catch (e:Exception)
          {
              runOnUiThread { alertClass.lowNetworkAlert() }
+             alertClass?.commonAlert("Download error","Unable to download this file")
+             alertDialog?.dismiss()
          }
         }
         coroutineScope.invokeOnCompletion {
@@ -714,6 +719,8 @@ class DownloadedActivtiy : BaseActivity() {
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
             Log.e("firstCatch",e.message.toString())
+            alertClass?.commonAlert("Download error","Unable to download this file")
+            alertDialog?.dismiss()
         }
 
         var success = true
@@ -817,6 +824,8 @@ class DownloadedActivtiy : BaseActivity() {
             return folder.getAbsolutePath() + "extension"
         }catch (e:Exception){
             Log.e("saveFile",e.toString())
+            alertClass?.commonAlert("Download error","Unable to download this file")
+            alertDialog?.dismiss()
         }
         finally {
             input?.close()
