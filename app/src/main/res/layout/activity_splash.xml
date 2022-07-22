@@ -33,6 +33,16 @@
             android:layout_height="wrap_content"/>
 
     </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/dataSync_tv"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone"
+        android:layout_above="@+id/progressBar" />
+
+
     <ProgressBar
         android:layout_marginBottom="20dp"
         android:layout_centerHorizontal="true"

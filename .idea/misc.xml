@@ -4,6 +4,11 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable-xxxhdpi/box_boarder.xml" value="0.1705" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable-xxxhdpi/ic_mobile.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable-xxxhdpi/ic_profile.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable-xxxhdpi/ic_route.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable-xxxhdpi/ic_specility.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable-xxxhdpi/ic_study.xml" value="0.1515" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/appbackground_selector.xml" value="0.13" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/bottom_navback.xml" value="0.1705" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/bottomsheet_round.xml" value="0.1705" />
@@ -14,11 +19,48 @@
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/eye_close.xml" value="0.151" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/eye_open.xml" value="0.151" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_bell.xml" value="0.1805" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_couple.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_cross.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_display_visual.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_download.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_download_visual.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_education.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_email.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_file.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_gender.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_home.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_home_icon.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_joining.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_landline.xml" value="0.1515" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_launcher_foreground.xml" value="0.1505" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_like.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_login_edit.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_magnifier.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_mail.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_manager.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_meeting.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_menu.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_menu_camera.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_menu_dot.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_menu_gallery.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_menu_slideshow.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_mobilenumber.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_no_wifi.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_notebook.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_palace.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_pincode.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_poweroff.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_refresh.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_state.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_suitcase.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/ic_tick.xml" value="0.1515" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/light_purple_ripple.xml" value="0.1515" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/nav_background_curved.xml" value="0.151" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/round_shape_edit.xml" value="0.151" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/sample_three_icons.xml" value="0.151" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/side_nav_bar.xml" value="0.1515" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/spinner_back.xml" value="0.1" />
+        <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/drawable/spinner_background.xml" value="0.1515" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-sw600dp-land/activity_display_visual.xml" value="0.16" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-sw600dp-land/activity_downloaded_activtiy.xml" value="0.18" />
         <entry key="..\:/Gyanesh/Android_Codes/Android_Native/SalesTrip_running/Salestrip/app/src/main/res/layout-sw600dp-land/activity_edetailing_.xml" value="0.1" />

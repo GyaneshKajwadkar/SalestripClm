@@ -46,6 +46,11 @@ class DoctorGraphModel {
         @SerializedName("dcrCountList")
         @Expose
         var dcrCountList: List<DcrCount> = ArrayList()
+            get() = field
+            set(value) {
+                if(value==null || value.isEmpty())field = ArrayList<DcrCount>()
+                else field = value
+            }
 
         class DcrCount {
          /*   @SerializedName("day")

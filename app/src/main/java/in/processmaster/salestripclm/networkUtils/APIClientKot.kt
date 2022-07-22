@@ -1,5 +1,6 @@
 package `in`.processmaster.salestripclm.networkUtils
 
+import android.util.Log
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -20,7 +21,6 @@ class APIClientKot {
             .readTimeout(100, TimeUnit.SECONDS).build()
         if (parent == 1) commonUrl = "https://app.salestrip.in/api/"
          else  commonUrl = childUrl
-
 
         return Retrofit.Builder()
             .client(client)

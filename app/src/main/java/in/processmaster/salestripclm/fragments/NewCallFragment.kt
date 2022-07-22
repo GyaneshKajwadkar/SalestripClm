@@ -87,6 +87,9 @@ class NewCallFragment : Fragment(),StringInterface {
             initView()
             instance = this
         }
+
+
+
         return views
     }
 
@@ -568,6 +571,7 @@ class NewCallFragment : Fragment(),StringInterface {
 
     fun removeDoneDcrFromList()
     {
+        Log.e("doctorListOne",doctorListArray.size.toString())
         val responseDocCall= HomePage.homePageDataBase?.getApiDetail(5)
         if(!responseDocCall.equals("")) {
 
@@ -599,7 +603,7 @@ class NewCallFragment : Fragment(),StringInterface {
         val rectTempList: ArrayList<SyncModel.Data.Retailer> = ArrayList()
         doctTempList.addAll(doctorListArray)
         rectTempList.addAll(retailerListArray)
-
+        Log.e("doctorListTwo",doctorListArray.size.toString())
         val dcrRetailerList=HomePage.homePageDataBase?.getAllSaveSendRetailer("retailerFeedback")
         val eDetailingArray=HomePage.homePageDataBase?.getAllSaveSend("feedback")
         for ((index,data) in doctTempList.withIndex())
@@ -616,6 +620,8 @@ class NewCallFragment : Fragment(),StringInterface {
                 retailerListArray.remove(data)
             }
         }
+        Log.e("doctorListThree",doctorListArray.size.toString())
+
     }
 
     fun setRetailer(retailerModel:SyncModel.Data.Retailer)

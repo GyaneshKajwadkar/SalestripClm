@@ -32,7 +32,7 @@ class DownloadedFragment : Fragment() {
     var nodownload_tv: TextView?= null
     var isFirstTimeOpen=true
     var getAlleDetailListDb: ArrayList<DevisionModel.Data.EDetailing> = ArrayList()
-    lateinit var views: View
+    var views: View? =null
 
     companion object {
         var adapter : Edetailing_Adapter?=null
@@ -44,9 +44,9 @@ class DownloadedFragment : Fragment() {
     ): View? {
         views = inflater.inflate(R.layout.fragment_downloaded2, container, false)
 
-        recyclerView=views.findViewById(R.id.recyclerView)as RecyclerView
-        nodownload_tv=views.findViewById(R.id.nodownload_tv)as TextView
-        nodata_gif=views.findViewById(R.id.nodata_gif)as ImageView
+        recyclerView=views?.findViewById(R.id.recyclerView)as RecyclerView
+        nodownload_tv=views?.findViewById(R.id.nodownload_tv)as TextView
+        nodata_gif=views?.findViewById(R.id.nodata_gif)as ImageView
         return views
         }
 

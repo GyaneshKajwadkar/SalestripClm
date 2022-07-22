@@ -62,10 +62,10 @@ class LoginActivity : BaseActivity() {
         { userName_et?.setText(sharePreferance?.getPref("userName_login")) }
 
         // userName_et?.setText("NILESH")
-         userName_et?.setText("MEDE0172")
+        // userName_et?.setText("MEDE0172")
         // password_et?.setText("NILESH")
-         password_et?.setText("1@@@sanjaysahu")
-         companyCode_et.setText("UAT2")
+        // password_et?.setText("1@@@sanjaysahu")
+        // companyCode_et.setText("UAT2")
 
         //forgot click
         forgotPass_tv?.setOnClickListener {
@@ -238,22 +238,22 @@ class LoginActivity : BaseActivity() {
         alertClass.showProgressAlert("Verify Company code")
 
         var call: Call<String>? = apiInterface?.checkCompanyCode(
-            companyCode_et?.getText().toString().uppercase()
+            companyCode_et?.getText().toString().uppercase().trim()
         ) as? Call<String>
         call?.enqueue(object : Callback<String?> {
             override fun onResponse(call: Call<String?>?, response: Response<String?>) {
-                Log.e("checkCC_api", response.code().toString() + "")
-                if (response.body().toString().isEmpty()) {
+                Log.e("checkCC_api", response.body().toString())
+                if (response.body().toString().isEmpty() || response.body()==null) {
                     companyCode_et?.setError("Invalid Company code")
                     companyCode_et?.requestFocus()
                 } else {
                     //check and save company code in sp
-                    sharePreferance?.setPref("secondaryUrl", response.body().toString())
-                    sharePreferance?.setPref(
-                        "companyCode",
-                        companyCode_et?.getText().toString().uppercase()
-                    )
-                    checkVersioin_api()
+                   sharePreferance?.setPref("secondaryUrl", response.body().toString())
+                   sharePreferance?.setPref(
+                       "companyCode",
+                       companyCode_et?.getText().toString().uppercase().trim()
+                   )
+                   checkVersioin_api()
                 }
                 alertClass.hideAlert()
             }

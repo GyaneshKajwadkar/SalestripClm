@@ -33,6 +33,11 @@ class SyncModel {
         @SerializedName("routeList")
         @Expose
         var routeList= ArrayList<Route>()
+            get() = field
+            set(value) {
+                if(value==null || value.isEmpty())field = ArrayList<Route>()
+                else field = value
+            }
 
         /*     @SerializedName("specialistList")
              @Expose
@@ -53,18 +58,38 @@ class SyncModel {
         @SerializedName("workTypeList")
         @Expose
         var workTypeList= ArrayList<WorkType>()
+            get() = field
+            set(value) {
+                if(value==null || value.isEmpty())field = ArrayList<WorkType>()
+                else field = value
+            }
 
         @SerializedName("retailerList")
         @Expose
         var retailerList= ArrayList<Retailer>()
+            get() = field
+            set(value) {
+                if(value==null || value.isEmpty())field = ArrayList<Retailer>()
+                else field = value
+            }
 
         @SerializedName("doctorList")
         @Expose
         var doctorList= ArrayList<Doctor>()
+            get() = field
+            set(value) {
+                if(value==null || value.isEmpty())field = ArrayList<Doctor>()
+                else field = value
+            }
 
         @SerializedName("productList")
         @Expose
         var productList= ArrayList<Product>()
+            get() = field
+            set(value) {
+                if(value==null || value.isEmpty())field = ArrayList<Product>()
+                else field = value
+            }
 
         /*   @SerializedName("brandList")
            @Expose
@@ -73,6 +98,11 @@ class SyncModel {
         @SerializedName("workingWithList")
         @Expose
         var workingWithList: ArrayList<WorkingWith>? = ArrayList()
+            get() = field
+            set(value) {
+                if(value==null || value.isEmpty())field = ArrayList<WorkingWith>()
+                else field = value
+            }
 
         /*   @SerializedName("expenseListTypeWiseList")
            @Expose
@@ -81,6 +111,11 @@ class SyncModel {
             @SerializedName("fieldStaffTeamList")
             @Expose
             var fieldStaffTeamList: ArrayList<FieldStaffTeam>? = null
+                get() = field
+                set(value) {
+                    if(value==null || value.isEmpty())field = ArrayList<FieldStaffTeam>()
+                    else field = value
+                }
 
         /*      @SerializedName("doctorFieldConfigDict")
               @Expose
@@ -113,6 +148,11 @@ class SyncModel {
         @SerializedName("schemeList")
         @Expose
         var schemeList: ArrayList<Scheme>? = null
+            get() = field
+            set(value) {
+                if(value==null || value.isEmpty())field = ArrayList<Scheme>()
+                else field = value
+            }
 
         /*  class Brand {
               @SerializedName("brandId")

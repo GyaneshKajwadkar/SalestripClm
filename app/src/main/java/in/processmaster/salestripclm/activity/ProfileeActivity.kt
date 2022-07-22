@@ -248,7 +248,8 @@ class ProfileeActivity : BaseActivity() {
                         .apply(
                             RequestOptions().centerCrop()
                                 .circleCrop()
-                                .placeholder(R.drawable.zm_menu_icon_profile)
+                                .placeholder(R.mipmap.ic_launcher)
+                                .error(R.mipmap.ic_launcher)
                         )
                         .into(changeProfilePic_civ)
                     updateProfilePic()
@@ -479,8 +480,8 @@ class ProfileeActivity : BaseActivity() {
 
             val options: RequestOptions = RequestOptions()
                 .centerCrop()
-                .placeholder(android.R.mipmap.sym_def_app_icon)
-                .error(android.R.mipmap.sym_def_app_icon)
+                .placeholder(R.mipmap.ic_launcher)
+                .error(R.mipmap.ic_launcher)
 
             Glide.with(this@ProfileeActivity).load(getObject?.absolutePath).apply(options)
                 .into(changeProfilePic_civ!!)
@@ -516,6 +517,10 @@ class ProfileeActivity : BaseActivity() {
 
             name_tv.setText(getObject?.fullName)
             designation_tv.setText(getObject?.hierDesc)
+        }
+        else{
+            parentProfile_ll.visibility=View.GONE
+            noProfileData_tv.visibility=View.VISIBLE
         }
     }
 

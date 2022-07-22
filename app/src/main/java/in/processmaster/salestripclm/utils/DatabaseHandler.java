@@ -455,6 +455,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             values.put(KEY_ID, id);
             db.insert(TABLE_SAVE_API, null, values);
         }
+        else{Log.e("update","addApiDataUpdate");}
         //db.close();
 
     }

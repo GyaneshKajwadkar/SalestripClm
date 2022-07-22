@@ -21,7 +21,7 @@ class NewDownloadsFragment : Fragment() {
     var nodownload_tv: TextView?= null
     var getAlleDetailListDb: ArrayList<DevisionModel.Data.EDetailing> = ArrayList()
     var isFirstTimeOpen=true
-    lateinit var views:View
+    var views: View?= null
     companion object { var adapter : Edetailing_Adapter?=null }
 
     override fun onCreateView(
@@ -32,8 +32,8 @@ class NewDownloadsFragment : Fragment() {
         // Inflate the layout for this fragment
          views= inflater.inflate(R.layout.fragment_new_downloads, container, false)
 
-        recyclerView=views.findViewById(R.id.recyclerView)as RecyclerView
-        nodownload_tv=views.findViewById(R.id.nodownload_tv)as TextView
+        recyclerView=views?.findViewById(R.id.recyclerView)as RecyclerView
+        nodownload_tv=views?.findViewById(R.id.nodownload_tv)as TextView
         return views
     }
 

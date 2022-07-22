@@ -58,27 +58,27 @@ class ShowDownloadedFragment : Fragment() {
         var currentDate = ""
     }
 
-    lateinit var views : View
+    var views : View?= null
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
         views= inflater.inflate(R.layout.fragment_show_downloaded, container, false)
-        video_rv=views.findViewById(R.id.video_rv)
-        images_rv=views.findViewById(R.id.images_rv)
-        html_rv=views.findViewById(R.id.html_rv)
-        nodata_gif=views.findViewById(R.id.nodata_gif)
+        video_rv=views?.findViewById(R.id.video_rv)
+        images_rv=views?.findViewById(R.id.images_rv)
+        html_rv=views?.findViewById(R.id.html_rv)
+        nodata_gif=views?.findViewById(R.id.nodata_gif)
        // topSearchParent=views.findViewById(R.id.topSearchParent)
 
-        nestedScroll=views.findViewById(R.id.nestedScroll)
+        nestedScroll=views?.findViewById(R.id.nestedScroll)
       //  filterFavList_et=views.findViewById(R.id.filterFavList_et)
 
-        selection_tv=views.findViewById(R.id.selection_tv)
+        selection_tv=views?.findViewById(R.id.selection_tv)
 
-        videoView_parent=views.findViewById(R.id.videoView_parent)
-        images_parent=views.findViewById(R.id.images_parent)
-        html_parent=views.findViewById(R.id.html_parent)
+        videoView_parent=views?.findViewById(R.id.videoView_parent)
+        images_parent=views?.findViewById(R.id.images_parent)
+        html_parent=views?.findViewById(R.id.html_parent)
 
         db = DatabaseHandler.getInstance(activity?.applicationContext)
 

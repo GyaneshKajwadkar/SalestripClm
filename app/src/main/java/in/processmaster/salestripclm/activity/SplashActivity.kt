@@ -2,6 +2,7 @@ package `in`.processmaster.salestripclm.activity
 
 import `in`.processmaster.salestripclm.networkUtils.ConnectivityChangeReceiver
 import `in`.processmaster.salestripclm.R
+import `in`.processmaster.salestripclm.common_classes.AlertClass
 import `in`.processmaster.salestripclm.models.LoginModel
 import `in`.processmaster.salestripclm.models.SyncModel
 import `in`.processmaster.salestripclm.networkUtils.APIClientKot
@@ -9,15 +10,18 @@ import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
 import `in`.processmaster.salestripclm.utils.PreferenceClass
 import android.content.Intent
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.os.*
 import android.util.Log
+import android.view.View
 import android.widget.ProgressBar
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.gson.Gson
+import kotlinx.android.synthetic.main.activity_splash.*
 import kotlinx.coroutines.*
+import java.io.File
+import java.lang.Runnable
 
 
 class SplashActivity : BaseActivity()
@@ -50,7 +54,25 @@ class SplashActivity : BaseActivity()
                 val token: String = task.getResult().toString()
                 Log.e("TOKEN",token)
             })*/
+
+        val getDeviceMemory= getAvailableInternalMemorySize()
+        Log.e("deviceMemory",getDeviceMemory.toString())
+        if(getDeviceMemory<1)
+        {
+            val r: Runnable = object : Runnable {
+                override fun run() {
+                    if(AlertClass.retunDialog) finish()
+                }
+            }
+            alertClass.commonAlertWithRunnable("OOps...","Your device is running low on memory. Please delete some file" +
+                    " and try again later",r)
+            return
+        }
+
+
         dbBase= DatabaseHandler.getInstance(applicationContext)
+
+
 
         if(sharePreferance?.getPrefBool("isLogin") == true)
         {
@@ -59,7 +81,16 @@ class SplashActivity : BaseActivity()
             {
                 generalClass.enableSimpleProgress(progressBar!!)
                 val coroutineScope= CoroutineScope(Dispatchers.IO).launch {
-                    val syncSmallData= async {  staticSyncData= dbBase?.getSYNCApiData(0)
+
+                    val syncSmallData= async {
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            runOnUiThread {
+                                dataSync_tv.setText("Please wait.... Data sync in progress")
+                                dataSync_tv.visibility= View.VISIBLE
+                            }
+                        },5000)
+
+                        staticSyncData= dbBase?.getSYNCApiData(0)
                     }
                     syncSmallData.await()
                 }
@@ -109,7 +140,7 @@ class SplashActivity : BaseActivity()
                 val intent = Intent(this, LoginActivity::class.java)
                 startActivity(intent)
                 finish()
-            }, 2000)
+            }, 1000)
         }
 
     }
@@ -121,12 +152,40 @@ class SplashActivity : BaseActivity()
         val response = APIClientKot().getUsersService(2, sharePreferanceBase?.getPref("secondaryUrl")!!
         ).syncApiCoo("bearer " + loginModel?.accessToken)
 
+        Handler(Looper.getMainLooper()).postDelayed({
+            runOnUiThread {
+                dataSync_tv.setText("Please wait.... Data sync in progress")
+                dataSync_tv.visibility= View.VISIBLE
+            }
+        },5000)
 
         withContext(Dispatchers.IO) {
             var intent=Intent()
                 if (response?.code() == 200 && !response.body().toString().isEmpty())
                 {
                     staticSyncData = response.body()?.data
+                    val apiModel=response.body()?.data
+                    val gson=Gson()
+
+                    runBlocking {
+                        withContext(Dispatchers.IO) {
+                            launch {  dbBase?.deleteAll_SYNCAPI() }
+                        }
+                    }
+                    runBlocking {
+                        withContext(Dispatchers.IO){
+                            launch { dbBase?.addSYNCAPIData(gson.toJson(apiModel?.settingDCR),
+                                gson.toJson(apiModel?.workTypeList),"",
+                                "",gson.toJson(apiModel?.workingWithList),gson.toJson(apiModel?.fieldStaffTeamList),""
+                                ,apiModel?.configurationSetting, gson.toJson(apiModel?.schemeList),
+                                "",0, gson.toJson(apiModel?.doctorList)) }
+                            launch {   dbBase?.addRoutes(apiModel?.routeList) }
+                            launch {  dbBase?.addRetailer(apiModel?.retailerList) }
+                            launch {  dbBase?.addProduct(apiModel?.productList)  }
+
+                        }
+                    }
+
                     intent = Intent(this@SplashActivity, HomePage::class.java)
                 }
                 else
@@ -144,5 +203,23 @@ class SplashActivity : BaseActivity()
         super.onDestroy()
     }
 
+    fun getAvailableInternalMemorySize(): Long {
+        val path: File = Environment.getDataDirectory()
+        val stat = StatFs(path.path)
+        val blockSize: Long
+        val availableBlocks: Long
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            blockSize = stat.getBlockSizeLong()
+            availableBlocks = stat.getAvailableBlocksLong()
+        } else {
+            blockSize = stat.getBlockSize().toLong()
+            availableBlocks = stat.getAvailableBlocks().toLong()
+        }
+        val convertByteIntoMb=availableBlocks * blockSize
+        val getInKb= convertByteIntoMb/1000
+        val getInMb= getInKb/1000
+        val getInGb= getInMb/1000
+        return getInGb
+    }
 
 }

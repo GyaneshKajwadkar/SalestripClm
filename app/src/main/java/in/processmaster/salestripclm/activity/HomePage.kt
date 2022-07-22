@@ -9,9 +9,7 @@ import `in`.processmaster.salestripclm.fragments.EdetailingDownloadFragment
 import `in`.processmaster.salestripclm.fragments.HomeFragment
 import `in`.processmaster.salestripclm.fragments.NewCallFragment
 import `in`.processmaster.salestripclm.fragments.PresentEDetailingFrag
-import `in`.processmaster.salestripclm.models.CommonModel
-import `in`.processmaster.salestripclm.models.DevisionModel
-import `in`.processmaster.salestripclm.models.LoginModel
+import `in`.processmaster.salestripclm.models.*
 import `in`.processmaster.salestripclm.networkUtils.APIClientKot
 import `in`.processmaster.salestripclm.networkUtils.APIInterface
 import `in`.processmaster.salestripclm.utils.DatabaseHandler
@@ -24,14 +22,17 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.os.StatFs
 import android.util.Log
-import android.view.*
+import android.view.Gravity
+import android.view.MenuItem
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.view.menu.MenuBuilder
-import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
@@ -40,19 +41,17 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.navigation.NavigationView
 import com.google.gson.Gson
-import com.google.gson.JsonObject
 import kotlinx.android.synthetic.main.activity_home_page.*
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import org.json.JSONObject
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import us.zoom.sdk.ZoomSDK
+import java.io.BufferedWriter
 import java.io.File
+import java.io.FileWriter
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/*, UserLoginCallback.ZoomDemoAuthenticationListener , MeetingServiceListener, InitAuthSDKCallback*/
@@ -67,6 +66,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
     var firstCall=false
     private var isAutoDownload = false
     var secondaryUrl=""
+    var isApiWorkOk=true
 
     companion object {
         var loginModelHomePage= LoginModel()
@@ -126,6 +126,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             else {isAutoDownload=true}
             homePageSharePref?.setPrefBool("isAutoDownload", isAutoDownload)
         })
+
     }
 
     @SuppressLint("RestrictedApi")
@@ -174,6 +175,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             alertClass?.commonAlert("Server error","Something went wrong please Sync data or try again later")
             return@OnNavigationItemSelectedListener true
         }
+
         when (item.itemId) {
             R.id.landingPage -> {
                 toolbarTv?.setText("Salestrip CLM")
@@ -183,7 +185,13 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                 return@OnNavigationItemSelectedListener true
             }
 
+
             R.id.downloadVisualPage -> {
+
+                if(isApiWorkOk==false && generalClass.isInternetAvailable()) {
+                    alertClass.commonAlert("Server error","Please sync data or try again later")
+                    return@OnNavigationItemSelectedListener true
+                }
 
                 if(::objDownloadManager.isInitialized && generalClass.isInternetAvailable() && DownloadManagerClass.cancelAutoDownload==false)
                 {
@@ -213,6 +221,12 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             }
 
             R.id.callPage->{
+
+                if(isApiWorkOk==false && generalClass.isInternetAvailable()) {
+                    alertClass.commonAlert("Server error","Please sync data or try again later")
+                    return@OnNavigationItemSelectedListener true
+                }
+
                 if(::objDownloadManager.isInitialized && generalClass.isInternetAvailable() && DownloadManagerClass.cancelAutoDownload==false)
                 {
                     if(objDownloadManager?.getNumber<objDownloadManager?.allProductList.size)
@@ -283,7 +297,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             stopDownload=true
 
             homePageSharePref?.setPrefBool("isLogin", false)
-
+            staticSyncData= SyncModel.Data()
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
             finish()
@@ -324,7 +338,9 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
               }
 
                 R.id.sync_menu -> {
-                    if (generalClass.isInternetAvailable()) callingMultipleAPI() //  sync_api()
+                    if (generalClass.isInternetAvailable()) {
+                        isApiWorkOk = true; callingMultipleAPI("sync")
+                    }
                     else alertClass.networkAlert()
                     drawer_layout?.closeDrawers()
                     return false
@@ -353,15 +369,28 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                 { logoutAppAlert() }
 
                 R.id.nav_createpob -> {
-                    var intent = Intent(this, CreatePobActivity::class.java)
-                    intent.putExtra("action","pob")
-                    startActivity(intent)
+
+                    if(isApiWorkOk==false && generalClass.isInternetAvailable()) {
+                        alertClass.commonAlert("Server error","Please sync data or try again later")
+                    }
+                    else
+                    {
+                        var intent = Intent(this, CreatePobActivity::class.java)
+                        intent.putExtra("action","pob")
+                        startActivity(intent)
+                    }
                 }
 
                 R.id.nav_sob -> {
-                    var intent = Intent(this, CreatePobActivity::class.java)
-                    intent.putExtra("action","stock")
-                    startActivity(intent)
+                    if(isApiWorkOk==false && generalClass.isInternetAvailable()) {
+                        alertClass.commonAlert("Server error","Please sync data or try again later")
+                    }
+                    else
+                    {
+                        var intent = Intent(this, CreatePobActivity::class.java)
+                        intent.putExtra("action","stock")
+                        startActivity(intent)
+                    }
                 }
             }
 
@@ -387,13 +416,10 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         stopConnectivity(this)
     }
 
-    fun callingMultipleAPI()
+    fun callingMultipleAPI( usingSync :String ="")
     {
         alertClass.showProgressAlert("")
         var isException=false
-    //    if (dbBase.getDatasCount() > 0) {
-
-       // }
 
         val coroutineScope= CoroutineScope(IO+ generalClass.coroutineExceptionHandler).launch {
 
@@ -403,14 +429,22 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             }
             catch (e:Exception)
             {
+                Log.e("sdfhsidfhsdifusd",e.message.toString())
                 isException=true
                 alertClass.hideAlert()
                 alertClass.lowNetworkAlert()
             }
 
             try {
-                val sync= async { callingSyncAPI() }
-                val deleteItem= async {  dbBase?.deleteAll() }
+
+                if (usingSync != "" || staticSyncData?.doctorList==null || staticSyncData?.doctorList?.size==0 )
+                {
+                    val sync= async { callingSyncAPI() }
+                    sync.await()
+                }
+
+
+                val deleteItem= async {  /*dbBase?.deleteAll()*/ }
                 val divisionApi =async { callingDivisionAPI() }
                 val quantityApi= async { getQuantityAPI() }
                 val doctorGraphApi= async { getDoctorGraphAPI() }
@@ -431,7 +465,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
                 }*/
                 deleteItem.await()
-                sync.await()
+
                 divisionApi.await()
                // scheduleApi.await()
                 quantityApi.await()
@@ -441,6 +475,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             }
             catch (e:Exception)
             {
+                isException=true
                 alertClass.hideAlert()
                 alertClass.commonAlert("OOps!","Something went wrong please try again later.")
             }
@@ -452,8 +487,13 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             {
                 this.runOnUiThread(java.lang.Runnable {
                     alertClass.hideAlert()
+
                     if(!firstCall) initView()
                     firstCall=true
+
+                    if(isApiWorkOk==false) {
+                        alertClass.commonAlert("Server error","Please sync data or try again later")
+                    }
 
                     bottomNavigation?.selectedItemId= R.id.landingPage
                     //  generalClass.disableProgress(progressView_parentRv!!)
@@ -497,12 +537,12 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                 ).detailingApiCoo( "bearer " + loginModelHomePage.accessToken, jsonObject.getString(
                     "Division"
                 ))
-
         if (response?.isSuccessful == true) {
             if (response?.code() == 200 && !response.body().toString().isEmpty()) {
 
-                     if(response.body()?.getData()?.geteDetailingList()==null)
-                    {  }
+                     if(response.body()?.getData()?.geteDetailingList()==null && response.body()?.data?.geteDetailingList()?.size==0)
+                    { isApiWorkOk=false
+                     Log.e("sdgsdfgsdfgdfgf","sdfsdfsdfsdfsdf")}
                     else{
                         for ((index, value) in response.body()?.getData()?.geteDetailingList()?.withIndex()!!) {
                                      //store edetailing data to db
@@ -513,7 +553,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                                      )
                                  }
                                  // clear database
-                                 for (dbList in dbBase!!?.getAlleDetail()) {
+                                 for (dbList in dbBase?.getAlleDetail()!!) {
                                      var isSet = false
                                      for (mainList in response.body()?.getData()?.geteDetailingList()!!) {
                                          if (mainList.geteDetailId() == dbList.geteDetailId()) {
@@ -553,10 +593,14 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                     }
             }
         }
+        else {
+            isApiWorkOk = false;
+        }
     }
 
     suspend fun callingSyncAPI()
     {
+        Log.e("callingSyncApi","abc")
         val response = APIClientKot().getUsersService(2, secondaryUrl
                 ).syncApiCoo("bearer " + loginModelHomePage.accessToken)
         if (response?.isSuccessful == true)
@@ -571,7 +615,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                         launch {  dbBase?.deleteAll_SYNCAPI() }
                     }
                 }
-
                 withContext(Dispatchers.IO){
                         launch { dbBase?.addSYNCAPIData(gson.toJson(apiModel?.settingDCR),
                             gson.toJson(apiModel?.workTypeList),"",
@@ -596,6 +639,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         }
         else
         {   Log.e("responseERROR", response?.errorBody().toString())
+            isApiWorkOk=false
             generalClass.checkInternet()
         }
     }
@@ -612,10 +656,17 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                     val gson = Gson()
                     var model = response.body()
                     dbBase?.addAPIData(gson.toJson(model?.getData()), 3)
+
                 }
-                else Log.e("elsequantitiveAPI", response.code().toString())
+                else {
+                    Log.e("elsequantitiveAPI", response.code().toString())
+                    isApiWorkOk =false
+                }
             }
-            else Log.e("quantitiveAPIERROR", response?.errorBody().toString())
+            else {
+                Log.e("quantitiveAPIERROR", response?.errorBody().toString())
+                isApiWorkOk = false
+            }
     }
 
     //exit app alert
@@ -674,9 +725,9 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                     var model = response.body()
                     dbBase?.addAPIData(Gson().toJson(model?.getData()), 4)
                 }
-                else Log.e("elseDoctorGraphAPI", response.code().toString())
+                else Log.e("elseDoctorGraphAPI", response.code().toString());
             }
-            else Log.e("DoctorGraphERROR", response?.errorBody().toString())
+            else Log.e("DoctorGraphERROR", response?.errorBody().toString());
 
     }
 
@@ -691,13 +742,17 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             {
                 if (response.code() == 200 && response.body()?.getErrorObj()?.errorMessage?.isEmpty() == true) {
                     var model = response.body()
-                    withContext(Dispatchers.Main) {
-                        launch {   dbBase?.addAPIData(Gson().toJson(model?.getData()), 6) }
+                    if(model?.getData()?.users!=null && model?.getData()?.users?.size!=0)
+                    {
+
+                        withContext(Dispatchers.IO) {
+                          launch {   dbBase?.addAPIData(Gson().toJson(model?.getData()), 6) }
+                      }
                     }
                 }
-                else Log.e("elseProfileAPI", response.code().toString())
+                else Log.e("elseProfileAPI", response.code().toString()) ;
             }
-            else Log.e("getProfileAPIERROR", response?.errorBody().toString())
+            else Log.e("getProfileAPIERROR", response?.errorBody().toString());
     }
 
     fun getFragmentRefreshListener(): FragmentRefreshListener? {
@@ -729,5 +784,31 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
         openFragment(fragment)
         openFragmentStr = "CallsFragment"
     }
+
+    // save json response to storage for read data
+    private fun saveJsonToFile(fileName: String, jsonString: String?) {
+
+        val file = File(getFilesDir(), "FILE_NAME")
+        val fileWriter = FileWriter(file)
+        val bufferedWriter = BufferedWriter(fileWriter)
+        bufferedWriter.write(jsonString)
+        bufferedWriter.close()
+        Log.e("sfuiosduifsdighsduif",file.absolutePath)
+  /*      return try {
+            val fos: FileOutputStream = openFileOutput(fileName, MODE_PRIVATE)
+            if (jsonString != null) {
+                fos.write(jsonString.toByteArray())
+            }
+            fos.close()
+            true
+        } catch (fileNotFound: FileNotFoundException) {
+            false
+        } catch (ioException: IOException) {
+            false
+        }*/
+    }
+
+
+
 
 }
