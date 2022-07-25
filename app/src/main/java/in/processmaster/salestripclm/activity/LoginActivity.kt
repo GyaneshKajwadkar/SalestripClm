@@ -292,7 +292,7 @@ class LoginActivity : BaseActivity() {
                         if(verionLower!= null &&  versionHigher!=null && version!=null)
                         {
                             if( version < verionLower ||version > versionHigher ) {
-                                needUpdateAlert()
+                               // needUpdateAlert()
                             }
                         }
 

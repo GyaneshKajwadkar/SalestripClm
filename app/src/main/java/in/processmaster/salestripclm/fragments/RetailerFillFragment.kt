@@ -178,7 +178,8 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
         vParent.doctorTwo_et.setOnClickListener {
             if(saveRcpaDetailList1.size==0)
             {
-                homePageGeneralClass?.showSnackbar(it ,"Doctor 1 brand detail is empty")
+                homePageGeneralClass?.showSnackbar(it ,"Doctor 1 brand detail is e" +
+                        "mpty")
                 return@setOnClickListener
             }
             selectDoctorManager_alert(20)}
@@ -791,8 +792,16 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
             }
 
             if(localSelection==3)
-            { giftArray= ArrayList<IdNameBoll_model>()
-                giftArray.addAll(passingArrayList)
+            {   //giftArray= ArrayList<IdNameBoll_model>()
+                //giftArray.addAll(passingArrayList)
+
+                for((index,data) in giftArray.withIndex())
+                {
+                    for(passingData in passingArrayList)
+                    {
+                        if(passingData.id==data.id) giftArray.set(index,passingData)
+                    }
+                }
 
                 var sendingList = giftArray?.filter { s -> s.isChecked == true }
 

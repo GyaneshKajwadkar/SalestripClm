@@ -917,6 +917,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             saveModel.productList = ArrayList()
             saveModel.eDetailList=edetailingEditModel.eDetailList
             saveModel.productList=edetailingEditModel.productList
+            edetailingEditModel.productList?.let { productList.addAll(it) }
         }
         else
         {
@@ -1189,8 +1190,17 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         }
         if(localSelection==2)
         {
-            sampleArray= ArrayList<IdNameBoll_model>()
-            sampleArray.addAll(passingArrayList)
+          //  sampleArray= ArrayList<IdNameBoll_model>()
+
+            for((index,data) in sampleArray.withIndex())
+            {
+                for(passingData in passingArrayList)
+                {
+                    if(passingData.id==data.id) sampleArray.set(index,passingData)
+                }
+            }
+
+          //  sampleArray.addAll(passingArrayList)
             if(isUpdate) {
                 var sendingList = sampleArray?.filter { s -> s.isChecked == true }
                 sample_rv.adapter =TextWithEditAdapter(
@@ -1205,8 +1215,18 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             }
         }
         if(localSelection==3)
-        { giftArray= ArrayList<IdNameBoll_model>()
-            giftArray.addAll(passingArrayList)
+        {
+            for((index,data) in giftArray.withIndex())
+            {
+                for(passingData in passingArrayList)
+                {
+                    if(passingData.id==data.id) giftArray.set(index,passingData)
+                }
+            }
+
+
+          //  giftArray= ArrayList<IdNameBoll_model>()
+          //  giftArray.addAll(passingArrayList)
             if(isUpdate) {
                 var sendingList = giftArray?.filter { s -> s.isChecked == true }
                 gift_rv.adapter = TextWithEditAdapter(
