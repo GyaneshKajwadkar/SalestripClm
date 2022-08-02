@@ -16,7 +16,6 @@ import android.view.View
 import android.widget.ProgressBar
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
-import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_splash.*
 import kotlinx.coroutines.*
@@ -165,7 +164,9 @@ class SplashActivity : BaseActivity()
                 {
                     staticSyncData = response.body()?.data
                     val apiModel=response.body()?.data
-                    val gson=Gson()
+                    insertSyncData(apiModel)
+
+                  /*  val gson=Gson()
 
                     runBlocking {
                         withContext(Dispatchers.IO) {
@@ -184,7 +185,7 @@ class SplashActivity : BaseActivity()
                             launch {  dbBase?.addProduct(apiModel?.productList)  }
 
                         }
-                    }
+                    }*/
 
                     intent = Intent(this@SplashActivity, HomePage::class.java)
                 }

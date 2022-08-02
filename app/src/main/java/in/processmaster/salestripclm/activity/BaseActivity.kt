@@ -608,4 +608,28 @@ open class BaseActivity : AppCompatActivity(){
         })
     }
 
+    fun insertSyncData(apiModel: SyncModel.Data?)
+    {
+        val gson=Gson()
+
+        runBlocking {
+            withContext(Dispatchers.IO) {
+                launch {  dbBase?.deleteAll_SYNCAPI() }
+            }
+        }
+        runBlocking {
+            withContext(Dispatchers.IO){
+                launch { dbBase?.addSYNCAPIData(gson.toJson(apiModel?.settingDCR),
+                    gson.toJson(apiModel?.workTypeList),"",
+                    "",gson.toJson(apiModel?.workingWithList),gson.toJson(apiModel?.fieldStaffTeamList),""
+                    ,apiModel?.configurationSetting, gson.toJson(apiModel?.schemeList),
+                    "",0, gson.toJson(apiModel?.doctorList)) }
+                launch {   dbBase?.addRoutes(apiModel?.routeList) }
+                launch {  dbBase?.addRetailer(apiModel?.retailerList) }
+                launch {  dbBase?.addProduct(apiModel?.productList)  }
+
+            }
+        }
+    }
+
 }

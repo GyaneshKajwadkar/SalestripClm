@@ -1003,7 +1003,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
         quantityArray: ArrayList<CommonModel.QuantityModel.Data.EmployeeSampleBalance>
     ) {
 
-       Log.e("isgfuiosgfiosgfuisf",Gson().toJson(saveModel))
+    //   Log.e("isgfuiosgfiosgfuisf",Gson().toJson(saveModel))
       // return
 
         alertClass?.showProgressAlert("")
@@ -1757,6 +1757,7 @@ class SubmitE_DetailingActivity : BaseActivity(), IdNameBoll_interface, PobProdu
             rcpaOrSamples_mb.setBackgroundTintList(this?.let { it1 -> ContextCompat.getColorStateList(it1, R.color.appColor) })
             rcpaOrSamples_mb.setTextColor(this?.let { it1 -> ContextCompat.getColorStateList(it1, R.color.white) })
             selectBtn.setText("Select Samples")
+            selectHeader_tv?.setText("Select Samples")
             sample_rv.visibility=View.VISIBLE
             if(checkIsDcrSave)selectBtn.visibility=View.GONE
             else selectBtn.visibility=View.VISIBLE

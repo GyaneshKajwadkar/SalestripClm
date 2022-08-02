@@ -213,6 +213,17 @@ class CreatePobActivity : BaseActivity(), IdNameBoll_interface, productTransfer,
                     SplashActivity.staticSyncData?.doctorList?.let   { doctorListArray.addAll(it) }
                     SplashActivity.staticSyncData?.retailerList?.let { retailerListArray.addAll(it) }
                     SplashActivity.staticSyncData?.fieldStaffTeamList?.let { teamsList.addAll(it) }
+
+                    val iterator = teamsList.iterator()
+                    while(iterator.hasNext()){
+                        val item = iterator.next()
+                        if(item.empId == HomePage.loginModelHomePage.empId){
+                            iterator.remove()
+                        }
+                        else if(item.hierachyCode=="ABM"){
+                            iterator.remove()
+                        }
+                    }
                 }
                 filterFour.await()
             }

@@ -184,7 +184,7 @@ class RetailerFillFragment() : Fragment(), IdNameBoll_interface, PobProductTrans
             }
             selectDoctorManager_alert(20)}
 
-        vParent.doctorThree_et.setOnClickListener {
+         vParent.doctorThree_et.setOnClickListener {
             if(saveRcpaDetailList1.size==0) {
                 homePageGeneralClass?.showSnackbar(it ,"Doctor 1 brand detail is empty")
                 return@setOnClickListener

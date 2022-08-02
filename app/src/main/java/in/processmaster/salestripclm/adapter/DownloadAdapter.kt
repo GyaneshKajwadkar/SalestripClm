@@ -60,8 +60,9 @@ class DownloadAdapter constructor() :
     var brandName=""
     var parentId=0
     var arraylistVideo: ArrayList<DownloadFileModel> = ArrayList()
+    var alertDialog: AlertDialog?=null
 
-    constructor(context: DownloadedActivtiy, downloadedType: String, parentId: Int, brandName: String, arraylistVideo: ArrayList<DownloadFileModel>, eDetailingId: String) : this()
+    constructor(context: DownloadedActivtiy, downloadedType: String, parentId: Int, brandName: String, arraylistVideo: ArrayList<DownloadFileModel>, eDetailingId: String, alertDialog : AlertDialog?) : this()
     {
         this.context=context
         this.downloadedType=downloadedType
@@ -69,11 +70,12 @@ class DownloadAdapter constructor() :
         this.brandName= brandName
         this.arraylistVideo= arraylistVideo
         this.eDetailingId= eDetailingId
+        this.alertDialog= alertDialog
     }
 
     var progressBarAlert: ProgressBar?=null
     var textViewAlert:TextView?=null
-    var alertDialog: AlertDialog?=null
+
 
 
 

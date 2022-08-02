@@ -37,11 +37,13 @@
             android:name=".activity.CreatePobActivity"
             android:exported="false"
             android:screenOrientation="landscape"
+            android:resizeableActivity="false"
             android:windowSoftInputMode="stateHidden"/>
         <activity
             android:name=".activity.CreatePresentationActivity"
             android:exported="false"
             android:screenOrientation="landscape"
+            android:resizeableActivity="false"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activity.MeetingActivity"
@@ -49,57 +51,68 @@
             android:hardwareAccelerated="true"
             android:launchMode="singleTop"
             android:screenOrientation="landscape"
+            android:resizeableActivity="false"
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".activity.SubmitE_DetailingActivity"
             android:screenOrientation="landscape"
+            android:resizeableActivity="false"
             android:windowSoftInputMode="stateHidden|adjustPan" />
         <activity
             android:name=".activity.MailActivity"
             android:launchMode="singleTop"
             android:screenOrientation="landscape"
+            android:resizeableActivity="false"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activity.OnlinePresentationActivity"
             android:launchMode="singleTop"
             android:screenOrientation="landscape"
+            android:resizeableActivity="false"
             android:windowSoftInputMode="stateHidden" />
         <activity android:name=".activity.AllDataSharingActivity" />
         <activity
             android:name=".activity.ProfileeActivity"
             android:launchMode="singleTop"
             android:screenOrientation="landscape"
+            android:resizeableActivity="false"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activity.SetSchedule_Activity"
             android:launchMode="singleTop"
             android:screenOrientation="landscape"
+            android:resizeableActivity="false"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activity.PhotoSlideShowActivity"
             android:launchMode="singleTop"
             android:screenOrientation="landscape"
+            android:resizeableActivity="false"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activity.VideoPlayerActivity"
             android:launchMode="singleTop"
             android:screenOrientation="landscape"
+            android:resizeableActivity="false"
             android:theme="@style/Theme.Salestrip.NoActionBar"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activity.ImageSelectorActivity"
             android:launchMode="singleTop"
             android:screenOrientation="landscape"
+            android:resizeableActivity="false"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activity.WebViewActivity"
             android:launchMode="singleTop"
             android:screenOrientation="landscape"
+            android:resizeableActivity="false"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activity.DownloadedActivtiy"
             android:launchMode="singleTop"
             android:screenOrientation="landscape"
+            android:resizeableActivity="false"
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".activity.BaseActivity" />
         <activity
@@ -107,16 +120,19 @@
             android:label="@string/title_activity_home_page"
             android:launchMode="singleTop"
             android:screenOrientation="landscape"
+            android:resizeableActivity="false"
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".activity.ForgotActivity"
             android:launchMode="singleTop"
             android:screenOrientation="landscape"
+            android:resizeableActivity="false"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activity.LoginActivity"
             android:launchMode="singleTop"
             android:screenOrientation="landscape"
+            android:resizeableActivity="false"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activity.SplashActivity"
@@ -135,6 +151,7 @@
             android:exported="true"
             android:hardwareAccelerated="true"
             android:launchMode="singleTop"
+            android:resizeableActivity="false"
             android:screenOrientation="landscape"
             android:windowSoftInputMode="stateHidden">
             <intent-filter>

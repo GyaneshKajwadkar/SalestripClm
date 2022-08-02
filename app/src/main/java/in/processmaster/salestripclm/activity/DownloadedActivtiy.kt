@@ -164,21 +164,22 @@ class DownloadedActivtiy : BaseActivity() {
 
         toolbarText_tv?.setText(brandName)
 
-        adapterVideo= DownloadAdapter(this, "VIDEO", brandId,brandName,arraylistVideoD,eDetailingId)
+        adapterVideo= DownloadAdapter(this, "VIDEO", brandId,brandName,arraylistVideoD,eDetailingId,alertDialog)
         video_rv?.layoutManager = GridLayoutManager(this, 5)
         video_rv?.itemAnimator = DefaultItemAnimator()
         video_rv?.adapter = adapterVideo
 
-        adapterImage= DownloadAdapter(this, "IMAGE", brandId,brandName,arraylistImagesD,eDetailingId)
+        adapterImage= DownloadAdapter(this, "IMAGE", brandId,brandName,arraylistImagesD,eDetailingId,alertDialog)
         images_rv?.layoutManager = GridLayoutManager(this, 5)
         images_rv?.itemAnimator = DefaultItemAnimator()
         images_rv?.adapter = adapterImage
 
-        adapterWeb= DownloadAdapter(this, "ZIP", brandId,brandName,arraylistZipD,eDetailingId)
+        adapterWeb= DownloadAdapter(this, "ZIP", brandId,brandName,arraylistZipD,eDetailingId,alertDialog)
         html_rv?.layoutManager = GridLayoutManager(this, 5)
         html_rv?.itemAnimator = DefaultItemAnimator()
         html_rv?.adapter = adapterWeb
 
+        alertClass = AlertClass(this)
 
         if(arraylistVideoD.size==0)
         {
@@ -588,7 +589,7 @@ class DownloadedActivtiy : BaseActivity() {
     override fun onResume() {
         super.onResume()
         createConnectivity(this)
-        alertClass = AlertClass(this)
+
 
     }
 
@@ -614,7 +615,7 @@ class DownloadedActivtiy : BaseActivity() {
 
     }
 
-    fun notifyDataChange(type:String, position: Int)
+/*    fun notifyDataChange(type:String, position: Int)
     {
         if(type=="IMAGE")
         {
@@ -636,7 +637,7 @@ class DownloadedActivtiy : BaseActivity() {
         }
 
 
-    }
+    }*/
 
     fun newDownloadMethod(model: DownloadFileModel, position: Int, type: String , arrayListtype: ArrayList<DownloadFileModel>, downloadType: String)
     {
@@ -847,6 +848,10 @@ class DownloadedActivtiy : BaseActivity() {
         return retrofit.create(serviceClass)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        if(alertDialog!=null && alertDialog?.isShowing == true) alertDialog?.dismiss()
 
+    }
 
 }

@@ -591,6 +591,14 @@ class SyncModel {
             @Expose
             var headQuaterName: String? = ""
 
+        /*    @SerializedName("roleType")
+            @Expose
+            var roleType: String? = ""*/
+
+            @SerializedName("hierachyCode")
+            @Expose
+            var hierachyCode: String? = ""
+
           /*  @SerializedName("headQuaterId")
             @Expose
             var headQuaterId: String? = ""
@@ -707,9 +715,7 @@ class SyncModel {
             @Expose
             private var isAuthPassword: Boolean? = false
 
-            @SerializedName("roleType")
-            @Expose
-            var roleType: String? = ""
+
 
             @SerializedName("roleName")
             @Expose
@@ -807,9 +813,7 @@ class SyncModel {
             @Expose
             var onFieldJobDate: String? = ""
 
-            @SerializedName("hierachyCode")
-            @Expose
-            var hierachyCode: String? = ""
+
 
             @SerializedName("hierachyType")
             @Expose

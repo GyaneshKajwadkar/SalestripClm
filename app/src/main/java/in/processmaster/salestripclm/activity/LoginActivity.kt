@@ -13,7 +13,6 @@ import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
@@ -137,8 +136,6 @@ class LoginActivity : BaseActivity() {
                 if (response.code() == 200 && !response.body().toString().isEmpty()) {
 
                     var loginModel = response.body()
-                    sendDeviceDetail_api(loginModel)
-
 
                     val jsonObj= JSONObject(loginModel?.configurationSetting)
                     val jsonObjEmp= JSONObject(loginModel?.getEmployeeObj())
@@ -161,18 +158,8 @@ class LoginActivity : BaseActivity() {
                     } catch (e: JSONException) {
                         Log.e("jsonNotFoundException",e.message.toString())
                     }
+                    sendDeviceDetail_api(loginModel,alertClass)
 
-                    sharePreferance?.setPref("userName_login", userName_et?.getText().toString())
-                    sharePreferance?.setPrefBool("isLogin", true)
-                    sharePreferance?.setPref(
-                        "userNameLogin", userName_et?.getText().toString() + "," +
-                                sharePreferance?.getPref("companyCode")
-                    )
-                    sharePreferance?.setPref("password", password_et?.getText().toString())
-                    val gson = Gson()
-                    sharePreferance?.setPref("profileData", gson.toJson(loginModel))
-
-                    callHomePage()
                 }
                 else {
                     alertClass.commonAlert("","Incorrect username or password")
@@ -189,7 +176,7 @@ class LoginActivity : BaseActivity() {
     }
 
     //Login APi
-    private fun sendDeviceDetail_api(loginModel: LoginModel?)
+    private fun sendDeviceDetail_api(loginModel: LoginModel?, alertClass: AlertClass)
     {
         var deviceDetailModel= CommonModel.SendDeviceDetailModel()
         deviceDetailModel.manufacturer= android.os.Build.MANUFACTURER
@@ -209,7 +196,7 @@ class LoginActivity : BaseActivity() {
 
         if(loginModel?.empId!=null) deviceDetailModel.userId= loginModel?.empId!!
 
-        Log.e("sendDeviceDetail_api",Gson().toJson(deviceDetailModel))
+        Log.e("sendDeviceDetailModel",Gson().toJson(deviceDetailModel))
 
         apiInterface= APIClientKot().getClient(2, sharePreferance?.getPref("secondaryUrl")).create(APIInterface::class.java)
 
@@ -217,13 +204,33 @@ class LoginActivity : BaseActivity() {
         call?.enqueue(object : Callback<GenerateOTPModel?> {
             override fun onResponse(call: Call<GenerateOTPModel?>?, response: Response<GenerateOTPModel?>) {
                 Log.e("sendDeviceDetail_api", response.code().toString() + "")
-                if (response.code() == 200 && !response.body().toString().isEmpty()) { }
-                else { }
+                if (response.code() == 200 && !response.body().toString().isEmpty()) {
+
+                    sharePreferance?.setPref("userName_login", userName_et?.getText().toString())
+                    sharePreferance?.setPrefBool("isLogin", true)
+                    sharePreferance?.setPref(
+                        "userNameLogin", userName_et?.getText().toString() + "," +
+                                sharePreferance?.getPref("companyCode")
+                    )
+                    sharePreferance?.setPref("password", password_et?.getText().toString())
+                    val gson = Gson()
+                    sharePreferance?.setPref("profileData", gson.toJson(loginModel))
+
+                    callHomePage()
+                    alertClass.hideAlert()
+
+                }
+                else {
+                    alertClass.hideAlert()
+                    generalClass.checkInternet()
+                }
             }
-            override fun onFailure(call: Call<GenerateOTPModel?>, t: Throwable?) {}
+            override fun onFailure(call: Call<GenerateOTPModel?>, t: Throwable?) {
+                alertClass.hideAlert()
+                generalClass.checkInternet()
+            }
         })
     }
-
 
     fun callHomePage()
     {

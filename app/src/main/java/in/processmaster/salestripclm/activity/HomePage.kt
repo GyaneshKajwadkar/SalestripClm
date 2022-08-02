@@ -600,7 +600,6 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
 
     suspend fun callingSyncAPI()
     {
-        Log.e("callingSyncApi","abc")
         val response = APIClientKot().getUsersService(2, secondaryUrl
                 ).syncApiCoo("bearer " + loginModelHomePage.accessToken)
         if (response?.isSuccessful == true)
@@ -609,7 +608,8 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
             {
                 staticSyncData=response.body()?.data
                 val apiModel=response.body()?.data
-                val gson=Gson()
+                insertSyncData(apiModel)
+             /*   val gson=Gson()
                 runBlocking {
                     withContext(Dispatchers.IO) {
                         launch {  dbBase?.deleteAll_SYNCAPI() }
@@ -625,7 +625,7 @@ class HomePage : BaseActivity(),NavigationView.OnNavigationItemSelectedListener/
                         launch {  dbBase?.addRetailer(apiModel?.retailerList) }
                         launch {  dbBase?.addProduct(apiModel?.productList)  }
 
-                    }
+                    }*/
             }
             // if token expire go to login page again
             else

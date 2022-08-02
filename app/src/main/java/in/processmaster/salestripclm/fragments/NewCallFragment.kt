@@ -119,6 +119,9 @@ class NewCallFragment : Fragment(),StringInterface {
                         if(item.empId == loginModelHomePage.empId){
                             iterator.remove()
                         }
+                        else if(item.hierachyCode=="ABM"){
+                            iterator.remove()
+                        }
                     }
 
                     routeList = routeList?.filter { s -> s.headQuaterName !=""} as java.util.ArrayList<SyncModel.Data.Route>
